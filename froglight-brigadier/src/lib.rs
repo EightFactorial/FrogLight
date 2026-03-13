@@ -1,0 +1,19 @@
+#![doc = include_str!("../README.md")]
+#![no_std]
+
+extern crate alloc;
+#[cfg(feature = "std")]
+extern crate std;
+
+pub mod bevy;
+pub mod event;
+pub mod graph;
+
+pub mod prelude {
+    //! Re-exports of common types, traits, and macros.
+
+    pub use crate::{
+        event::GameCommand,
+        graph::{AddGameCommand, CommandGraph},
+    };
+}

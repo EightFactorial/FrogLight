@@ -6,9 +6,9 @@ pub mod plugins {
     #[cfg(feature = "network")]
     pub use crate::{api::bevy::ApiPlugin, network::bevy::NetworkPlugin};
     pub use crate::{
-        bevy::FroglightPlugins, common::bevy::CommonPlugin, entity::bevy::EntityPlugin,
-        inventory::bevy::InventoryPlugin, physics::bevy::PhysicsPlugin, player::bevy::PlayerPlugin,
-        world::bevy::WorldPlugin,
+        bevy::FroglightPlugins, brigadier::bevy::BrigadierPlugin, common::bevy::CommonPlugin,
+        entity::bevy::EntityPlugin, inventory::bevy::InventoryPlugin, physics::bevy::PhysicsPlugin,
+        player::bevy::PlayerPlugin, world::bevy::WorldPlugin,
     };
 }
 
@@ -28,6 +28,7 @@ impl PluginGroup for FroglightPlugins {
 
         group
             .add(plugins::CommonPlugin)
+            .add(plugins::BrigadierPlugin)
             .add(plugins::EntityPlugin)
             .add(plugins::InventoryPlugin)
             .add(plugins::PhysicsPlugin)

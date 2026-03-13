@@ -5,6 +5,8 @@
 pub use froglight_api as api;
 pub use froglight_biome as biome;
 pub use froglight_block as block;
+#[cfg(feature = "bevy")]
+pub use froglight_brigadier as brigadier;
 pub use froglight_common as common;
 pub use froglight_entity as entity;
 pub use froglight_inventory as inventory;
@@ -25,8 +27,6 @@ pub use bevy::*;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "bevy")]
-    pub use crate::plugins::FroglightPlugins;
     #[cfg(feature = "network")]
     pub use crate::{api::prelude::*, network::prelude::*};
     pub use crate::{
@@ -34,4 +34,6 @@ pub mod prelude {
         inventory::prelude::*, math::prelude::*, packet::prelude::*, physics::prelude::*,
         player::prelude::*, registry::prelude::*, world::prelude::*,
     };
+    #[cfg(feature = "bevy")]
+    pub use crate::{brigadier::prelude::*, plugins::FroglightPlugins};
 }

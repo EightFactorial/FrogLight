@@ -7,7 +7,7 @@ froglight = { default-features = false, path = "froglight", version = "0.0.1" }
 froglight-api = { default-features = false, path = "froglight-api", version = "0.0.1" }
 froglight-biome = { default-features = false, path = "froglight-biome", version = "0.0.1" }
 froglight-block = { default-features = false, path = "froglight-block", version = "0.0.1" }
-# froglight-brigadier = { default-features = false, path = "froglight-brigadier" }
+froglight-brigadier = { default-features = false, path = "froglight-brigadier", version = "0.0.1" }
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
 froglight-entity = { default-features = false, path = "froglight-entity", version = "0.0.1" }
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
@@ -69,6 +69,8 @@ indexmap = { default-features = false, version = "2.13" }
 libm = { default-features = false, version = "0.2" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
+petgraph = { default-features = false, version = "0.8" }
+replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, version = "1.0" }
@@ -97,7 +99,7 @@ members = [
   "froglight-api",
   "froglight-biome",
   "froglight-block",
-  # "froglight-brigadier",
+  "froglight-brigadier",
   "froglight-codegen",
   "froglight-common",
   "froglight-entity",
