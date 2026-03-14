@@ -62,3 +62,10 @@ pub enum ArgumentParseError {
     /// Some other error occurred while parsing the argument.
     Other(Box<dyn Error + Sync + Send>),
 }
+
+impl ArgumentParseError {
+    /// Create a [`ArgumentParseError::Other`] from an error.
+    #[inline]
+    #[must_use]
+    pub fn other<E: Error + Sync + Send + 'static>(err: E) -> Self { Self::Other(Box::new(err)) }
+}
