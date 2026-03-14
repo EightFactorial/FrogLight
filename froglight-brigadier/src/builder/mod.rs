@@ -8,7 +8,10 @@ mod argument;
 pub use argument::{ArgumentBundle, ArgumentParseError, CommandArgument};
 use petgraph::prelude::NodeIndex;
 
-use crate::{builder::argument::BundleFunction, prelude::CommandGraph};
+use crate::{
+    builder::argument::{BundleAppender, BundleFunction},
+    prelude::CommandGraph,
+};
 
 /// A builder for constructing a [`GameCommand`].
 pub struct GameCommandBuilder<'w, A> {
@@ -31,6 +34,17 @@ impl<'w> GameCommandBuilder<'w, ()> {
     /// Add an argument to the command being built.
     #[must_use]
     pub fn with<T: CommandArgument>(self) -> GameCommandBuilder<'w, T> {
+        GameCommandBuilder {
+            graph: self.graph,
+            function: self.function,
+            entrypoint: self.entrypoint,
+            _args: PhantomData,
+        }
+    }
+
+    /// Add a bundle of arguments to the command being built.
+    #[must_use]
+    pub fn with_bundle<B: ArgumentBundle>(self) -> GameCommandBuilder<'w, B> {
         GameCommandBuilder {
             graph: self.graph,
             function: self.function,
@@ -97,6 +111,12 @@ pub trait CommandBuilderExt<'w> {
     /// Add an argument to the command being built.
     #[must_use]
     fn with<T: CommandArgument>(self) -> Self::WithBuilder<'w, T>;
+
+    /// Add a bundle of arguments to the command being built.
+    #[must_use]
+    fn with_bundle<B: ArgumentBundle>(self) -> <Self as BundleAppender<B>>::Appended
+    where
+        Self: BundleAppender<B>;
 }
 
 macro_rules! impl_command_builder {
@@ -113,6 +133,12 @@ macro_rules! impl_command_builder {
                     entrypoint: self.entrypoint,
                     _args: PhantomData,
                 }
+            }
+
+            fn with_bundle<B: ArgumentBundle>(self) -> <Self as BundleAppender<B>>::Appended
+                where Self: BundleAppender<B>
+            {
+                <Self as BundleAppender<B>>::append(self)
             }
         }
     };
