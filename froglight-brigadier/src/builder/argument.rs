@@ -1,15 +1,18 @@
-use alloc::vec::Vec;
-use core::any::TypeId;
+use alloc::{boxed::Box, string::String, vec::Vec};
+use core::error::Error;
 
 use bevy_ecs::world::World;
-use bevy_reflect::prelude::IntoFunction;
+use bevy_reflect::{PartialReflect, prelude::IntoFunction};
 
-use crate::builder::{CommandBuilderExt, GameCommandBuilder};
+use crate::{
+    builder::{CommandBuilderExt, GameCommandBuilder},
+    graph::CommandEdge,
+};
 
 /// An argument for a [`GameCommand`](crate::prelude::GameCommand).
-pub trait CommandArgument {
+pub trait CommandArgument: Sized + 'static {
     /// The actual type of the argument.
-    type Output: Sized + 'static;
+    type Output: PartialReflect + Sized + 'static;
 
     /// A parser for the argument.
     ///
@@ -20,32 +23,38 @@ pub trait CommandArgument {
 }
 
 /// An error that can occur when parsing an argument.
-#[derive(Debug, Clone)]
-pub enum ArgumentParseError {}
+#[derive(Debug)]
+pub enum ArgumentParseError {
+    /// Not necessarily an error,
+    /// but indicates that the input was not valid for this argument.
+    InputMismatch,
+    /// Invalid input for this argument type.
+    InputInvalid(String),
+    /// Some other error occurred while parsing the argument.
+    Other(Box<dyn Error + Sync + Send>),
+}
 
 // -------------------------------------------------------------------------------------------------
 
 /// A bundle of [`CommandArgument`]s.
-pub trait ArgumentBundle: Sized {
-    /// The [`TypeId`]s of the argument types in this bundle, in order.
-    ///
-    /// TODO: Replace `TypeId` with graph entries.
-    fn type_infos() -> Vec<TypeId>;
+pub trait ArgumentBundle: Sized + 'static {
+    /// The [`CommandEdge`]s of the arguments in this bundle, in order.
+    fn graph_edges() -> Vec<CommandEdge>;
 }
 
 macro_rules! impl_argument_bundle {
     ($(#[$meta:meta])* $($A:ident),*) => {
         $(#[$meta])*
         impl<$($A: CommandArgument),*> ArgumentBundle for ($($A,)*) {
-            fn type_infos() -> Vec<TypeId> {
-                alloc::vec![$(TypeId::of::<$A::Output>()),*]
+            fn graph_edges() -> Vec<CommandEdge> {
+                alloc::vec![$(CommandEdge::new::<$A>()),*]
             }
         }
     };
 }
 
 impl<A: CommandArgument> ArgumentBundle for A {
-    fn type_infos() -> Vec<TypeId> { alloc::vec![TypeId::of::<A::Output>()] }
+    fn graph_edges() -> Vec<CommandEdge> { alloc::vec![CommandEdge::new::<A>()] }
 }
 
 variadics_please::all_tuples!(impl_argument_bundle, 1, 15, A);

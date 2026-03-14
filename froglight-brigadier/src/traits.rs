@@ -9,6 +9,10 @@ use crate::{builder::GameCommandBuilder, prelude::CommandGraph};
 /// Adds methods for building [`GameCommands`] to an [`App`].
 pub trait AddGameCommand {
     /// Build and add a [`GameCommand`] to the [`App`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if a duplicate command is added.
     fn add_game_command(
         &mut self,
         command: impl Into<Cow<'static, str>>,

@@ -9,5 +9,7 @@ use crate::graph::CommandGraph;
 pub struct BrigadierPlugin;
 
 impl Plugin for BrigadierPlugin {
-    fn build(&self, app: &mut App) { app.register_type::<CommandGraph>(); }
+    fn build(&self, app: &mut App) {
+        app.init_resource::<CommandGraph>().register_type::<CommandGraph>();
+    }
 }

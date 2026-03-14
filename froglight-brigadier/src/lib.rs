@@ -7,9 +7,9 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+pub mod bevy;
 pub mod builder;
 pub mod graph;
-pub mod plugin;
 pub mod traits;
 
 pub mod prelude {
