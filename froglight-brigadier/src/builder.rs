@@ -1,15 +1,15 @@
 //! TODO
 
+use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 use bevy_reflect::{func::DynamicFunction, prelude::IntoFunction};
-
-mod argument;
-pub use argument::{ArgumentBundle, ArgumentParseError, CommandArgument};
 use petgraph::prelude::NodeIndex;
 
 use crate::{
-    builder::argument::{BundleAppender, BundleFunction},
+    argument::{ArgumentBundle, BundleAppender, BundleFunction},
+    graph::CommandEdge,
+    parse::CommandArgument,
     prelude::CommandGraph,
 };
 
@@ -17,6 +17,7 @@ use crate::{
 pub struct GameCommandBuilder<'w, A> {
     graph: &'w mut CommandGraph,
     function: &'w mut Option<DynamicFunction<'static>>,
+    arguments: Vec<CommandEdge>,
     entrypoint: NodeIndex,
     _args: PhantomData<A>,
 }
@@ -28,15 +29,26 @@ impl<'w> GameCommandBuilder<'w, ()> {
         function: &'w mut Option<DynamicFunction<'static>>,
         entrypoint: NodeIndex,
     ) -> Self {
-        Self { graph, function, entrypoint, _args: PhantomData }
+        Self { graph, function, arguments: Vec::new(), entrypoint, _args: PhantomData }
     }
 
     /// Add an argument to the command being built.
+    ///
+    /// Uses the default argument parser.
+    #[inline]
     #[must_use]
     pub fn with<T: CommandArgument>(self) -> GameCommandBuilder<'w, T> {
+        self.with_parser(T::default())
+    }
+
+    /// Add an argument to the command being built, using a custom parser.
+    #[must_use]
+    pub fn with_parser<T: CommandArgument>(mut self, parser: T) -> GameCommandBuilder<'w, T> {
+        self.arguments.push(CommandEdge::new_from(parser));
         GameCommandBuilder {
             graph: self.graph,
             function: self.function,
+            arguments: self.arguments,
             entrypoint: self.entrypoint,
             _args: PhantomData,
         }
@@ -44,10 +56,12 @@ impl<'w> GameCommandBuilder<'w, ()> {
 
     /// Add a bundle of arguments to the command being built.
     #[must_use]
-    pub fn with_bundle<B: ArgumentBundle>(self) -> GameCommandBuilder<'w, B> {
+    pub fn with_bundle<B: ArgumentBundle>(mut self) -> GameCommandBuilder<'w, B> {
+        self.arguments.extend(B::graph_edges());
         GameCommandBuilder {
             graph: self.graph,
             function: self.function,
+            arguments: self.arguments,
             entrypoint: self.entrypoint,
             _args: PhantomData,
         }
@@ -84,6 +98,7 @@ where
         GameCommandBuilder {
             graph: self.graph,
             function: self.function,
+            arguments: self.arguments.clone(),
             entrypoint: self.entrypoint,
             _args: PhantomData,
         }
@@ -96,21 +111,29 @@ where
             Some(func) => *self.function = Some(func.clone().with_overload(function)),
             None => *self.function = Some(function),
         }
+        self.graph.register_parser_from(self.entrypoint, self.arguments.clone()).unwrap();
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// An extension trait for [`GameCommandBuilder`] that provides extra methods.
-pub trait CommandBuilderExt<'w> {
+pub trait CommandBuilderExt<'w>: Sized {
     /// The [`ArgumentBundle`] type that will be used for the next builder.
     type WithBundle<T: CommandArgument>: ArgumentBundle;
     /// The builder type that will be returned by the `with` method.
     type WithBuilder<'b, T: CommandArgument + Sized>: Sized;
 
     /// Add an argument to the command being built.
+    ///
+    /// Uses the default argument parser.
+    #[inline]
     #[must_use]
-    fn with<T: CommandArgument>(self) -> Self::WithBuilder<'w, T>;
+    fn with<T: CommandArgument>(self) -> Self::WithBuilder<'w, T> { self.with_parser(T::default()) }
+
+    /// Add an argument to the command being built, using a custom parser.
+    #[must_use]
+    fn with_parser<T: CommandArgument>(self, parser: T) -> Self::WithBuilder<'w, T>;
 
     /// Add a bundle of arguments to the command being built.
     #[must_use]
@@ -126,10 +149,12 @@ macro_rules! impl_command_builder {
             type WithBundle<T: CommandArgument> = ($($A,)* T,);
             type WithBuilder<'b, T: CommandArgument> = GameCommandBuilder<'b, Self::WithBundle<T>>;
 
-            fn with<T: CommandArgument>(self) -> Self::WithBuilder<'w, T>{
+            fn with_parser<T: CommandArgument>(mut self, parser: T) -> Self::WithBuilder<'w, T>{
+                self.arguments.push(CommandEdge::new_from(parser));
                 GameCommandBuilder {
                     graph: self.graph,
                     function: self.function,
+                    arguments: self.arguments,
                     entrypoint: self.entrypoint,
                     _args: PhantomData,
                 }

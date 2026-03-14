@@ -1,40 +1,15 @@
-use alloc::{boxed::Box, string::String, vec::Vec};
-use core::error::Error;
+//! TODO
+
+use alloc::vec::Vec;
 
 use bevy_ecs::world::World;
-use bevy_reflect::{PartialReflect, prelude::IntoFunction};
+use bevy_reflect::prelude::IntoFunction;
 
 use crate::{
     builder::{CommandBuilderExt, GameCommandBuilder},
     graph::CommandEdge,
+    parse::CommandArgument,
 };
-
-/// An argument for a [`GameCommand`](crate::prelude::GameCommand).
-pub trait CommandArgument: Sized + 'static {
-    /// The actual type of the argument.
-    type Output: PartialReflect + Sized + 'static;
-
-    /// A parser for the argument.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the input is invalid for this argument type.
-    fn parse_argument(input: &str) -> Result<(Self::Output, &str), ArgumentParseError>;
-}
-
-/// An error that can occur when parsing an argument.
-#[derive(Debug)]
-pub enum ArgumentParseError {
-    /// Not necessarily an error,
-    /// but indicates that the input was not valid for this argument.
-    InputMismatch,
-    /// Invalid input for this argument type.
-    InputInvalid(String),
-    /// Some other error occurred while parsing the argument.
-    Other(Box<dyn Error + Sync + Send>),
-}
-
-// -------------------------------------------------------------------------------------------------
 
 /// A bundle of [`CommandArgument`]s.
 pub trait ArgumentBundle: Sized + 'static {
@@ -61,9 +36,11 @@ variadics_please::all_tuples!(impl_argument_bundle, 1, 15, A);
 
 // -------------------------------------------------------------------------------------------------
 
+/// A trait for appending a bundle of arguments to a [`GameCommandBuilder`].
 pub trait BundleAppender<Bundle> {
+    /// The builder type after appending the bundle.
     type Appended;
-
+    /// Appends the bundle to the builder.
     fn append(bundle: Self) -> Self::Appended;
 }
 
@@ -122,6 +99,7 @@ variadics_please::all_tuples!(impl_bundle_appender, 1, 11, A);
 
 // -------------------------------------------------------------------------------------------------
 
+/// A trait for specifying the function type that accepts a bundle of arguments.
 pub trait BundleFunction<Bundle, Marker>: IntoFunction<'static, Marker> + Sized {}
 
 macro_rules! impl_bundle_function {

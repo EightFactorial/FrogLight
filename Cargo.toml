@@ -66,6 +66,7 @@ glam = { default-features = false, version = "=0.30" }
 hashbrown = { default-features = false, version = "0.16" }
 hickory-resolver = { default-features = false, version = "0.25" }
 indexmap = { default-features = false, version = "2.13" }
+lexical = { default-features = false, version = "7.0" }
 libm = { default-features = false, version = "0.2" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }

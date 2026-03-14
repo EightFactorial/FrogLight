@@ -1,22 +1,22 @@
 //! TODO
 
-use alloc::borrow::Cow;
+use alloc::{borrow::Cow, boxed::Box};
 use core::any::TypeId;
 
 use bevy_ecs::prelude::*;
 use bevy_reflect::{
-    func::{ArgList, ArgValue, DynamicFunction, FunctionError},
+    func::{ArgList, DynamicFunction, FunctionError},
     prelude::*,
 };
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 use petgraph::prelude::*;
 
-use crate::builder::{ArgumentBundle, ArgumentParseError, CommandArgument};
+use crate::parse::{ArgumentParseError, CommandArgument, CommandArgumentDyn};
 
 /// A graph of containing a tree of command nodes.
-#[derive(Debug, Default, Clone, Resource, Reflect)]
-#[reflect(opaque, Debug, Default, Clone, Resource)]
+#[derive(Default, Clone, Resource, Reflect)]
+#[reflect(opaque, Default, Clone, Resource)]
 pub struct CommandGraph {
     commands:
         IndexMap<Cow<'static, str>, (NodeIndex, Option<DynamicFunction<'static>>), RandomState>,
@@ -53,12 +53,13 @@ impl CommandGraph {
     /// # Errors
     ///
     /// Returns an error if no commands with the given name exist.
-    pub fn register_parser<A: ArgumentBundle>(
+    pub fn register_parser(
         &mut self,
         command: impl AsRef<str>,
+        edges: impl IntoIterator<Item = CommandEdge>,
     ) -> Result<(), ParserRegisterError> {
         if let Some((entrypoint, _)) = self.commands.get(command.as_ref()) {
-            self.register_parser_from::<A>(*entrypoint)
+            self.register_parser_from(*entrypoint, edges)
         } else {
             Err(ParserRegisterError::UnknownCommand)
         }
@@ -69,16 +70,17 @@ impl CommandGraph {
     /// # Errors
     ///
     /// Returns an error if no command with the given entrypoint exists.
-    pub fn register_parser_from<A: ArgumentBundle>(
+    pub fn register_parser_from(
         &mut self,
         entrypoint: NodeIndex,
+        edges: impl IntoIterator<Item = CommandEdge>,
     ) -> Result<(), ParserRegisterError> {
         if self.graph.node_weight(entrypoint).copied() != Some(CommandNode::Entrypoint) {
             return Err(ParserRegisterError::InvalidEntrypoint);
         }
 
         let mut current_node = entrypoint;
-        let mut edges = A::graph_edges();
+        let mut edges = edges.into_iter().collect::<alloc::vec::Vec<_>>();
         edges.reverse();
 
         'outer: while let Some(current_edge) = edges.pop() {
@@ -131,29 +133,51 @@ impl CommandGraph {
         let mut current_node = *entrypoint;
         let mut arguments = ArgList::new();
 
-        while !command.is_empty() {
+        'outer: while !command.is_empty() {
+            // First, try edges with conditions
             for edge in self.graph.edges(current_node) {
-                // If the edge has a condition, check it before parsing.
                 if let Some(condition) = edge.weight().condition
-                    && !(condition)(&arguments, command)
+                    && (condition)(&arguments, command)
                 {
-                    continue;
-                }
-
-                match (edge.weight().parser)(command) {
-                    // Push the argument and continue parsing
-                    Ok((arg, rem)) => {
-                        arguments.push_arg(arg);
-                        command = rem.trim_start();
-                        current_node = edge.target();
-                        break;
+                    match edge.weight().parser.parse_value(command) {
+                        // Push the argument and continue parsing
+                        Ok((arg, rem)) => {
+                            arguments.push_arg(arg);
+                            command = rem.trim_start();
+                            current_node = edge.target();
+                            continue 'outer;
+                        }
+                        // If the input doesn't match, try the next edge.
+                        Err(ArgumentParseError::InputMismatch) => {}
+                        // Otherwise return the error.
+                        Err(err) => return Err(CommandExecuteError::Parser(err)),
                     }
-                    // If the input doesn't match, try the next edge.
-                    Err(ArgumentParseError::InputMismatch) => {}
-                    // Otherwise return the error.
-                    Err(err) => return Err(CommandExecuteError::Parser(err)),
                 }
             }
+
+            // If no edges with conditions matched, try edges without conditions.
+            for edge in self.graph.edges(current_node) {
+                if edge.weight().condition.is_none() {
+                    match edge.weight().parser.parse_value(command) {
+                        // Push the argument and continue parsing
+                        Ok((arg, rem)) => {
+                            arguments.push_arg(arg);
+                            command = rem.trim_start();
+                            current_node = edge.target();
+                            continue 'outer;
+                        }
+                        // If the input doesn't match, try the next edge.
+                        Err(ArgumentParseError::InputMismatch) => {}
+                        // Otherwise return the error.
+                        Err(err) => return Err(CommandExecuteError::Parser(err)),
+                    }
+                }
+            }
+
+            // If no edges matched, the input is invalid.
+            return Err(CommandExecuteError::Parser(ArgumentParseError::InputInvalid(
+                command.into(),
+            )));
         }
 
         self.run_command(command_name, arguments, world)
@@ -242,16 +266,28 @@ pub enum CommandNode {
 }
 
 /// An edge in the [`CommandGraph`].
-#[derive(Debug, Clone)]
+#[derive(Reflect)]
+#[reflect(opaque, Clone, PartialEq)]
 pub struct CommandEdge {
     /// An optional condition to traverse this edge.
     pub condition: Option<fn(&ArgList<'_>, &str) -> bool>,
     /// The parser for this edge.
-    pub parser: fn(&str) -> Result<(ArgValue<'static>, &str), ArgumentParseError>,
-    /// The [`TypeId`] of the argument parser.
+    pub parser: Box<dyn CommandArgumentDyn>,
+    /// The [`TypeId`] of the parser.
     pub parser_ty: TypeId,
     /// The [`TypeId`] of the parsed value.
     pub value_ty: TypeId,
+}
+
+impl Clone for CommandEdge {
+    fn clone(&self) -> Self {
+        Self {
+            condition: self.condition,
+            parser: self.parser.dyn_clone(),
+            parser_ty: self.parser_ty,
+            value_ty: self.value_ty,
+        }
+    }
 }
 
 impl Eq for CommandEdge {}
@@ -264,15 +300,17 @@ impl PartialEq for CommandEdge {
 }
 
 impl CommandEdge {
-    /// Create a new [`CommandEdge`] for the given [`CommandArgument`].
+    /// Create a new [`CommandEdge`] using the default [`CommandArgument`].
+    #[inline]
     #[must_use]
-    pub const fn new<A: CommandArgument>() -> Self {
+    pub fn new<A: CommandArgument>() -> Self { Self::new_from::<A>(A::default()) }
+
+    /// Create a new [`CommandEdge`] using the given [`CommandArgument`].
+    #[must_use]
+    pub fn new_from<A: CommandArgument>(argument: A) -> Self {
         Self {
             condition: None,
-            parser: |input| {
-                A::parse_argument(input)
-                    .map(|(val, rem)| (ArgValue::Owned(alloc::boxed::Box::new(val)), rem))
-            },
+            parser: Box::new(argument),
             parser_ty: TypeId::of::<A>(),
             value_ty: TypeId::of::<A::Output>(),
         }
@@ -281,17 +319,15 @@ impl CommandEdge {
     /// Create a new [`CommandEdge`] for the given [`CommandArgument`] and
     /// condition.
     #[must_use]
-    pub const fn new_optional<A: CommandArgument>(
+    pub fn new_optional<A: CommandArgument>(
+        argument: A,
         condition: fn(&ArgList<'_>, &str) -> bool,
     ) -> Self {
         Self {
             condition: Some(condition),
-            parser: |input| {
-                A::parse_argument(input)
-                    .map(|(val, rem)| (ArgValue::Owned(alloc::boxed::Box::new(val)), rem))
-            },
+            parser: Box::new(argument),
             parser_ty: TypeId::of::<A>(),
-            value_ty: TypeId::of::<Option<A::Output>>(),
+            value_ty: TypeId::of::<A::Output>(),
         }
     }
 }
