@@ -7,15 +7,11 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-pub mod argument;
 pub mod bevy;
-pub mod builder;
 pub mod graph;
-pub mod parse;
-pub mod traits;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{builder::CommandBuilderExt, graph::CommandGraph, traits::AddGameCommand};
+    pub use crate::graph::CommandGraph;
 }
