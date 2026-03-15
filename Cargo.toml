@@ -93,6 +93,18 @@ tracing-subscriber = { features = ["tracing-log"], version = "0.3" }
 
 # --- Workspace Settings ---
 
+[profile.release]
+debug = 0
+opt-level = 3
+strip = "debuginfo"
+
+[profile.distribution]
+lto = "fat"
+strip = true
+panic = "abort"
+codegen-units = 1
+inherits = "release"
+
 [workspace]
 default-members = ["froglight"]
 members = [
