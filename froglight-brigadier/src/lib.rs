@@ -7,11 +7,13 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+pub mod argument;
 pub mod bevy;
 pub mod graph;
+pub mod traits;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::graph::CommandGraph;
+    pub use crate::graph::{CommandCtx, CommandGraph};
 }

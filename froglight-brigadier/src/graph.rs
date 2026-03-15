@@ -9,12 +9,13 @@ use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 use petgraph::prelude::*;
 
+use crate::argument::ArgumentParseError;
+
 /// A set of commands with parsing logic represented as a graph.
 #[derive(Default, Clone, Reflect, Resource)]
 #[reflect(opaque, Default, Clone, Resource)]
 pub struct CommandGraph {
     commands: IndexMap<Cow<'static, str>, CommandInfo, RandomState>,
-    #[expect(unused, reason = "WIP")]
     graph: StableDiGraph<(), CommandEdge>,
 }
 
@@ -23,6 +24,26 @@ impl CommandGraph {
     #[inline]
     #[must_use]
     pub fn new() -> Self { Self::default() }
+
+    /// Register a command with the given name and system.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a command with the same name already exists.
+    pub fn register_command<I: 'static>(
+        &mut self,
+        command: impl Into<Cow<'static, str>>,
+        system: SystemId<In<CommandCtx<I>>, ()>,
+    ) -> Result<NodeIndex, CommandRegisterError> {
+        let command = command.into();
+        if self.commands.contains_key(&command) {
+            Err(CommandRegisterError::AlreadyExists)
+        } else {
+            let root = self.graph.add_node(());
+            self.commands.insert(command, CommandInfo::new(root, system));
+            Ok(root)
+        }
+    }
 
     /// Parse a command string into an [`ArgList`].
     ///
@@ -50,12 +71,13 @@ impl CommandGraph {
     /// Returns an error if the command is not found or execution fails.
     pub fn execute(
         &self,
+        entity: Entity,
         command: &str,
         args: ArgList<'_>,
         world: &mut World,
     ) -> Result<(), CommandExecuteError> {
         if let Some(info) = self.commands.get(command) {
-            info.run(args, world).map_err(CommandExecuteError::CommandError)
+            info.run(entity, args, world).map_err(CommandExecuteError::CommandError)
         } else {
             Err(CommandExecuteError::CommandNotFound(command.into()))
         }
@@ -69,6 +91,7 @@ impl CommandGraph {
     /// or fails to parse and execute.
     pub fn parse_and_execute(
         &self,
+        entity: Entity,
         mut command: &str,
         world: &mut World,
     ) -> Result<(), ParseOrExecuteError> {
@@ -77,8 +100,15 @@ impl CommandGraph {
         if let Some((name, _)) = command.split_once(' ') {
             command = name;
         }
-        self.execute(command, args, world).map_err(ParseOrExecuteError::Execute)
+        self.execute(entity, command, args, world).map_err(ParseOrExecuteError::Execute)
     }
+}
+
+/// An error that can occur while registering a command.
+#[derive(Debug)]
+pub enum CommandRegisterError {
+    /// A command with the same name already exists.
+    AlreadyExists,
 }
 
 /// An error that can occur while parsing a command string.
@@ -87,7 +117,7 @@ pub enum CommandParseError {
     /// The command was not found.
     CommandNotFound(String),
     /// An error occurred while parsing the command.
-    ParseError(Box<dyn Error + Send + Sync>),
+    ParseError(ArgumentParseError),
 }
 
 /// An error that can occur while executing a command.
@@ -122,14 +152,14 @@ impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
     #[must_use]
     #[allow(unused, reason = "WIP")]
-    pub fn new<I: 'static>(root: NodeIndex, system: SystemId<In<I>, ()>) -> Self {
+    pub fn new<I: 'static>(root: NodeIndex, system: SystemId<In<CommandCtx<I>>, ()>) -> Self {
         Self {
             root,
             #[expect(unused, reason = "WIP")]
-            runner: Box::new(move |args, world| {
+            runner: Box::new(move |entity, args, world| {
                 todo!("ArgList -> In<I>");
                 world
-                    .run_system_with(system, todo!())
+                    .run_system_with(system, CommandCtx::new(entity, todo!()))
                     .map_err(|err| -> Box<dyn Error + Send + Sync> { Box::new(err) })
             }),
         }
@@ -148,10 +178,11 @@ impl CommandInfo {
     #[inline]
     pub fn run(
         &self,
+        entity: Entity,
         args: ArgList<'_>,
         world: &mut World,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
-        (self.runner)(args, world)
+        (self.runner)(entity, args, world)
     }
 }
 
@@ -166,9 +197,42 @@ impl Clone for CommandInfo {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Context provided to command systems.
+pub struct CommandCtx<T> {
+    entity: Entity,
+    input: T,
+}
+
+impl<T> CommandCtx<T> {
+    /// Create a new [`CommandCtx`] with the given entity and input.
+    #[inline]
+    #[must_use]
+    pub const fn new(entity: Entity, input: T) -> Self { Self { entity, input } }
+
+    /// Get the [`Entity`] that is executing this command.
+    #[inline]
+    #[must_use]
+    pub const fn entity(&self) -> Entity { self.entity }
+
+    /// Get a reference to the input for this command.
+    #[inline]
+    #[must_use]
+    pub const fn input(&self) -> &T { &self.input }
+
+    /// Get the input for this command.
+    #[inline]
+    #[must_use]
+    pub fn into_input(self) -> T { self.input }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /// A trait for functions that can be stored in the [`CommandGraph`].
 pub trait GraphFn:
-    Fn(ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>> + Send + Sync + 'static
+    Fn(Entity, ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
+    + Send
+    + Sync
+    + 'static
 {
     /// Clone this function as a trait object.
     fn dyn_clone(&self) -> Box<dyn GraphFn>;
@@ -176,7 +240,7 @@ pub trait GraphFn:
 impl<T> GraphFn for T
 where
     T: Clone
-        + Fn(ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
+        + Fn(Entity, ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
         + Send
         + Sync
         + 'static,

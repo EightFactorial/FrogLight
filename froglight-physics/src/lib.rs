@@ -1,4 +1,4 @@
-#![cfg_attr(feature = "nightly", feature(portable_simd))]
+#![cfg_attr(feature = "nightly", feature(portable_simd), allow(unused_features, reason = "WIP"))]
 #![doc = include_str!("../README.md")]
 #![no_std]
 
