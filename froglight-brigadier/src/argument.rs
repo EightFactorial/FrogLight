@@ -2,7 +2,7 @@
 
 use alloc::vec::Vec;
 
-use bevy_ecs::world::World;
+// use bevy_ecs::world::World;
 use bevy_reflect::prelude::IntoFunction;
 
 use crate::{
@@ -26,6 +26,10 @@ macro_rules! impl_argument_bundle {
             }
         }
     };
+}
+
+impl ArgumentBundle for () {
+    fn graph_edges() -> Vec<CommandEdge> { Vec::new() }
 }
 
 impl<A: CommandArgument> ArgumentBundle for A {
@@ -106,13 +110,17 @@ macro_rules! impl_bundle_function {
     ($(#[$meta:meta])* $($A:ident),*) => {
         $(#[$meta])*
         impl<T, $($A: CommandArgument),*, Marker> BundleFunction<($($A,)*), Marker> for T
-            where T: for<'w> Fn($($A::Output),*, &'w mut World) + IntoFunction<'static, Marker>
+            where T: for<'w> Fn($($A::Output),*) + IntoFunction<'static, Marker>
         {}
     };
 }
 
 impl<T, Marker> BundleFunction<(), Marker> for T where
-    T: for<'w> Fn(&'w mut World) + IntoFunction<'static, Marker>
+    T: for<'w> Fn() + IntoFunction<'static, Marker>
+{
+}
+impl<T, A: CommandArgument, Marker> BundleFunction<A, Marker> for T where
+    T: for<'w> Fn(A::Output) + IntoFunction<'static, Marker>
 {
 }
 

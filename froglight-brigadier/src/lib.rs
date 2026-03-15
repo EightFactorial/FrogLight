@@ -17,5 +17,5 @@ pub mod traits;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{graph::CommandGraph, traits::AddGameCommand};
+    pub use crate::{builder::CommandBuilderExt, graph::CommandGraph, traits::AddGameCommand};
 }

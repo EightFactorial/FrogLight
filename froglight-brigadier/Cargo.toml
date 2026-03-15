@@ -18,6 +18,9 @@ workspace = true
 
 # --- Dependencies ---
 
+[dev-dependencies]
+bevy = { features = ["bevy_log"], workspace = true }
+
 [dependencies]
 bevy_app = { features = ["bevy_reflect", "reflect_functions"], workspace = true }
 bevy_ecs = { features = ["bevy_reflect", "reflect_functions"], workspace = true }

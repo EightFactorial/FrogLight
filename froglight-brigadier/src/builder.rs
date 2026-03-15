@@ -32,6 +32,17 @@ impl<'w> GameCommandBuilder<'w, ()> {
         Self { graph, function, arguments: Vec::new(), entrypoint, _args: PhantomData }
     }
 
+    /// Add a function to the command being built,
+    /// and return a new builder with another argument.
+    #[must_use]
+    pub fn build_and<T: CommandArgument, F: BundleFunction<(), Marker>, Marker>(
+        mut self,
+        f: F,
+    ) -> GameCommandBuilder<'w, T> {
+        self.build(f);
+        self.with::<T>()
+    }
+
     /// Add an argument to the command being built.
     ///
     /// Uses the default argument parser.
@@ -68,10 +79,7 @@ impl<'w> GameCommandBuilder<'w, ()> {
     }
 }
 
-impl<'w, A: ArgumentBundle> GameCommandBuilder<'w, A>
-where
-    Self: CommandBuilderExt<'w>,
-{
+impl<A: ArgumentBundle> GameCommandBuilder<'_, A> {
     /// Add a function to the command being built.
     ///
     /// # Panics
@@ -79,6 +87,21 @@ where
     /// Panics if `build` is called twice with the same arguments.
     pub fn build<F: BundleFunction<A, Marker>, Marker>(&mut self, f: F) { self.merge(f); }
 
+    /// Add a function as an overload to the current command.
+    fn merge<F: IntoFunction<'static, Marker>, Marker>(&mut self, f: F) {
+        let function = IntoFunction::into_function(f);
+        match self.function.as_ref() {
+            Some(func) => *self.function = Some(func.clone().with_overload(function)),
+            None => *self.function = Some(function),
+        }
+        self.graph.register_parser_from(self.entrypoint, self.arguments.clone()).unwrap();
+    }
+}
+
+impl<'w, A: ArgumentBundle> GameCommandBuilder<'w, A>
+where
+    Self: CommandBuilderExt<'w>,
+{
     /// Add a function to the command being built,
     /// and return a new builder with another argument.
     #[must_use]
@@ -102,16 +125,6 @@ where
             entrypoint: self.entrypoint,
             _args: PhantomData,
         }
-    }
-
-    /// Add a function as an overload to the current command.
-    fn merge<F: IntoFunction<'static, Marker>, Marker>(&mut self, f: F) {
-        let function = IntoFunction::into_function(f);
-        match self.function.as_ref() {
-            Some(func) => *self.function = Some(func.clone().with_overload(function)),
-            None => *self.function = Some(function),
-        }
-        self.graph.register_parser_from(self.entrypoint, self.arguments.clone()).unwrap();
     }
 }
 
@@ -167,6 +180,29 @@ macro_rules! impl_command_builder {
             }
         }
     };
+}
+
+impl<'w, A: CommandArgument> CommandBuilderExt<'w> for GameCommandBuilder<'w, A> {
+    type WithBuilder<'b, T: CommandArgument> = GameCommandBuilder<'b, Self::WithBundle<T>>;
+    type WithBundle<T: CommandArgument> = (A, T);
+
+    fn with_parser<T: CommandArgument>(mut self, parser: T) -> Self::WithBuilder<'w, T> {
+        self.arguments.push(CommandEdge::new_from(parser));
+        GameCommandBuilder {
+            graph: self.graph,
+            function: self.function,
+            arguments: self.arguments,
+            entrypoint: self.entrypoint,
+            _args: PhantomData,
+        }
+    }
+
+    fn with_bundle<B: ArgumentBundle>(self) -> <Self as BundleAppender<B>>::Appended
+    where
+        Self: BundleAppender<B>,
+    {
+        <Self as BundleAppender<B>>::append(self)
+    }
 }
 
 variadics_please::all_tuples!(
