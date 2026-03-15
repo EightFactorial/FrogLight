@@ -244,18 +244,11 @@ macro_rules! generate {
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
-                                $componentid => {
-                                    if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data){
-                                        f(alloc::boxed::Box::new(component));
-                                    }
+                                $componentid if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) => {
+                                    f(alloc::boxed::Box::new(component));
                                 }
                             )*
-                            #[cfg(not(feature = "tracing"))]
                             _ => {},
-                            #[cfg(feature = "tracing")]
-                            unk => {
-                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component at index {unk}", $string);
-                            }
                         }
                     }
                 }
@@ -267,18 +260,11 @@ macro_rules! generate {
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
-                                $componentid => {
-                                    if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) {
-                                        f(facet::Peek::new(&component));
-                                    }
+                                $componentid if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) => {
+                                    f(facet::Peek::new(&component));
                                 },
                             )*
-                            #[cfg(not(feature = "tracing"))]
                             _ => {},
-                            #[cfg(feature = "tracing")]
-                            unk => {
-                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component at index {unk}", $string);
-                            }
                         }
                     }
                 }
@@ -294,39 +280,21 @@ macro_rules! generate {
                 ])
             },
             read: { |cursor| {
-                let remainder: &[u8];
-                let data: crate::generated::datatype::EntityDataType;
-
-                #[cfg(feature = "tracing_ext")]
-                tracing::trace!(target: "froglight_entity::entity", "Peek: {:?}", cursor.as_slice());
-
                 let (len, val) = facet_minecraft::deserialize::bytes_to_variable(cursor.as_slice())?;
                 cursor.consume(len);
 
                 match val {
                     $(
-                        $dataid => {
-                            #[cfg(feature = "tracing_ext")]
-                            tracing::trace!(target: "froglight_entity::entity", "EntityDataId: {:?} ({})", $dataid, stringify!($datatype));
-
-                            let (value, rem) = facet_minecraft::from_slice_remainder(cursor.as_slice()).map_err(|_err| {
-                                #[cfg(feature = "tracing")]
-                                tracing::error!(target: "froglight_entity::entity", "Failed to deserialize \"{}\", {_err}", stringify!($datatype));
-                                facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow
-                            })?;
-
-                            data = crate::generated::datatype::EntityDataType::$datatype(value);
-                            cursor.consume(cursor.as_slice().len() - rem.len());
+                        $dataid => match facet_minecraft::from_slice_remainder(cursor.as_slice()) {
+                            Ok((value, rem)) => {
+                                cursor.consume(cursor.as_slice().len() - rem.len());
+                                Ok(crate::generated::datatype::EntityDataType::$datatype(value))
+                            }
+                            Err(_) => Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow)
                         }
                     )*
-                    _ => return Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow),
+                    _ => Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow),
                 }
-
-
-                #[cfg(feature = "tracing_ext")]
-                tracing::trace!(target: "froglight_entity::entity", "EntityDataType: {data:?}");
-
-                Ok(data)
             } },
             write: { |(), data, buffer| {
                 let mut content = alloc::vec::Vec::with_capacity(8);
