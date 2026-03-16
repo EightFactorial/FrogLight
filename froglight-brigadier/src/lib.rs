@@ -11,11 +11,14 @@ pub mod argument;
 pub mod bevy;
 pub mod bundle;
 pub mod context;
+pub mod event;
 pub mod set;
 pub mod traits;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{context::CommandCtx, set::CommandSet, traits::AppGameCommand};
+    pub use crate::{
+        context::CommandCtx, event::GameCommandEvent, set::CommandSet, traits::AppGameCommand,
+    };
 }
