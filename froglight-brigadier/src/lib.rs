@@ -11,7 +11,6 @@ pub mod argument;
 pub mod bevy;
 pub mod bundle;
 pub mod context;
-pub mod event;
 pub mod set;
 pub mod traits;
 
@@ -20,7 +19,6 @@ pub mod prelude {
 
     pub use crate::{
         context::GameCommandCtx,
-        event::GameCommandEvent,
         set::GameCommandSet,
         traits::{AppGameCommand, CommandsGameCommand, EntityCommandsGameCommand},
     };

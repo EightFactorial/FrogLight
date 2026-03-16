@@ -160,7 +160,7 @@ impl Display for ParseOrExecuteError {
 #[reflect(opaque)]
 pub struct CommandInfo {
     parser_ty: TypeId,
-    runner: Box<dyn SetFn>,
+    runner: Box<dyn CommandSetFn>,
 }
 
 impl CommandInfo {
@@ -221,13 +221,13 @@ impl Clone for CommandInfo {
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for functions that can be stored in the [`GameCommandSet`].
-pub trait SetFn:
+pub trait CommandSetFn:
     Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError> + Send + Sync + 'static
 {
     /// Clone this function as a trait object.
-    fn dyn_clone(&self) -> Box<dyn SetFn>;
+    fn dyn_clone(&self) -> Box<dyn CommandSetFn>;
 }
-impl<T> SetFn for T
+impl<T> CommandSetFn for T
 where
     T: Clone
         + Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError>
@@ -235,5 +235,5 @@ where
         + Sync
         + 'static,
 {
-    fn dyn_clone(&self) -> Box<dyn SetFn> { Box::new(self.clone()) }
+    fn dyn_clone(&self) -> Box<dyn CommandSetFn> { Box::new(self.clone()) }
 }
