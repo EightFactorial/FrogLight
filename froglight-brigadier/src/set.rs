@@ -15,7 +15,7 @@ use indexmap::IndexMap;
 use crate::{argument::ArgumentParseError, bundle::ArgumentBundle, prelude::GameCommandCtx};
 
 /// A set of commands that can be executed by entities.
-#[derive(Default, Clone, Reflect, Resource)]
+#[derive(Default, Clone, Resource, Reflect)]
 #[reflect(opaque, Default, Clone, Resource)]
 pub struct GameCommandSet(IndexMap<Cow<'static, str>, CommandInfo, RandomState>);
 

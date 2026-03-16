@@ -148,7 +148,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::BlockEvent() => todo!(),
                     // ClientboundPlayEvent::BlockUpdate() => todo!(),
                     // ClientboundPlayEvent::BossEvent() => todo!(),
-                    // ClientboundPlayEvent::BundleDelimiter => todo!(),
+                    ClientboundPlayEvent::BundleDelimiter => {}
                     // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
                     // ClientboundPlayEvent::ChatSuggestions() => todo!(),
                     ClientboundPlayEvent::ChunkBatchFinished(size) => {
@@ -222,7 +222,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::DisguisedChat() => todo!(),
                     // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
                     // ClientboundPlayEvent::EntityEvent() => todo!(),
-                    // ClientboundPlayEvent::EntityPosition() => todo!(),
+                    ClientboundPlayEvent::EntityPosition() => {}
                     // ClientboundPlayEvent::Explode() => todo!(),
                     // ClientboundPlayEvent::ForgetChunk() => todo!(),
                     // ClientboundPlayEvent::GameEvent() => todo!(),
@@ -268,9 +268,9 @@ impl BotPlugin {
                     // ClientboundPlayEvent::MapItemData() => todo!(),
                     // ClientboundPlayEvent::MerchantOffers() => todo!(),
                     // ClientboundPlayEvent::MountScreen() => todo!(),
-                    // ClientboundPlayEvent::MoveEntityPos() => todo!(),
-                    // ClientboundPlayEvent::MoveEntityPosRot() => todo!(),
-                    // ClientboundPlayEvent::MoveEntityRot() => todo!(),
+                    ClientboundPlayEvent::MoveEntityPos() => {}
+                    ClientboundPlayEvent::MoveEntityPosRot() => {}
+                    ClientboundPlayEvent::MoveEntityRot() => {}
                     // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
                     // ClientboundPlayEvent::MoveVehicle() => todo!(),
                     // ClientboundPlayEvent::OpenBook() => todo!(),
@@ -321,6 +321,7 @@ impl BotPlugin {
                                         let registry = registry.read();
 
                                         // Iterate over the entity's components
+                                        debug!("Despawning Entity {entity_id} with:");
                                         for component in world.inspect_entity(entity_id).unwrap() {
                                             if let Some(info) =
                                                 registry.get_type_info(component.type_id().unwrap())
@@ -346,7 +347,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ResourcePackPop() => todo!(),
                     // ClientboundPlayEvent::ResourcePackPush() => todo!(),
                     // ClientboundPlayEvent::Respawn() => todo!(),
-                    // ClientboundPlayEvent::RotateHead() => todo!(),
+                    ClientboundPlayEvent::RotateHead() => {}
                     // ClientboundPlayEvent::SelectAdvancementTab() => todo!(),
                     // ClientboundPlayEvent::ServerData() => todo!(),
                     // ClientboundPlayEvent::ServerLinks() => todo!(),
@@ -379,6 +380,11 @@ impl BotPlugin {
                                     && let Some(bundle) = entity.get::<EntityBundle>().cloned()
                                     && let Ok(bundle) = bundle.with_dataset(dataset)
                                 {
+                                    debug!("Adding to Entity {} ({}):", entity.id(), id.0);
+                                    bundle.inspect_reflect(|ty| {
+                                        debug!("    - {}", ty.reflect_short_type_path());
+                                    });
+
                                     commands.entity(target).insert(bundle);
                                 }
                             } else {
@@ -387,7 +393,7 @@ impl BotPlugin {
                         });
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
-                    // ClientboundPlayEvent::SetEntityMotion() => todo!(),
+                    ClientboundPlayEvent::SetEntityMotion() => {}
                     // ClientboundPlayEvent::SetEquipment() => todo!(),
                     // ClientboundPlayEvent::SetExperience() => todo!(),
                     // ClientboundPlayEvent::SetHealth() => todo!(),
