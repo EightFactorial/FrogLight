@@ -496,6 +496,7 @@ fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
             Ok("EntityOptionalVarInt")
         }
 
+        // TODO: Maybe use enums for these?
         (
             "CAT_SOUND_VARIANT"
             | "CAT_VARIANT"
@@ -509,6 +510,15 @@ fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
             | "WOLF_SOUND_VARIANT"
             | "WOLF_VARIANT"
             | "ZOMBIE_NAUTILUS_VARIANT",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("EntityVarInt"),
+        (
+            "ARMADILLO_STATE"
+            | "COPPER_GOLEM_STATE"
+            | "HUMANOID_ARM"
+            | "POSE"
+            | "SNIFFER_STATE"
+            | "WEATHERING_COPPER_STATE",
             "net/minecraft/network/syncher/EntityDataSerializers",
         ) => Ok("EntityVarInt"),
 
@@ -542,21 +552,13 @@ fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
             "OPTIONAL_LIVING_ENTITY_REFERENCE",
             "net/minecraft/network/syncher/EntityDataSerializers",
         ) => Ok("Option<uuid::Uuid>"),
+        ("RESOLVABLE_PROFILE", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("froglight_player::profile::MaybePartialProfile")
+        }
 
         // TODO
         (
-            "ARMADILLO_STATE"
-            | "COMPONENT"
-            | "COPPER_GOLEM_STATE"
-            | "HUMANOID_ARM"
-            | "ITEM_STACK"
-            | "PAINTING_VARIANT"
-            | "PARTICLE"
-            | "PARTICLES"
-            | "POSE"
-            | "RESOLVABLE_PROFILE"
-            | "SNIFFER_STATE"
-            | "WEATHERING_COPPER_STATE",
+            "COMPONENT" | "ITEM_STACK" | "PAINTING_VARIANT" | "PARTICLE" | "PARTICLES",
             "net/minecraft/network/syncher/EntityDataSerializers",
         ) => Ok("()"),
         ("OPTIONAL_COMPONENT", "net/minecraft/network/syncher/EntityDataSerializers") => {

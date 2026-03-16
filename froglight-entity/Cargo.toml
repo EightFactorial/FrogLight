@@ -20,6 +20,7 @@ workspace = true
 
 [dependencies]
 froglight-common = { features = ["alloc"], workspace = true }
+froglight-player = { workspace = true }
 glam = { workspace = true }
 uuid = { workspace = true }
 
@@ -41,11 +42,11 @@ default = ["std"]
 # Enable support for atomics
 atomic = []
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy"]
 # Enable `facet` support.
-facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
+facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet", "froglight-player/facet"]
 # Enable `tracing` support.
-tracing = ["dep:tracing"]
+tracing = ["dep:tracing", "froglight-common/tracing", "froglight-player/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["facet-minecraft?/tracing", "tracing"]
 
@@ -53,9 +54,9 @@ tracing_ext = ["facet-minecraft?/tracing", "tracing"]
 libm = ["dep:libm", "glam/nostd-libm"]
 
 # Enable support for the standard library
-std = ["dep:arc-swap", "facet?/std", "facet-minecraft?/std", "froglight-common/std", "glam/std", "uuid/std"]
+std = ["dep:arc-swap", "facet?/std", "facet-minecraft?/std", "froglight-common/std", "froglight-player/std", "glam/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["facet-minecraft?/nightly", "froglight-common/nightly"]
+nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "froglight-player/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

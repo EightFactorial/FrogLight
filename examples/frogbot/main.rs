@@ -71,7 +71,10 @@ impl BotPlugin {
 
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
-        let connection = ClientConnection::new::<Protocol, FuturesLite, TcpStream>(stream, false);
+        let connection = ClientConnection::new::<Protocol, FuturesLite, TcpStream>(
+            stream,
+            cfg!(debug_assertions),
+        );
 
         info!(
             "Attempting to login as \"{}\" ({})...",
