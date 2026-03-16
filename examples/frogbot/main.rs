@@ -90,8 +90,8 @@ impl BotPlugin {
         // Send the handshake and login events.
         let entity = entity.into_readonly();
         let conn = entity.get::<ClientConnection>().unwrap();
-        let _ = conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity);
-        let _ = conn.send(ServerboundLoginEvent::Hello(login), entity);
+        conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity).unwrap();
+        conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
     }
 
     /// An [`Observer`] that exits the app when the bot entity despawns.
@@ -310,34 +310,32 @@ impl BotPlugin {
                             if let Some(entity) = instance.get(entity_id) {
                                 debug!("Despawning Entity {entity} ({})", entity_id.0);
 
-                                // Log the entity's components before despawning it.
-                                commands
-                                    .entity(entity)
-                                    .queue(|mut entity: EntityWorldMut| {
-                                        let entity_id = entity.id();
-                                        entity.world_scope(|world| {
-                                            // Get the type registry
-                                            let registry =
-                                                world.resource::<AppTypeRegistry>().clone();
-                                            let registry = registry.read();
+                                let mut entity = commands.entity(entity);
 
-                                            // Iterate over the entity's components
-                                            for component in
-                                                world.inspect_entity(entity_id).unwrap()
+                                // Debug log the entity's components before despawning it.
+                                entity.queue(|mut entity: EntityWorldMut| {
+                                    let entity_id = entity.id();
+                                    entity.world_scope(|world| {
+                                        // Get the type registry
+                                        let registry = world.resource::<AppTypeRegistry>().clone();
+                                        let registry = registry.read();
+
+                                        // Iterate over the entity's components
+                                        for component in world.inspect_entity(entity_id).unwrap() {
+                                            if let Some(info) =
+                                                registry.get_type_info(component.type_id().unwrap())
                                             {
-                                                if let Some(info) = registry
-                                                    .get_type_info(component.type_id().unwrap())
-                                                {
-                                                    // Log the component's type
-                                                    trace!(
-                                                        "    - {}",
-                                                        info.type_path_table().short_path()
-                                                    );
-                                                }
+                                                // Log the component's type
+                                                debug!(
+                                                    "    - {}",
+                                                    info.type_path_table().short_path()
+                                                );
                                             }
-                                        })
+                                        }
                                     })
-                                    .despawn();
+                                });
+
+                                entity.despawn();
                             } else {
                                 error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
                             }
