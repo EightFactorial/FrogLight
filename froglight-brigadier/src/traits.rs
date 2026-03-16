@@ -6,7 +6,7 @@ use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
 
 use crate::{
-    bundle::ArgumentParserBundleExt,
+    bundle::ArgumentBundle,
     prelude::{CommandCtx, CommandSet},
 };
 
@@ -18,12 +18,15 @@ pub trait AppGameCommand {
     /// # Panics
     ///
     /// Panics if a command with the same name is already registered.
-    fn add_game_command<B: Default + ArgumentParserBundleExt, Marker>(
+    #[inline]
+    fn add_game_command<B: ArgumentBundle, Marker>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: impl IntoSystem<In<CommandCtx<B::Arguments>>, (), Marker> + 'static,
-    ) {
-        self.add_game_command_using(command, B::default(), system);
+        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
+    ) where
+        B::BundleData: Default,
+    {
+        self.add_game_command_using(command, B::BundleData::default(), system);
     }
 
     /// Add a game command the the [`App`].
@@ -31,28 +34,26 @@ pub trait AppGameCommand {
     /// # Panics
     ///
     /// Panics if a command with the same name is already registered.
-    fn add_game_command_using<B: ArgumentParserBundleExt, Marker>(
+    fn add_game_command_using<B: ArgumentBundle, Marker>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        parser: B,
-        system: impl IntoSystem<In<CommandCtx<B::Arguments>>, (), Marker> + 'static,
+        settings: B::BundleData,
+        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
     );
 }
 
 impl AppGameCommand for App {
-    fn add_game_command_using<B: ArgumentParserBundleExt, Marker>(
+    fn add_game_command_using<B: ArgumentBundle, Marker>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        parser: B,
-        system: impl IntoSystem<In<CommandCtx<B::Arguments>>, (), Marker> + 'static,
+        settings: B::BundleData,
+        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
     ) {
         let system = self.world_mut().register_system_cached(system);
-        let command = command.into();
-
         if let Err(err) = self
             .world_mut()
             .get_resource_or_init::<CommandSet>()
-            .register_command_using(command, parser, system)
+            .register_command_using(command, settings, system)
         {
             panic!("Failed to register command: {err:?}");
         }

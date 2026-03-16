@@ -3,7 +3,7 @@
 use alloc::boxed::Box;
 use core::error::Error;
 
-use bevy_reflect::{PartialReflect, func::ArgValue};
+use bevy_reflect::PartialReflect;
 
 mod core_impl;
 // pub use core_impl::*;
@@ -16,35 +16,17 @@ mod uuid_impl;
 #[cfg(feature = "uuid")]
 pub use uuid_impl::*;
 
-/// A trait for types that can be parsed from a string.
-pub trait ArgumentParser: Send + Sync + Sized {
-    /// Parse a value of this type from the string,
-    /// returning any remaining unparsed string.
+/// A trait for arguments that can be parsed from a string.
+pub trait ArgumentParser: PartialReflect + Sized + 'static {
+    /// Data required to parse the argument from a string.
+    type Data: Clone + Send + Sync + Sized + 'static;
+
+    /// Parse the argument from an input string and some parser data.
     ///
     /// # Errors
     ///
-    /// TODO
-    fn parse(input: &str) -> Result<(Self, &str), ArgumentParseError>;
-}
-
-/// A trait for types that can parse [`ArgValue`]s from a string.
-pub trait ArgumentParserObject: Send + Sync + 'static {
-    /// Parse a value from the string,
-    /// returning any remaining unparsed string.
-    ///
-    /// # Errors
-    ///
-    /// TODO
-    fn parse_dyn<'a>(
-        &self,
-        input: &'a str,
-    ) -> Result<(ArgValue<'static>, &'a str), ArgumentParseError>;
-}
-
-/// An extension trait for [`ArgumentParserObject`].
-pub trait ArgumentParserObjectExt: ArgumentParserObject {
-    /// The type of value that this parser produces.
-    type Output: PartialReflect;
+    /// Returns an error if the input string could not be parsed.
+    fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError>;
 }
 
 // -------------------------------------------------------------------------------------------------

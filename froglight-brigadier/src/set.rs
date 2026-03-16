@@ -4,14 +4,11 @@ use alloc::{borrow::Cow, boxed::Box, string::String};
 use core::{any::TypeId, error::Error};
 
 use bevy_ecs::{prelude::*, system::SystemId};
-use bevy_reflect::{func::ArgList, prelude::*, std_traits::ReflectDefault};
+use bevy_reflect::{prelude::*, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
-use crate::{
-    argument::ArgumentParseError,
-    bundle::{ArgumentParserBundle, ArgumentParserBundleExt},
-};
+use crate::{argument::ArgumentParseError, bundle::ArgumentBundle};
 
 /// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Reflect, Resource)]
@@ -30,12 +27,15 @@ impl CommandSet {
     ///
     /// Returns an error if a command with the same name already exists.
     #[inline]
-    pub fn register_command<B: Default + ArgumentParserBundleExt>(
+    pub fn register_command<B: ArgumentBundle>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
-    ) -> Result<(), CommandRegisterError> {
-        Self::register_command_using(self, command, B::default(), system)
+        system: SystemId<In<CommandCtx<B>>, ()>,
+    ) -> Result<(), CommandRegisterError>
+    where
+        B::BundleData: Default,
+    {
+        Self::register_command_using(self, command, B::BundleData::default(), system)
     }
 
     /// Register a command with the given name, parser, and system.
@@ -43,37 +43,18 @@ impl CommandSet {
     /// # Errors
     ///
     /// Returns an error if a command with the same name already exists.
-    pub fn register_command_using<B: ArgumentParserBundleExt>(
+    pub fn register_command_using<B: ArgumentBundle>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        parser: B,
-        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+        settings: B::BundleData,
+        system: SystemId<In<CommandCtx<B>>, ()>,
     ) -> Result<(), CommandRegisterError> {
         let command = command.into();
         if self.0.contains_key(&command) {
             Err(CommandRegisterError::AlreadyExists)
         } else {
-            self.0.insert(command, CommandInfo::new_from::<B>(parser, system));
+            self.0.insert(command, CommandInfo::new_from::<B>(settings, system));
             Ok(())
-        }
-    }
-
-    /// Parse a command string into an [`ArgList`].
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the command is not found or parsing fails.
-    pub fn parse(&self, mut command: &str) -> Result<ArgList<'static>, CommandParseError> {
-        // Separate the command name from the arguments.
-        let mut arguments = "";
-        if let Some((name, args)) = command.split_once(' ') {
-            (command, arguments) = (name, args);
-        }
-
-        if let Some(info) = self.0.get(command) {
-            info.parser.try_from_string(arguments).map_err(CommandParseError::ParseError)
-        } else {
-            Err(CommandParseError::CommandNotFound(command.into()))
         }
     }
 
@@ -86,34 +67,13 @@ impl CommandSet {
         &self,
         entity: Entity,
         command: &str,
-        args: ArgList<'static>,
-        world: &mut World,
-    ) -> Result<(), CommandExecuteError> {
-        if let Some(info) = self.0.get(command) {
-            info.run(entity, args, world).map_err(CommandExecuteError::CommandError)
-        } else {
-            Err(CommandExecuteError::CommandNotFound(command.into()))
-        }
-    }
-
-    /// Parse and execute a command string.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the command is not found,
-    /// or fails to parse and execute.
-    pub fn parse_and_execute(
-        &self,
-        entity: Entity,
-        mut command: &str,
         world: &mut World,
     ) -> Result<(), ParseOrExecuteError> {
-        let args = self.parse(command).map_err(ParseOrExecuteError::Parse)?;
-        // Extract the command name to execute, ignoring the arguments.
-        if let Some((name, _)) = command.split_once(' ') {
-            command = name;
+        if let Some(info) = self.0.get(command) {
+            info.run(entity, command, world)
+        } else {
+            Err(ParseOrExecuteError::Parse(CommandParseError::CommandNotFound(command.into())))
         }
-        self.execute(entity, command, args, world).map_err(ParseOrExecuteError::Execute)
     }
 }
 
@@ -136,8 +96,6 @@ pub enum CommandParseError {
 /// An error that can occur while executing a command.
 #[derive(Debug)]
 pub enum CommandExecuteError {
-    /// The command was not found.
-    CommandNotFound(String),
     /// An error occurred while executing the command.
     CommandError(Box<dyn Error + Send + Sync>),
 }
@@ -158,7 +116,6 @@ pub enum ParseOrExecuteError {
 #[reflect(opaque)]
 pub struct CommandInfo {
     parser_ty: TypeId,
-    parser: Box<dyn ArgumentParserBundle>,
     runner: Box<dyn SetFn>,
 }
 
@@ -166,25 +123,28 @@ impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
     #[inline]
     #[must_use]
-    pub fn new<B: Default + ArgumentParserBundleExt>(
-        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
-    ) -> Self {
-        Self::new_from(B::default(), system)
+    pub fn new<B: ArgumentBundle>(system: SystemId<In<CommandCtx<B>>, ()>) -> Self
+    where
+        B::BundleData: Default,
+    {
+        Self::new_from(B::BundleData::default(), system)
     }
 
     /// Create a new [`CommandInfo`] for the given root node and system.
     #[must_use]
-    pub fn new_from<B: ArgumentParserBundleExt>(
-        parser: B,
-        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+    pub fn new_from<B: ArgumentBundle>(
+        data: B::BundleData,
+        system: SystemId<In<CommandCtx<B>>, ()>,
     ) -> Self {
         Self {
             parser_ty: TypeId::of::<B>(),
-            parser: Box::new(parser),
             runner: Box::new(move |entity, args, world| {
-                world
-                    .run_system_with(system, CommandCtx::new(entity, B::try_from_args(args)?))
-                    .map_err(|err| -> Box<dyn Error + Send + Sync> { Box::new(err) })
+                let input = B::bundle_from_string(args, &data).map_err(|err| {
+                    ParseOrExecuteError::Parse(CommandParseError::ParseError(err))
+                })?;
+                world.run_system_with(system, CommandCtx::new(entity, input)).map_err(|err| {
+                    ParseOrExecuteError::Execute(CommandExecuteError::CommandError(Box::new(err)))
+                })
             }),
         }
     }
@@ -198,10 +158,10 @@ impl CommandInfo {
     pub fn run(
         &self,
         entity: Entity,
-        args: ArgList<'static>,
+        input: &str,
         world: &mut World,
-    ) -> Result<(), Box<dyn Error + Send + Sync>> {
-        (self.runner)(entity, args, world)
+    ) -> Result<(), ParseOrExecuteError> {
+        (self.runner)(entity, input, world)
     }
 }
 
@@ -211,13 +171,7 @@ impl PartialEq for CommandInfo {
 }
 
 impl Clone for CommandInfo {
-    fn clone(&self) -> Self {
-        Self {
-            parser_ty: self.parser_ty,
-            parser: self.parser.dyn_clone(),
-            runner: self.runner.dyn_clone(),
-        }
-    }
+    fn clone(&self) -> Self { Self { parser_ty: self.parser_ty, runner: self.runner.dyn_clone() } }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -254,10 +208,7 @@ impl<T> CommandCtx<T> {
 
 /// A trait for functions that can be stored in the [`CommandSet`].
 pub trait SetFn:
-    Fn(Entity, ArgList<'static>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
-    + Send
-    + Sync
-    + 'static
+    Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError> + Send + Sync + 'static
 {
     /// Clone this function as a trait object.
     fn dyn_clone(&self) -> Box<dyn SetFn>;
@@ -265,7 +216,7 @@ pub trait SetFn:
 impl<T> SetFn for T
 where
     T: Clone
-        + Fn(Entity, ArgList<'static>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
+        + Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError>
         + Send
         + Sync
         + 'static,

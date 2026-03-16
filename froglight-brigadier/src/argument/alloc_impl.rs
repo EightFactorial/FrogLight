@@ -1,81 +1,43 @@
-use alloc::string::String;
-use core::ops::{Deref, DerefMut};
+use alloc::{borrow::Cow, string::String};
 
-use bevy_reflect::Reflect;
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
 use super::{ArgumentParseError, ArgumentParser};
 
 impl ArgumentParser for String {
-    fn parse(input: &str) -> Result<(Self, &str), ArgumentParseError> {
-        if input.starts_with('"') {
-            todo!("Parse quoted strings")
-        } else {
-            StringWord::parse(input).map(|(word, rest)| (word.0, rest))
-        }
-    }
-}
+    type Data = StringType;
 
-// -------------------------------------------------------------------------------------------------
-
-/// An [`ArgumentParser`] that parses a [`String`] from a single world.
-#[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Reflect)]
-#[reflect(Debug, Clone, PartialEq, Hash)]
-pub struct StringWord(pub String);
-
-impl ArgumentParser for StringWord {
-    fn parse(input: &str) -> Result<(Self, &str), ArgumentParseError> {
-        let mut output = String::new();
-        let mut chars = input.chars();
-        for c in chars.by_ref() {
-            if c.is_whitespace() {
-                break;
+    fn parse<'a>(input: &'a str, data: &StringType) -> Result<(Self, &'a str), ArgumentParseError> {
+        match data {
+            StringType::Default if input.starts_with('"') => todo!("Quoted Strings"),
+            StringType::Default | StringType::Word => {
+                let (input, remainder) = input.split_once(' ').unwrap_or((input, ""));
+                Ok((input.into(), remainder))
             }
-            output.push(c);
+            StringType::Greedy => Ok((input.into(), "")),
         }
-        Ok((Self(output), chars.as_str()))
     }
 }
 
-impl From<StringWord> for String {
-    #[inline]
-    fn from(value: StringWord) -> Self { value.0 }
-}
-impl From<String> for StringWord {
-    #[inline]
-    fn from(value: String) -> Self { Self(value) }
-}
-
-impl Deref for StringWord {
-    type Target = String;
+impl ArgumentParser for Cow<'static, str> {
+    type Data = StringType;
 
     #[inline]
-    fn deref(&self) -> &Self::Target { &self.0 }
-}
-impl DerefMut for StringWord {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An [`ArgumentParser`] that parses a [`String`] from the rest of the command.
-#[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Reflect)]
-#[reflect(Debug, Clone, PartialEq, Hash)]
-pub struct StringGreedy(pub String);
-
-impl ArgumentParser for StringGreedy {
-    fn parse(input: &str) -> Result<(Self, &str), ArgumentParseError> {
-        Ok((Self(input.into()), ""))
+    fn parse<'a>(input: &'a str, data: &StringType) -> Result<(Self, &'a str), ArgumentParseError> {
+        String::parse(input, data).map(|(s, rest)| (Cow::Owned(s), rest))
     }
 }
 
-impl From<StringGreedy> for String {
-    #[inline]
-    fn from(value: StringGreedy) -> Self { value.0 }
-}
-impl From<String> for StringGreedy {
-    #[inline]
-    fn from(value: String) -> Self { Self(value) }
+/// The type of string to parse.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
+#[reflect(Debug, Default, Clone, PartialEq, Hash)]
+pub enum StringType {
+    /// The default string type,
+    /// which is either a single word or a quoted string.
+    #[default]
+    Default,
+    /// A single word, separated by spaces.
+    Word,
+    /// The entire remaining input.
+    Greedy,
 }
