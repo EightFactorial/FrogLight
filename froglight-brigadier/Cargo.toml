@@ -30,7 +30,6 @@ froglight-common = { workspace = true }
 glam = { workspace = true }
 indexmap = { workspace = true }
 lexical = { features = ["format", "parse"], workspace = true }
-petgraph = { features = ["stable_graph"], workspace = true }
 variadics_please = { workspace = true }
 
 # Optional dependencies
@@ -52,6 +51,6 @@ uuid = ["dep:uuid", "bevy_reflect/uuid"]
 libm = ["dep:libm", "glam/nostd-libm"]
 
 # Enable support for the standard library
-std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "froglight-common/std", "glam/std", "indexmap/std", "lexical/std", "petgraph/std", "uuid?/std"]
+std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "froglight-common/std", "glam/std", "indexmap/std", "lexical/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly"]

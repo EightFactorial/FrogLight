@@ -1,7 +1,7 @@
 //! TODO
 
 use alloc::boxed::Box;
-use core::{error::Error, marker::PhantomData};
+use core::error::Error;
 
 use bevy_reflect::{PartialReflect, func::ArgValue};
 
@@ -17,7 +17,7 @@ mod uuid_impl;
 pub use uuid_impl::*;
 
 /// A trait for types that can be parsed from a string.
-pub trait ArgumentParser: Send + Sync + Sized + 'static {
+pub trait ArgumentParser: Send + Sync + Sized {
     /// Parse a value of this type from the string,
     /// returning any remaining unparsed string.
     ///
@@ -35,37 +35,16 @@ pub trait ArgumentParserObject: Send + Sync + 'static {
     /// # Errors
     ///
     /// TODO
-    fn parse_dyn<'a>(&self, input: &'a str) -> Result<(ArgValue<'a>, &'a str), ArgumentParseError>;
+    fn parse_dyn<'a>(
+        &self,
+        input: &'a str,
+    ) -> Result<(ArgValue<'static>, &'a str), ArgumentParseError>;
 }
 
-// -------------------------------------------------------------------------------------------------
-
-/// A [`ArgumentParserObject`] wrapper for any type that implements
-/// [`ArgumentParser`].
-#[repr(transparent)]
-pub struct ArgWrapper<T: ArgumentParser + PartialReflect>(PhantomData<T>);
-
-impl<T: ArgumentParser + PartialReflect> ArgWrapper<T> {
-    /// Create a new [`DynArgumentWrapper`] for the given type.
-    #[inline]
-    #[must_use]
-    pub const fn new() -> Self { Self(PhantomData) }
-}
-
-impl<T: ArgumentParser + PartialReflect> Default for ArgWrapper<T> {
-    #[inline]
-    fn default() -> Self { Self(PhantomData) }
-}
-impl<T: ArgumentParser + PartialReflect> Clone for ArgWrapper<T> {
-    #[inline]
-    fn clone(&self) -> Self { *self }
-}
-impl<T: ArgumentParser + PartialReflect> Copy for ArgWrapper<T> {}
-
-impl<T: ArgumentParser + PartialReflect> ArgumentParserObject for ArgWrapper<T> {
-    fn parse_dyn<'a>(&self, input: &'a str) -> Result<(ArgValue<'a>, &'a str), ArgumentParseError> {
-        T::parse(input).map(|(val, rem)| (ArgValue::Owned(Box::new(val)), rem))
-    }
+/// An extension trait for [`ArgumentParserObject`].
+pub trait ArgumentParserObjectExt: ArgumentParserObject {
+    /// The type of value that this parser produces.
+    type Output: PartialReflect;
 }
 
 // -------------------------------------------------------------------------------------------------

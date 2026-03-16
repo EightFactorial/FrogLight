@@ -4,9 +4,7 @@ macro_rules! impl_integer {
     ($($ty:ty),*) => {
         $(
             impl ArgumentParser for $ty {
-                fn parse(
-                    input: & str,
-                ) -> Result<(Self, & str), ArgumentParseError> {
+                fn parse(input: &str) -> Result<(Self, &str), ArgumentParseError> {
                     match lexical::parse_partial::<$ty, _>(input) {
                         Ok((value, length)) => Ok((value, &input[length..])),
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),

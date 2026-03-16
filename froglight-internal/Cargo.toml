@@ -36,7 +36,7 @@ froglight-world = { features = ["froglight-biome", "froglight-block"], workspace
 bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 froglight-api = { features = ["resolver", "ureq"], workspace = true, optional = true }
-froglight-brigadier = { workspace = true, optional = true }
+froglight-brigadier = { features = ["uuid"], workspace = true, optional = true }
 froglight-network = { features = ["futures-lite"], workspace = true, optional = true }
 
 # --- Features ---

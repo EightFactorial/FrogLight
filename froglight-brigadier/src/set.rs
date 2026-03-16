@@ -1,26 +1,25 @@
 //! TODO
 
 use alloc::{borrow::Cow, boxed::Box, string::String};
-use core::error::Error;
+use core::{any::TypeId, error::Error};
 
 use bevy_ecs::{prelude::*, system::SystemId};
 use bevy_reflect::{func::ArgList, prelude::*, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
-use petgraph::prelude::*;
 
-use crate::argument::ArgumentParseError;
+use crate::{
+    argument::ArgumentParseError,
+    bundle::{ArgumentParserBundle, ArgumentParserBundleExt},
+};
 
-/// A set of commands with parsing logic represented as a graph.
+/// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Reflect, Resource)]
 #[reflect(opaque, Default, Clone, Resource)]
-pub struct CommandGraph {
-    commands: IndexMap<Cow<'static, str>, CommandInfo, RandomState>,
-    graph: StableDiGraph<(), CommandEdge>,
-}
+pub struct CommandSet(IndexMap<Cow<'static, str>, CommandInfo, RandomState>);
 
-impl CommandGraph {
-    /// Create a new empty [`CommandGraph`].
+impl CommandSet {
+    /// Create a new empty [`CommandSet`].
     #[inline]
     #[must_use]
     pub fn new() -> Self { Self::default() }
@@ -30,18 +29,32 @@ impl CommandGraph {
     /// # Errors
     ///
     /// Returns an error if a command with the same name already exists.
-    pub fn register_command<I: 'static>(
+    #[inline]
+    pub fn register_command<B: Default + ArgumentParserBundleExt>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: SystemId<In<CommandCtx<I>>, ()>,
-    ) -> Result<NodeIndex, CommandRegisterError> {
+        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+    ) -> Result<(), CommandRegisterError> {
+        Self::register_command_using(self, command, B::default(), system)
+    }
+
+    /// Register a command with the given name, parser, and system.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a command with the same name already exists.
+    pub fn register_command_using<B: ArgumentParserBundleExt>(
+        &mut self,
+        command: impl Into<Cow<'static, str>>,
+        parser: B,
+        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+    ) -> Result<(), CommandRegisterError> {
         let command = command.into();
-        if self.commands.contains_key(&command) {
+        if self.0.contains_key(&command) {
             Err(CommandRegisterError::AlreadyExists)
         } else {
-            let root = self.graph.add_node(());
-            self.commands.insert(command, CommandInfo::new(root, system));
-            Ok(root)
+            self.0.insert(command, CommandInfo::new_from::<B>(parser, system));
+            Ok(())
         }
     }
 
@@ -50,15 +63,15 @@ impl CommandGraph {
     /// # Errors
     ///
     /// Returns an error if the command is not found or parsing fails.
-    pub fn parse<'a>(&self, mut command: &'a str) -> Result<ArgList<'a>, CommandParseError> {
+    pub fn parse(&self, mut command: &str) -> Result<ArgList<'static>, CommandParseError> {
         // Separate the command name from the arguments.
         let mut arguments = "";
         if let Some((name, args)) = command.split_once(' ') {
             (command, arguments) = (name, args);
         }
 
-        if let Some(_info) = self.commands.get(command) {
-            todo!("Parse arguments: \"{arguments}\"");
+        if let Some(info) = self.0.get(command) {
+            info.parser.try_from_string(arguments).map_err(CommandParseError::ParseError)
         } else {
             Err(CommandParseError::CommandNotFound(command.into()))
         }
@@ -73,10 +86,10 @@ impl CommandGraph {
         &self,
         entity: Entity,
         command: &str,
-        args: ArgList<'_>,
+        args: ArgList<'static>,
         world: &mut World,
     ) -> Result<(), CommandExecuteError> {
-        if let Some(info) = self.commands.get(command) {
+        if let Some(info) = self.0.get(command) {
             info.run(entity, args, world).map_err(CommandExecuteError::CommandError)
         } else {
             Err(CommandExecuteError::CommandNotFound(command.into()))
@@ -140,35 +153,41 @@ pub enum ParseOrExecuteError {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Information about a command in the [`CommandGraph`].
+/// Information about a command in the [`CommandSet`].
 #[derive(Reflect)]
 #[reflect(opaque)]
 pub struct CommandInfo {
-    root: NodeIndex,
-    runner: Box<dyn GraphFn>,
+    parser_ty: TypeId,
+    parser: Box<dyn ArgumentParserBundle>,
+    runner: Box<dyn SetFn>,
 }
 
 impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
+    #[inline]
     #[must_use]
-    #[allow(unused, reason = "WIP")]
-    pub fn new<I: 'static>(root: NodeIndex, system: SystemId<In<CommandCtx<I>>, ()>) -> Self {
+    pub fn new<B: Default + ArgumentParserBundleExt>(
+        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+    ) -> Self {
+        Self::new_from(B::default(), system)
+    }
+
+    /// Create a new [`CommandInfo`] for the given root node and system.
+    #[must_use]
+    pub fn new_from<B: ArgumentParserBundleExt>(
+        parser: B,
+        system: SystemId<In<CommandCtx<B::Arguments>>, ()>,
+    ) -> Self {
         Self {
-            root,
-            #[expect(unused, reason = "WIP")]
+            parser_ty: TypeId::of::<B>(),
+            parser: Box::new(parser),
             runner: Box::new(move |entity, args, world| {
-                todo!("ArgList -> In<I>");
                 world
-                    .run_system_with(system, CommandCtx::new(entity, todo!()))
+                    .run_system_with(system, CommandCtx::new(entity, B::try_from_args(args)?))
                     .map_err(|err| -> Box<dyn Error + Send + Sync> { Box::new(err) })
             }),
         }
     }
-
-    /// Get the [`NodeIndex`] for the root node of this command.
-    #[inline]
-    #[must_use]
-    pub const fn root(&self) -> NodeIndex { self.root }
 
     /// Run this command.
     ///
@@ -179,7 +198,7 @@ impl CommandInfo {
     pub fn run(
         &self,
         entity: Entity,
-        args: ArgList<'_>,
+        args: ArgList<'static>,
         world: &mut World,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         (self.runner)(entity, args, world)
@@ -188,11 +207,17 @@ impl CommandInfo {
 
 impl Eq for CommandInfo {}
 impl PartialEq for CommandInfo {
-    fn eq(&self, other: &Self) -> bool { self.root == other.root }
+    fn eq(&self, other: &Self) -> bool { self.parser_ty == other.parser_ty }
 }
 
 impl Clone for CommandInfo {
-    fn clone(&self) -> Self { Self { root: self.root, runner: self.runner.dyn_clone() } }
+    fn clone(&self) -> Self {
+        Self {
+            parser_ty: self.parser_ty,
+            parser: self.parser.dyn_clone(),
+            runner: self.runner.dyn_clone(),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -227,29 +252,23 @@ impl<T> CommandCtx<T> {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A trait for functions that can be stored in the [`CommandGraph`].
-pub trait GraphFn:
-    Fn(Entity, ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
+/// A trait for functions that can be stored in the [`CommandSet`].
+pub trait SetFn:
+    Fn(Entity, ArgList<'static>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
     + Send
     + Sync
     + 'static
 {
     /// Clone this function as a trait object.
-    fn dyn_clone(&self) -> Box<dyn GraphFn>;
+    fn dyn_clone(&self) -> Box<dyn SetFn>;
 }
-impl<T> GraphFn for T
+impl<T> SetFn for T
 where
     T: Clone
-        + Fn(Entity, ArgList<'_>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
+        + Fn(Entity, ArgList<'static>, &mut World) -> Result<(), Box<dyn Error + Send + Sync>>
         + Send
         + Sync
         + 'static,
 {
-    fn dyn_clone(&self) -> Box<dyn GraphFn> { Box::new(self.clone()) }
+    fn dyn_clone(&self) -> Box<dyn SetFn> { Box::new(self.clone()) }
 }
-
-// -------------------------------------------------------------------------------------------------
-
-/// An edge in the [`CommandGraph`].
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CommandEdge {}

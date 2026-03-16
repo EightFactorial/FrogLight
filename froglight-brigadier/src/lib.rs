@@ -9,11 +9,15 @@ extern crate std;
 
 pub mod argument;
 pub mod bevy;
-pub mod graph;
+pub mod bundle;
+pub mod set;
 pub mod traits;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::graph::{CommandCtx, CommandGraph};
+    pub use crate::{
+        set::{CommandCtx, CommandSet},
+        traits::AppGameCommand,
+    };
 }
