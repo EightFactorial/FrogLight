@@ -3,8 +3,6 @@
 use alloc::boxed::Box;
 use core::error::Error;
 
-use bevy_reflect::PartialReflect;
-
 mod core_impl;
 // pub use core_impl::*;
 
@@ -17,7 +15,7 @@ mod uuid_impl;
 pub use uuid_impl::*;
 
 /// A trait for arguments that can be parsed from a string.
-pub trait ArgumentParser: PartialReflect + Sized + 'static {
+pub trait ArgumentParser: Sized + 'static {
     /// Data required to parse the argument from a string.
     type Data: Clone + Send + Sync + Sized + 'static;
 
@@ -27,6 +25,18 @@ pub trait ArgumentParser: PartialReflect + Sized + 'static {
     ///
     /// Returns an error if the input string could not be parsed.
     fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError>;
+}
+
+impl<T: ArgumentParser> ArgumentParser for Option<T> {
+    type Data = T::Data;
+
+    fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError> {
+        match T::parse(input, data) {
+            Ok((value, remaining)) => Ok((Some(value), remaining)),
+            Err(ArgumentParseError::InputMismatch) => Ok((None, input)),
+            Err(err) => Err(err),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ pub trait AppGameCommand {
     fn add_game_command<B: ArgumentBundle, Marker>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
+        system: impl IntoSystem<CommandCtx<B>, (), Marker> + 'static,
     ) where
         B::BundleData: Default,
     {
@@ -38,7 +38,7 @@ pub trait AppGameCommand {
         &mut self,
         command: impl Into<Cow<'static, str>>,
         settings: B::BundleData,
-        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
+        system: impl IntoSystem<CommandCtx<B>, (), Marker> + 'static,
     );
 }
 
@@ -47,7 +47,7 @@ impl AppGameCommand for App {
         &mut self,
         command: impl Into<Cow<'static, str>>,
         settings: B::BundleData,
-        system: impl IntoSystem<In<CommandCtx<B>>, (), Marker> + 'static,
+        system: impl IntoSystem<CommandCtx<B>, (), Marker> + 'static,
     ) {
         let system = self.world_mut().register_system_cached(system);
         if let Err(err) = self

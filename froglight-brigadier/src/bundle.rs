@@ -51,7 +51,7 @@ macro_rules! impl_argument_bundle {
             fn bundle_from_string(mut input: &str, data: &Self::BundleData) -> Result<Self, ArgumentParseError> {
                 $(
                     let ($T, rest) = <$T as ArgumentParser>::parse(input, &data.$n)?;
-                    input = rest;
+                    input = rest.trim_start();
                 )*
                 Ok(($($T),*))
             }

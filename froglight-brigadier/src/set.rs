@@ -8,7 +8,7 @@ use bevy_reflect::{prelude::*, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
-use crate::{argument::ArgumentParseError, bundle::ArgumentBundle};
+use crate::{argument::ArgumentParseError, bundle::ArgumentBundle, prelude::CommandCtx};
 
 /// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Reflect, Resource)]
@@ -30,7 +30,7 @@ impl CommandSet {
     pub fn register_command<B: ArgumentBundle>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: SystemId<In<CommandCtx<B>>, ()>,
+        system: SystemId<CommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError>
     where
         B::BundleData: Default,
@@ -47,7 +47,7 @@ impl CommandSet {
         &mut self,
         command: impl Into<Cow<'static, str>>,
         settings: B::BundleData,
-        system: SystemId<In<CommandCtx<B>>, ()>,
+        system: SystemId<CommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError> {
         let command = command.into();
         if self.0.contains_key(&command) {
@@ -123,7 +123,7 @@ impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
     #[inline]
     #[must_use]
-    pub fn new<B: ArgumentBundle>(system: SystemId<In<CommandCtx<B>>, ()>) -> Self
+    pub fn new<B: ArgumentBundle>(system: SystemId<CommandCtx<B>, ()>) -> Self
     where
         B::BundleData: Default,
     {
@@ -134,7 +134,7 @@ impl CommandInfo {
     #[must_use]
     pub fn new_from<B: ArgumentBundle>(
         data: B::BundleData,
-        system: SystemId<In<CommandCtx<B>>, ()>,
+        system: SystemId<CommandCtx<B>, ()>,
     ) -> Self {
         Self {
             parser_ty: TypeId::of::<B>(),
@@ -142,7 +142,7 @@ impl CommandInfo {
                 let input = B::bundle_from_string(args, &data).map_err(|err| {
                     ParseOrExecuteError::Parse(CommandParseError::ParseError(err))
                 })?;
-                world.run_system_with(system, CommandCtx::new(entity, input)).map_err(|err| {
+                world.run_system_with(system, (entity, input)).map_err(|err| {
                     ParseOrExecuteError::Execute(CommandExecuteError::CommandError(Box::new(err)))
                 })
             }),
@@ -172,36 +172,6 @@ impl PartialEq for CommandInfo {
 
 impl Clone for CommandInfo {
     fn clone(&self) -> Self { Self { parser_ty: self.parser_ty, runner: self.runner.dyn_clone() } }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// Context provided to command systems.
-pub struct CommandCtx<T> {
-    entity: Entity,
-    input: T,
-}
-
-impl<T> CommandCtx<T> {
-    /// Create a new [`CommandCtx`] with the given entity and input.
-    #[inline]
-    #[must_use]
-    pub const fn new(entity: Entity, input: T) -> Self { Self { entity, input } }
-
-    /// Get the [`Entity`] that is executing this command.
-    #[inline]
-    #[must_use]
-    pub const fn entity(&self) -> Entity { self.entity }
-
-    /// Get a reference to the input for this command.
-    #[inline]
-    #[must_use]
-    pub const fn input(&self) -> &T { &self.input }
-
-    /// Get the input for this command.
-    #[inline]
-    #[must_use]
-    pub fn into_input(self) -> T { self.input }
 }
 
 // -------------------------------------------------------------------------------------------------
