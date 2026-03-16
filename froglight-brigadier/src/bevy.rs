@@ -18,7 +18,8 @@ impl Plugin for BrigadierPlugin {
 
 impl BrigadierPlugin {
     /// An [`Observer`] that executes [`GameCommandEvent`]s.
-    pub fn command_observer(event: On<GameCommandEvent>, world: &mut World) {
+    #[allow(unused, reason = "Used if tracing is enabled")]
+    fn command_observer(event: On<GameCommandEvent>, world: &mut World) {
         world.resource_scope::<CommandSet, _>(|world, commands| {
             if let Err(err) = commands.execute(event.entity(), event.command(), world) {
                 #[cfg(feature = "tracing")]

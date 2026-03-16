@@ -28,7 +28,7 @@ impl ArgumentParser for Cow<'static, str> {
     }
 }
 
-/// The type of string to parse.
+/// The type of [`String`] to parse.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
 pub enum StringType {

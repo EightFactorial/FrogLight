@@ -27,18 +27,6 @@ pub trait ArgumentParser: Sized + 'static {
     fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError>;
 }
 
-impl<T: ArgumentParser> ArgumentParser for Option<T> {
-    type Data = T::Data;
-
-    fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError> {
-        match T::parse(input, data) {
-            Ok((value, remaining)) => Ok((Some(value), remaining)),
-            Err(ArgumentParseError::InputMismatch) => Ok((None, input)),
-            Err(err) => Err(err),
-        }
-    }
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// An error that can occur when parsing an argument from a string.
@@ -46,6 +34,9 @@ impl<T: ArgumentParser> ArgumentParser for Option<T> {
 pub enum ArgumentParseError {
     /// The input did not match the expected format.
     InputMismatch,
+    /// The input did not meet required constraints
+    /// (e.g. a number was out of range).
+    InputInvalid,
     /// Some other error occurred while parsing the argument.
     Other(Box<dyn Error + Send + Sync>),
 }
