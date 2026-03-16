@@ -5,6 +5,22 @@ use core::num::{
 
 use super::{ArgumentParseError, ArgumentParser};
 
+impl ArgumentParser for bool {
+    type Data = ();
+
+    fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError> {
+        if let Some(rest) = input.strip_prefix("true") {
+            Ok((true, rest))
+        } else if let Some(rest) = input.strip_prefix("false") {
+            Ok((false, rest))
+        } else {
+            Err(ArgumentParseError::InputMismatch)
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 macro_rules! impl_integer {
     ($($ty:ty),*) => {
         $(

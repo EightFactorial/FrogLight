@@ -51,7 +51,11 @@ macro_rules! impl_argument_bundle {
             fn bundle_from_string(mut input: &str, data: &Self::BundleData) -> Result<Self, ArgumentParseError> {
                 $(
                     let ($T, rest) = <$T as ArgumentParser>::parse(input, &data.$n)?;
-                    input = rest.trim_start();
+                    if rest.is_empty() {
+                        input = rest;
+                    } else {
+                        input = rest.strip_prefix(' ').ok_or(ArgumentParseError::InputMismatch)?;
+                    }
                 )*
                 Ok(($($T),*))
             }

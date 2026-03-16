@@ -19,6 +19,9 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
-        context::CommandCtx, event::GameCommandEvent, set::CommandSet, traits::AppGameCommand,
+        context::GameCommandCtx,
+        event::GameCommandEvent,
+        set::GameCommandSet,
+        traits::{AppGameCommand, CommandsGameCommand, EntityCommandsGameCommand},
     };
 }

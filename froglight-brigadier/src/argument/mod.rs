@@ -1,13 +1,18 @@
 //! TODO
 
 use alloc::boxed::Box;
-use core::error::Error;
-
-mod core_impl;
-// pub use core_impl::*;
+use core::{
+    error::Error,
+    fmt::{self, Display},
+};
 
 mod alloc_impl;
 pub use alloc_impl::*;
+
+mod core_impl;
+
+#[cfg(feature = "glam")]
+mod glam_impl;
 
 #[cfg(feature = "uuid")]
 mod uuid_impl;
@@ -46,4 +51,19 @@ impl ArgumentParseError {
     #[inline]
     #[must_use]
     pub fn other<E: Error + Send + Sync + 'static>(err: E) -> Self { Self::Other(Box::new(err)) }
+}
+
+impl Error for ArgumentParseError {}
+impl Display for ArgumentParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ArgumentParseError::InputMismatch => {
+                write!(f, "input did not match expected format")
+            }
+            ArgumentParseError::InputInvalid => {
+                write!(f, "input did not meet required constraints")
+            }
+            ArgumentParseError::Other(err) => Display::fmt(err, f),
+        }
+    }
 }

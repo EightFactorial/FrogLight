@@ -165,7 +165,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
                     // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    ClientboundPlayEvent::ChunkWithLight(pos, chunk, _) => {
+                    ClientboundPlayEvent::ChunkWithLight(chunk_pos, chunk_data, _) => {
                         let Some(instance) = bot.get::<WorldInstanceChunks>() else {
                             error!(
                                 "Received ChunkWithLight but bot doesn't have a WorldInstanceChunks!"
@@ -173,7 +173,7 @@ impl BotPlugin {
                             continue;
                         };
 
-                        match chunk.as_chunk::<Protocol>(Some((
+                        match chunk_data.as_chunk::<Protocol>(Some((
                             instance.height_max(),
                             instance.height_min(),
                         ))) {
@@ -181,14 +181,14 @@ impl BotPlugin {
                                 let entity = commands.spawn((
                                     ChunkOfInstance::new(bot.id()),
                                     SharedChunk::new(chunk),
-                                    *pos,
+                                    *chunk_pos,
                                 ));
 
                                 debug!(
                                     "Spawning Chunk as Entity {} ({}, {})",
                                     entity.id(),
-                                    pos.x(),
-                                    pos.z()
+                                    chunk_pos.x(),
+                                    chunk_pos.z()
                                 );
                             }
                             Err(err) => error!("Failed to convert chunk data: {err:?}"),

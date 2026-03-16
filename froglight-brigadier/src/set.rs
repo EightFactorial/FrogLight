@@ -1,22 +1,26 @@
 //! TODO
 
 use alloc::{borrow::Cow, boxed::Box, string::String};
-use core::{any::TypeId, error::Error};
+use core::{
+    any::TypeId,
+    error::Error,
+    fmt::{self, Display},
+};
 
 use bevy_ecs::{prelude::*, system::SystemId};
 use bevy_reflect::{prelude::*, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
-use crate::{argument::ArgumentParseError, bundle::ArgumentBundle, prelude::CommandCtx};
+use crate::{argument::ArgumentParseError, bundle::ArgumentBundle, prelude::GameCommandCtx};
 
 /// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Reflect, Resource)]
 #[reflect(opaque, Default, Clone, Resource)]
-pub struct CommandSet(IndexMap<Cow<'static, str>, CommandInfo, RandomState>);
+pub struct GameCommandSet(IndexMap<Cow<'static, str>, CommandInfo, RandomState>);
 
-impl CommandSet {
-    /// Create a new empty [`CommandSet`].
+impl GameCommandSet {
+    /// Create a new empty [`GameCommandSet`].
     #[inline]
     #[must_use]
     pub fn new() -> Self { Self::default() }
@@ -30,7 +34,7 @@ impl CommandSet {
     pub fn register_command<B: ArgumentBundle>(
         &mut self,
         command: impl Into<Cow<'static, str>>,
-        system: SystemId<CommandCtx<B>, ()>,
+        system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError>
     where
         B::BundleData: Default,
@@ -47,7 +51,7 @@ impl CommandSet {
         &mut self,
         command: impl Into<Cow<'static, str>>,
         settings: B::BundleData,
-        system: SystemId<CommandCtx<B>, ()>,
+        system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError> {
         let command = command.into();
         if self.0.contains_key(&command) {
@@ -84,6 +88,17 @@ pub enum CommandRegisterError {
     AlreadyExists,
 }
 
+impl Error for CommandRegisterError {}
+impl Display for CommandRegisterError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CommandRegisterError::AlreadyExists => {
+                write!(f, "a command with the same name already exists")
+            }
+        }
+    }
+}
+
 /// An error that can occur while parsing a command string.
 #[derive(Debug)]
 pub enum CommandParseError {
@@ -93,11 +108,30 @@ pub enum CommandParseError {
     ParseError(ArgumentParseError),
 }
 
+impl Error for CommandParseError {}
+impl Display for CommandParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CommandParseError::CommandNotFound(cmd) => write!(f, "command not found: \"{cmd}\""),
+            CommandParseError::ParseError(err) => Display::fmt(err, f),
+        }
+    }
+}
+
 /// An error that can occur while executing a command.
 #[derive(Debug)]
 pub enum CommandExecuteError {
     /// An error occurred while executing the command.
     CommandError(Box<dyn Error + Send + Sync>),
+}
+
+impl Error for CommandExecuteError {}
+impl Display for CommandExecuteError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CommandExecuteError::CommandError(err) => Display::fmt(err, f),
+        }
+    }
 }
 
 /// An error that can occur while parsing or executing a command.
@@ -109,9 +143,19 @@ pub enum ParseOrExecuteError {
     Execute(CommandExecuteError),
 }
 
+impl Error for ParseOrExecuteError {}
+impl Display for ParseOrExecuteError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParseOrExecuteError::Parse(err) => write!(f, "Parse error, {err}"),
+            ParseOrExecuteError::Execute(err) => write!(f, "Execute error: {err}"),
+        }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
-/// Information about a command in the [`CommandSet`].
+/// Information about a command in the [`GameCommandSet`].
 #[derive(Reflect)]
 #[reflect(opaque)]
 pub struct CommandInfo {
@@ -123,7 +167,7 @@ impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
     #[inline]
     #[must_use]
-    pub fn new<B: ArgumentBundle>(system: SystemId<CommandCtx<B>, ()>) -> Self
+    pub fn new<B: ArgumentBundle>(system: SystemId<GameCommandCtx<B>, ()>) -> Self
     where
         B::BundleData: Default,
     {
@@ -134,7 +178,7 @@ impl CommandInfo {
     #[must_use]
     pub fn new_from<B: ArgumentBundle>(
         data: B::BundleData,
-        system: SystemId<CommandCtx<B>, ()>,
+        system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Self {
         Self {
             parser_ty: TypeId::of::<B>(),
@@ -176,7 +220,7 @@ impl Clone for CommandInfo {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A trait for functions that can be stored in the [`CommandSet`].
+/// A trait for functions that can be stored in the [`GameCommandSet`].
 pub trait SetFn:
     Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError> + Send + Sync + 'static
 {
