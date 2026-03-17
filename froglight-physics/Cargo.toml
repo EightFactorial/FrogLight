@@ -43,13 +43,13 @@ default = ["alloc", "std"]
 bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_math", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy", "froglight-math/bevy"]
 
 # Enable `libm` for `no_std` support.
-libm = ["bevy_math?/nostd-libm", "dep:libm", "froglight-math/libm", "glam/nostd-libm"]
+libm = ["bevy_math?/nostd-libm", "dep:libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing"]
 
 # Enable support for a global allocator
 alloc = ["bevy_math?/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_math?/std", "bevy_reflect?/std", "froglight-block/std", "froglight-common/std", "froglight-math/std", "froglight-world/std", "glam/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_math?/std", "bevy_reflect?/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-math/nightly", "froglight-world/std", "std"]
+nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-math/nightly", "froglight-world/std", "std"]

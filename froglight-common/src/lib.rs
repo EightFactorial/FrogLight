@@ -4,6 +4,7 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+pub mod aabb;
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod entity;
