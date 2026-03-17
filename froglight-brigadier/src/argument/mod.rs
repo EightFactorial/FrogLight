@@ -42,6 +42,9 @@ pub enum ArgumentParseError {
     /// The input did not meet required constraints
     /// (e.g. a number was out of range).
     InputInvalid,
+
+    /// Some other unknown error occurred.
+    Unknown,
     /// Some other error occurred while parsing the argument.
     Other(Box<dyn Error + Send + Sync>),
 }
@@ -62,6 +65,9 @@ impl Display for ArgumentParseError {
             }
             ArgumentParseError::InputInvalid => {
                 write!(f, "input did not meet required constraints")
+            }
+            ArgumentParseError::Unknown => {
+                write!(f, "an unknown error occurred")
             }
             ArgumentParseError::Other(err) => Display::fmt(err, f),
         }

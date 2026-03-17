@@ -10,10 +10,11 @@ use bevy_reflect::PartialReflect;
 #[cfg(feature = "facet")]
 use facet::Peek;
 use froglight_common::prelude::Identifier;
+use glam::Vec2;
 
 use crate::{
     atomic::MaybeAtomicU32,
-    entity::{EntityDataSet, GlobalId, entity::EntityType},
+    entity::{EntityAabb, EntityDataSet, GlobalId, entity::EntityType},
     prelude::EntityVersion,
 };
 
@@ -25,6 +26,9 @@ pub struct EntityMetadata {
     global_id: MaybeAtomicU32,
     /// The default [`EntityDataSet`] for this entity type.
     dataset: EntityDataSet<'static>,
+
+    // The entity's bounding box.
+    aabb: EntityAabb,
 
     #[cfg(feature = "bevy")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
@@ -50,12 +54,16 @@ impl EntityMetadata {
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     pub const unsafe fn new<E: EntityType<V>, V: EntityVersion>(
         identifier: Identifier<'static>,
+        size: [f32; 2],
+        eye_height: f32,
         global_id: u32,
     ) -> Self {
         Self {
             identifier,
             global_id: MaybeAtomicU32::new(global_id),
             dataset: E::DATASET,
+
+            aabb: EntityAabb::new(Vec2::new(size[0], size[1]), eye_height),
 
             #[cfg(feature = "bevy")]
             inspect_reflect: E::inspect_reflect,
@@ -80,6 +88,11 @@ impl EntityMetadata {
     /// Get the default [`EntityDataSet`] for this entity type.
     #[must_use]
     pub fn default_data(&self) -> EntityDataSet<'static> { self.dataset.clone() }
+
+    /// Get the entity's [`EntityAabb`].
+    #[inline]
+    #[must_use]
+    pub const fn aabb(&self) -> &EntityAabb { &self.aabb }
 
     /// Returns `true` if this entity is of type `E`.
     #[must_use]

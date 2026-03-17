@@ -30,7 +30,10 @@ macro_rules! impl_integer {
                     match lexical::parse_partial::<$ty, _>(input) {
                         Ok((value, length)) => Ok((value, &input[length..])),
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
+                        #[cfg(feature = "std")]
                         Err(err) => Err(ArgumentParseError::other(err)),
+                        #[cfg(not(feature = "std"))]
+                        Err(_) => Err(ArgumentParseError::Unknown),
                     }
                 }
             }
@@ -47,7 +50,10 @@ macro_rules! impl_integer {
                             None => Err(ArgumentParseError::InputInvalid),
                         },
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
+                        #[cfg(feature = "std")]
                         Err(err) => Err(ArgumentParseError::other(err)),
+                        #[cfg(not(feature = "std"))]
+                        Err(_) => Err(ArgumentParseError::Unknown),
                     }
                 }
             }
@@ -72,7 +78,10 @@ macro_rules! impl_float {
                     match lexical::parse_partial::<$ty, _>(input) {
                         Ok((value, length)) => Ok((value, &input[length..])),
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
+                        #[cfg(feature = "std")]
                         Err(err) => Err(ArgumentParseError::other(err)),
+                        #[cfg(not(feature = "std"))]
+                        Err(_) => Err(ArgumentParseError::Unknown),
                     }
                 }
             }

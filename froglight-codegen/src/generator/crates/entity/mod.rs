@@ -26,11 +26,39 @@ pub struct EntityData {
     pub datatype_order: Vec<String>,
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct EntityInfo {
     pub id: String,
     pub class: Option<String>,
     pub metadata: Vec<EntityMetadataItem>,
+
+    pub size: [f32; 2],
+    pub eye_height: Option<f32>,
+    pub spawn_dimensions_scale: f32,
+
+    pub passenger_attachment: Vec<[f32; 3]>,
+    pub vehicle_attachment: [f32; 3],
+
+    pub riding_offset: [f32; 3],
+}
+
+impl Default for EntityInfo {
+    fn default() -> Self {
+        Self {
+            id: String::new(),
+            class: None,
+            metadata: Vec::new(),
+
+            size: [0.6, 1.8],
+            eye_height: None,
+            spawn_dimensions_scale: 1.0,
+
+            passenger_attachment: Vec::new(),
+            vehicle_attachment: [0.0, 0.0, 0.0],
+
+            riding_offset: [0.0, 0.0, 0.0],
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -169,7 +197,20 @@ impl EntityData {
                             }
                             ("clientTrackingRange", _) => {}
                             ("createNothing", _) => {}
-                            ("eyeHeight", _) => {}
+                            ("eyeHeight", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "(F)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        if let [.. , LiteralConstant::Float(eye_height)] =
+                                            constants.as_slice()
+                                        {
+                                            current.eye_height = Some(*eye_height);
+                                        } else {
+                                            miette::bail!("Expected a float constant for \"eyeHeight\"")
+                                        }
+                                    },
+                                    unk => miette::bail!("Unknown descriptor for \"eyeHeight\": \"{unk}\""),
+                                }
+                            }
                             ("fireImmune", _) => {}
                             ("immuneTo", _) => {}
                             ("nameTagOffset", _) => {}
@@ -177,18 +218,91 @@ impl EntityData {
                             ("noSave", _) => {}
                             ("noSummon", _) => {}
                             ("notInPeaceful", _) => {}
-                            ("passengerAttachments", _) => {}
+                            ("passengerAttachments", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "([F)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        let mut iter = constants.iter().rev();
+                                        while let Some(LiteralConstant::Float(y)) = iter.next() {
+                                            current.passenger_attachment.push([0.0, *y, 0.0]);
+                                        }
+                                        if current.passenger_attachment.is_empty() {
+                                            miette::bail!("Expected at least one float constant for \"passengerAttachments\"")
+                                        }
+                                    }
+                                    "([Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        let mut iter = constants.iter().rev();
+                                        while let (Some(LiteralConstant::Double(x)), Some(LiteralConstant::Double(y)), Some(LiteralConstant::Double(z))) =
+                                            (iter.next(), iter.next(), iter.next())
+                                        {
+                                            #[expect(clippy::cast_possible_truncation, reason = "Yes")]
+                                            current.passenger_attachment.push([*x as f32, *y as f32, *z as f32]);
+                                        }
+                                        if current.passenger_attachment.is_empty() {
+                                            miette::bail!("Expected at least three double constants for \"passengerAttachments\"")
+                                        }
+                                    }
+                                    unk => miette::bail!("Unknown descriptor for \"passengerAttachments\": \"{unk}\""),
+                                }
+                            }
                             ("raftFactory", _) => {
                                 current.class = Some(String::from(
                                     "net/minecraft/world/entity/vehicle/boat/Raft",
                                 ));
                             }
-                            ("ridingOffset", _) => {}
+                            ("ridingOffset", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "(F)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        if let Some(LiteralConstant::Float(offset)) = constants.last() {
+                                            current.riding_offset = [0.0, -*offset, 0.0];
+                                        } else {
+                                            miette::bail!("Expected a float constant for \"ridingOffset\"")
+                                        }
+                                    },
+                                    unk => miette::bail!("Unknown descriptor for \"ridingOffset\": \"{unk}\""),
+                                }
+                            }
                             ("setCanPickUpLoot", _) => {}
-                            ("sized", _) => {}
-                            ("spawnDimensionsScale", _) => {}
+                            ("sized", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "(FF)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        if let [.. , LiteralConstant::Float( width), LiteralConstant::Float(height)] =
+                                            constants.as_slice()
+                                        {
+                                            current.size = [*width, *height];
+                                        } else {
+                                            miette::bail!("Expected two float constants for \"sized\"")
+                                        }
+                                    },
+                                    unk => miette::bail!("Unknown descriptor for \"sized\": \"{unk}\""),
+                                }
+                            }
+                            ("spawnDimensionsScale", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "(F)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        if let Some(LiteralConstant::Float(scale)) = constants.last() {
+                                            current.spawn_dimensions_scale = *scale;
+                                        } else {
+                                            miette::bail!("Expected a float constant for \"spawnDimensionsScale\"")
+                                        }
+                                    }
+                                    unk => miette::bail!("Unknown descriptor for \"spawnDimensionsScale\": \"{unk}\""),
+                                }
+                            }
                             ("updateInterval", _) => {}
-                            ("vehicleAttachment", _) => {}
+                            ("vehicleAttachment", _) => {
+                                match name_and_type.descriptor.as_ref() {
+                                    "(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/EntityType$Builder;" => {
+                                        if let [.., LiteralConstant::Float(x), LiteralConstant::Float(y), LiteralConstant::Float(z)] =
+                                            constants.as_slice()
+                                        {
+                                            current.vehicle_attachment = [*x, *y, *z];
+                                        } else {
+                                            miette::bail!("Expected three double constants for \"vehicleAttachment\"")
+                                        }
+                                    }
+                                    unk => miette::bail!("Unknown descriptor for \"vehicleAttachment\": \"{unk}\""),
+                                }
+                            }
                             // ("", _) => {}
 
                             // Skip
@@ -580,7 +694,7 @@ async fn generate(
     EntityData::get_for(&version.real, storage, async |data| {
         let version_ident = version.base.as_feature().to_ascii_uppercase();
         let mut content = format!(
-            "use froglight_common::version::{version_ident};
+            "#![allow(clippy::unreadable_literal, reason = \"Generated code\")]\n\nuse froglight_common::version::{version_ident};
 #[expect(clippy::wildcard_imports, reason = \"Generated code\")]
 use crate::{{generated::{{component::*, entity::*}}, types::*}};
 
@@ -610,9 +724,12 @@ generate! {{
         for (index, entity) in data.entities.values().enumerate() {
             let ident = entity_name(&entity.id);
 
+            let [width, height] = entity.size;
+            let eye_height = entity.eye_height.unwrap_or(height * 0.85);
+
             write!(
                 content,
-                "    {ident} => {{ ident: \"minecraft:{}\", global: {index},\n        components: [",
+                "    {ident} => {{ ident: \"minecraft:{}\", global: {index}, size: [{width}f32, {height}f32], eye_height: {eye_height}f32,\n        components: [",
                 entity.id,
             )
             .unwrap();

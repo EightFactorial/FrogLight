@@ -211,6 +211,8 @@ macro_rules! generate {
             $ident:ident => {
                 ident: $string:literal,
                 global: $global:literal,
+                size: [$width:literal, $height:literal],
+                eye_height: $eye_height:literal,
                 components: [
                     $($component:ident = $componentid:literal),*
                 ]
@@ -223,6 +225,8 @@ macro_rules! generate {
                 const METADATA: &'static crate::entity::EntityMetadata = {
                     static METADATA: crate::entity::EntityMetadata = unsafe { crate::entity::EntityMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
+                        [$width, $height],
+                        $eye_height,
                         $global,
                     ) };
 

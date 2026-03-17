@@ -1,5 +1,8 @@
 //! TODO
 
+mod aabb;
+pub use aabb::EntityAabb;
+
 mod dataset;
 pub use dataset::EntityDataSet;
 

@@ -1,3 +1,5 @@
+#![allow(clippy::unreadable_literal, reason = "Generated code")]
+
 use froglight_common::version::V26_1;
 
 #[expect(clippy::wildcard_imports, reason = "Generated code")]
@@ -53,475 +55,475 @@ generate! {
         ResolvableProfile(froglight_player::profile::MaybePartialProfile) = 41,
         HumanoidArm(EntityVarInt) = 42
     },
-    AcaciaBoat => { ident: "minecraft:acacia_boat", global: 0,
+    AcaciaBoat => { ident: "minecraft:acacia_boat", global: 0, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    AcaciaChestBoat => { ident: "minecraft:acacia_chest_boat", global: 1,
+    AcaciaChestBoat => { ident: "minecraft:acacia_chest_boat", global: 1, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Allay => { ident: "minecraft:allay", global: 2,
+    Allay => { ident: "minecraft:allay", global: 2, size: [0.35f32, 0.6f32], eye_height: 0.36f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AllayDancing = 16, AllayCanDuplicate = 17 ]
     },
-    AreaEffectCloud => { ident: "minecraft:area_effect_cloud", global: 3,
+    AreaEffectCloud => { ident: "minecraft:area_effect_cloud", global: 3, size: [6f32, 0.5f32], eye_height: 0.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, AreaEffectCloudRadius = 8, AreaEffectCloudWaiting = 9, AreaEffectCloudParticle = 10 ]
     },
-    Armadillo => { ident: "minecraft:armadillo", global: 4,
+    Armadillo => { ident: "minecraft:armadillo", global: 4, size: [0.7f32, 0.65f32], eye_height: 0.26f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, ArmadilloState = 18 ]
     },
-    ArmorStand => { ident: "minecraft:armor_stand", global: 5,
+    ArmorStand => { ident: "minecraft:armor_stand", global: 5, size: [0.5f32, 1.975f32], eye_height: 1.7775f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, ArmorStandClientFlags = 15, ArmorStandHeadPose = 16, ArmorStandBodyPose = 17, ArmorStandLeftArmPose = 18, ArmorStandRightArmPose = 19, ArmorStandLeftLegPose = 20, ArmorStandRightLegPose = 21 ]
     },
-    Arrow => { ident: "minecraft:arrow", global: 6,
+    Arrow => { ident: "minecraft:arrow", global: 6, size: [0.5f32, 0.5f32], eye_height: 0.13f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, AbstractArrowIdFlags = 8, AbstractArrowPierceLevel = 9, AbstractArrowInGround = 10, ArrowIdEffectColor = 11 ]
     },
-    Axolotl => { ident: "minecraft:axolotl", global: 7,
+    Axolotl => { ident: "minecraft:axolotl", global: 7, size: [0.75f32, 0.42f32], eye_height: 0.2751f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AxolotlVariant = 18, AxolotlPlayingDead = 19, AxolotlFromBucket = 20 ]
     },
-    BambooChestRaft => { ident: "minecraft:bamboo_chest_raft", global: 8,
+    BambooChestRaft => { ident: "minecraft:bamboo_chest_raft", global: 8, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    BambooRaft => { ident: "minecraft:bamboo_raft", global: 9,
+    BambooRaft => { ident: "minecraft:bamboo_raft", global: 9, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Bat => { ident: "minecraft:bat", global: 10,
+    Bat => { ident: "minecraft:bat", global: 10, size: [0.5f32, 0.9f32], eye_height: 0.45f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, BatIdFlags = 16 ]
     },
-    Bee => { ident: "minecraft:bee", global: 11,
+    Bee => { ident: "minecraft:bee", global: 11, size: [0.7f32, 0.6f32], eye_height: 0.3f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, BeeFlagsId = 18, BeeAngerEndTime = 19 ]
     },
-    BirchBoat => { ident: "minecraft:birch_boat", global: 12,
+    BirchBoat => { ident: "minecraft:birch_boat", global: 12, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    BirchChestBoat => { ident: "minecraft:birch_chest_boat", global: 13,
+    BirchChestBoat => { ident: "minecraft:birch_chest_boat", global: 13, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Blaze => { ident: "minecraft:blaze", global: 14,
+    Blaze => { ident: "minecraft:blaze", global: 14, size: [0.6f32, 1.8f32], eye_height: 1.53f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, BlazeFlagsId = 16 ]
     },
-    BlockDisplay => { ident: "minecraft:block_display", global: 15,
+    BlockDisplay => { ident: "minecraft:block_display", global: 15, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, DisplayTransformationInterpolationStartDeltaTicksId = 8, DisplayTransformationInterpolationDurationId = 9, DisplayPosRotInterpolationDurationId = 10, DisplayTranslationId = 11, DisplayScaleId = 12, DisplayLeftRotationId = 13, DisplayRightRotationId = 14, DisplayBillboardRenderConstraintsId = 15, DisplayBrightnessOverrideId = 16, DisplayViewRangeId = 17, DisplayShadowRadiusId = 18, DisplayShadowStrengthId = 19, DisplayWidthId = 20, DisplayHeightId = 21, DisplayGlowColorOverrideId = 22, DisplayBlockStateId = 23 ]
     },
-    Bogged => { ident: "minecraft:bogged", global: 16,
+    Bogged => { ident: "minecraft:bogged", global: 16, size: [0.6f32, 1.99f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, BoggedSheared = 16 ]
     },
-    Breeze => { ident: "minecraft:breeze", global: 17,
+    Breeze => { ident: "minecraft:breeze", global: 17, size: [0.6f32, 1.77f32], eye_height: 1.3452f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    BreezeWindCharge => { ident: "minecraft:breeze_wind_charge", global: 18,
+    BreezeWindCharge => { ident: "minecraft:breeze_wind_charge", global: 18, size: [0.3125f32, 0.3125f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Camel => { ident: "minecraft:camel", global: 19,
+    Camel => { ident: "minecraft:camel", global: 19, size: [1.7f32, 2.375f32], eye_height: 2.275f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, CamelDash = 19, CamelLastPoseChangeTick = 20 ]
     },
-    CamelHusk => { ident: "minecraft:camel_husk", global: 20,
+    CamelHusk => { ident: "minecraft:camel_husk", global: 20, size: [1.7f32, 2.375f32], eye_height: 2.275f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, CamelDash = 19, CamelLastPoseChangeTick = 20 ]
     },
-    Cat => { ident: "minecraft:cat", global: 21,
+    Cat => { ident: "minecraft:cat", global: 21, size: [0.6f32, 0.7f32], eye_height: 0.35f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TamableAnimalFlagsId = 18, TamableAnimalOwneruuidId = 19, CatVariantId = 20, CatIsLying = 21, CatRelaxStateOne = 22, CatCollarColor = 23, CatSoundVariantId = 24 ]
     },
-    CaveSpider => { ident: "minecraft:cave_spider", global: 22,
+    CaveSpider => { ident: "minecraft:cave_spider", global: 22, size: [0.7f32, 0.5f32], eye_height: 0.45f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SpiderFlagsId = 16 ]
     },
-    CherryBoat => { ident: "minecraft:cherry_boat", global: 23,
+    CherryBoat => { ident: "minecraft:cherry_boat", global: 23, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    CherryChestBoat => { ident: "minecraft:cherry_chest_boat", global: 24,
+    CherryChestBoat => { ident: "minecraft:cherry_chest_boat", global: 24, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    ChestMinecart => { ident: "minecraft:chest_minecart", global: 25,
+    ChestMinecart => { ident: "minecraft:chest_minecart", global: 25, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12 ]
     },
-    Chicken => { ident: "minecraft:chicken", global: 26,
+    Chicken => { ident: "minecraft:chicken", global: 26, size: [0.4f32, 0.7f32], eye_height: 0.644f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, ChickenVariantId = 18, ChickenSoundVariantId = 19 ]
     },
-    Cod => { ident: "minecraft:cod", global: 27,
+    Cod => { ident: "minecraft:cod", global: 27, size: [0.5f32, 0.3f32], eye_height: 0.195f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractFishFromBucket = 16 ]
     },
-    CopperGolem => { ident: "minecraft:copper_golem", global: 28,
+    CopperGolem => { ident: "minecraft:copper_golem", global: 28, size: [0.49f32, 0.98f32], eye_height: 0.8125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, CopperGolemWeatherState = 16, CopperGolemState = 17 ]
     },
-    CommandBlockMinecart => { ident: "minecraft:command_block_minecart", global: 29,
+    CommandBlockMinecart => { ident: "minecraft:command_block_minecart", global: 29, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12, MinecartCommandBlockIdCommandName = 13, MinecartCommandBlockIdLastOutput = 14 ]
     },
-    Cow => { ident: "minecraft:cow", global: 30,
+    Cow => { ident: "minecraft:cow", global: 30, size: [0.9f32, 1.4f32], eye_height: 1.3f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, CowVariantId = 18, CowSoundVariantId = 19 ]
     },
-    Creaking => { ident: "minecraft:creaking", global: 31,
+    Creaking => { ident: "minecraft:creaking", global: 31, size: [0.9f32, 2.7f32], eye_height: 2.3f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, CreakingCanMove = 16, CreakingIsActive = 17, CreakingIsTearingDown = 18, CreakingHomePos = 19 ]
     },
-    Creeper => { ident: "minecraft:creeper", global: 32,
+    Creeper => { ident: "minecraft:creeper", global: 32, size: [0.6f32, 1.7f32], eye_height: 1.445f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, CreeperSwellDir = 16, CreeperIsPowered = 17, CreeperIsIgnited = 18 ]
     },
-    DarkOakBoat => { ident: "minecraft:dark_oak_boat", global: 33,
+    DarkOakBoat => { ident: "minecraft:dark_oak_boat", global: 33, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    DarkOakChestBoat => { ident: "minecraft:dark_oak_chest_boat", global: 34,
+    DarkOakChestBoat => { ident: "minecraft:dark_oak_chest_boat", global: 34, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Dolphin => { ident: "minecraft:dolphin", global: 35,
+    Dolphin => { ident: "minecraft:dolphin", global: 35, size: [0.9f32, 0.6f32], eye_height: 0.3f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, DolphinGotFish = 18, DolphinMoistnessLevel = 19 ]
     },
-    Donkey => { ident: "minecraft:donkey", global: 36,
+    Donkey => { ident: "minecraft:donkey", global: 36, size: [1.3964844f32, 1.5f32], eye_height: 1.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, AbstractChestedHorseIdChest = 19 ]
     },
-    DragonFireball => { ident: "minecraft:dragon_fireball", global: 37,
+    DragonFireball => { ident: "minecraft:dragon_fireball", global: 37, size: [1f32, 1f32], eye_height: 0.85f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Drowned => { ident: "minecraft:drowned", global: 38,
+    Drowned => { ident: "minecraft:drowned", global: 38, size: [0.6f32, 1.95f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZombieBabyId = 16, ZombieSpecialTypeId = 17, ZombieDrownedConversionId = 18 ]
     },
-    Egg => { ident: "minecraft:egg", global: 39,
+    Egg => { ident: "minecraft:egg", global: 39, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    ElderGuardian => { ident: "minecraft:elder_guardian", global: 40,
+    ElderGuardian => { ident: "minecraft:elder_guardian", global: 40, size: [1.9975f32, 1.9975f32], eye_height: 0.99875f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, GuardianIdMoving = 16, GuardianIdAttackTarget = 17 ]
     },
-    Enderman => { ident: "minecraft:enderman", global: 41,
+    Enderman => { ident: "minecraft:enderman", global: 41, size: [0.6f32, 2.9f32], eye_height: 2.55f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, EnderManCarryState = 16, EnderManCreepy = 17, EnderManStaredAt = 18 ]
     },
-    Endermite => { ident: "minecraft:endermite", global: 42,
+    Endermite => { ident: "minecraft:endermite", global: 42, size: [0.4f32, 0.3f32], eye_height: 0.13f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    EnderDragon => { ident: "minecraft:ender_dragon", global: 43,
+    EnderDragon => { ident: "minecraft:ender_dragon", global: 43, size: [16f32, 8f32], eye_height: 6.8f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, EnderDragonPhase = 16 ]
     },
-    EnderPearl => { ident: "minecraft:ender_pearl", global: 44,
+    EnderPearl => { ident: "minecraft:ender_pearl", global: 44, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    EndCrystal => { ident: "minecraft:end_crystal", global: 45,
+    EndCrystal => { ident: "minecraft:end_crystal", global: 45, size: [2f32, 2f32], eye_height: 1.7f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, EndCrystalBeamTarget = 8, EndCrystalShowBottom = 9 ]
     },
-    Evoker => { ident: "minecraft:evoker", global: 46,
+    Evoker => { ident: "minecraft:evoker", global: 46, size: [0.6f32, 1.95f32], eye_height: 1.6575f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16, SpellcasterIllagerSpellCastingId = 17 ]
     },
-    EvokerFangs => { ident: "minecraft:evoker_fangs", global: 47,
+    EvokerFangs => { ident: "minecraft:evoker_fangs", global: 47, size: [0.5f32, 0.8f32], eye_height: 0.68f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    ExperienceBottle => { ident: "minecraft:experience_bottle", global: 48,
+    ExperienceBottle => { ident: "minecraft:experience_bottle", global: 48, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    ExperienceOrb => { ident: "minecraft:experience_orb", global: 49,
+    ExperienceOrb => { ident: "minecraft:experience_orb", global: 49, size: [0.5f32, 0.5f32], eye_height: 0.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ExperienceOrbValue = 8 ]
     },
-    EyeOfEnder => { ident: "minecraft:eye_of_ender", global: 50,
+    EyeOfEnder => { ident: "minecraft:eye_of_ender", global: 50, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, EyeOfEnderItemStack = 8 ]
     },
-    FallingBlock => { ident: "minecraft:falling_block", global: 51,
+    FallingBlock => { ident: "minecraft:falling_block", global: 51, size: [0.98f32, 0.98f32], eye_height: 0.83300006f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, FallingBlockEntityStartPos = 8 ]
     },
-    Fireball => { ident: "minecraft:fireball", global: 52,
+    Fireball => { ident: "minecraft:fireball", global: 52, size: [1f32, 1f32], eye_height: 0.85f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, FireballItemStack = 8 ]
     },
-    FireworkRocket => { ident: "minecraft:firework_rocket", global: 53,
+    FireworkRocket => { ident: "minecraft:firework_rocket", global: 53, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, FireworkRocketEntityIdFireworksItem = 8, FireworkRocketEntityAttachedToTarget = 9, FireworkRocketEntityShotAtAngle = 10 ]
     },
-    Fox => { ident: "minecraft:fox", global: 54,
+    Fox => { ident: "minecraft:fox", global: 54, size: [0.6f32, 0.7f32], eye_height: 0.4f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, FoxTypeId = 18, FoxFlagsId = 19, FoxTrustedId0 = 20, FoxTrustedId1 = 21 ]
     },
-    Frog => { ident: "minecraft:frog", global: 55,
+    Frog => { ident: "minecraft:frog", global: 55, size: [0.5f32, 0.5f32], eye_height: 0.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, FrogVariantId = 18, FrogTongueTargetId = 19 ]
     },
-    FurnaceMinecart => { ident: "minecraft:furnace_minecart", global: 56,
+    FurnaceMinecart => { ident: "minecraft:furnace_minecart", global: 56, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12, MinecartFurnaceIdFuel = 13 ]
     },
-    Ghast => { ident: "minecraft:ghast", global: 57,
+    Ghast => { ident: "minecraft:ghast", global: 57, size: [4f32, 4f32], eye_height: 2.6f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, GhastIsCharging = 16 ]
     },
-    HappyGhast => { ident: "minecraft:happy_ghast", global: 58,
+    HappyGhast => { ident: "minecraft:happy_ghast", global: 58, size: [4f32, 4f32], eye_height: 2.6f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, HappyGhastIsLeashHolder = 18, HappyGhastStaysStill = 19 ]
     },
-    Giant => { ident: "minecraft:giant", global: 59,
+    Giant => { ident: "minecraft:giant", global: 59, size: [3.6f32, 12f32], eye_height: 10.44f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    GlowItemFrame => { ident: "minecraft:glow_item_frame", global: 60,
+    GlowItemFrame => { ident: "minecraft:glow_item_frame", global: 60, size: [0.5f32, 0.5f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, HangingEntityDirection = 8, ItemFrameItem = 9, ItemFrameRotation = 10 ]
     },
-    GlowSquid => { ident: "minecraft:glow_squid", global: 61,
+    GlowSquid => { ident: "minecraft:glow_squid", global: 61, size: [0.8f32, 0.8f32], eye_height: 0.4f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, GlowSquidDarkTicksRemaining = 18 ]
     },
-    Goat => { ident: "minecraft:goat", global: 62,
+    Goat => { ident: "minecraft:goat", global: 62, size: [0.9f32, 1.3f32], eye_height: 1.105f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, GoatIsScreamingGoat = 18, GoatHasLeftHorn = 19, GoatHasRightHorn = 20 ]
     },
-    Guardian => { ident: "minecraft:guardian", global: 63,
+    Guardian => { ident: "minecraft:guardian", global: 63, size: [0.85f32, 0.85f32], eye_height: 0.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, GuardianIdMoving = 16, GuardianIdAttackTarget = 17 ]
     },
-    Hoglin => { ident: "minecraft:hoglin", global: 64,
+    Hoglin => { ident: "minecraft:hoglin", global: 64, size: [1.3964844f32, 1.4f32], eye_height: 1.19f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, HoglinImmuneToZombification = 18 ]
     },
-    HopperMinecart => { ident: "minecraft:hopper_minecart", global: 65,
+    HopperMinecart => { ident: "minecraft:hopper_minecart", global: 65, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12 ]
     },
-    Horse => { ident: "minecraft:horse", global: 66,
+    Horse => { ident: "minecraft:horse", global: 66, size: [1.3964844f32, 1.6f32], eye_height: 1.52f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, HorseIdTypeVariant = 19 ]
     },
-    Husk => { ident: "minecraft:husk", global: 67,
+    Husk => { ident: "minecraft:husk", global: 67, size: [0.6f32, 1.95f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZombieBabyId = 16, ZombieSpecialTypeId = 17, ZombieDrownedConversionId = 18 ]
     },
-    Illusioner => { ident: "minecraft:illusioner", global: 68,
+    Illusioner => { ident: "minecraft:illusioner", global: 68, size: [0.6f32, 1.95f32], eye_height: 1.6575f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16, SpellcasterIllagerSpellCastingId = 17 ]
     },
-    Interaction => { ident: "minecraft:interaction", global: 69,
+    Interaction => { ident: "minecraft:interaction", global: 69, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, InteractionWidthId = 8, InteractionHeightId = 9, InteractionResponseId = 10 ]
     },
-    IronGolem => { ident: "minecraft:iron_golem", global: 70,
+    IronGolem => { ident: "minecraft:iron_golem", global: 70, size: [1.4f32, 2.7f32], eye_height: 2.295f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, IronGolemFlagsId = 16 ]
     },
-    ItemEntity => { ident: "minecraft:item", global: 71,
+    ItemEntity => { ident: "minecraft:item", global: 71, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ItemEntityItem = 8 ]
     },
-    ItemDisplay => { ident: "minecraft:item_display", global: 72,
+    ItemDisplay => { ident: "minecraft:item_display", global: 72, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, DisplayTransformationInterpolationStartDeltaTicksId = 8, DisplayTransformationInterpolationDurationId = 9, DisplayPosRotInterpolationDurationId = 10, DisplayTranslationId = 11, DisplayScaleId = 12, DisplayLeftRotationId = 13, DisplayRightRotationId = 14, DisplayBillboardRenderConstraintsId = 15, DisplayBrightnessOverrideId = 16, DisplayViewRangeId = 17, DisplayShadowRadiusId = 18, DisplayShadowStrengthId = 19, DisplayWidthId = 20, DisplayHeightId = 21, DisplayGlowColorOverrideId = 22, DisplayItemStackId = 23, DisplayItemDisplayId = 24 ]
     },
-    ItemFrame => { ident: "minecraft:item_frame", global: 73,
+    ItemFrame => { ident: "minecraft:item_frame", global: 73, size: [0.5f32, 0.5f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, HangingEntityDirection = 8, ItemFrameItem = 9, ItemFrameRotation = 10 ]
     },
-    JungleBoat => { ident: "minecraft:jungle_boat", global: 74,
+    JungleBoat => { ident: "minecraft:jungle_boat", global: 74, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    JungleChestBoat => { ident: "minecraft:jungle_chest_boat", global: 75,
+    JungleChestBoat => { ident: "minecraft:jungle_chest_boat", global: 75, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    LeashKnot => { ident: "minecraft:leash_knot", global: 76,
+    LeashKnot => { ident: "minecraft:leash_knot", global: 76, size: [0.375f32, 0.5f32], eye_height: 0.0625f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    LightningBolt => { ident: "minecraft:lightning_bolt", global: 77,
+    LightningBolt => { ident: "minecraft:lightning_bolt", global: 77, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Llama => { ident: "minecraft:llama", global: 78,
+    Llama => { ident: "minecraft:llama", global: 78, size: [0.9f32, 1.87f32], eye_height: 1.7765f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, AbstractChestedHorseIdChest = 19, LlamaStrengthId = 20, LlamaVariantId = 21 ]
     },
-    LlamaSpit => { ident: "minecraft:llama_spit", global: 79,
+    LlamaSpit => { ident: "minecraft:llama_spit", global: 79, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    MagmaCube => { ident: "minecraft:magma_cube", global: 80,
+    MagmaCube => { ident: "minecraft:magma_cube", global: 80, size: [0.52f32, 0.52f32], eye_height: 0.325f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SlimeIdSize = 16 ]
     },
-    MangroveBoat => { ident: "minecraft:mangrove_boat", global: 81,
+    MangroveBoat => { ident: "minecraft:mangrove_boat", global: 81, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    MangroveChestBoat => { ident: "minecraft:mangrove_chest_boat", global: 82,
+    MangroveChestBoat => { ident: "minecraft:mangrove_chest_boat", global: 82, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Mannequin => { ident: "minecraft:mannequin", global: 83,
+    Mannequin => { ident: "minecraft:mannequin", global: 83, size: [0.6f32, 1.8f32], eye_height: 1.62f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MannequinAvatarPlayerMainHand = 15, MannequinAvatarPlayerModeCustomisation = 16, MannequinProfile = 17, MannequinImmovable = 18, MannequinDescription = 19 ]
     },
-    Marker => { ident: "minecraft:marker", global: 84,
+    Marker => { ident: "minecraft:marker", global: 84, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Minecart => { ident: "minecraft:minecart", global: 85,
+    Minecart => { ident: "minecraft:minecart", global: 85, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12 ]
     },
-    Mooshroom => { ident: "minecraft:mooshroom", global: 86,
+    Mooshroom => { ident: "minecraft:mooshroom", global: 86, size: [0.9f32, 1.4f32], eye_height: 1.3f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, MushroomCowType = 18 ]
     },
-    Mule => { ident: "minecraft:mule", global: 87,
+    Mule => { ident: "minecraft:mule", global: 87, size: [1.3964844f32, 1.6f32], eye_height: 1.52f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, AbstractChestedHorseIdChest = 19 ]
     },
-    Nautilus => { ident: "minecraft:nautilus", global: 88,
+    Nautilus => { ident: "minecraft:nautilus", global: 88, size: [0.875f32, 0.95f32], eye_height: 0.2751f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TamableAnimalFlagsId = 18, TamableAnimalOwneruuidId = 19, AbstractNautilusDash = 20 ]
     },
-    OakBoat => { ident: "minecraft:oak_boat", global: 89,
+    OakBoat => { ident: "minecraft:oak_boat", global: 89, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    OakChestBoat => { ident: "minecraft:oak_chest_boat", global: 90,
+    OakChestBoat => { ident: "minecraft:oak_chest_boat", global: 90, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Ocelot => { ident: "minecraft:ocelot", global: 91,
+    Ocelot => { ident: "minecraft:ocelot", global: 91, size: [0.6f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, OcelotTrusting = 18 ]
     },
-    OminousItemSpawner => { ident: "minecraft:ominous_item_spawner", global: 92,
+    OminousItemSpawner => { ident: "minecraft:ominous_item_spawner", global: 92, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, OminousItemSpawnerItem = 8 ]
     },
-    Painting => { ident: "minecraft:painting", global: 93,
+    Painting => { ident: "minecraft:painting", global: 93, size: [0.5f32, 0.5f32], eye_height: 0.425f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, HangingEntityDirection = 8, PaintingVariantId = 9 ]
     },
-    PaleOakBoat => { ident: "minecraft:pale_oak_boat", global: 94,
+    PaleOakBoat => { ident: "minecraft:pale_oak_boat", global: 94, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    PaleOakChestBoat => { ident: "minecraft:pale_oak_chest_boat", global: 95,
+    PaleOakChestBoat => { ident: "minecraft:pale_oak_chest_boat", global: 95, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Panda => { ident: "minecraft:panda", global: 96,
+    Panda => { ident: "minecraft:panda", global: 96, size: [1.3f32, 1.25f32], eye_height: 1.0625f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, PandaUnhappyCounter = 18, PandaSneezeCounter = 19, PandaEatCounter = 20, PandaMainGeneId = 21, PandaHiddenGeneId = 22, PandaIdFlags = 23 ]
     },
-    Parched => { ident: "minecraft:parched", global: 97,
+    Parched => { ident: "minecraft:parched", global: 97, size: [0.6f32, 1.99f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    Parrot => { ident: "minecraft:parrot", global: 98,
+    Parrot => { ident: "minecraft:parrot", global: 98, size: [0.5f32, 0.9f32], eye_height: 0.54f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TamableAnimalFlagsId = 18, TamableAnimalOwneruuidId = 19, ParrotVariantId = 20 ]
     },
-    Phantom => { ident: "minecraft:phantom", global: 99,
+    Phantom => { ident: "minecraft:phantom", global: 99, size: [0.9f32, 0.5f32], eye_height: 0.175f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, PhantomIdSize = 16 ]
     },
-    Pig => { ident: "minecraft:pig", global: 100,
+    Pig => { ident: "minecraft:pig", global: 100, size: [0.9f32, 0.9f32], eye_height: 0.765f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, PigBoostTime = 18, PigVariantId = 19, PigSoundVariantId = 20 ]
     },
-    Piglin => { ident: "minecraft:piglin", global: 101,
+    Piglin => { ident: "minecraft:piglin", global: 101, size: [0.6f32, 1.95f32], eye_height: 1.79f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractPiglinImmuneToZombification = 16, PiglinBabyId = 17, PiglinIsChargingCrossbow = 18, PiglinIsDancing = 19 ]
     },
-    PiglinBrute => { ident: "minecraft:piglin_brute", global: 102,
+    PiglinBrute => { ident: "minecraft:piglin_brute", global: 102, size: [0.6f32, 1.95f32], eye_height: 1.79f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractPiglinImmuneToZombification = 16 ]
     },
-    Pillager => { ident: "minecraft:pillager", global: 103,
+    Pillager => { ident: "minecraft:pillager", global: 103, size: [0.6f32, 1.95f32], eye_height: 1.6575f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16, PillagerIsChargingCrossbow = 17 ]
     },
-    PolarBear => { ident: "minecraft:polar_bear", global: 104,
+    PolarBear => { ident: "minecraft:polar_bear", global: 104, size: [1.4f32, 1.4f32], eye_height: 1.19f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, PolarBearStandingId = 18 ]
     },
-    SplashPotion => { ident: "minecraft:splash_potion", global: 105,
+    SplashPotion => { ident: "minecraft:splash_potion", global: 105, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    LingeringPotion => { ident: "minecraft:lingering_potion", global: 106,
+    LingeringPotion => { ident: "minecraft:lingering_potion", global: 106, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    Pufferfish => { ident: "minecraft:pufferfish", global: 107,
+    Pufferfish => { ident: "minecraft:pufferfish", global: 107, size: [0.7f32, 0.7f32], eye_height: 0.455f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractFishFromBucket = 16, PufferfishPuffState = 17 ]
     },
-    Rabbit => { ident: "minecraft:rabbit", global: 108,
+    Rabbit => { ident: "minecraft:rabbit", global: 108, size: [0.49f32, 0.6f32], eye_height: 0.59f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, RabbitTypeId = 18 ]
     },
-    Ravager => { ident: "minecraft:ravager", global: 109,
+    Ravager => { ident: "minecraft:ravager", global: 109, size: [1.95f32, 2.2f32], eye_height: 1.8700001f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16 ]
     },
-    Salmon => { ident: "minecraft:salmon", global: 110,
+    Salmon => { ident: "minecraft:salmon", global: 110, size: [0.7f32, 0.4f32], eye_height: 0.26f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractFishFromBucket = 16, SalmonType = 17 ]
     },
-    Sheep => { ident: "minecraft:sheep", global: 111,
+    Sheep => { ident: "minecraft:sheep", global: 111, size: [0.9f32, 1.3f32], eye_height: 1.235f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, SheepWoolId = 18 ]
     },
-    Shulker => { ident: "minecraft:shulker", global: 112,
+    Shulker => { ident: "minecraft:shulker", global: 112, size: [1f32, 1f32], eye_height: 0.5f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ShulkerAttachFaceId = 16, ShulkerPeekId = 17, ShulkerColorId = 18 ]
     },
-    ShulkerBullet => { ident: "minecraft:shulker_bullet", global: 113,
+    ShulkerBullet => { ident: "minecraft:shulker_bullet", global: 113, size: [0.3125f32, 0.3125f32], eye_height: 0.265625f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Silverfish => { ident: "minecraft:silverfish", global: 114,
+    Silverfish => { ident: "minecraft:silverfish", global: 114, size: [0.4f32, 0.3f32], eye_height: 0.13f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    Skeleton => { ident: "minecraft:skeleton", global: 115,
+    Skeleton => { ident: "minecraft:skeleton", global: 115, size: [0.6f32, 1.99f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SkeletonStrayConversionId = 16 ]
     },
-    SkeletonHorse => { ident: "minecraft:skeleton_horse", global: 116,
+    SkeletonHorse => { ident: "minecraft:skeleton_horse", global: 116, size: [1.3964844f32, 1.6f32], eye_height: 1.52f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18 ]
     },
-    Slime => { ident: "minecraft:slime", global: 117,
+    Slime => { ident: "minecraft:slime", global: 117, size: [0.52f32, 0.52f32], eye_height: 0.325f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SlimeIdSize = 16 ]
     },
-    SmallFireball => { ident: "minecraft:small_fireball", global: 118,
+    SmallFireball => { ident: "minecraft:small_fireball", global: 118, size: [0.3125f32, 0.3125f32], eye_height: 0.265625f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, FireballItemStack = 8 ]
     },
-    Sniffer => { ident: "minecraft:sniffer", global: 119,
+    Sniffer => { ident: "minecraft:sniffer", global: 119, size: [1.9f32, 1.75f32], eye_height: 1.05f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, SnifferState = 18, SnifferDropSeedAtTick = 19 ]
     },
-    Snowball => { ident: "minecraft:snowball", global: 120,
+    Snowball => { ident: "minecraft:snowball", global: 120, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, ThrowableItemProjectileItemStack = 8 ]
     },
-    SnowGolem => { ident: "minecraft:snow_golem", global: 121,
+    SnowGolem => { ident: "minecraft:snow_golem", global: 121, size: [0.7f32, 1.9f32], eye_height: 1.7f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SnowGolemPumpkinId = 16 ]
     },
-    SpawnerMinecart => { ident: "minecraft:spawner_minecart", global: 122,
+    SpawnerMinecart => { ident: "minecraft:spawner_minecart", global: 122, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12 ]
     },
-    SpectralArrow => { ident: "minecraft:spectral_arrow", global: 123,
+    SpectralArrow => { ident: "minecraft:spectral_arrow", global: 123, size: [0.5f32, 0.5f32], eye_height: 0.13f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, AbstractArrowIdFlags = 8, AbstractArrowPierceLevel = 9, AbstractArrowInGround = 10 ]
     },
-    Spider => { ident: "minecraft:spider", global: 124,
+    Spider => { ident: "minecraft:spider", global: 124, size: [1.4f32, 0.9f32], eye_height: 0.65f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, SpiderFlagsId = 16 ]
     },
-    SpruceBoat => { ident: "minecraft:spruce_boat", global: 125,
+    SpruceBoat => { ident: "minecraft:spruce_boat", global: 125, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    SpruceChestBoat => { ident: "minecraft:spruce_chest_boat", global: 126,
+    SpruceChestBoat => { ident: "minecraft:spruce_chest_boat", global: 126, size: [1.375f32, 0.5625f32], eye_height: 0.5625f32,
         components: [ ]
     },
-    Squid => { ident: "minecraft:squid", global: 127,
+    Squid => { ident: "minecraft:squid", global: 127, size: [0.8f32, 0.8f32], eye_height: 0.4f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17 ]
     },
-    Stray => { ident: "minecraft:stray", global: 128,
+    Stray => { ident: "minecraft:stray", global: 128, size: [0.6f32, 1.99f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    Strider => { ident: "minecraft:strider", global: 129,
+    Strider => { ident: "minecraft:strider", global: 129, size: [0.9f32, 1.7f32], eye_height: 1.445f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, StriderBoostTime = 18, StriderSuffocating = 19 ]
     },
-    Tadpole => { ident: "minecraft:tadpole", global: 130,
+    Tadpole => { ident: "minecraft:tadpole", global: 130, size: [0.4f32, 0.3f32], eye_height: 0.19500001f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractFishFromBucket = 16, TadpoleAgeLocked = 17 ]
     },
-    TextDisplay => { ident: "minecraft:text_display", global: 131,
+    TextDisplay => { ident: "minecraft:text_display", global: 131, size: [0f32, 0f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, DisplayTransformationInterpolationStartDeltaTicksId = 8, DisplayTransformationInterpolationDurationId = 9, DisplayPosRotInterpolationDurationId = 10, DisplayTranslationId = 11, DisplayScaleId = 12, DisplayLeftRotationId = 13, DisplayRightRotationId = 14, DisplayBillboardRenderConstraintsId = 15, DisplayBrightnessOverrideId = 16, DisplayViewRangeId = 17, DisplayShadowRadiusId = 18, DisplayShadowStrengthId = 19, DisplayWidthId = 20, DisplayHeightId = 21, DisplayGlowColorOverrideId = 22, DisplayTextId = 23, DisplayLineWidthId = 24, DisplayBackgroundColorId = 25, DisplayTextOpacityId = 26, DisplayStyleFlagsId = 27 ]
     },
-    Tnt => { ident: "minecraft:tnt", global: 132,
+    Tnt => { ident: "minecraft:tnt", global: 132, size: [0.98f32, 0.98f32], eye_height: 0.15f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, PrimedTntFuseId = 8, PrimedTntBlockStateId = 9 ]
     },
-    TntMinecart => { ident: "minecraft:tnt_minecart", global: 133,
+    TntMinecart => { ident: "minecraft:tnt_minecart", global: 133, size: [0.98f32, 0.7f32], eye_height: 0.595f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, VehicleEntityIdHurt = 8, VehicleEntityIdHurtdir = 9, VehicleEntityIdDamage = 10, AbstractMinecartIdCustomDisplayBlock = 11, AbstractMinecartIdDisplayOffset = 12 ]
     },
-    TraderLlama => { ident: "minecraft:trader_llama", global: 134,
+    TraderLlama => { ident: "minecraft:trader_llama", global: 134, size: [0.9f32, 1.87f32], eye_height: 1.7765f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18, AbstractChestedHorseIdChest = 19, LlamaStrengthId = 20, LlamaVariantId = 21 ]
     },
-    Trident => { ident: "minecraft:trident", global: 135,
+    Trident => { ident: "minecraft:trident", global: 135, size: [0.5f32, 0.5f32], eye_height: 0.13f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, AbstractArrowIdFlags = 8, AbstractArrowPierceLevel = 9, AbstractArrowInGround = 10, ThrownTridentIdLoyalty = 11, ThrownTridentIdFoil = 12 ]
     },
-    TropicalFish => { ident: "minecraft:tropical_fish", global: 136,
+    TropicalFish => { ident: "minecraft:tropical_fish", global: 136, size: [0.5f32, 0.4f32], eye_height: 0.26f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AbstractFishFromBucket = 16, TropicalFishIdTypeVariant = 17 ]
     },
-    Turtle => { ident: "minecraft:turtle", global: 137,
+    Turtle => { ident: "minecraft:turtle", global: 137, size: [1.2f32, 0.4f32], eye_height: 0.34f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TurtleHasEgg = 18, TurtleLayingEgg = 19 ]
     },
-    Vex => { ident: "minecraft:vex", global: 138,
+    Vex => { ident: "minecraft:vex", global: 138, size: [0.4f32, 0.8f32], eye_height: 0.51875f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, VexFlagsId = 16 ]
     },
-    Villager => { ident: "minecraft:villager", global: 139,
+    Villager => { ident: "minecraft:villager", global: 139, size: [0.6f32, 1.95f32], eye_height: 1.62f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractVillagerUnhappyCounter = 18, VillagerData = 19, VillagerDataFinalized = 20 ]
     },
-    Vindicator => { ident: "minecraft:vindicator", global: 140,
+    Vindicator => { ident: "minecraft:vindicator", global: 140, size: [0.6f32, 1.95f32], eye_height: 1.6575f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16 ]
     },
-    WanderingTrader => { ident: "minecraft:wandering_trader", global: 141,
+    WanderingTrader => { ident: "minecraft:wandering_trader", global: 141, size: [0.6f32, 1.95f32], eye_height: 1.62f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractVillagerUnhappyCounter = 18 ]
     },
-    Warden => { ident: "minecraft:warden", global: 142,
+    Warden => { ident: "minecraft:warden", global: 142, size: [0.9f32, 2.9f32], eye_height: 2.4650002f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, WardenClientAngerLevel = 16 ]
     },
-    WindCharge => { ident: "minecraft:wind_charge", global: 143,
+    WindCharge => { ident: "minecraft:wind_charge", global: 143, size: [0.3125f32, 0.3125f32], eye_height: 0f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7 ]
     },
-    Witch => { ident: "minecraft:witch", global: 144,
+    Witch => { ident: "minecraft:witch", global: 144, size: [0.6f32, 1.95f32], eye_height: 1.62f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, RaiderIsCelebrating = 16, WitchUsingItem = 17 ]
     },
-    Wither => { ident: "minecraft:wither", global: 145,
+    Wither => { ident: "minecraft:wither", global: 145, size: [0.9f32, 3.5f32], eye_height: 2.9750001f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, WitherBossTargetA = 16, WitherBossTargetB = 17, WitherBossTargetC = 18, WitherBossIdInv = 19 ]
     },
-    WitherSkeleton => { ident: "minecraft:wither_skeleton", global: 146,
+    WitherSkeleton => { ident: "minecraft:wither_skeleton", global: 146, size: [0.7f32, 2.4f32], eye_height: 2.1f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15 ]
     },
-    WitherSkull => { ident: "minecraft:wither_skull", global: 147,
+    WitherSkull => { ident: "minecraft:wither_skull", global: 147, size: [0.3125f32, 0.3125f32], eye_height: 0.265625f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, WitherSkullDangerous = 8 ]
     },
-    Wolf => { ident: "minecraft:wolf", global: 148,
+    Wolf => { ident: "minecraft:wolf", global: 148, size: [0.6f32, 0.85f32], eye_height: 0.68f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TamableAnimalFlagsId = 18, TamableAnimalOwneruuidId = 19, WolfInterestedId = 20, WolfCollarColor = 21, WolfAngerEndTime = 22, WolfVariantId = 23, WolfSoundVariantId = 24 ]
     },
-    Zoglin => { ident: "minecraft:zoglin", global: 149,
+    Zoglin => { ident: "minecraft:zoglin", global: 149, size: [1.3964844f32, 1.4f32], eye_height: 1.19f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZoglinBabyId = 16 ]
     },
-    Zombie => { ident: "minecraft:zombie", global: 150,
+    Zombie => { ident: "minecraft:zombie", global: 150, size: [0.6f32, 1.95f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZombieBabyId = 16, ZombieSpecialTypeId = 17, ZombieDrownedConversionId = 18 ]
     },
-    ZombieHorse => { ident: "minecraft:zombie_horse", global: 151,
+    ZombieHorse => { ident: "minecraft:zombie_horse", global: 151, size: [1.3964844f32, 1.6f32], eye_height: 1.52f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, AbstractHorseIdFlags = 18 ]
     },
-    ZombieNautilus => { ident: "minecraft:zombie_nautilus", global: 152,
+    ZombieNautilus => { ident: "minecraft:zombie_nautilus", global: 152, size: [0.875f32, 0.95f32], eye_height: 0.2751f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, AgeableMobBabyId = 16, AgeableMobAgeLocked = 17, TamableAnimalFlagsId = 18, TamableAnimalOwneruuidId = 19, AbstractNautilusDash = 20, ZombieNautilusVariantId = 21 ]
     },
-    ZombieVillager => { ident: "minecraft:zombie_villager", global: 153,
+    ZombieVillager => { ident: "minecraft:zombie_villager", global: 153, size: [0.6f32, 1.95f32], eye_height: 1.74f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZombieBabyId = 16, ZombieSpecialTypeId = 17, ZombieDrownedConversionId = 18, ZombieVillagerConvertingId = 19, ZombieVillagerVillagerData = 20, ZombieVillagerVillagerDataFinalized = 21 ]
     },
-    ZombifiedPiglin => { ident: "minecraft:zombified_piglin", global: 154,
+    ZombifiedPiglin => { ident: "minecraft:zombified_piglin", global: 154, size: [0.6f32, 1.95f32], eye_height: 1.79f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, LivingEntityFlags = 8, LivingEntityHealthId = 9, LivingEntityEffectParticles = 10, LivingEntityEffectAmbienceId = 11, LivingEntityArrowCountId = 12, LivingEntityStingerCountId = 13, LivingEntitySleepingPosId = 14, MobFlagsId = 15, ZombieBabyId = 16, ZombieSpecialTypeId = 17, ZombieDrownedConversionId = 18 ]
     },
-    Player => { ident: "minecraft:player", global: 155,
+    Player => { ident: "minecraft:player", global: 155, size: [0.6f32, 1.8f32], eye_height: 1.62f32,
         components: [ ]
     },
-    FishingBobber => { ident: "minecraft:fishing_bobber", global: 156,
+    FishingBobber => { ident: "minecraft:fishing_bobber", global: 156, size: [0.25f32, 0.25f32], eye_height: 0.2125f32,
         components: [ EntitySharedFlagsId = 0, EntityAirSupplyId = 1, EntityCustomName = 2, EntityCustomNameVisible = 3, EntitySilent = 4, EntityNoGravity = 5, EntityPose = 6, EntityTicksFrozen = 7, FishingHookHookedEntity = 8, FishingHookBiting = 9 ]
     }
 }
