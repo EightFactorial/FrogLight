@@ -1,14 +1,29 @@
 //! TODO
+#![allow(
+    clippy::unsafe_derive_deserialize,
+    reason = "Allowed, as while important, it does not cause undefined behavior"
+)]
 
 use core::ops::{Add, Sub};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+#[cfg(feature = "facet")]
+use facet::Facet;
 use glam::DVec3;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 // Using a larger epsilon to match original behavior.
 const EPSILON: f64 = 1e-7;
 
 /// An axis-aligned bounding box (AABB).
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "facet", derive(Facet), facet(opaque))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct CommonAabb {
     min: DVec3,
     max: DVec3,

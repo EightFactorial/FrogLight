@@ -1,5 +1,9 @@
 use core::ops::{Deref, DerefMut};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::{component::Component, reflect::ReflectComponent};
+#[cfg(feature = "bevy")]
+use bevy_reflect::Reflect;
 use froglight_common::aabb::CommonAabb;
 use glam::DVec3;
 
@@ -7,6 +11,8 @@ use glam::DVec3;
 ///
 /// Centered around the entity's eye position.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
 pub struct EntityAabb {
     common: CommonAabb,
     eye_height: f64,
