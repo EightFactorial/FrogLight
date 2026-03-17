@@ -4,6 +4,8 @@ use froglight_common::aabb::CommonAabb;
 use glam::DVec3;
 
 /// An axis-aligned bounding box (AABB) for an entity.
+///
+/// Centered around the entity's eye position.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct EntityAabb {
     common: CommonAabb,
