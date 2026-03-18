@@ -16,3 +16,10 @@ use crate::prelude::*;
 #[cfg_attr(feature = "bevy", require(PhysicsState))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 pub struct PhysicsController {}
+
+impl PhysicsController {
+    /// Create a new [`PhysicsController`].
+    #[inline]
+    #[must_use]
+    pub fn new() -> Self { Self::default() }
+}

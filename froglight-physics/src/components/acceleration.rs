@@ -21,7 +21,6 @@ pub struct Acceleration(pub Vec3);
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", require(super::PreviousVelocity))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 pub struct PreviousAcceleration(pub Vec3);
 
