@@ -35,10 +35,11 @@ use froglight_packet::{
             ClearDialogS2CPacket as PlayClearDialogS2CPacket,
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
-            DisconnectS2CPacket as PlayDisconnectS2CPacket,
+            DisconnectS2CPacket as PlayDisconnectS2CPacket, EntityPositionSyncS2CPacket,
             KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
             KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LevelChunkWithLightS2CPacket,
-            LoginS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
+            LoginS2CPacket, MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket,
+            MoveEntityRotS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
             PongC2SPacket as PlayPongC2SPacket, PongResponseS2CPacket as PlayPongResponseS2CPacket,
             RemoveEntitiesS2CPacket, ServerboundPackets as PlayServerboundPackets,
         },
@@ -376,8 +377,12 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityEvent(packet))))
                 }
-                ClientboundPlayEvent::EntityPosition() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::EntityPosition(entity, data, on_ground) => {
+                    let packet = EntityPositionSyncS2CPacket {
+                        entity_id: VarEntityId(entity),
+                        data,
+                        on_ground,
+                    };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityPositionSync(
                         packet,
                     ))))
@@ -448,18 +453,42 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::MountScreenOpen(packet))))
                 }
-                ClientboundPlayEvent::MoveEntityPos() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityPos(packet))))
-                }
-                ClientboundPlayEvent::MoveEntityPosRot() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityPosRot(packet))))
-                }
-                ClientboundPlayEvent::MoveEntityRot() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityRot(packet))))
-                }
+                ClientboundPlayEvent::MoveEntityPos(data)
+                | ClientboundPlayEvent::MoveEntityPosRot(data)
+                | ClientboundPlayEvent::MoveEntityRot(data) => match (data.delta, data.yaw_pitch) {
+                    (Some(delta), None) => Ok(Some(VersionPacket::Play(
+                        PlayClientboundPackets::MoveEntityPos(MoveEntityPosS2CPacket {
+                            entity_id: VarEntityId(data.entity_id),
+                            delta,
+                            on_ground: data.on_ground,
+                        }),
+                    ))),
+                    (Some(delta), Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
+                        PlayClientboundPackets::MoveEntityPosRot(MoveEntityPosRotS2CPacket {
+                            entity_id: VarEntityId(data.entity_id),
+                            delta,
+                            yaw: y_rot,
+                            pitch: x_rot,
+                            on_ground: data.on_ground,
+                        }),
+                    ))),
+                    (None, Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
+                        PlayClientboundPackets::MoveEntityRot(MoveEntityRotS2CPacket {
+                            entity_id: VarEntityId(data.entity_id),
+                            yaw: y_rot,
+                            pitch: x_rot,
+                            on_ground: data.on_ground,
+                        }),
+                    ))),
+                    _ => {
+                        #[cfg(feature = "tracing")]
+                        tracing::warn!(
+                            target: "froglight_network",
+                            "Invalid EntityPositionData, requires either delta or rotation!"
+                        );
+                        Err(ConnectionError::UnknownPacket)
+                    }
+                },
                 ClientboundPlayEvent::MoveMinecartTrack() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveMinecartAlongTrack(
@@ -1027,8 +1056,12 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::EntityEvent(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityEvent())))
                 }
-                PlayClientboundPackets::EntityPositionSync(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityPosition())))
+                PlayClientboundPackets::EntityPositionSync(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityPosition(
+                        packet.entity_id.0,
+                        packet.data,
+                        packet.on_ground,
+                    ))))
                 }
                 PlayClientboundPackets::Explode(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Explode())))
@@ -1085,18 +1118,20 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::MerchantOffers(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MerchantOffers())))
                 }
-                PlayClientboundPackets::MoveEntityPos(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPos())))
-                }
-                PlayClientboundPackets::MoveEntityPosRot(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPosRot())))
+                PlayClientboundPackets::MoveEntityPos(packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPos(packet.into())),
+                )),
+                PlayClientboundPackets::MoveEntityPosRot(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPosRot(
+                        packet.into(),
+                    ))))
                 }
                 PlayClientboundPackets::MoveMinecartAlongTrack(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPosRot())))
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveMinecartTrack())))
                 }
-                PlayClientboundPackets::MoveEntityRot(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityRot())))
-                }
+                PlayClientboundPackets::MoveEntityRot(packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityRot(packet.into())),
+                )),
                 PlayClientboundPackets::MoveVehicle(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveVehicle())))
                 }

@@ -16,8 +16,6 @@ use froglight_world::{
 
 use crate::common::unsized_buffer::UnsizedBuffer;
 
-// -------------------------------------------------------------------------------------------------
-
 /// Raw chunk data.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]

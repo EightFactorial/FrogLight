@@ -7,6 +7,7 @@ pub mod entity_id;
 pub mod handshake;
 pub mod known_packs;
 pub mod login;
+pub mod position;
 pub mod spawn_info;
 pub mod unsized_buffer;
 pub mod update_tags;

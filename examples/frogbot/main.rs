@@ -3,7 +3,7 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
-use bevy::{prelude::*, tasks::block_on};
+use bevy::{math::DVec3, prelude::*, tasks::block_on};
 use froglight::{
     network::{
         bevy::ClientDespawn,
@@ -225,7 +225,41 @@ impl BotPlugin {
                     // ClientboundPlayEvent::DisguisedChat() => todo!(),
                     // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
                     // ClientboundPlayEvent::EntityEvent() => todo!(),
-                    ClientboundPlayEvent::EntityPosition() => {}
+                    ClientboundPlayEvent::EntityPosition(entity_id, data, on_ground) => {
+                        let entity_id = *entity_id;
+                        let data = *data;
+                        let on_ground = *on_ground;
+
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+                            let Some(target) = instance.get(&entity_id) else {
+                                error!(
+                                    "Received EntityPosition for unknown EntityId {}!",
+                                    entity_id.0
+                                );
+                                return;
+                            };
+
+                            let mut entity = entity.into_world_mut().entity_mut(target);
+                            trace!("Moving Entity {target} ({})", entity_id.0);
+
+                            if let Some(mut transform) = entity.get_mut::<Transform>() {
+                                transform.translation =
+                                    DVec3::new(data.position_x, data.position_y, data.position_z)
+                                        .as_vec3();
+                                // TODO: Yaw/Pitch
+                            }
+                            if let Some(mut velocity) = entity.get_mut::<Velocity>() {
+                                velocity.0 =
+                                    DVec3::new(data.velocity_x, data.velocity_y, data.velocity_z)
+                                        .as_vec3();
+                            }
+
+                            if let Some(mut ground) = entity.get_mut::<OnGround>() {
+                                ground.0 = on_ground;
+                            }
+                        });
+                    }
                     // ClientboundPlayEvent::Explode() => todo!(),
                     // ClientboundPlayEvent::ForgetChunk() => todo!(),
                     // ClientboundPlayEvent::GameEvent() => todo!(),
@@ -271,9 +305,41 @@ impl BotPlugin {
                     // ClientboundPlayEvent::MapItemData() => todo!(),
                     // ClientboundPlayEvent::MerchantOffers() => todo!(),
                     // ClientboundPlayEvent::MountScreen() => todo!(),
-                    ClientboundPlayEvent::MoveEntityPos() => {}
-                    ClientboundPlayEvent::MoveEntityPosRot() => {}
-                    ClientboundPlayEvent::MoveEntityRot() => {}
+                    ClientboundPlayEvent::MoveEntityPos(data)
+                    | ClientboundPlayEvent::MoveEntityPosRot(data)
+                    | ClientboundPlayEvent::MoveEntityRot(data) => {
+                        let data = *data;
+
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+                            let Some(target) = instance.get(&data.entity_id) else {
+                                error!(
+                                    "Received MoveEntity for unknown EntityId {}!",
+                                    data.entity_id.0
+                                );
+                                return;
+                            };
+
+                            let mut entity = entity.into_world_mut().entity_mut(target);
+                            trace!("Moving Entity {target} ({})", data.entity_id.0);
+
+                            if let Some(delta) = data.delta
+                                && let Some(mut transform) = entity.get_mut::<Transform>()
+                            {
+                                transform.translation = delta.add_to_vec(transform.translation);
+                            }
+
+                            if let Some((_y_rot, _x_rot)) = data.yaw_pitch
+                                && let Some(_transform) = entity.get_mut::<Transform>()
+                            {
+                                // TODO: Yaw/Pitch
+                            }
+
+                            if let Some(mut on_ground) = entity.get_mut::<OnGround>() {
+                                on_ground.0 = data.on_ground;
+                            }
+                        });
+                    }
                     // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
                     // ClientboundPlayEvent::MoveVehicle() => todo!(),
                     // ClientboundPlayEvent::OpenBook() => todo!(),
@@ -408,7 +474,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::SetScore() => todo!(),
                     // ClientboundPlayEvent::SetSimulationDistance() => todo!(),
                     // ClientboundPlayEvent::SetSubtitleText() => todo!(),
-                    // ClientboundPlayEvent::SetTime() => todo!(),
+                    ClientboundPlayEvent::SetTime() => {}
                     // ClientboundPlayEvent::SetTitleAnimation() => todo!(),
                     // ClientboundPlayEvent::SetTitleText() => todo!(),
                     // ClientboundPlayEvent::ShowDialog() => todo!(),

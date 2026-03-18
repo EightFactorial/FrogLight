@@ -56,7 +56,7 @@ tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block
 tracing_ext = ["froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-network?/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["froglight-block/libm", "froglight-brigadier?/libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "froglight-physics/libm", "froglight-world/libm"]
+libm = ["froglight-block/libm", "froglight-brigadier?/libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "froglight-packet/libm", "froglight-physics/libm", "froglight-world/libm"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["froglight-biome/once_cell", "froglight-inventory/once_cell", "froglight-math/once_cell"]
 # Enable `parking_lot` for `no_std` support.

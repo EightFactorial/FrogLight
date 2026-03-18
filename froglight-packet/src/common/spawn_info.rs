@@ -1,8 +1,10 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
-use facet::{Partial, Peek};
+use facet::{Facet, Partial, Peek};
 #[cfg(feature = "facet")]
 use facet_minecraft::{
     self as mc, DeserializeFn, SerializeFn,
@@ -14,9 +16,9 @@ use froglight_common::prelude::Identifier;
 use froglight_world::component::DimensionPos;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", derive(Facet))]
 pub struct PlayerSpawnInfo {
     #[cfg_attr(feature = "facet", facet(mc::variable))]
     pub dimension_type: u32,
