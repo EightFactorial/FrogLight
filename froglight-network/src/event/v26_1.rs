@@ -42,6 +42,7 @@ use froglight_packet::{
             MoveEntityRotS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
             PongC2SPacket as PlayPongC2SPacket, PongResponseS2CPacket as PlayPongResponseS2CPacket,
             RemoveEntitiesS2CPacket, ServerboundPackets as PlayServerboundPackets,
+            SetEntityMotionS2CPacket,
         },
     },
     version::{Clientbound, Serverbound, VersionPacket},
@@ -671,8 +672,8 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityLink(packet))))
                 }
-                ClientboundPlayEvent::SetEntityMotion() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::SetEntityMotion(entity, delta) => {
+                    let packet = SetEntityMotionS2CPacket { entity_id: VarEntityId(entity), delta };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityMotion(packet))))
                 }
                 ClientboundPlayEvent::SetEquipment() => {
@@ -1268,8 +1269,11 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::SetEntityLink(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityLink())))
                 }
-                PlayClientboundPackets::SetEntityMotion(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityMotion())))
+                PlayClientboundPackets::SetEntityMotion(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityMotion(
+                        packet.entity_id.0,
+                        packet.delta,
+                    ))))
                 }
                 PlayClientboundPackets::SetEquipment(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEquipment())))

@@ -29,6 +29,13 @@ pub struct PreviousVelocity(pub Vec3);
 macro_rules! impls {
     ($($ty:ident),*) => {
         $(
+            impl $ty {
+                #[inline]
+                #[must_use]
+                #[doc = concat!("Create a new [`", stringify!($ty), "`].")]
+                pub const fn new(v: Vec3) -> Self { Self(v) }
+            }
+
             impl AsRef<Vec3> for $ty {
                 fn as_ref(&self) -> &Vec3 { &self.0 }
             }

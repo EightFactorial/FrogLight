@@ -10,17 +10,24 @@ use froglight_entity::entity::EntityDataSet;
 #[cfg(feature = "std")]
 use froglight_entity::{entity::DataSetSerializer, prelude::EntityVersion};
 
-use crate::common::{entity_id::VarEntityId, unsized_buffer::UnsizedBuffer};
+use crate::common::{entity_id::VarEntityId, lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct AddEntityBundle {
     pub entity_id: VarEntityId,
     pub entity_uuid: EntityUuid,
     #[cfg_attr(feature = "facet", facet(mc::variable))]
     pub entity_type: u32,
+    pub position_x: f64,
+    pub position_y: f64,
+    pub position_z: f64,
+    pub velocity: LpDVec3,
+    pub pitch: i8,
+    pub yaw: i8,
+    pub head_yaw: i8,
     pub data: UnsizedBuffer<'static>,
 }
 

@@ -127,21 +127,27 @@ impl BotPlugin {
                 // Handle gameplay events.
                 ClientboundEventEnum::Play(event) => match event {
                     // ClientboundPlayEvent::ActionBarText() => todo!(),
-                    ClientboundPlayEvent::AddEntity(entity_data) => {
+                    ClientboundPlayEvent::AddEntity(data) => {
                         let mut entity = commands.spawn((
                             EntityOfInstance::new(bot.id()),
-                            entity_data.entity_id.0,
-                            entity_data.entity_uuid,
+                            data.entity_id.0,
+                            data.entity_uuid,
+                            Transform::from_translation(Vec3::new(
+                                data.position_x as f32,
+                                data.position_y as f32,
+                                data.position_z as f32,
+                            )),
+                            Velocity::new(data.velocity.as_dvec3().as_vec3()),
                         ));
 
                         let entities = Protocol::entities().load();
-                        if let Some(bundle) = entities.get_entity(entity_data.entity_type.into()) {
+                        if let Some(bundle) = entities.get_entity(data.entity_type.into()) {
                             entity.insert(bundle);
                         } else {
-                            error!("Unknown Entity Type {:?}!", entity_data.entity_type);
+                            error!("Unknown Entity Type {:?}!", data.entity_type);
                         }
 
-                        debug!("Spawning Entity {} ({})", entity.id(), entity_data.entity_id.0.0);
+                        debug!("Spawning Entity {} ({})", entity.id(), data.entity_id.0.0);
                     }
                     // ClientboundPlayEvent::Animate() => todo!(),
                     // ClientboundPlayEvent::AwardStats() => todo!(),
@@ -390,13 +396,13 @@ impl BotPlugin {
                                         let registry = registry.read();
 
                                         // Iterate over the entity's components
-                                        debug!("Despawning Entity {entity_id} with:");
+                                        trace!("Despawning Entity {entity_id} with:");
                                         for component in world.inspect_entity(entity_id).unwrap() {
                                             if let Some(info) =
                                                 registry.get_type_info(component.type_id().unwrap())
                                             {
                                                 // Log the component's type
-                                                debug!(
+                                                trace!(
                                                     "    - {}",
                                                     info.type_path_table().short_path()
                                                 );
@@ -442,19 +448,21 @@ impl BotPlugin {
                             let Some(instance) = entity.get::<WorldInstance>() else { return };
 
                             if let Some(target) = instance.get(&id) {
-                                let (entities, mut commands) =
-                                    entity.into_world_mut().entities_and_commands();
+                                let mut entity = entity.into_world_mut().entity_mut(target);
 
-                                if let Ok(entity) = entities.get(target)
-                                    && let Some(bundle) = entity.get::<EntityBundle>().cloned()
+                                if let Some(bundle) = entity.get::<EntityBundle>().cloned()
                                     && let Ok(bundle) = bundle.with_dataset(dataset)
                                 {
-                                    debug!("Adding to Entity {} ({}):", entity.id(), id.0);
+                                    trace!("Adding to Entity {} ({}):", entity.id(), id.0);
                                     bundle.inspect_reflect(|ty| {
-                                        debug!("    - {}", ty.reflect_short_type_path());
+                                        trace!("    - {}", ty.reflect_short_type_path());
                                     });
 
-                                    commands.entity(target).insert(bundle);
+                                    entity.insert(bundle);
+                                } else {
+                                    error!(
+                                        "Received SetEntityData for Entity {target} without EntityBundle!"
+                                    );
                                 }
                             } else {
                                 error!("Received SetEntityData for unknown EntityId {}!", id.0);
@@ -462,7 +470,28 @@ impl BotPlugin {
                         });
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
-                    ClientboundPlayEvent::SetEntityMotion() => {}
+                    ClientboundPlayEvent::SetEntityMotion(id, delta) => {
+                        let id = *id;
+                        let delta = *delta;
+
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+
+                            if let Some(target) = instance.get(&id) {
+                                if let Some(mut velocity) =
+                                    entity.into_world_mut().get_mut::<Velocity>(target)
+                                {
+                                    **velocity += delta.as_dvec3().as_vec3();
+                                } else {
+                                    error!(
+                                        "Received SetEntityMotion for Entity {target} without Velocity!"
+                                    );
+                                }
+                            } else {
+                                error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
+                            }
+                        });
+                    }
                     // ClientboundPlayEvent::SetEquipment() => todo!(),
                     // ClientboundPlayEvent::SetExperience() => todo!(),
                     // ClientboundPlayEvent::SetHealth() => todo!(),
@@ -482,7 +511,8 @@ impl BotPlugin {
                     // ClientboundPlayEvent::SoundEntity() => todo!(),
                     ClientboundPlayEvent::StartConfiguration => {
                         info!("Reconfiguring...");
-                        commands.entity(bot.id()).remove::<WorldInstance>();
+                        let mut commands = commands.entity(bot.id());
+                        commands.remove::<WorldInstance>().remove::<WorldInstanceChunks>();
                     }
                     // ClientboundPlayEvent::StopSound() => todo!(),
                     // ClientboundPlayEvent::StoreCookie() => todo!(),
