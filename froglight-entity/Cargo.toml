@@ -28,6 +28,7 @@ uuid = { workspace = true }
 arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_math = { features = ["alloc", "bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["alloc", "uuid"], workspace = true, optional = true }
 facet-minecraft = { workspace = true, optional = true }
@@ -41,7 +42,7 @@ default = ["std"]
 # Enable support for atomics
 atomic = []
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_math", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet", "froglight-player/facet"]
 # Enable `tracing` support.
@@ -50,7 +51,7 @@ tracing = ["dep:tracing", "froglight-common/tracing", "froglight-player/tracing"
 tracing_ext = ["facet-minecraft?/tracing", "tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["froglight-common/libm", "glam/nostd-libm"]
+libm = ["bevy_math/nostd-libm", "froglight-common/libm", "glam/nostd-libm"]
 
 # Enable support for the standard library
 std = ["dep:arc-swap", "facet?/std", "facet-minecraft?/std", "froglight-common/std", "froglight-player/std", "glam/std", "uuid/std"]

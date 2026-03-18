@@ -9,10 +9,13 @@ extern crate std;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
+pub mod components;
+pub mod controller;
+pub mod state;
+pub mod step;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Delete Me
-    pub struct PhysicsPlaceholder;
+    pub use crate::{components::*, controller::PhysicsController, state::PhysicsState};
 }

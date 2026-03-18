@@ -2,46 +2,43 @@
 use alloc::{borrow::Cow, vec};
 use core::ops::Add;
 
-use froglight_common::aabb::CommonAabb;
+use froglight_common::aabb::{DCommonAabb, EPSILON_F64};
 use glam::DVec3;
-
-// Using a larger epsilon to match original behavior.
-const EPSILON: f64 = 1e-7;
 
 /// The shape of a block.
 ///
-/// Defined as zero or more [`CommonAabb`]s.
+/// Defined as zero or more [`CommonDAabb`]s.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BlockShape<'a> {
     /// An empty block shape with no AABBs.
     None,
     /// A block shape with a single AABB.
-    Single(CommonAabb),
+    Single(DCommonAabb),
     /// A block shape with multiple AABBs.
     #[cfg(not(feature = "alloc"))]
-    Collection(&'a [CommonAabb]),
+    Collection(&'a [DCommonAabb]),
     /// A block shape with multiple AABBs.
     #[cfg(feature = "alloc")]
-    Collection(Cow<'a, [CommonAabb]>),
+    Collection(Cow<'a, [DCommonAabb]>),
 }
 
 impl BlockShape<'_> {
     /// An empty block.
     pub const EMPTY: Self = BlockShape::None;
     /// A full block.
-    pub const FULL: Self = BlockShape::Single(CommonAabb::ONE);
+    pub const FULL: Self = BlockShape::Single(DCommonAabb::ONE);
 
     /// Creates a new [`BlockShape`] from the given minimum and maximum
     /// coordinates.
     #[must_use]
     pub const fn new(min: DVec3, max: DVec3) -> Self {
-        if (max.x - min.x).abs() > EPSILON
-            && (max.y - min.y).abs() > EPSILON
-            && (max.z - min.z).abs() > EPSILON
+        if (max.x - min.x).abs() > EPSILON_F64
+            && (max.y - min.y).abs() > EPSILON_F64
+            && (max.z - min.z).abs() > EPSILON_F64
         {
             BlockShape::None
         } else {
-            BlockShape::Single(CommonAabb::new(min, max))
+            BlockShape::Single(DCommonAabb::new(min, max))
         }
     }
 
@@ -63,11 +60,13 @@ impl BlockShape<'_> {
     #[must_use]
     #[cfg(feature = "std")]
     pub const fn new_from_corners(a: DVec3, b: DVec3) -> Self {
-        if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
+        if (a.x - b.x).abs() > EPSILON_F64
+            && (a.y - b.y).abs() > EPSILON_F64
+            && (a.z - b.z).abs() > EPSILON_F64
         {
             BlockShape::None
         } else {
-            BlockShape::Single(CommonAabb::new_corners(b, a))
+            BlockShape::Single(DCommonAabb::new_corners(b, a))
         }
     }
 
@@ -75,11 +74,13 @@ impl BlockShape<'_> {
     #[must_use]
     #[cfg(all(not(feature = "std"), feature = "libm"))]
     pub fn new_from_corners(a: DVec3, b: DVec3) -> Self {
-        if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
+        if (a.x - b.x).abs() > EPSILON_F64
+            && (a.y - b.y).abs() > EPSILON_F64
+            && (a.z - b.z).abs() > EPSILON_F64
         {
             BlockShape::None
         } else {
-            BlockShape::Single(CommonAabb::new_corners(b, a))
+            BlockShape::Single(DCommonAabb::new_corners(b, a))
         }
     }
 
@@ -102,7 +103,7 @@ impl BlockShape<'_> {
     pub const fn is_empty(&self) -> bool {
         match self {
             BlockShape::None => true,
-            BlockShape::Single(shape) => shape.const_eq(&CommonAabb::ZERO),
+            BlockShape::Single(shape) => shape.const_eq(&DCommonAabb::ZERO),
             #[cfg(not(feature = "alloc"))]
             BlockShape::Collection(slice) => slice.is_empty(),
             #[cfg(feature = "alloc")]
@@ -112,9 +113,9 @@ impl BlockShape<'_> {
         }
     }
 
-    /// Returns the block's [`CommonAabb`]s as a slice.
+    /// Returns the block's [`CommonDAabb`]s as a slice.
     #[must_use]
-    pub const fn as_slice(&self) -> &[CommonAabb] {
+    pub const fn as_slice(&self) -> &[DCommonAabb] {
         match self {
             BlockShape::None => &[],
             BlockShape::Single(aabb) => core::slice::from_ref(aabb),
@@ -127,10 +128,10 @@ impl BlockShape<'_> {
         }
     }
 
-    /// Adds a new [`CommonAabb`] to the [`BlockShape`].
+    /// Combine this [`BlockShape`] with another.
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub fn add_shape(self, shape: BlockShape<'_>) -> BlockShape<'static> {
+    pub fn with_shape(self, shape: BlockShape<'_>) -> BlockShape<'static> {
         match (self, shape) {
             (aabb, BlockShape::None) | (BlockShape::None, aabb) => aabb.into_owned(),
             (BlockShape::Single(aabb_a), BlockShape::Single(aabb_b)) => {
@@ -171,5 +172,5 @@ impl Default for BlockShape<'_> {
 impl Add<BlockShape<'_>> for BlockShape<'_> {
     type Output = BlockShape<'static>;
 
-    fn add(self, rhs: BlockShape<'_>) -> Self::Output { self.add_shape(rhs) }
+    fn add(self, rhs: BlockShape<'_>) -> Self::Output { self.with_shape(rhs) }
 }

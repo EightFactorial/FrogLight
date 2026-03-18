@@ -62,7 +62,7 @@ impl EntityMetadata {
             global_id: MaybeAtomicU32::new(global_id),
             dataset: E::DATASET,
 
-            aabb: EntityAabb::new(size[0] as f64, size[1] as f64, eye_height as f64),
+            aabb: EntityAabb::new(size[0], size[1], eye_height),
 
             #[cfg(feature = "bevy")]
             inspect_reflect: E::inspect_reflect,
