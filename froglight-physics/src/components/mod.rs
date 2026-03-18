@@ -1,9 +1,6 @@
 //! TODO
 #![expect(missing_docs, reason = "WIP")]
 
-mod aabb;
-pub use aabb::Aabb3d;
-
 mod acceleration;
 pub use acceleration::{Acceleration, PreviousAcceleration};
 

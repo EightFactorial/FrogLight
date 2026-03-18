@@ -18,6 +18,8 @@ use bevy_reflect::Reflect;
 use facet::Peek;
 use froglight_common::prelude::Identifier;
 
+#[cfg(feature = "bevy")]
+use crate::bevy::EntityBundleEvent;
 use crate::{
     entity::{EntityDataSet, GlobalId, metadata::EntityMetadata},
     generated::datatype::EntityDataType,
@@ -170,6 +172,7 @@ impl EntityBundle {
 
         #[cfg(feature = "tracing")]
         tracing::trace!(target: "froglight_entity", "Applying EntityBundle \"{}\" to Entity {}", bundle.identifier(), ctx.entity);
+        commands.trigger(EntityBundleEvent::new);
     }
 
     fn replace_hook(mut world: DeferredWorld, ctx: HookContext) {

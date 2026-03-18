@@ -18,7 +18,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
-        entity::{EntityBundle, EntityType},
+        entity::{EntityAabb, EntityBundle, EntityType},
         generated::{
             component as entity_data,
             entity::{self, VanillaEntity},
