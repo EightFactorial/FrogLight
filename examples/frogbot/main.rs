@@ -137,7 +137,7 @@ impl BotPlugin {
                                 data.position_y as f32,
                                 data.position_z as f32,
                             )),
-                            Velocity::new(data.velocity.as_dvec3().as_vec3()),
+                            Velocity::new(data.velocity.as_vec3()),
                         ));
 
                         let entities = Protocol::entities().load();
@@ -481,7 +481,7 @@ impl BotPlugin {
                                 if let Some(mut velocity) =
                                     entity.into_world_mut().get_mut::<Velocity>(target)
                                 {
-                                    **velocity += delta.as_dvec3().as_vec3();
+                                    **velocity += delta.as_vec3();
                                 } else {
                                     error!(
                                         "Received SetEntityMotion for Entity {target} without Velocity!"

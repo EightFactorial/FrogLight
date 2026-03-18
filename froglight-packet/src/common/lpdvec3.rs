@@ -18,7 +18,7 @@ use facet_minecraft::{
     replace_with::replace_with_or_abort,
     serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
 };
-use glam::DVec3;
+use glam::{DVec3, Vec3};
 
 /// A variable-length [`DVec3`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -113,11 +113,32 @@ impl LpDVec3 {
         }
     }
 
+    /// Handle `Nan` and out-of-range values.
+    #[inline]
+    #[must_use]
+    const fn sanitize(val: f64) -> f64 {
+        if val.is_nan() { 0.0 } else { val.clamp(-1.7179869183E10, 1.7179869183E10) }
+    }
+
+    const fn ceil_long(val: f64) -> i64 {
+        let long = val as i64;
+        if val > long as f64 { long + 1 } else { long }
+    }
+
+    /// Pack a [`f64`] into a [`u64`].
     #[cfg(feature = "std")]
     const fn pack(val: f64) -> u64 { f64::round((val * 0.5 + 0.5) * 32766.) as u64 }
 
+    /// Pack a [`f64`] into a [`u64`].
     #[cfg(all(not(feature = "std"), feature = "libm"))]
     fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
+
+    /// Create a [`Vec3`] from a [`LpDVec3`].
+    #[must_use]
+    pub const fn as_vec3(self) -> Vec3 {
+        let dvec = self.as_dvec3();
+        Vec3 { x: dvec.x as f32, y: dvec.y as f32, z: dvec.z as f32 }
+    }
 
     /// Create a [`DVec3`] from a [`LpDVec3`].
     #[must_use]
@@ -153,18 +174,6 @@ impl LpDVec3 {
     #[inline]
     #[must_use]
     const fn unpack(val: u64) -> f64 { f64::min((val & 32767) as f64, 32766.) * 2. / 32766. - 1. }
-
-    /// Handle `Nan` and out-of-range values.
-    #[inline]
-    #[must_use]
-    const fn sanitize(val: f64) -> f64 {
-        if val.is_nan() { 0.0 } else { val.clamp(-1.7179869183E10, 1.7179869183E10) }
-    }
-
-    const fn ceil_long(val: f64) -> i64 {
-        let long = val as i64;
-        if val > long as f64 { long + 1 } else { long }
-    }
 }
 
 #[cfg(feature = "facet")]
@@ -181,7 +190,7 @@ impl LpDVec3 {
         let a = cursor.take_array::<1>()?[0];
         if a == 0 {
             replace_with_or_abort(partial, |partial| {
-                partial.set(LpDVec3(LpDVec3Inner::Zero)).unwrap()
+                partial.set(Self(LpDVec3Inner::Zero)).unwrap()
             });
             return Ok(());
         }
@@ -194,11 +203,11 @@ impl LpDVec3 {
 
             let d = d as u32;
             replace_with_or_abort(partial, |partial| {
-                partial.set(LpDVec3(LpDVec3Inner::Extended { a, b, c, d })).unwrap()
+                partial.set(Self(LpDVec3Inner::Extended { a, b, c, d })).unwrap()
             });
         } else {
             replace_with_or_abort(partial, |partial| {
-                partial.set(LpDVec3(LpDVec3Inner::Normal { a, b, c })).unwrap()
+                partial.set(Self(LpDVec3Inner::Normal { a, b, c })).unwrap()
             });
         }
 
@@ -240,8 +249,19 @@ impl LpDVec3 {
 }
 
 impl From<DVec3> for LpDVec3 {
+    #[inline]
     fn from(value: DVec3) -> Self { LpDVec3::new(value) }
 }
 impl From<LpDVec3> for DVec3 {
+    #[inline]
     fn from(value: LpDVec3) -> Self { value.as_dvec3() }
+}
+
+impl From<Vec3> for LpDVec3 {
+    #[inline]
+    fn from(value: Vec3) -> Self { LpDVec3::new(value.as_dvec3()) }
+}
+impl From<LpDVec3> for Vec3 {
+    #[inline]
+    fn from(value: LpDVec3) -> Self { value.as_vec3() }
 }
