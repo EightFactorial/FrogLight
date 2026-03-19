@@ -30,8 +30,8 @@ use froglight_packet::{
             ServerboundPackets as LoginServerboundPackets,
         },
         play::{
-            AddEntityS2CPacket, BundleDelimiterS2CPacket, ChunkBatchFinishedS2CPacket,
-            ChunkBatchReceivedC2SPacket, ChunkBatchStartS2CPacket,
+            AcceptTeleportationC2SPacket, AddEntityS2CPacket, BundleDelimiterS2CPacket,
+            ChunkBatchFinishedS2CPacket, ChunkBatchReceivedC2SPacket, ChunkBatchStartS2CPacket,
             ClearDialogS2CPacket as PlayClearDialogS2CPacket,
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
@@ -40,9 +40,10 @@ use froglight_packet::{
             KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LevelChunkWithLightS2CPacket,
             LoginS2CPacket, MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket,
             MoveEntityRotS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
-            PongC2SPacket as PlayPongC2SPacket, PongResponseS2CPacket as PlayPongResponseS2CPacket,
-            RemoveEntitiesS2CPacket, ServerboundPackets as PlayServerboundPackets,
-            SetEntityMotionS2CPacket,
+            PlayerPositionS2CPacket, PongC2SPacket as PlayPongC2SPacket,
+            PongResponseS2CPacket as PlayPongResponseS2CPacket, RemoveEntitiesS2CPacket,
+            ServerboundPackets as PlayServerboundPackets, SetEntityMotionS2CPacket,
+            TeleportEntityS2CPacket,
         },
     },
     version::{Clientbound, Serverbound, VersionPacket},
@@ -548,8 +549,8 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerLookAt(packet))))
                 }
-                ClientboundPlayEvent::PlayerPosition() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::PlayerPosition(teleport_id, data, relative) => {
+                    let packet = PlayerPositionS2CPacket { teleport_id, data, relative };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerPosition(packet))))
                 }
                 ClientboundPlayEvent::PlayerRotation() => {
@@ -780,8 +781,13 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::TakeItemEntity(packet))))
                 }
-                ClientboundPlayEvent::TeleportEntity() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::TeleportEntity(entity, data, relative, on_ground) => {
+                    let packet = TeleportEntityS2CPacket {
+                        entity_id: VarEntityId(entity),
+                        data,
+                        relative,
+                        on_ground,
+                    };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::TeleportEntity(packet))))
                 }
                 ClientboundPlayEvent::TestBlockStatus() => {
@@ -1178,8 +1184,12 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::PlayerLookAt(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerLookAt())))
                 }
-                PlayClientboundPackets::PlayerPosition(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerPosition())))
+                PlayClientboundPackets::PlayerPosition(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerPosition(
+                        packet.teleport_id,
+                        packet.data,
+                        packet.relative,
+                    ))))
                 }
                 PlayClientboundPackets::PlayerRotation(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerRotation())))
@@ -1344,8 +1354,13 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::TakeItemEntity(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TakeItemEntity())))
                 }
-                PlayClientboundPackets::TeleportEntity(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TeleportEntity())))
+                PlayClientboundPackets::TeleportEntity(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TeleportEntity(
+                        packet.entity_id.0,
+                        packet.data,
+                        packet.relative,
+                        packet.on_ground,
+                    ))))
                 }
                 PlayClientboundPackets::TestInstanceBlockStatus(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TestBlockStatus())))
@@ -1487,8 +1502,8 @@ impl EventVersion for V26_1 {
             },
 
             ServerboundEventEnum::Play(play) => match play {
-                ServerboundPlayEvent::AcceptTeleportation() => {
-                    let packet = todo!();
+                ServerboundPlayEvent::AcceptTeleportation(teleport_id) => {
+                    let packet = AcceptTeleportationC2SPacket { teleport_id };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::AcceptTeleportation(
                         packet,
                     ))))
@@ -1875,9 +1890,11 @@ impl EventVersion for V26_1 {
             }
 
             VersionPacket::Play(play) => match play {
-                PlayServerboundPackets::AcceptTeleportation(_packet) => Ok(Some(
-                    ServerboundEventEnum::Play(ServerboundPlayEvent::AcceptTeleportation()),
-                )),
+                PlayServerboundPackets::AcceptTeleportation(packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::AcceptTeleportation(
+                        packet.teleport_id,
+                    ))))
+                }
                 PlayServerboundPackets::Attack(_packet) => {
                     Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::Attack())))
                 }

@@ -24,11 +24,7 @@ use froglight::{
 };
 
 fn main() -> AppExit {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(FroglightPlugins)
-        .add_plugins(BotPlugin)
-        .run()
+    App::new().add_plugins((DefaultPlugins, FroglightPlugins)).add_plugins(BotPlugin).run()
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -366,7 +362,31 @@ impl BotPlugin {
                     // ClientboundPlayEvent::PlayerInfoRemove() => todo!(),
                     // ClientboundPlayEvent::PlayerInfoUpdate() => todo!(),
                     // ClientboundPlayEvent::PlayerLookAt() => todo!(),
-                    // ClientboundPlayEvent::PlayerPosition() => todo!(),
+                    ClientboundPlayEvent::PlayerPosition(teleport, data, flags) => {
+                        // Tell the server we accepted the teleport.
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundPlayEvent::AcceptTeleportation(*teleport),
+                        ));
+
+                        // Set the player's position/rotation/velocity.
+                        let data = *data;
+                        let flags = *flags;
+                        commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut| {
+                            if let Ok((mut transform, mut velocity)) = entity.get_components_mut::<(
+                                &mut Transform,
+                                &mut Velocity,
+                            )>(
+                            ) {
+                                let Transform { translation, rotation, .. } = &mut *transform;
+                                data.apply_relative(translation, rotation, &mut velocity, &flags);
+                            } else {
+                                error!(
+                                    "Received TeleportEntity for Player without Transform, Velocity, or OnGround!"
+                                );
+                            }
+                        });
+                    }
                     // ClientboundPlayEvent::PlayerRotation() => todo!(),
                     ClientboundPlayEvent::Pong(id) => {
                         info!("Received Pong: {id}");
@@ -520,7 +540,37 @@ impl BotPlugin {
                     // ClientboundPlayEvent::TabList() => todo!(),
                     // ClientboundPlayEvent::TagQuery() => todo!(),
                     // ClientboundPlayEvent::TakeItemEntity() => todo!(),
-                    // ClientboundPlayEvent::TeleportEntity() => todo!(),
+                    ClientboundPlayEvent::TeleportEntity(id, data, flags, on_ground) => {
+                        let id = *id;
+                        let data = *data;
+                        let flags = *flags;
+                        let on_ground = *on_ground;
+
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+
+                            if let Some(target) = instance.get(&id) {
+                                let mut entity = entity.into_world_mut().entity_mut(target);
+
+                                if let Ok((mut transform, mut velocity, mut ground)) = entity.get_components_mut::<(
+                                    &mut Transform,
+                                    &mut Velocity,
+                                    &mut OnGround,
+                                )>(
+                                ) {
+                                    let Transform { translation, rotation, .. } = &mut *transform;
+                                    data.apply_relative(translation, rotation, &mut velocity, &flags);
+                                    ground.0 = on_ground;
+                                } else {
+                                    error!(
+                                        "Received TeleportEntity for Entity {target} without Transform, Velocity, or OnGround!"
+                                    );
+                                }
+                            } else {
+                                error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
+                            }
+                        });
+                    }
                     // ClientboundPlayEvent::TestBlockStatus() => todo!(),
                     // ClientboundPlayEvent::TickingState() => todo!(),
                     // ClientboundPlayEvent::TickingStep() => todo!(),

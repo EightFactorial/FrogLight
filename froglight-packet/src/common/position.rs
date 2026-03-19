@@ -3,9 +3,16 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
-use facet::Facet;
+use facet::{Facet, Partial, Peek};
+#[cfg(feature = "facet")]
+use facet_minecraft::{
+    self as mc, DeserializeFn, SerializeFn,
+    deserialize::{InputCursor, error::DeserializeValueError},
+    replace_with::replace_with_or_abort,
+    serialize::{buffer::SerializeWriter, error::SerializeIterError},
+};
 use froglight_common::prelude::EntityId;
-use glam::{DVec3, Vec3};
+use glam::{DVec3, Quat, Vec3};
 
 use crate::generated::v26_1::play::{
     MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket, MoveEntityRotS2CPacket,
@@ -83,6 +90,156 @@ pub struct EntityPositionRotationData {
     pub yaw: f32,
     /// The entity's pitch in degrees.
     pub pitch: f32,
+}
+
+impl EntityPositionRotationData {
+    /// Apply the position and rotation using the given relative flags.
+    #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
+    pub fn apply_relative(
+        &self,
+        position: &mut Vec3,
+        _rotation: &mut Quat,
+        velocity: &mut Vec3,
+        flags: &EntityRelativeFlags,
+    ) {
+        macro_rules! apply {
+            ($data:expr, $field:expr, $condition:expr) => {
+                if $condition {
+                    *$field += $data;
+                } else {
+                    *$field = $data;
+                }
+            };
+        }
+
+        apply!(self.position_x as f32, &mut position.x, flags.x);
+        apply!(self.position_y as f32, &mut position.y, flags.y);
+        apply!(self.position_z as f32, &mut position.z, flags.z);
+
+        apply!(self.velocity_x as f32, &mut velocity.x, flags.delta_x);
+        apply!(self.velocity_y as f32, &mut velocity.y, flags.delta_y);
+        apply!(self.velocity_z as f32, &mut velocity.z, flags.delta_z);
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "facet", derive(Facet))]
+#[cfg_attr(feature = "facet", facet(mc::serialize = EntityRelativeFlags::SERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::deserialize = EntityRelativeFlags::DESERIALIZE))]
+#[expect(clippy::struct_excessive_bools, reason = "That's just how it is")]
+#[expect(missing_docs, reason = "TODO")]
+pub struct EntityRelativeFlags {
+    pub x: bool,
+    pub y: bool,
+    pub z: bool,
+    pub y_rot: bool,
+    pub x_rot: bool,
+    pub delta_x: bool,
+    pub delta_y: bool,
+    pub delta_z: bool,
+    pub rotate_delta: bool,
+}
+
+impl EntityRelativeFlags {
+    /// An [`EntityRelativeMovements`] where all data is absolute.
+    pub const ABSOLUTE: Self = Self {
+        x: false,
+        y: false,
+        z: false,
+        y_rot: false,
+        x_rot: false,
+        delta_x: false,
+        delta_y: false,
+        delta_z: false,
+        rotate_delta: false,
+    };
+    /// An [`EntityRelativeMovements`] where all data is relative.
+    pub const RELATIVE: Self = Self {
+        x: true,
+        y: true,
+        z: true,
+        y_rot: true,
+        x_rot: true,
+        delta_x: true,
+        delta_y: true,
+        delta_z: true,
+        rotate_delta: true,
+    };
+}
+
+#[cfg(feature = "facet")]
+impl EntityRelativeFlags {
+    const DESERIALIZE: DeserializeFn =
+        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
+    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+
+    fn facet_deserialize<'facet, const BORROW: bool>(
+        partial: &mut Partial<'facet, BORROW>,
+        cursor: &mut InputCursor<'_, 'facet>,
+    ) -> Result<(), DeserializeValueError> {
+        let data = u32::from_be_bytes(*cursor.take_array::<4>()?);
+        replace_with_or_abort(partial, |partial| {
+            partial
+                .set(Self {
+                    x: data & 0b0000_0000_0001 != 0,
+                    y: data & 0b0000_0000_0010 != 0,
+                    z: data & 0b0000_0000_0100 != 0,
+                    y_rot: data & 0b0000_0000_1000 != 0,
+                    x_rot: data & 0b0000_0001_0000 != 0,
+                    delta_x: data & 0b0000_0010_0000 != 0,
+                    delta_y: data & 0b0000_0100_0000 != 0,
+                    delta_z: data & 0b0000_1000_0000 != 0,
+                    rotate_delta: data & 0b0001_0000_0000 != 0,
+                })
+                .unwrap()
+        });
+        Ok(())
+    }
+
+    fn facet_serialize<'mem, 'facet>(
+        peek: Peek<'mem, 'facet>,
+        writer: &mut dyn SerializeWriter,
+    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
+        let data = peek.get::<Self>()?;
+        let mut output = 0u32;
+        if data.x {
+            output |= 0b0000_0000_0001;
+        }
+        if data.y {
+            output |= 0b0000_0000_0010;
+        }
+        if data.z {
+            output |= 0b0000_0000_0100;
+        }
+        if data.y_rot {
+            output |= 0b0000_0000_1000;
+        }
+        if data.x_rot {
+            output |= 0b0000_0001_0000;
+        }
+        if data.delta_x {
+            output |= 0b0000_0010_0000;
+        }
+        if data.delta_y {
+            output |= 0b0000_0100_0000;
+        }
+        if data.delta_z {
+            output |= 0b0000_1000_0000;
+        }
+        if data.rotate_delta {
+            output |= 0b0001_0000_0000;
+        }
+
+        if writer.write_data(&output.to_be_bytes()) {
+            Ok(())
+        } else {
+            Err(SerializeIterError::new())
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

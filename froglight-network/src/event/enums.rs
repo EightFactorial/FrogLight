@@ -12,7 +12,7 @@ use froglight_packet::common::{
     known_packs::KnownResourcePack,
     login::{LoginHelloContent, PlayLoginContent},
     lpdvec3::LpDVec3,
-    position::{EntityPositionRotationData, EntityPositionUpdateData},
+    position::{EntityPositionRotationData, EntityPositionUpdateData, EntityRelativeFlags},
     unsized_buffer::UnsizedBuffer,
     update_tags::TagMap,
 };
@@ -156,7 +156,7 @@ pub enum ClientboundPlayEvent {
     PlayerInfoRemove(),
     PlayerInfoUpdate(),
     PlayerLookAt(),
-    PlayerPosition(),
+    PlayerPosition(u32, EntityPositionRotationData, EntityRelativeFlags),
     PlayerRotation(),
     Pong(u32),
     ProjectilePower(),
@@ -209,7 +209,7 @@ pub enum ClientboundPlayEvent {
     TabList(),
     TagQuery(),
     TakeItemEntity(),
-    TeleportEntity(),
+    TeleportEntity(EntityId, EntityPositionRotationData, EntityRelativeFlags, bool),
     TestBlockStatus(),
     TickingState(),
     TickingStep(),
@@ -228,7 +228,7 @@ pub enum ClientboundPlayEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundPlayEvent {
-    AcceptTeleportation(),
+    AcceptTeleportation(u32),
     AcknowledgeConfiguration,
     AdvancementSeen(),
     Attack(),
