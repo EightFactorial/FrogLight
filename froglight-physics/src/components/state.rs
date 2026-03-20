@@ -10,12 +10,12 @@ use froglight_block::{
     block::{BlockShape, GlobalId},
     storage::BlockStorage,
 };
-use froglight_entity::prelude::*;
 use froglight_world::prelude::*;
 use glam::IVec3;
 #[cfg(feature = "std")]
 use quick_cache::unsync::Cache;
 
+#[allow(unused_imports, reason = "May be used depending on features")]
 use crate::prelude::*;
 
 /// The current state of the physics simulation for an entity.
@@ -189,50 +189,5 @@ impl PhysicsState {
         let z = (z + half) as usize;
 
         (y * Self::CACHE_SIDE_LENGTH * Self::CACHE_SIDE_LENGTH) + (z * Self::CACHE_SIDE_LENGTH) + x
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A bundle of mutable references used by [`PhysicsState`].
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::query::QueryData))]
-#[cfg_attr(feature = "bevy", query_data(mutable))]
-pub struct PhysicsMut<'a> {
-    /// The entity's physics controller, if it has one.
-    pub controller: Option<&'a mut PhysicsController>,
-    /// The entity's physics state.
-    pub state: &'a mut PhysicsState,
-    /// The entity's AABB.
-    pub bounding_box: &'a mut EntityAabb,
-
-    /// The entity's current transform.
-    pub transform: &'a mut Transform,
-    /// The entity's previous transform.
-    pub prev_transform: &'a mut PreviousTransform,
-
-    /// The entity's current velocity.
-    pub velocity: &'a mut Velocity,
-    /// The entity's previous velocity.
-    pub prev_velocity: &'a mut PreviousVelocity,
-
-    /// The entity's current acceleration.
-    pub acceleration: &'a mut Acceleration,
-    /// The entity's previous acceleration.
-    pub prev_acceleration: &'a mut PreviousAcceleration,
-
-    /// Whether the entity is currently on the ground.
-    pub on_ground: &'a mut OnGround,
-    /// Whether the entity was previously on the ground.
-    pub prev_on_ground: &'a mut PreviousOnGround,
-}
-
-impl PhysicsMut<'_> {
-    /// Update the previous state to match the current state.
-    #[inline]
-    pub fn update_previous(&mut self) {
-        *self.prev_transform = PreviousTransform(*self.transform);
-        *self.prev_velocity = PreviousVelocity(**self.velocity);
-        *self.prev_acceleration = PreviousAcceleration(**self.acceleration);
-        *self.prev_on_ground = PreviousOnGround(**self.on_ground);
     }
 }

@@ -5,18 +5,22 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
-#[allow(unused_imports, reason = "WIP")]
+#[allow(unused_imports, reason = "May be used depending on features")]
 use crate::prelude::*;
 
 /// A controller for physics entities.
 ///
 /// Allows for performing inputs and other actions.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", require(PhysicsState))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash, Component))]
 pub struct PhysicsController {
     inputs: u8,
+}
+
+impl Default for PhysicsController {
+    fn default() -> Self { Self::new() }
 }
 
 impl PhysicsController {
@@ -31,7 +35,7 @@ impl PhysicsController {
     /// Create a new [`PhysicsController`].
     #[inline]
     #[must_use]
-    pub fn new() -> Self { Self::default() }
+    pub const fn new() -> Self { Self { inputs: 0 } }
 
     /// Returns `true` if the controller is moving forward.
     #[must_use]
