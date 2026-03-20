@@ -6,8 +6,6 @@
 use core::ops::{Add, Div, Mul, Sub};
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-#[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 use facet::{Partial, Peek};
@@ -26,8 +24,8 @@ use crate::{CHUNK_LENGTH, CHUNK_WIDTH, component::ChunkBlockPos, prelude::ChunkP
 
 /// A block's position in the world.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 #[cfg_attr(feature = "facet", facet(mc::serialize = BlockPos::SERIALIZE))]
 #[cfg_attr(feature = "facet", facet(mc::deserialize = BlockPos::DESERIALIZE))]
@@ -37,6 +35,9 @@ use crate::{CHUNK_LENGTH, CHUNK_WIDTH, component::ChunkBlockPos, prelude::ChunkP
 pub struct BlockPos(IVec3);
 
 impl BlockPos {
+    /// A [`BlockPos`] with all coordinates set to `0`.
+    pub const ZERO: Self = Self(IVec3::ZERO);
+
     /// Create a new [`BlockPos`] from the given coordinates.
     #[inline]
     #[must_use]
@@ -67,6 +68,11 @@ impl BlockPos {
     #[must_use]
     pub const fn z(&self) -> i32 { self.0.z }
 
+    /// Get the coordinates of this [`BlockPos`] as an [`IVec3`].
+    #[inline]
+    #[must_use]
+    pub const fn as_ivec3(&self) -> IVec3 { self.0 }
+
     /// Create a new [`BlockPos`] from the given [`ChunkBlockPos`],
     /// [`ChunkPos`], and vertical offset.
     #[must_use]
@@ -76,6 +82,12 @@ impl BlockPos {
             block.y() as i32 + offset,
             block.z() as i32 + (chunk.z() * CHUNK_WIDTH as i32),
         ))
+    }
+
+    /// Create a [`ChunkPos`] from this [`BlockPos`].
+    #[must_use]
+    pub const fn into_chunk_pos(self) -> ChunkPos {
+        ChunkPos::new_xz(self.x() / CHUNK_LENGTH as i32, self.z() / CHUNK_WIDTH as i32)
     }
 }
 

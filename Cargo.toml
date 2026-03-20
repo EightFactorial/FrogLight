@@ -72,6 +72,7 @@ libm = { default-features = false, version = "0.2" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
 petgraph = { default-features = false, version = "0.8" }
+quick_cache = { default-features = false, version = "0.6" }
 replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }

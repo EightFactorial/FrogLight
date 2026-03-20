@@ -17,5 +17,9 @@ pub mod step;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{components::*, controller::PhysicsController, state::PhysicsState};
+    pub use crate::{
+        components::*,
+        controller::PhysicsController,
+        state::{PhysicsMut, PhysicsState},
+    };
 }

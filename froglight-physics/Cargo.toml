@@ -29,6 +29,7 @@ froglight-world = { features = ["froglight-block"], workspace = true }
 glam = { workspace = true }
 
 # Optional dependencies
+quick_cache = { features = ["ahash", "parking_lot"], workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
@@ -51,6 +52,6 @@ tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing",
 # Enable support for a global allocator
 alloc = ["bevy_math/alloc", "bevy_transform/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_math/std", "bevy_reflect?/std", "bevy_transform/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_math/std", "bevy_reflect?/std", "bevy_transform/std", "dep:quick_cache", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-math/nightly", "froglight-world/std", "std"]
