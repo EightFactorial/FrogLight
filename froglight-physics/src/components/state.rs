@@ -76,10 +76,12 @@ impl PhysicsState {
         &mut self,
         position: BlockPos,
         chunks: impl Fn(ChunkPos) -> (&'a NaiveChunk, &'a BlockStorage, TypeId),
-        refresh: bool,
+        mut refresh: bool,
     ) -> &[&'static BlockShape<'static>; Self::CACHE_SIZE] {
         // If the position is different, update the cache.
-        if refresh || position != self.world_cache.0 {
+        refresh |= position != self.world_cache.0;
+
+        if refresh {
             #[expect(clippy::cast_possible_truncation, reason = "Small Constant")]
             #[expect(clippy::cast_possible_wrap, reason = "Small Constant")]
             const LENGTH: i32 = PhysicsState::CACHE_SIDE_LENGTH as i32;
