@@ -1,14 +1,19 @@
+//! TODO
+
 use bevy_app::{PluginGroup, PluginGroupBuilder};
 
 pub mod plugins {
     //! Re-exports of all provided bevy [`Plugin`](bevy_app::Plugin)s.
 
     #[cfg(feature = "network")]
-    pub use crate::{api::bevy::ApiPlugin, network::bevy::NetworkPlugin};
+    pub use crate::modules::{api::bevy::ApiPlugin, network::bevy::NetworkPlugin};
     pub use crate::{
-        bevy::FroglightPlugins, brigadier::bevy::BrigadierPlugin, common::bevy::CommonPlugin,
-        entity::bevy::EntityPlugin, inventory::bevy::InventoryPlugin, physics::bevy::PhysicsPlugin,
-        player::bevy::PlayerPlugin, world::bevy::WorldPlugin,
+        bevy::FroglightPlugins,
+        modules::{
+            brigadier::bevy::BrigadierPlugin, common::bevy::CommonPlugin,
+            entity::bevy::EntityPlugin, inventory::bevy::InventoryPlugin,
+            physics::bevy::PhysicsPlugin, player::bevy::PlayerPlugin, world::bevy::WorldPlugin,
+        },
     };
 }
 
