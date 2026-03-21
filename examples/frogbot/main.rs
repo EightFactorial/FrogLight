@@ -34,7 +34,7 @@ struct BotPlugin;
 
 const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
 const USERNAME: &str = "FrogBot";
-type Protocol = V26_1;
+type Version = V26_1;
 
 impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
@@ -67,7 +67,7 @@ impl BotPlugin {
 
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
-        let connection = ClientConnection::new::<Protocol, FuturesLite, TcpStream>(
+        let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(
             stream,
             cfg!(debug_assertions),
         );
@@ -79,7 +79,7 @@ impl BotPlugin {
         );
 
         // Prepare the handshake and login events.
-        let handshake = HandshakeContent::new_socket::<Protocol>(ADDRESS, ConnectionIntent::Login);
+        let handshake = HandshakeContent::new_socket::<Version>(ADDRESS, ConnectionIntent::Login);
         let login = LoginHelloContent::new_from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
@@ -136,7 +136,7 @@ impl BotPlugin {
                             Velocity::new(data.velocity.as_vec3()),
                         ));
 
-                        let entities = Protocol::entities().load();
+                        let entities = Version::entities().load();
                         if let Some(bundle) = entities.get_entity(data.entity_type.into()) {
                             entity.insert(bundle);
                         } else {
@@ -178,7 +178,7 @@ impl BotPlugin {
                             continue;
                         };
 
-                        match chunk_data.as_chunk::<Protocol>(Some((
+                        match chunk_data.as_chunk::<Version>(Some((
                             instance.height_max(),
                             instance.height_min(),
                         ))) {
@@ -297,7 +297,7 @@ impl BotPlugin {
                             WorldInstance::new(login.spawn_info.dimension.clone()),
                             WorldInstanceChunks::new(320, -64),
                             EntityOfInstance::new(bot.id()),
-                            EntityBundle::new::<entity::Player, Protocol>(),
+                            EntityBundle::new::<entity::Player, Version>(),
                         ));
 
                         // Add the bot's `EntityId` and `EntityUuid`
@@ -684,7 +684,7 @@ impl BotPlugin {
                         commands.write_message(AppExit::error());
                     }
                     ClientboundConfigEvent::UpdateTags(tags) => {
-                        let mut registry = Protocol::registry().write();
+                        let mut registry = Version::registry().write();
 
                         for (identifier, tags) in &tags.0 {
                             info!("Received UpdateTags: \"{identifier}\"");
@@ -697,7 +697,7 @@ impl BotPlugin {
                         }
 
                         // As an example, trace log the "minecraft:slabs" tag.
-                        let blocks = Protocol::blocks().load();
+                        let blocks = Version::blocks().load();
                         let Some(block_reg) = registry.get("minecraft:block") else { continue };
                         let Some(slabs_val) = block_reg.get_by_name("minecraft:slabs") else {
                             continue;
