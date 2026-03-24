@@ -13,7 +13,7 @@ pub struct V26_1;
 
 #[cfg(feature = "v26_1")]
 impl super::Version for V26_1 {
-    const DATA_VERSION: u32 = 4784;
-    const PROTOCOL_ID: u32 = 1073742126;
+    const DATA_VERSION: u32 = 4786;
+    const PROTOCOL_ID: u32 = 775;
     const RESOURCE_VERSION: u32 = 84;
 }
