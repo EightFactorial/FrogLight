@@ -137,6 +137,24 @@ impl Identifier<'_> {
         Ok(())
     }
 
+    /// Get the namespace of this [`Identifier`].
+    #[must_use]
+    pub fn namespace(&self) -> &str { self.namespace_and_path().0 }
+
+    /// Get the path of this [`Identifier`].
+    #[must_use]
+    pub fn path(&self) -> &str { self.namespace_and_path().1 }
+
+    /// Get the namespace and path of this [`Identifier`] as a tuple.
+    #[must_use]
+    #[expect(
+        clippy::missing_panics_doc,
+        reason = "Should never panic, as it is unsafe to create an invalid identifier"
+    )]
+    pub fn namespace_and_path(&self) -> (&str, &str) {
+        self.as_str().split_once(':').expect("Invalid identifier: missing namespace separator?!")
+    }
+
     /// Reborrow this [`Identifier`] with a shorter lifetime.
     ///
     /// Useful for converting a reference into an owned identifier without
