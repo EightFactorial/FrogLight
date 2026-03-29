@@ -133,6 +133,90 @@ macro_rules! impl_aabbs {
             #[must_use]
             #[doc = concat!("Returns the minimum and maximum coordinates of the [`", stringify!($ty), "`] as a tuple.")]
             pub const fn min_max(self) -> ($vecty, $vecty) { (self.min, self.max) }
+
+            /// Get the bottom 4 corners in counter-clockwise order,
+            /// starting from the front-left corner.
+            #[must_use]
+            pub const fn bottom(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(min.x, min.y, min.z),
+                    $vecty::new(max.x, min.y, min.z),
+                    $vecty::new(max.x, min.y, max.z),
+                    $vecty::new(min.x, min.y, max.z),
+                ]
+            }
+
+            /// Get the top 4 corners in counter-clockwise order,
+            /// starting from the front-left corner.
+            #[must_use]
+            pub const fn top(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(max.x, max.y, min.z),
+                    $vecty::new(min.x, max.y, min.z),
+                    $vecty::new(min.x, max.y, max.z),
+                    $vecty::new(max.x, max.y, max.z),
+                ]
+            }
+
+            /// Get the north 4 corners in counter-clockwise order,
+            /// starting from the bottom-left corner.
+            #[must_use]
+            pub const fn north(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(max.x, min.y, min.z),
+                    $vecty::new(min.x, min.y, min.z),
+                    $vecty::new(min.x, max.y, min.z),
+                    $vecty::new(max.x, max.y, min.z),
+                ]
+            }
+
+            /// Get the south 4 corners in counter-clockwise order,
+            /// starting from the bottom-left corner.
+            #[must_use]
+            pub const fn south(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(min.x, min.y, max.z),
+                    $vecty::new(max.x, min.y, max.z),
+                    $vecty::new(max.x, max.y, max.z),
+                    $vecty::new(min.x, max.y, max.z),
+                ]
+            }
+
+            /// Get the west 4 corners in counter-clockwise order,
+            /// starting from the bottom-front corner.
+            #[must_use]
+            pub const fn west(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(min.x, min.y, min.z),
+                    $vecty::new(min.x, min.y, max.z),
+                    $vecty::new(min.x, max.y, max.z),
+                    $vecty::new(min.x, max.y, min.z),
+                ]
+            }
+
+            /// Get the east 4 corners in counter-clockwise order,
+            /// starting from the bottom-front corner.
+            #[must_use]
+            pub const fn east(self) -> [$vecty; 4] {
+                let min = self.min;
+                let max = self.max;
+                [
+                    $vecty::new(max.x, min.y, max.z),
+                    $vecty::new(max.x, min.y, min.z),
+                    $vecty::new(max.x, max.y, min.z),
+                    $vecty::new(max.x, max.y, max.z),
+                ]
+            }
         }
 
         impl PartialEq for $ty {
