@@ -8,7 +8,15 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 pub struct VersionData {
+    #[facet(rename = "assetIndex")]
+    pub asset_index: VersionAssetIndex,
     pub downloads: VersionDownloads,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Facet)]
+pub struct VersionAssetIndex {
+    pub sha1: String,
+    pub url: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]

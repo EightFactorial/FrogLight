@@ -11,3 +11,6 @@ pub use jarfile::JarFile;
 
 mod versiondata;
 pub use versiondata::VersionData;
+
+mod versionasset;
+pub use versionasset::VersionAssets;

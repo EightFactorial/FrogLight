@@ -38,6 +38,9 @@ async fn main() -> Result<()> {
     tasks.spawn(crates::network::generate_global(config));
     tasks.spawn(crates::packet::generate_global(config));
 
+    // Generate a `vanilla.zip` resource pack if requested
+    tasks.spawn(generator::resourcepack::generate(config));
+
     // Wait for all tasks to complete, returning the first error encountered.
     while let Some(result) = tasks.join_next().await {
         match result {

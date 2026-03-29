@@ -73,7 +73,11 @@ impl Identifier<'_> {
     /// # Errors
     ///
     /// Returns an error if the string is not a valid identifier.
-    pub fn try_new<T: AsRef<str> + ?Sized>(_s: &T) -> Result<Self, IdentifierError> { todo!() }
+    pub fn try_new<T: AsRef<str> + ?Sized>(s: &T) -> Result<Identifier<'_>, IdentifierError> {
+        Self::is_valid(s.as_ref())?;
+        // SAFETY: We just checked that `s` is valid.
+        Ok(unsafe { Self::new_unchecked(s.as_ref()) })
+    }
 
     /// Try to create an owned [`Identifier`] from a string slice.
     ///
@@ -81,8 +85,23 @@ impl Identifier<'_> {
     ///
     /// Returns an error if the string is not a valid identifier.
     #[cfg(feature = "alloc")]
-    pub fn try_new_owned<T: AsRef<str> + ?Sized>(s: &T) -> Result<Self, IdentifierError> {
-        Self::try_new::<T>(s).map(Self::into_owned)
+    pub fn try_new_owned<T: AsRef<str> + ?Sized>(
+        s: &T,
+    ) -> Result<Identifier<'static>, IdentifierError> {
+        let val = Self::try_new::<T>(s)?;
+        Ok(val.into_owned())
+    }
+
+    /// Try to create a new owned [`Identifier`] from a string.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the string is not a valid identifier.
+    #[cfg(feature = "alloc")]
+    pub fn try_new_string(s: alloc::string::String) -> Result<Self, IdentifierError> {
+        Self::is_valid(s.as_str())?;
+        // SAFETY: We just checked that `s` is valid.
+        Ok(unsafe { Self::new_owned_unchecked(s) })
     }
 
     /// Convert this [`Identifier`] into an owned version.
@@ -90,6 +109,32 @@ impl Identifier<'_> {
     #[cfg(feature = "alloc")]
     pub fn into_owned(self) -> Identifier<'static> {
         Identifier { inner: Cow::Owned(self.inner.into_owned()) }
+    }
+
+    /// Returns `Ok(())` if the given string is a valid identifier.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the string:
+    /// - Is empty.
+    /// - Starts with a namespace separator (`:`).
+    /// - Ends with a namespace separator (`:`).
+    /// - Contains more than one namespace separator (`:`).
+    pub fn is_valid(str: &str) -> Result<(), IdentifierError> {
+        if str.is_empty() {
+            return Err(IdentifierError::Empty);
+        }
+
+        let mut parts = str.split(':');
+        // Two parts, namespace and path
+        let _namespace = parts.next().ok_or(IdentifierError::RequiresNamespace)?;
+        let _path = parts.next().ok_or(IdentifierError::RequiresNamespace)?;
+        // Cannot have multiple namespaces
+        if parts.next().is_some() {
+            return Err(IdentifierError::InvalidNamespace);
+        }
+
+        Ok(())
     }
 
     /// Reborrow this [`Identifier`] with a shorter lifetime.
@@ -157,7 +202,7 @@ impl Identifier<'_> {
     /// The caller must ensure that the provided string is a valid identifier.
     #[inline]
     #[must_use]
-    pub const fn new_unchecked(s: &str) -> Identifier<'_> {
+    pub const unsafe fn new_unchecked(s: &str) -> Identifier<'_> {
         #[cfg(feature = "alloc")]
         {
             Identifier { inner: Cow::Borrowed(s) }
@@ -176,7 +221,7 @@ impl Identifier<'_> {
     #[inline]
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub fn new_owned_unchecked(s: alloc::string::String) -> Identifier<'static> {
+    pub const unsafe fn new_owned_unchecked(s: alloc::string::String) -> Identifier<'static> {
         Identifier { inner: Cow::Owned(s) }
     }
 }
@@ -237,7 +282,15 @@ impl Hash for Identifier<'_> {
 
 /// An error that occurs when creating an [`Identifier`].
 #[derive(Clone, Copy)]
-pub enum IdentifierError {}
+pub enum IdentifierError {
+    /// The string is empty.
+    Empty,
+    /// The string has no namespace separator (`:`).
+    RequiresNamespace,
+    /// The string either starts with, ends with,
+    /// or contains more than one namespace separator (`:`).
+    InvalidNamespace,
+}
 
 impl Display for IdentifierError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result { todo!() }

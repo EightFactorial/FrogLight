@@ -32,8 +32,8 @@ fmt:
     cargo sort-derives
 
 # Run the code generator
-generate:
-    RUST_LOG=debug cargo run --package=froglight-codegen --release
+generate arg="":
+    RUST_LOG=debug cargo run --package=froglight-codegen --release -- {{ arg }}
     @just fmt
 
 # Show the dependency tree for a specific package
