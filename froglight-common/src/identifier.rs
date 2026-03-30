@@ -51,6 +51,9 @@ pub struct Identifier<'a> {
 }
 
 impl Identifier<'_> {
+    /// The default namespace to use when one is not provided.
+    pub const DEFAULT_NAMESPACE: &'static str = "minecraft";
+
     /// Create a new static [`Identifier`].
     ///
     /// # Panics
@@ -70,16 +73,41 @@ impl Identifier<'_> {
 
     /// Try to create a new [`Identifier`] from a string slice.
     ///
+    /// # Note
+    ///
+    /// If the `alloc` feature is enabled and a string without a namespace is
+    /// provided, one will be automatically added.
+    ///
     /// # Errors
     ///
     /// Returns an error if the string is not a valid identifier.
     pub fn try_new<T: AsRef<str> + ?Sized>(s: &T) -> Result<Identifier<'_>, IdentifierError> {
-        Self::is_valid(s.as_ref())?;
-        // SAFETY: We just checked that `s` is valid.
-        Ok(unsafe { Self::new_unchecked(s.as_ref()) })
+        match Self::validate_string(s.as_ref()) {
+            Ok(()) => {
+                // SAFETY: We just checked that `s` is valid.
+                Ok(unsafe { Self::new_unchecked(s.as_ref()) })
+            }
+            #[cfg(feature = "alloc")]
+            Err(IdentifierError::RequiresNamespace) => {
+                // SAFETY: We know that `s` is not empty, so we can prepend a namespace.
+                Ok(unsafe {
+                    Self::new_owned_unchecked(alloc::format!(
+                        "{}:{}",
+                        Self::DEFAULT_NAMESPACE,
+                        s.as_ref()
+                    ))
+                })
+            }
+            Err(err) => Err(err),
+        }
     }
 
     /// Try to create an owned [`Identifier`] from a string slice.
+    ///
+    /// # Note
+    ///
+    /// If the `alloc` feature is enabled and a string without a namespace is
+    /// provided, one will be automatically added.
     ///
     /// # Errors
     ///
@@ -94,14 +122,29 @@ impl Identifier<'_> {
 
     /// Try to create a new owned [`Identifier`] from a string.
     ///
+    /// # Note
+    ///
+    /// If a string without a namespace is provided, one will be automatically
+    /// added.
+    ///
     /// # Errors
     ///
     /// Returns an error if the string is not a valid identifier.
     #[cfg(feature = "alloc")]
     pub fn try_new_string(s: alloc::string::String) -> Result<Self, IdentifierError> {
-        Self::is_valid(s.as_str())?;
-        // SAFETY: We just checked that `s` is valid.
-        Ok(unsafe { Self::new_owned_unchecked(s) })
+        match Self::validate_string(s.as_str()) {
+            Ok(()) => {
+                // SAFETY: We just checked that `s` is valid.
+                Ok(unsafe { Self::new_owned_unchecked(s) })
+            }
+            Err(IdentifierError::RequiresNamespace) => {
+                // SAFETY: We know that `s` is not empty, so we can prepend a namespace.
+                Ok(unsafe {
+                    Self::new_owned_unchecked(alloc::format!("{}:{s}", Self::DEFAULT_NAMESPACE))
+                })
+            }
+            Err(err) => Err(err),
+        }
     }
 
     /// Convert this [`Identifier`] into an owned version.
@@ -120,18 +163,19 @@ impl Identifier<'_> {
     /// - Starts with a namespace separator (`:`).
     /// - Ends with a namespace separator (`:`).
     /// - Contains more than one namespace separator (`:`).
-    pub fn is_valid(str: &str) -> Result<(), IdentifierError> {
+    pub fn validate_string(str: &str) -> Result<(), IdentifierError> {
         if str.is_empty() {
             return Err(IdentifierError::Empty);
         }
 
-        let mut parts = str.split(':');
         // Two parts, namespace and path
-        let _namespace = parts.next().ok_or(IdentifierError::RequiresNamespace)?;
-        let _path = parts.next().ok_or(IdentifierError::RequiresNamespace)?;
-        // Cannot have multiple namespaces
-        if parts.next().is_some() {
-            return Err(IdentifierError::InvalidNamespace);
+        let Some((namespace, path)) = str.split_once(':') else {
+            return Err(IdentifierError::RequiresNamespace);
+        };
+
+        // Neither part must be empty, and there must be no more separators
+        if namespace.is_empty() || path.is_empty() || path.contains(':') {
+            return Err(IdentifierError::Invalid);
         }
 
         Ok(())
@@ -307,7 +351,7 @@ pub enum IdentifierError {
     RequiresNamespace,
     /// The string either starts with, ends with,
     /// or contains more than one namespace separator (`:`).
-    InvalidNamespace,
+    Invalid,
 }
 
 impl Display for IdentifierError {
