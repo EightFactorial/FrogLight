@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::{borrow::Cow, boxed::Box, string::String};
+use alloc::{borrow::Cow, boxed::Box};
 use core::{
     any::TypeId,
     error::Error,
@@ -39,7 +39,7 @@ impl GameCommandSet {
     where
         B::BundleData: Default,
     {
-        Self::register_command_using(self, command, B::BundleData::default(), system)
+        Self::register_command_using(self, command.into(), B::BundleData::default(), system)
     }
 
     /// Register a command with the given name, parser, and system.
@@ -49,15 +49,14 @@ impl GameCommandSet {
     /// Returns an error if a command with the same name already exists.
     pub fn register_command_using<B: ArgumentBundle>(
         &mut self,
-        command: impl Into<Cow<'static, str>>,
+        command: Cow<'static, str>,
         settings: B::BundleData,
         system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError> {
-        let command = command.into();
         if self.0.contains_key(&command) {
             Err(CommandRegisterError::AlreadyExists)
         } else {
-            self.0.insert(command, CommandInfo::new_from::<B>(settings, system));
+            self.0.insert(command, CommandInfo::new::<B>(settings, system));
             Ok(())
         }
     }
@@ -67,12 +66,12 @@ impl GameCommandSet {
     /// # Errors
     ///
     /// Returns an error if the command is not found or execution fails.
-    pub fn execute(
+    pub fn execute<'a>(
         &self,
         entity: Entity,
-        command: &str,
+        command: &'a str,
         world: &mut World,
-    ) -> Result<(), ParseOrExecuteError> {
+    ) -> Result<(), ParseOrExecuteError<'a>> {
         if let Some(info) = self.0.get(command) {
             info.run(entity, command, world)
         } else {
@@ -101,15 +100,29 @@ impl Display for CommandRegisterError {
 
 /// An error that can occur while parsing a command string.
 #[derive(Debug)]
-pub enum CommandParseError {
+pub enum CommandParseError<'a> {
     /// The command was not found.
-    CommandNotFound(String),
+    CommandNotFound(Cow<'a, str>),
     /// An error occurred while parsing the command.
     ParseError(ArgumentParseError),
 }
 
-impl Error for CommandParseError {}
-impl Display for CommandParseError {
+impl CommandParseError<'_> {
+    /// Take ownership of the error, converting any borrowed data into owned
+    /// data.
+    #[must_use]
+    pub fn into_owned(self) -> CommandParseError<'static> {
+        match self {
+            CommandParseError::CommandNotFound(cmd) => {
+                CommandParseError::CommandNotFound(cmd.into_owned().into())
+            }
+            CommandParseError::ParseError(err) => CommandParseError::ParseError(err),
+        }
+    }
+}
+
+impl Error for CommandParseError<'_> {}
+impl Display for CommandParseError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandParseError::CommandNotFound(cmd) => write!(f, "command not found: \"{cmd}\""),
@@ -136,15 +149,27 @@ impl Display for CommandExecuteError {
 
 /// An error that can occur while parsing or executing a command.
 #[derive(Debug)]
-pub enum ParseOrExecuteError {
+pub enum ParseOrExecuteError<'a> {
     /// An error occurred while parsing the command.
-    Parse(CommandParseError),
+    Parse(CommandParseError<'a>),
     /// An error occurred while executing the command.
     Execute(CommandExecuteError),
 }
 
-impl Error for ParseOrExecuteError {}
-impl Display for ParseOrExecuteError {
+impl ParseOrExecuteError<'_> {
+    /// Take ownership of the error, converting any borrowed data into owned
+    /// data.
+    #[must_use]
+    pub fn into_owned(self) -> ParseOrExecuteError<'static> {
+        match self {
+            ParseOrExecuteError::Parse(err) => ParseOrExecuteError::Parse(err.into_owned()),
+            ParseOrExecuteError::Execute(err) => ParseOrExecuteError::Execute(err),
+        }
+    }
+}
+
+impl Error for ParseOrExecuteError<'_> {}
+impl Display for ParseOrExecuteError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ParseOrExecuteError::Parse(err) => write!(f, "Parse error, {err}"),
@@ -165,27 +190,19 @@ pub struct CommandInfo {
 
 impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
-    #[inline]
     #[must_use]
-    pub fn new<B: ArgumentBundle>(system: SystemId<GameCommandCtx<B>, ()>) -> Self
-    where
-        B::BundleData: Default,
-    {
-        Self::new_from(B::BundleData::default(), system)
-    }
-
-    /// Create a new [`CommandInfo`] for the given root node and system.
-    #[must_use]
-    pub fn new_from<B: ArgumentBundle>(
+    pub fn new<B: ArgumentBundle>(
         data: B::BundleData,
         system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Self {
         Self {
             parser_ty: TypeId::of::<B>(),
             runner: Box::new(move |entity, args, world| {
+                // Parse the `BundleData` from the input string.
                 let input = B::bundle_from_string(args, &data).map_err(|err| {
                     ParseOrExecuteError::Parse(CommandParseError::ParseError(err))
                 })?;
+                // Run the system with the Entity and `BundleData` as input.
                 world.run_system_with(system, (entity, input)).map_err(|err| {
                     ParseOrExecuteError::Execute(CommandExecuteError::CommandError(Box::new(err)))
                 })
@@ -199,12 +216,12 @@ impl CommandInfo {
     ///
     /// Returns an error if execution fails.
     #[inline]
-    pub fn run(
+    pub fn run<'a>(
         &self,
         entity: Entity,
-        input: &str,
+        input: &'a str,
         world: &mut World,
-    ) -> Result<(), ParseOrExecuteError> {
+    ) -> Result<(), ParseOrExecuteError<'a>> {
         (self.runner)(entity, input, world)
     }
 }
@@ -222,15 +239,18 @@ impl Clone for CommandInfo {
 
 /// A trait for functions that can be stored in the [`GameCommandSet`].
 pub trait CommandSetFn:
-    Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError> + Send + Sync + 'static
+    for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), ParseOrExecuteError<'a>>
+    + Send
+    + Sync
+    + 'static
 {
     /// Clone this function as a trait object.
     fn dyn_clone(&self) -> Box<dyn CommandSetFn>;
 }
 impl<T> CommandSetFn for T
 where
-    T: Clone
-        + Fn(Entity, &str, &mut World) -> Result<(), ParseOrExecuteError>
+    T: for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), ParseOrExecuteError<'a>>
+        + Clone
         + Send
         + Sync
         + 'static,

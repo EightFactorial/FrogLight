@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::borrow::Cow;
+use alloc::{borrow::Cow, string::String};
 
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
@@ -8,6 +8,7 @@ use bevy_ecs::prelude::*;
 use crate::{
     bundle::ArgumentBundle,
     prelude::{GameCommandCtx, GameCommandSet},
+    set::ParseOrExecuteError,
 };
 
 /// A extension trait adding [`App::add_game_command`] and
@@ -53,7 +54,7 @@ impl AppGameCommand for App {
         if let Err(err) = self
             .world_mut()
             .get_resource_or_init::<GameCommandSet>()
-            .register_command_using(command, settings, system)
+            .register_command_using(command.into(), settings, system)
         {
             panic!("Failed to register command: {err:?}");
         }
@@ -65,33 +66,38 @@ impl AppGameCommand for App {
 /// An extension trait for [`Commands`] that adds [`Commands::game_command`].
 pub trait CommandsGameCommand {
     /// Queue a game command to be executed by the given entity.
-    fn game_command(&mut self, entity: Entity, command: impl Into<Cow<'static, str>>) -> &mut Self;
+    fn game_command(&mut self, entity: Entity, command: impl AsRef<str>) -> &mut Self;
+}
+
+impl CommandsGameCommand for Commands<'_, '_> {
+    #[inline]
+    fn game_command(&mut self, entity: Entity, command: impl AsRef<str>) -> &mut Self {
+        self.entity(entity).game_command(command);
+        self
+    }
 }
 
 /// An extension trait for [`EntityCommands`] that adds
 /// [`EntityCommands::game_command`].
 pub trait EntityCommandsGameCommand {
     /// Queue a game command to be executed by the entity.
-    fn game_command(&mut self, command: impl Into<Cow<'static, str>>) -> &mut Self;
-}
-
-impl CommandsGameCommand for Commands<'_, '_> {
-    fn game_command(&mut self, entity: Entity, command: impl Into<Cow<'static, str>>) -> &mut Self {
-        self.entity(entity).game_command(command);
-        self
-    }
+    fn game_command(&mut self, command: impl AsRef<str>) -> &mut Self;
 }
 
 impl EntityCommandsGameCommand for EntityCommands<'_> {
-    fn game_command(&mut self, command: impl Into<Cow<'static, str>>) -> &mut Self {
-        let command = command.into();
-        self.queue(move |mut entity: EntityWorldMut| {
+    fn game_command(&mut self, command: impl AsRef<str>) -> &mut Self {
+        let command = String::from(command.as_ref());
+        self.queue(move |entity: EntityWorldMut| {
             let entity_id = entity.id();
-            entity.world_scope(|world| {
-                world.init_resource::<GameCommandSet>();
-                world.resource_scope::<GameCommandSet, _>(|world, commands| {
-                    commands.execute(entity_id, &command, world)
-                })
+            let world = entity.into_world_mut();
+
+            // Ensure the `GameCommandSet` is exists.
+            world.init_resource::<GameCommandSet>();
+            // Execute the command.
+            world.resource_scope::<GameCommandSet, _>(|world, commands| {
+                commands
+                    .execute(entity_id, &command, world)
+                    .map_err(ParseOrExecuteError::into_owned)
             })
         });
         self
