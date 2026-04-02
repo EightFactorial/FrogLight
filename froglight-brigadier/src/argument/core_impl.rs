@@ -110,6 +110,7 @@ impl<T: ArgumentParser> ArgumentParser for Option<T> {
 impl<T: ArgumentParser, const N: usize> ArgumentParser for [T; N] {
     type Data = T::Data;
 
+    #[cfg(not(feature = "nightly"))]
     fn parse<'a>(
         mut input: &'a str,
         data: &T::Data,
@@ -122,5 +123,18 @@ impl<T: ArgumentParser, const N: usize> ArgumentParser for [T; N] {
         }
         // SAFETY: Vector is guaranteed to be `N` elements long.
         Ok((unsafe { result.try_into().unwrap_unchecked() }, input))
+    }
+
+    #[cfg(feature = "nightly")]
+    fn parse<'a>(
+        mut input: &'a str,
+        data: &T::Data,
+    ) -> Result<(Self, &'a str), ArgumentParseError> {
+        core::array::try_from_fn(|_| {
+            let (value, rest) = T::parse(input, data)?;
+            input = rest;
+            Ok(value)
+        })
+        .map(|arr| (arr, input))
     }
 }
