@@ -23,10 +23,7 @@ impl EntityAabb {
     /// Create a new [`EntityAabb`] from an entity's size and eye height.
     #[must_use]
     pub const fn new(xz: f32, y: f32, eye_height: f32) -> Self {
-        let mut aabb = CommonAabb::new_centered(Vec3::ZERO, Vec3::new(xz, y, xz));
-        aabb.min.y -= eye_height;
-        aabb.max.y -= eye_height;
-        Self::new_from(aabb, eye_height)
+        Self::new_from(CommonAabb::new_centered(Vec3::ZERO, Vec3::new(xz, y, xz)), eye_height)
     }
 
     /// Create an [`EntityAabb`] from it's [`CommonAabb`] and the entity's eye
