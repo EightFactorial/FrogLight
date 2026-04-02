@@ -26,10 +26,25 @@ fn basic() -> AppExit {
         |_ctx: GameCommandCtx<String>| {},
     );
 
-    // Exit after 0.25 seconds
+    app.add_game_command("exit", |_: GameCommandCtx<()>, mut commands: Commands| {
+        commands.write_message(AppExit::Success);
+    });
+
+    // Exit after 0.20 seconds
+    app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
+        if time.elapsed_secs() > 0.20 {
+            #[cfg(debug_assertions)]
+            info!("Exiting via command...");
+            commands.spawn_empty().game_command("exit");
+        }
+    });
+
+    // Fail after 0.25 seconds
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
         if time.elapsed_secs() > 0.25 {
-            commands.write_message(AppExit::Success);
+            #[cfg(debug_assertions)]
+            error!("Exiting via timeout...");
+            commands.write_message(AppExit::error());
         }
     });
 
