@@ -2,7 +2,7 @@
 
 use froglight_world::{chunk::NaiveChunk, prelude::ChunkPos};
 
-use crate::query::{PhysicsMutItem, PhysicsMutReadOnlyItem};
+use crate::prelude::{PhysicsMut, PhysicsRef};
 
 pub mod s1_fluid;
 pub mod s2_move;
@@ -12,7 +12,7 @@ pub mod s4_effects;
 /// Perform a physics step.
 ///
 /// Just a wrapper for calling the individual step functions in order.
-pub fn step<'s, E: EntityQuery<'s>, W: ChunkQuery>(mut input: PhysicsInput<'s, E, W>) {
+pub fn step<E: EntityQuery, W: ChunkQuery>(mut input: PhysicsInput<E, W>) {
     s1_fluid::fluid_step(&mut input);
     s2_move::move_step(&mut input);
     s3_travel::travel_step(&mut input);
@@ -22,7 +22,7 @@ pub fn step<'s, E: EntityQuery<'s>, W: ChunkQuery>(mut input: PhysicsInput<'s, E
 // -------------------------------------------------------------------------------------------------
 
 /// The input for the physics [`step`] function.
-pub struct PhysicsInput<'s, E: EntityQuery<'s>, W: ChunkQuery> {
+pub struct PhysicsInput<E: EntityQuery, W: ChunkQuery> {
     /// The entity to perform the physics step for.
     pub target: E::ID,
     /// Access to entity data.
@@ -32,15 +32,15 @@ pub struct PhysicsInput<'s, E: EntityQuery<'s>, W: ChunkQuery> {
 }
 
 /// A type that can query for entities' physics components.
-pub trait EntityQuery<'s> {
+pub trait EntityQuery {
     /// An identifier for an entity.
     type ID;
 
     /// Get the physics components for an entity, if it exists.
-    fn get_entity(&self, entity: Self::ID) -> Option<PhysicsMutReadOnlyItem<'_, 's, 'static>>;
+    fn get_entity(&self, entity: Self::ID) -> Option<PhysicsRef<'_>>;
 
     /// Muatably get the physics components for an entity, if it exists.
-    fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMutItem<'_, 's, 'static>>;
+    fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMut<'_>>;
 }
 
 /// A type that can query for chunk data.

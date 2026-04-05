@@ -7,11 +7,10 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::prelude::*;
 use froglight_common::prelude::*;
 use froglight_entity::{bevy::EntityBundleEvent, entity::EntityAabb, prelude::*};
-use froglight_world::{chunk::SharedChunk, prelude::*};
+use froglight_world::prelude::*;
 
 use crate::{
     prelude::*,
-    query::{PhysicsMutItem, PhysicsMutReadOnlyItem},
     step::{ChunkGuard, ChunkQuery, EntityQuery, PhysicsInput},
 };
 
@@ -104,17 +103,17 @@ pub fn many_as_input<const N: usize>(
 /// An [`EntityQuery`] implementation for Bevy.
 pub struct BevyQuery<'s>(Query<'s, 's, PhysicsMut<'static>, ()>);
 
-impl<'s> EntityQuery<'s> for BevyQuery<'s> {
+impl EntityQuery for BevyQuery<'_> {
     type ID = Entity;
 
     #[inline]
-    fn get_entity(&self, entity: Self::ID) -> Option<PhysicsMutReadOnlyItem<'_, 's, 'static>> {
-        self.0.get(entity).ok()
+    fn get_entity(&self, entity: Self::ID) -> Option<PhysicsRef<'_>> {
+        self.0.get(entity).ok().map(Into::into)
     }
 
     #[inline]
-    fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMutItem<'_, 's, 'static>> {
-        self.0.get_mut(entity).ok()
+    fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMut<'_>> {
+        self.0.get_mut(entity).ok().map(Into::into)
     }
 }
 

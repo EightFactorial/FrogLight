@@ -16,5 +16,8 @@ pub mod step;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{components::*, query::PhysicsMut};
+    pub use crate::{
+        components::*,
+        query::{PhysicsMut, PhysicsRef},
+    };
 }

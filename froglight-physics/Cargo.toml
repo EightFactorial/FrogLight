@@ -26,7 +26,7 @@ froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
 froglight-math = { workspace = true }
-froglight-world = { features = ["froglight-block"], workspace = true }
+froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 glam = { workspace = true }
 
 # Optional dependencies
@@ -44,7 +44,7 @@ tracing = { workspace = true, optional = true }
 default = ["alloc", "std"]
 
 # Enable `bevy` support.
-bevy = ["alloc", "bevy_math/bevy_reflect", "bevy_transform/bevy-support", "bevy_transform/bevy_reflect", "dep:arc-swap", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy", "froglight-math/bevy"]
+bevy = ["alloc", "bevy_math/bevy_reflect", "bevy_transform/bevy-support", "bevy_transform/bevy_reflect", "dep:arc-swap", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy", "froglight-math/bevy", "froglight-world/bevy"]
 
 # Enable `libm` for `no_std` support.
 libm = ["bevy_math/nostd-libm", "bevy_transform/libm", "dep:libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
