@@ -79,21 +79,25 @@ pub fn many_as_input<const N: usize>(
 
     // SAFETY: None of the queries can access any other's components.
     // SAFETY: No archetype changes can occur through `PhysicsInput`.
+    // SAFETY: The caller ensures the target is never accessed through `BevyQuery`.
     unsafe {
         let mut physics = physics.query_unchecked(cell);
         let mut chunks = chunks.query_unchecked(cell);
 
-        for entity in entities {
+        for target_id in entities {
+            let target_phys = PhysicsMut::from_world_cell(target_id, cell).unwrap();
+
             let instance_id =
-                cell.get_entity(entity).unwrap().get::<EntityOfInstance>().unwrap().entity();
+                cell.get_entity(target_id).unwrap().get::<EntityOfInstance>().unwrap().entity();
             let instance =
                 cell.get_entity(instance_id).unwrap().get::<WorldInstanceChunks>().unwrap();
 
-            f(PhysicsInput {
-                target: entity,
-                entities: BevyQuery(physics.reborrow()),
-                world: WorldQuery { instance, query: chunks.reborrow() },
-            });
+            f(PhysicsInput::new(
+                target_id,
+                target_phys,
+                BevyQuery { query: physics.reborrow() },
+                WorldQuery { instance, query: chunks.reborrow() },
+            ));
         }
     }
 }
@@ -101,19 +105,21 @@ pub fn many_as_input<const N: usize>(
 // -------------------------------------------------------------------------------------------------
 
 /// An [`EntityQuery`] implementation for Bevy.
-pub struct BevyQuery<'s>(Query<'s, 's, PhysicsMut<'static>, ()>);
+pub struct BevyQuery<'s> {
+    query: Query<'s, 's, PhysicsMut<'static>, ()>,
+}
 
 impl EntityQuery for BevyQuery<'_> {
     type ID = Entity;
 
     #[inline]
     fn get_entity(&self, entity: Self::ID) -> Option<PhysicsRef<'_>> {
-        self.0.get(entity).ok().map(Into::into)
+        self.query.get(entity).ok().map(Into::into)
     }
 
     #[inline]
     fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMut<'_>> {
-        self.0.get_mut(entity).ok().map(Into::into)
+        self.query.get_mut(entity).ok().map(Into::into)
     }
 }
 

@@ -37,6 +37,30 @@ pub struct PhysicsRef<'a> {
     pub prev_on_ground: &'a PreviousOnGround,
 }
 
+impl PhysicsRef<'_> {
+    /// Reborrow this [`PhysicsRef`] as a new [`PhysicsRef`] with a shorter
+    /// lifetime.
+    #[must_use]
+    pub const fn reborrow(&self) -> PhysicsRef<'_> {
+        PhysicsRef {
+            controller: match &self.controller {
+                Some(controller) => Some(controller),
+                None => None,
+            },
+            state: self.state,
+            bounding_box: self.bounding_box,
+            transform: self.transform,
+            prev_transform: self.prev_transform,
+            velocity: self.velocity,
+            prev_velocity: self.prev_velocity,
+            acceleration: self.acceleration,
+            prev_acceleration: self.prev_acceleration,
+            on_ground: self.on_ground,
+            prev_on_ground: self.prev_on_ground,
+        }
+    }
+}
+
 impl<'a> From<PhysicsMut<'a>> for PhysicsRef<'a> {
     #[inline]
     fn from(mutable: PhysicsMut<'a>) -> Self {
@@ -147,6 +171,63 @@ pub struct PhysicsMut<'a> {
 }
 
 impl<'a> PhysicsMut<'a> {
+    /// Get a [`PhysicsMut`] for the given entity from the world.
+    ///
+    /// Returns `None` if the entity doesn't have the required components.
+    #[cfg(feature = "bevy")]
+    pub fn from_world(
+        entity: bevy_ecs::prelude::Entity,
+        world: &mut bevy_ecs::prelude::World,
+    ) -> Option<PhysicsMut<'_>> {
+        world.query::<PhysicsMut<'_>>().get_mut(world, entity).ok().map(Into::into)
+    }
+
+    /// Get a [`PhysicsMut`] for the given entity from the world.
+    ///
+    /// Returns `None` if the entity doesn't have the required components.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that no other references to the entity's physics
+    /// components exist while the returned [`PhysicsMut`] is alive.
+    #[cfg(feature = "bevy")]
+    pub unsafe fn from_world_cell(
+        entity: bevy_ecs::prelude::Entity,
+        world: bevy_ecs::world::unsafe_world_cell::UnsafeWorldCell<'_>,
+    ) -> Option<PhysicsMut<'_>> {
+        let entity = world.get_entity(entity).ok()?;
+
+        unsafe {
+            Some(PhysicsMut {
+                controller: entity
+                    .get_mut::<PhysicsController>()
+                    .map(bevy_ecs::world::Mut::into_inner),
+                state: entity.get_mut::<PhysicsState>().map(bevy_ecs::world::Mut::into_inner)?,
+                bounding_box: entity
+                    .get_mut::<EntityAabb>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+                transform: entity.get_mut::<Transform>().map(bevy_ecs::world::Mut::into_inner)?,
+                prev_transform: entity
+                    .get_mut::<PreviousTransform>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+                velocity: entity.get_mut::<Velocity>().map(bevy_ecs::world::Mut::into_inner)?,
+                prev_velocity: entity
+                    .get_mut::<PreviousVelocity>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+                acceleration: entity
+                    .get_mut::<Acceleration>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+                prev_acceleration: entity
+                    .get_mut::<PreviousAcceleration>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+                on_ground: entity.get_mut::<OnGround>().map(bevy_ecs::world::Mut::into_inner)?,
+                prev_on_ground: entity
+                    .get_mut::<PreviousOnGround>()
+                    .map(bevy_ecs::world::Mut::into_inner)?,
+            })
+        }
+    }
+
     /// Update the previous state to match the current state.
     #[inline]
     pub fn update_previous(&mut self) {
@@ -156,15 +237,69 @@ impl<'a> PhysicsMut<'a> {
         *self.prev_on_ground = PreviousOnGround(**self.on_ground);
     }
 
-    /// Reborrow this [`PhysicsMut`] as a [`PhysicsRef`].
-    #[inline]
+    /// Reborrow this [`PhysicsMut`] as a new [`PhysicsMut`] with a shorter
+    /// lifetime.
     #[must_use]
-    pub fn as_ref(&self) -> PhysicsRef<'_> { PhysicsRef::from(self) }
+    pub const fn reborrow(&mut self) -> PhysicsMut<'_> {
+        PhysicsMut {
+            controller: match &mut self.controller {
+                Some(controller) => Some(controller),
+                None => None,
+            },
+            state: &mut *self.state,
+            bounding_box: &mut *self.bounding_box,
+            transform: &mut *self.transform,
+            prev_transform: &mut *self.prev_transform,
+            velocity: &mut *self.velocity,
+            prev_velocity: &mut *self.prev_velocity,
+            acceleration: &mut *self.acceleration,
+            prev_acceleration: &mut *self.prev_acceleration,
+            on_ground: &mut *self.on_ground,
+            prev_on_ground: &mut *self.prev_on_ground,
+        }
+    }
+
+    /// Reborrow this [`PhysicsMut`] as a [`PhysicsRef`].
+    #[must_use]
+    pub const fn as_ref(&self) -> PhysicsRef<'_> {
+        PhysicsRef {
+            controller: match &self.controller {
+                Some(controller) => Some(controller),
+                None => None,
+            },
+            state: &*self.state,
+            bounding_box: &*self.bounding_box,
+            transform: &*self.transform,
+            prev_transform: &*self.prev_transform,
+            velocity: &*self.velocity,
+            prev_velocity: &*self.prev_velocity,
+            acceleration: &*self.acceleration,
+            prev_acceleration: &*self.prev_acceleration,
+            on_ground: &*self.on_ground,
+            prev_on_ground: &*self.prev_on_ground,
+        }
+    }
 
     /// Convert this [`PhysicsMut`] into a [`PhysicsRef`].
-    #[inline]
     #[must_use]
-    pub fn into_ref(self) -> PhysicsRef<'a> { PhysicsRef::from(self) }
+    pub const fn into_ref(self) -> PhysicsRef<'a> {
+        PhysicsRef {
+            controller: match self.controller {
+                Some(controller) => Some(controller),
+                None => None,
+            },
+            state: self.state,
+            bounding_box: self.bounding_box,
+            transform: self.transform,
+            prev_transform: self.prev_transform,
+            velocity: self.velocity,
+            prev_velocity: self.prev_velocity,
+            acceleration: self.acceleration,
+            prev_acceleration: self.prev_acceleration,
+            on_ground: self.on_ground,
+            prev_on_ground: self.prev_on_ground,
+        }
+    }
 }
 
 #[cfg(feature = "bevy")]

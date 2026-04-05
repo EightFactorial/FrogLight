@@ -22,19 +22,79 @@ pub fn step<E: EntityQuery, W: ChunkQuery>(mut input: PhysicsInput<E, W>) {
 // -------------------------------------------------------------------------------------------------
 
 /// The input for the physics [`step`] function.
-pub struct PhysicsInput<E: EntityQuery, W: ChunkQuery> {
+pub struct PhysicsInput<'a, E: EntityQuery, W: ChunkQuery> {
     /// The entity to perform the physics step for.
-    pub target: E::ID,
+    target_id: E::ID,
+    /// The target entity's [`PhysicsMut`].
+    target: PhysicsMut<'a>,
+
     /// Access to entity data.
-    pub entities: E,
+    entities: E,
     /// Access to chunk data.
-    pub world: W,
+    world: W,
 }
+
+impl<'a, E: EntityQuery, W: ChunkQuery> PhysicsInput<'a, E, W> {
+    /// Create a new [`PhysicsInput`] for the given target.
+    #[inline]
+    #[must_use]
+    pub const fn new(target_id: E::ID, target: PhysicsMut<'a>, entities: E, world: W) -> Self {
+        Self { target_id, target, entities, world }
+    }
+
+    /// Get the target entity's [`PhysicsRef`].
+    #[must_use]
+    pub const fn target(&self) -> PhysicsRef<'_> { self.target.as_ref() }
+
+    /// Get the target entity's [`PhysicsMut`].
+    #[must_use]
+    pub const fn target_mut(&mut self) -> PhysicsMut<'_> { self.target.reborrow() }
+
+    /// Get the [`PhysicsRef`] for an entity, if it exists.
+    #[must_use]
+    pub fn get_entity(&self, entity: E::ID) -> Option<PhysicsRef<'_>> {
+        if entity == self.target_id {
+            Some(self.target.as_ref())
+        } else {
+            self.entities.get_entity(entity)
+        }
+    }
+
+    /// Get the [`PhysicsMut`] for an entity, if it exists.
+    #[must_use]
+    pub fn get_entity_mut(&mut self, entity: E::ID) -> Option<PhysicsMut<'_>> {
+        if entity == self.target_id {
+            Some(self.target.reborrow())
+        } else {
+            self.entities.get_entity_mut(entity)
+        }
+    }
+
+    /// Get a guard for a chunk, if it exists.
+    #[inline]
+    #[must_use]
+    pub fn get_chunk(&self, chunk: &ChunkPos) -> Option<W::Guard> { self.world.get_chunk(chunk) }
+
+    /// Get all parts of the input as a tuple.
+    ///
+    /// # SAFETY
+    ///
+    /// The caller must ensure that the target entity's [`PhysicsMut`] is
+    /// *never* accessed through `E`.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn as_mut_parts(&mut self) -> (E::ID, PhysicsMut<'_>, &mut E, &mut W) {
+        let Self { target_id, target, entities, world } = self;
+        (*target_id, target.reborrow(), entities, world)
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /// A type that can query for entities' physics components.
 pub trait EntityQuery {
     /// An identifier for an entity.
-    type ID;
+    type ID: Copy + Eq;
 
     /// Get the physics components for an entity, if it exists.
     fn get_entity(&self, entity: Self::ID) -> Option<PhysicsRef<'_>>;
