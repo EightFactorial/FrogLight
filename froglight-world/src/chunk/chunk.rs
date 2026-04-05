@@ -80,6 +80,11 @@ impl Chunk {
     #[must_use]
     pub fn into_naive(self) -> NaiveChunk { self.naive }
 
+    /// Get a reference to the inner [`NaiveChunk`] of this chunk.
+    #[inline]
+    #[must_use]
+    pub const fn as_naive(&self) -> &NaiveChunk { &self.naive }
+
     /// Get the height of this [`Chunk`].
     ///
     /// ## Note

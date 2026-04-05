@@ -36,10 +36,13 @@ fn entry_a() {
     let registry = storage.get("test:example_a").unwrap();
 
     assert_eq!(registry.len(), 3);
+
     assert!(registry.get_by_name("test:example_a_a").is_some());
     assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+
     assert!(registry.get_by_name("test:example_a_b").is_some());
     assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
+
     assert!(registry.get_by_name("test:example_a_c").is_some());
     assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
 
@@ -53,12 +56,16 @@ fn entry_a() {
             .push(RegistryValue::new_static(Identifier::new_static("test:example_a_d"), &[]));
 
         assert_eq!(registry.len(), 4);
+
         assert!(registry.get_by_name("test:example_a_a").is_some());
         assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+
         assert!(registry.get_by_name("test:example_a_b").is_some());
         assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
+
         assert!(registry.get_by_name("test:example_a_c").is_some());
         assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
+
         assert!(registry.get_by_name("test:example_a_d").is_some());
         assert_eq!(registry.get(3).unwrap().key(), "test:example_a_d");
     }
@@ -72,8 +79,10 @@ fn entry_b() {
     let registry = storage.get("test:example_b").unwrap();
 
     assert_eq!(registry.len(), 2);
+
     assert!(registry.get_by_name("test:example_b_1").is_some());
     assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
+
     assert!(registry.get_by_name("test:example_b_2").is_some());
     assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
 
@@ -87,10 +96,13 @@ fn entry_b() {
             .push(RegistryValue::new_static(Identifier::new_static("test:example_b_3"), &[]));
 
         assert_eq!(registry.len(), 3);
+
         assert!(registry.get_by_name("test:example_b_1").is_some());
         assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
+
         assert!(registry.get_by_name("test:example_b_2").is_some());
         assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
+
         assert!(registry.get_by_name("test:example_b_3").is_some());
         assert_eq!(registry.get(2).unwrap().key(), "test:example_b_3");
     }

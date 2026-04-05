@@ -12,11 +12,10 @@ use crate::prelude::*;
 ///
 /// Allows for performing inputs and other actions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", require(PhysicsState))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect), require(PhysicsState))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash, Component))]
 pub struct PhysicsController {
-    inputs: u8,
+    input: ControllerInputFlags,
 }
 
 impl Default for PhysicsController {
@@ -24,107 +23,77 @@ impl Default for PhysicsController {
 }
 
 impl PhysicsController {
-    const INPUT_JUMP: u8 = 0b0000_0001;
-    const INPUT_MOVE_BACKWARD: u8 = 0b0100_0000;
-    const INPUT_MOVE_FORWARD: u8 = 0b1000_0000;
-    const INPUT_MOVE_LEFT: u8 = 0b0010_0000;
-    const INPUT_RIGHT: u8 = 0b0001_0000;
-    const INPUT_SNEAK: u8 = 0b0000_0010;
-    const INPUT_SPRINT: u8 = 0b0000_0100;
-
     /// Create a new [`PhysicsController`].
     #[inline]
     #[must_use]
-    pub const fn new() -> Self { Self { inputs: 0 } }
+    pub const fn new() -> Self { Self { input: ControllerInputFlags::empty() } }
 
-    /// Returns `true` if the controller is moving forward.
+    /// Get the current input flags for this controller.
+    #[inline]
     #[must_use]
-    pub const fn is_moving_forward(&self) -> bool { self.inputs & Self::INPUT_MOVE_FORWARD != 0 }
+    pub const fn get_inputs(&self) -> ControllerInputFlags { self.input }
 
-    /// Set whether the controller is moving forward.
-    pub const fn forward(&mut self, forward: bool) {
-        if forward {
-            self.inputs |= Self::INPUT_MOVE_FORWARD;
-        } else {
-            self.inputs &= !Self::INPUT_MOVE_FORWARD;
-        }
+    /// Set the input flags for this controller.
+    #[inline]
+    pub const fn set_inputs(&mut self, input: ControllerInputFlags) { self.input = input; }
+
+    /// Set the forward input for this controller.
+    #[inline]
+    pub fn set_move_forward(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::MOVE_FORWARD, enabled);
     }
 
-    /// Returns `true` if the controller is moving backward.
-    #[must_use]
-    pub const fn is_moving_backward(&self) -> bool { self.inputs & Self::INPUT_MOVE_BACKWARD != 0 }
-
-    /// Set whether the controller is moving backward.
-    pub const fn backward(&mut self, backward: bool) {
-        if backward {
-            self.inputs |= Self::INPUT_MOVE_BACKWARD;
-        } else {
-            self.inputs &= !Self::INPUT_MOVE_BACKWARD;
-        }
+    /// Set the backward input for this controller.
+    #[inline]
+    pub fn set_move_backward(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::MOVE_BACKWARD, enabled);
     }
 
-    /// Returns `true` if the controller is moving left.
-    #[must_use]
-    pub const fn is_moving_left(&self) -> bool { self.inputs & Self::INPUT_MOVE_LEFT != 0 }
-
-    /// Set whether the controller is moving left.
-    pub const fn left(&mut self, left: bool) {
-        if left {
-            self.inputs |= Self::INPUT_MOVE_LEFT;
-        } else {
-            self.inputs &= !Self::INPUT_MOVE_LEFT;
-        }
+    /// Set the left input for this controller.
+    #[inline]
+    pub fn set_move_left(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::MOVE_LEFT, enabled);
     }
 
-    /// Returns `true` if the controller is moving right.
-    #[must_use]
-    pub const fn is_moving_right(&self) -> bool { self.inputs & Self::INPUT_RIGHT != 0 }
-
-    /// Set whether the controller is moving right.
-    pub const fn right(&mut self, right: bool) {
-        if right {
-            self.inputs |= Self::INPUT_RIGHT;
-        } else {
-            self.inputs &= !Self::INPUT_RIGHT;
-        }
+    /// Set the right input for this controller.
+    #[inline]
+    pub fn set_move_right(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::MOVE_RIGHT, enabled);
     }
 
-    /// Returns `true` if the controller is jumping.
-    #[must_use]
-    pub const fn is_jumping(&self) -> bool { self.inputs & Self::INPUT_JUMP != 0 }
-
-    /// Set whether the controller is jumping.
-    pub const fn jump(&mut self, jump: bool) {
-        if jump {
-            self.inputs |= Self::INPUT_JUMP;
-        } else {
-            self.inputs &= !Self::INPUT_JUMP;
-        }
+    /// Set the jump input for this controller.
+    #[inline]
+    pub fn set_jump(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::JUMP, enabled);
     }
 
-    /// Returns `true` if the controller is sneaking.
-    #[must_use]
-    pub const fn is_sneaking(&self) -> bool { self.inputs & Self::INPUT_SNEAK != 0 }
-
-    /// Set whether the controller is sneaking.
-    pub const fn sneak(&mut self, sneak: bool) {
-        if sneak {
-            self.inputs |= Self::INPUT_SNEAK;
-        } else {
-            self.inputs &= !Self::INPUT_SNEAK;
-        }
+    /// Set the sneak input for this controller.
+    #[inline]
+    pub fn set_sneak(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::SNEAK, enabled);
     }
 
-    /// Returns `true` if the controller is sprinting.
-    #[must_use]
-    pub const fn is_sprinting(&self) -> bool { self.inputs & Self::INPUT_SPRINT != 0 }
+    /// Set the sprint input for this controller.
+    #[inline]
+    pub fn set_sprint(&mut self, enabled: bool) {
+        self.input.set(ControllerInputFlags::SPRINT, enabled);
+    }
+}
 
-    /// Set whether the controller is sprinting.
-    pub const fn sprint(&mut self, sprint: bool) {
-        if sprint {
-            self.inputs |= Self::INPUT_SPRINT;
-        } else {
-            self.inputs &= !Self::INPUT_SPRINT;
-        }
+// -------------------------------------------------------------------------------------------------
+
+bitflags::bitflags! {
+    /// The input flags for a [`PhysicsController`].
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque))]
+    #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+    pub struct ControllerInputFlags: u8 {
+        const MOVE_FORWARD = 0b0000_0001;
+        const MOVE_BACKWARD = 0b0000_0010;
+        const MOVE_LEFT = 0b0000_0100;
+        const MOVE_RIGHT = 0b0000_1000;
+        const JUMP = 0b0001_0000;
+        const SNEAK = 0b0010_0000;
+        const SPRINT = 0b0100_0000;
     }
 }

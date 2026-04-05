@@ -170,6 +170,8 @@ impl EntityBundle {
             commands.insert_reflect(c);
         });
 
+        commands.insert(*bundle.metadata().aabb());
+
         #[cfg(feature = "tracing")]
         tracing::trace!(target: "froglight_entity", "Applying EntityBundle \"{}\" to Entity {}", bundle.identifier(), ctx.entity);
         commands.trigger(EntityBundleEvent::new);

@@ -1,12 +1,13 @@
 //! TODO
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::query::QueryData;
 use froglight_entity::prelude::*;
 
 use crate::prelude::*;
 
-/// A bundle of mutable references used by [`PhysicsState`].
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::query::QueryData))]
-#[cfg_attr(feature = "bevy", query_data(mutable))]
+/// A bundle of mutable physics component references.
+#[cfg_attr(feature = "bevy", derive(QueryData), query_data(mutable))]
 pub struct PhysicsMut<'a> {
     /// The entity's physics controller, if it has one.
     pub controller: Option<&'a mut PhysicsController>,
