@@ -79,14 +79,11 @@ pub fn many_as_input<const N: usize>(
 
     // SAFETY: None of the queries can access any other's components.
     // SAFETY: No archetype changes can occur through `PhysicsInput`.
-    // SAFETY: The caller ensures the target is never accessed through `BevyQuery`.
     unsafe {
         let mut physics = physics.query_unchecked(cell);
         let mut chunks = chunks.query_unchecked(cell);
 
         for target_id in entities {
-            let target_phys = PhysicsMut::from_world_cell(target_id, cell).unwrap();
-
             let instance_id =
                 cell.get_entity(target_id).unwrap().get::<EntityOfInstance>().unwrap().entity();
             let instance =
@@ -94,7 +91,6 @@ pub fn many_as_input<const N: usize>(
 
             f(PhysicsInput::new(
                 target_id,
-                target_phys,
                 BevyQuery { query: physics.reborrow() },
                 WorldQuery { instance, query: chunks.reborrow() },
             ));
