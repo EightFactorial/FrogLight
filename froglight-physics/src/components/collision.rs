@@ -2,7 +2,9 @@ use core::ops::{Deref, DerefMut};
 
 use bevy_ecs::{
     entity::{EntityHashMap, EntityHashSet},
+    lifecycle::HookContext,
     prelude::*,
+    world::DeferredWorld,
 };
 use bevy_reflect::prelude::*;
 use bevy_transform::components::GlobalTransform;
@@ -37,12 +39,34 @@ impl EntityCollisions {
 
     /// Remove a pair of entities from the collision map.
     ///
-    /// Returns `true` if either entity were previously colliding.
+    /// Returns `true` if the entities were previously colliding.
     pub fn remove_pair(&mut self, entity_a: Entity, entity_b: Entity) -> bool {
         let mut result = false;
         result |= self.0.entry(entity_a).or_default().remove(&entity_b);
         result |= self.0.entry(entity_b).or_default().remove(&entity_a);
         result
+    }
+
+    /// Remove an entity from the collision map.
+    ///
+    /// Returns `true` if the entity was present in the collision map.
+    pub fn remove_entity(&mut self, entity: Entity) -> bool {
+        if let Some(collisions) = self.0.remove(&entity) {
+            // Remove the entity from all of its collisions.
+            for other in collisions {
+                if let Some(other) = self.0.get_mut(&other) {
+                    other.remove(&entity);
+                }
+            }
+            true
+        } else {
+            // Search through all collisions in case the entity is present somewhere.
+            let mut result = false;
+            for collisions in self.0.values_mut() {
+                result |= collisions.remove(&entity);
+            }
+            result
+        }
     }
 
     /// Get the [`EntityHashSet`] of entities colliding with the given entity.
@@ -101,6 +125,7 @@ impl EntityCollisions {
 #[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
 #[require(Transform)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]
+#[component(on_replace = Self::replace_hook)]
 pub struct CollidingWith(EntityHashSet);
 
 impl Default for CollidingWith {
@@ -117,6 +142,30 @@ impl CollidingWith {
     #[inline]
     #[must_use]
     pub const fn from_set(set: EntityHashSet) -> Self { Self(set) }
+
+    /// Get a reference to the inner [`EntityHashSet`].
+    #[inline]
+    #[must_use]
+    pub const fn as_inner(&self) -> &EntityHashSet { &self.0 }
+
+    /// Get a mutable reference to the inner [`EntityHashSet`].
+    #[inline]
+    #[must_use]
+    pub const fn as_inner_mut(&mut self) -> &mut EntityHashSet { &mut self.0 }
+
+    /// Return the inner [`EntityHashSet`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> EntityHashSet { self.0 }
+
+    /// A `on_replace` [`ComponentHook`](bevy_ecs::lifecycle::ComponentHooks)
+    /// that removes an entity from [`EntityCollisions`] when the
+    /// [`CollidingWith`] [`Component`] is replaced or removed.
+    pub fn replace_hook(mut world: DeferredWorld, ctx: HookContext) {
+        if let Some(mut collisions) = world.get_resource_mut::<EntityCollisions>() {
+            collisions.remove_entity(ctx.entity);
+        }
+    }
 }
 
 impl Deref for CollidingWith {
