@@ -12,7 +12,7 @@ pub mod s4_effects;
 /// Perform a physics step.
 ///
 /// Just a wrapper for calling the individual step functions in order.
-pub fn step<E: EntityQuery, W: ChunkQuery>(mut input: PhysicsInput<E, W>) {
+pub fn step<E: EntityQuery, C: CollidingQuery, W: ChunkQuery>(mut input: PhysicsInput<E, C, W>) {
     s1_fluid::fluid_step(&mut input);
     s2_move::move_step(&mut input);
     s3_travel::travel_step(&mut input);
@@ -22,28 +22,39 @@ pub fn step<E: EntityQuery, W: ChunkQuery>(mut input: PhysicsInput<E, W>) {
 // -------------------------------------------------------------------------------------------------
 
 /// The input for the physics [`step`] function.
-pub struct PhysicsInput<E: EntityQuery, W: ChunkQuery> {
+pub struct PhysicsInput<E: EntityQuery, C: CollidingQuery, W: ChunkQuery> {
     /// The entity to perform the physics step for.
     target_id: E::ID,
     /// Access to entity data.
     entities: E,
+    /// Access to colliding entities.
+    colliding: C,
     /// Access to chunk data.
     world: W,
 }
 
-impl<E: EntityQuery, W: ChunkQuery> PhysicsInput<E, W> {
+impl<E: EntityQuery, C: CollidingQuery, W: ChunkQuery> PhysicsInput<E, C, W>
+where
+    C::ID: Into<E::ID>,
+    E::ID: Into<C::ID>,
+{
     /// Create a new [`PhysicsInput`] for the given target.
     #[inline]
     #[must_use]
-    pub const fn new(target_id: E::ID, entities: E, world: W) -> Self {
-        Self { target_id, entities, world }
+    pub const fn new(target_id: E::ID, entities: E, colliding: C, world: W) -> Self {
+        Self { target_id, entities, colliding, world }
     }
+
+    /// Get the target entity's ID.
+    #[inline]
+    #[must_use]
+    pub const fn target(&self) -> E::ID { self.target_id }
 
     /// Get the target entity's [`PhysicsRef`].
     #[inline]
     #[must_use]
     #[expect(clippy::missing_panics_doc, reason = "Shouldn't ever panic")]
-    pub fn target(&self) -> PhysicsRef<'_> { self.get_entity(self.target_id).unwrap() }
+    pub fn target_ref(&self) -> PhysicsRef<'_> { self.get_entity(self.target_id).unwrap() }
 
     /// Get the target entity's [`PhysicsMut`].
     #[inline]
@@ -65,6 +76,13 @@ impl<E: EntityQuery, W: ChunkQuery> PhysicsInput<E, W> {
         self.entities.get_entity_mut(entity)
     }
 
+    /// Get the entities that are colliding with the given entity, if any.
+    #[inline]
+    #[must_use]
+    pub fn get_colliding(&self, entity: C::ID) -> Option<impl Iterator<Item = C::ID> + '_> {
+        self.colliding.get_colliding(entity)
+    }
+
     /// Get a guard for a chunk, if it exists.
     #[inline]
     #[must_use]
@@ -73,9 +91,9 @@ impl<E: EntityQuery, W: ChunkQuery> PhysicsInput<E, W> {
     /// Get all parts of the input as a tuple.
     #[inline]
     #[must_use]
-    pub const fn as_mut_parts(&mut self) -> (E::ID, &mut E, &mut W) {
-        let Self { target_id, entities, world } = self;
-        (*target_id, entities, world)
+    pub const fn as_mut_parts(&mut self) -> (E::ID, &mut E, &mut C, &mut W) {
+        let Self { target_id, entities, colliding, world } = self;
+        (*target_id, entities, colliding, world)
     }
 }
 
@@ -91,6 +109,15 @@ pub trait EntityQuery {
 
     /// Muatably get the physics components for an entity, if it exists.
     fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMut<'_>>;
+}
+
+/// A type that can query for colliding entities.
+pub trait CollidingQuery {
+    /// An identifier for an entity.
+    type ID: Copy + Eq;
+
+    /// Get the entities that are colliding with the given entity, if any.
+    fn get_colliding(&self, entity: Self::ID) -> Option<impl Iterator<Item = Self::ID> + '_>;
 }
 
 /// A type that can query for chunk data.

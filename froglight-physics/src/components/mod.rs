@@ -4,6 +4,11 @@
 mod acceleration;
 pub use acceleration::{Acceleration, PreviousAcceleration};
 
+#[cfg(feature = "bevy")]
+mod collision;
+#[cfg(feature = "bevy")]
+pub use collision::{CollidingWith, EntityCollisions};
+
 mod controller;
 pub use controller::PhysicsController;
 

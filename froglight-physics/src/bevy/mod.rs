@@ -11,7 +11,7 @@ use froglight_world::prelude::*;
 
 use crate::{
     prelude::*,
-    step::{ChunkGuard, ChunkQuery, EntityQuery, PhysicsInput},
+    step::{ChunkGuard, ChunkQuery, CollidingQuery, EntityQuery, PhysicsInput},
 };
 
 /// A [`Plugin`] that...
@@ -25,6 +25,8 @@ impl Plugin for PhysicsPlugin {
         app.register_type::<Acceleration>().register_type::<PreviousAcceleration>();
         app.register_type::<OnGround>().register_type::<PreviousOnGround>();
         app.register_type::<PhysicsState>().register_type::<PhysicsController>();
+
+        app.init_resource::<EntityCollisions>().register_type::<EntityCollisions>();
 
         app.add_observer(Self::entity_physics_observer);
     }
@@ -57,7 +59,7 @@ impl PhysicsPlugin {
 pub fn entity_as_input(
     entity: Entity,
     world: &mut World,
-    f: impl FnMut(PhysicsInput<BevyQuery<'_>, WorldQuery<'_>>),
+    f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>>),
 ) {
     many_as_input::<1>([entity], world, f);
 }
@@ -71,9 +73,10 @@ pub fn entity_as_input(
 pub fn many_as_input<const N: usize>(
     entities: [Entity; N],
     world: &mut World,
-    mut f: impl FnMut(PhysicsInput<BevyQuery<'_>, WorldQuery<'_>>),
+    mut f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>>),
 ) {
     let mut physics = world.query::<PhysicsMut<'static>>();
+    let mut colliders = world.query::<&CollidingWith>();
     let mut chunks = world.query::<&SharedChunk>();
     let cell = world.as_unsafe_world_cell();
 
@@ -81,6 +84,7 @@ pub fn many_as_input<const N: usize>(
     // SAFETY: No archetype changes can occur through `PhysicsInput`.
     unsafe {
         let mut physics = physics.query_unchecked(cell);
+        let mut colliders = colliders.query_unchecked(cell);
         let mut chunks = chunks.query_unchecked(cell);
 
         for target_id in entities {
@@ -91,7 +95,8 @@ pub fn many_as_input<const N: usize>(
 
             f(PhysicsInput::new(
                 target_id,
-                BevyQuery { query: physics.reborrow() },
+                PhysQuery { query: physics.reborrow() },
+                ColliderQuery { query: colliders.reborrow() },
                 WorldQuery { instance, query: chunks.reborrow() },
             ));
         }
@@ -101,11 +106,11 @@ pub fn many_as_input<const N: usize>(
 // -------------------------------------------------------------------------------------------------
 
 /// An [`EntityQuery`] implementation for Bevy.
-pub struct BevyQuery<'s> {
-    query: Query<'s, 's, PhysicsMut<'static>, ()>,
+pub struct PhysQuery<'a> {
+    query: Query<'a, 'a, PhysicsMut<'static>, ()>,
 }
 
-impl EntityQuery for BevyQuery<'_> {
+impl EntityQuery for PhysQuery<'_> {
     type ID = Entity;
 
     #[inline]
@@ -119,10 +124,23 @@ impl EntityQuery for BevyQuery<'_> {
     }
 }
 
+/// A [`ColliderQuery`] implementation for Bevy.
+pub struct ColliderQuery<'a> {
+    query: Query<'a, 'a, &'static CollidingWith, ()>,
+}
+
+impl CollidingQuery for ColliderQuery<'_> {
+    type ID = Entity;
+
+    fn get_colliding(&self, entity: Entity) -> Option<impl Iterator<Item = Entity> + '_> {
+        self.query.get(entity).ok().map(|c| c.iter().copied())
+    }
+}
+
 /// A [`ChunkQuery`] implementation for Bevy.
-pub struct WorldQuery<'s> {
-    instance: &'s WorldInstanceChunks,
-    query: Query<'s, 's, &'static SharedChunk, ()>,
+pub struct WorldQuery<'a> {
+    instance: &'a WorldInstanceChunks,
+    query: Query<'a, 'a, &'static SharedChunk, ()>,
 }
 
 impl ChunkQuery for WorldQuery<'_> {

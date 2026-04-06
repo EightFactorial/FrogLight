@@ -100,6 +100,31 @@ macro_rules! impl_aabbs {
                 )
             }
 
+
+            #[must_use]
+            #[doc = concat!("Create a new [`", stringify!($ty), "`] by translating this one by the given vector.")]
+            pub const fn with_translation(mut self, translation: $vecty) -> Self {
+                self.min.x += translation.x;
+                self.min.y += translation.y;
+                self.min.z += translation.z;
+                self.max.x += translation.x;
+                self.max.y += translation.y;
+                self.max.z += translation.z;
+                self
+            }
+
+            #[must_use]
+            #[doc = concat!("Create a new [`", stringify!($ty), "`] by scaling this one by the given vector.")]
+            pub const fn with_scale(mut self, scale: $vecty) -> Self {
+                self.min.x *= scale.x;
+                self.min.y *= scale.y;
+                self.min.z *= scale.z;
+                self.max.x *= scale.x;
+                self.max.y *= scale.y;
+                self.max.z *= scale.z;
+                self
+            }
+
             #[must_use]
             #[doc = concat!("Compares two [`", stringify!($ty), "`]s for equality in a `const` context.")]
             pub const fn const_eq(&self, other: &Self) -> bool {
@@ -120,6 +145,15 @@ macro_rules! impl_aabbs {
                     && point.y <= self.max.y
                     && point.z >= self.min.z
                     && point.z <= self.max.z
+            }
+
+            #[must_use]
+            #[doc = concat!("Returns `true` if the given [`", stringify!($ty), "`] intersects with this one.")]
+            pub const fn intersects(&self, other: &Self) -> bool {
+                let x_overlaps = self.min.x <= other.max.x && self.max.x >= other.min.x;
+                let y_overlaps = self.min.y <= other.max.y && self.max.y >= other.min.y;
+                let z_overlaps = self.min.z <= other.max.z && self.max.z >= other.min.z;
+                x_overlaps && y_overlaps && z_overlaps
             }
 
             #[must_use]

@@ -34,6 +34,27 @@ impl EntityAabb {
         Self { common, eye_height }
     }
 
+    /// Create a new [`EntityAabb`] by translating this one by the given vector.
+    #[must_use]
+    pub const fn with_translation(mut self, translation: Vec3) -> Self {
+        self.common = self.common.with_translation(translation);
+        self
+    }
+
+    /// Create a new [`EntityAabb`] by scaling this one by the given vector.
+    #[must_use]
+    pub const fn with_scale(mut self, scale: Vec3) -> Self {
+        self.common = self.common.with_scale(scale);
+        self
+    }
+
+    /// Check if this [`EntityAabb`] intersects with another.
+    #[inline]
+    #[must_use]
+    pub const fn intersects(&self, other: &EntityAabb) -> bool {
+        self.common.intersects(&other.common)
+    }
+
     /// Get the inner [`CommonAabb`] of this [`EntityAabb`].
     #[inline]
     #[must_use]
