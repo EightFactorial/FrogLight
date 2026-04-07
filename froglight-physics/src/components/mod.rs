@@ -15,6 +15,9 @@ pub use collision::{PreviousWorldCollision, WorldCollision};
 mod controller;
 pub use controller::PhysicsController;
 
+mod falling;
+pub use falling::{IsFalling, PreviousIsFalling};
+
 mod fluid;
 pub use fluid::{InFluid, PreviousInFluid};
 

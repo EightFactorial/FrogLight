@@ -12,7 +12,7 @@ use crate::prelude::*;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", require(Transform, PreviousTransform))]
-#[cfg_attr(feature = "bevy", require(Velocity, Acceleration, OnGround, InFluid))]
+#[cfg_attr(feature = "bevy", require(Velocity, Acceleration, OnGround, IsFalling, InFluid))]
 #[cfg_attr(feature = "bevy", require(CollidingWith, WorldCollision))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 pub struct PhysicsState {}

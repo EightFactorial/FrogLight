@@ -41,6 +41,11 @@ pub struct PhysicsRef<'a> {
     /// Whether the entity was previously on the ground.
     pub prev_on_ground: &'a PreviousOnGround,
 
+    /// The entity's current fall distance.
+    pub fall_distance: &'a IsFalling,
+    /// The entity's previous fall distance.
+    pub prev_fall_distance: &'a PreviousIsFalling,
+
     /// Whether the entity is currently in a fluid.
     pub in_fluid: &'a InFluid,
     /// Whether the entity was previously in a fluid.
@@ -69,6 +74,8 @@ impl PhysicsRef<'_> {
             prev_acceleration: self.prev_acceleration,
             on_ground: self.on_ground,
             prev_on_ground: self.prev_on_ground,
+            fall_distance: self.fall_distance,
+            prev_fall_distance: self.prev_fall_distance,
             in_fluid: self.in_fluid,
             prev_in_fluid: self.prev_in_fluid,
         }
@@ -92,6 +99,8 @@ impl<'a> From<PhysicsMut<'a>> for PhysicsRef<'a> {
             prev_acceleration: mutable.prev_acceleration,
             on_ground: mutable.on_ground,
             prev_on_ground: mutable.prev_on_ground,
+            fall_distance: mutable.fall_distance,
+            prev_fall_distance: mutable.prev_fall_distance,
             in_fluid: mutable.in_fluid,
             prev_in_fluid: mutable.prev_in_fluid,
         }
@@ -114,6 +123,8 @@ impl<'a> From<&'a PhysicsMut<'_>> for PhysicsRef<'a> {
             prev_acceleration: mutable.prev_acceleration,
             on_ground: mutable.on_ground,
             prev_on_ground: mutable.prev_on_ground,
+            fall_distance: mutable.fall_distance,
+            prev_fall_distance: mutable.prev_fall_distance,
             in_fluid: mutable.in_fluid,
             prev_in_fluid: mutable.prev_in_fluid,
         }
@@ -138,6 +149,8 @@ impl<'a> From<PhysicsRefItem<'a, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: item.prev_acceleration,
             on_ground: item.on_ground,
             prev_on_ground: item.prev_on_ground,
+            fall_distance: item.fall_distance,
+            prev_fall_distance: item.prev_fall_distance,
             in_fluid: item.in_fluid,
             prev_in_fluid: item.prev_in_fluid,
         }
@@ -161,6 +174,8 @@ impl<'a> From<&'a PhysicsRefItem<'_, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: item.prev_acceleration,
             on_ground: item.on_ground,
             prev_on_ground: item.prev_on_ground,
+            fall_distance: item.fall_distance,
+            prev_fall_distance: item.prev_fall_distance,
             in_fluid: item.in_fluid,
             prev_in_fluid: item.prev_in_fluid,
         }
@@ -204,6 +219,11 @@ pub struct PhysicsMut<'a> {
     /// Whether the entity was previously on the ground.
     pub prev_on_ground: &'a mut PreviousOnGround,
 
+    /// The entity's current fall distance.
+    pub fall_distance: &'a mut IsFalling,
+    /// The entity's previous fall distance.
+    pub prev_fall_distance: &'a mut PreviousIsFalling,
+
     /// Whether the entity is currently in a fluid.
     pub in_fluid: &'a mut InFluid,
     /// Whether the entity was previously in a fluid.
@@ -230,6 +250,7 @@ impl<'a> PhysicsMut<'a> {
         *self.prev_velocity = PreviousVelocity(**self.velocity);
         *self.prev_acceleration = PreviousAcceleration(**self.acceleration);
         *self.prev_on_ground = PreviousOnGround(**self.on_ground);
+        *self.prev_fall_distance = PreviousIsFalling::from(*self.fall_distance);
         *self.prev_in_fluid = PreviousInFluid::from(*self.in_fluid);
     }
 
@@ -254,6 +275,8 @@ impl<'a> PhysicsMut<'a> {
             prev_acceleration: &mut *self.prev_acceleration,
             on_ground: &mut *self.on_ground,
             prev_on_ground: &mut *self.prev_on_ground,
+            fall_distance: &mut *self.fall_distance,
+            prev_fall_distance: &mut *self.prev_fall_distance,
             in_fluid: &mut *self.in_fluid,
             prev_in_fluid: &mut *self.prev_in_fluid,
         }
@@ -279,6 +302,8 @@ impl<'a> PhysicsMut<'a> {
             prev_acceleration: &*self.prev_acceleration,
             on_ground: &*self.on_ground,
             prev_on_ground: &*self.prev_on_ground,
+            fall_distance: &*self.fall_distance,
+            prev_fall_distance: &*self.prev_fall_distance,
             in_fluid: &*self.in_fluid,
             prev_in_fluid: &*self.prev_in_fluid,
         }
@@ -304,6 +329,8 @@ impl<'a> PhysicsMut<'a> {
             prev_acceleration: self.prev_acceleration,
             on_ground: self.on_ground,
             prev_on_ground: self.prev_on_ground,
+            fall_distance: self.fall_distance,
+            prev_fall_distance: self.prev_fall_distance,
             in_fluid: self.in_fluid,
             prev_in_fluid: self.prev_in_fluid,
         }
@@ -328,6 +355,8 @@ impl<'a> From<PhysicsMutItem<'a, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: item.prev_acceleration.into_inner(),
             on_ground: item.on_ground.into_inner(),
             prev_on_ground: item.prev_on_ground.into_inner(),
+            fall_distance: item.fall_distance.into_inner(),
+            prev_fall_distance: item.prev_fall_distance.into_inner(),
             in_fluid: item.in_fluid.into_inner(),
             prev_in_fluid: item.prev_in_fluid.into_inner(),
         }
@@ -351,6 +380,8 @@ impl<'a> From<&'a PhysicsMutItem<'_, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: &item.prev_acceleration,
             on_ground: &item.on_ground,
             prev_on_ground: &item.prev_on_ground,
+            fall_distance: &item.fall_distance,
+            prev_fall_distance: &item.prev_fall_distance,
             in_fluid: &item.in_fluid,
             prev_in_fluid: &item.prev_in_fluid,
         }
@@ -375,6 +406,8 @@ impl<'a> From<PhysicsMutItem<'a, '_, '_>> for PhysicsMut<'a> {
             prev_acceleration: item.prev_acceleration.into_inner(),
             on_ground: item.on_ground.into_inner(),
             prev_on_ground: item.prev_on_ground.into_inner(),
+            fall_distance: item.fall_distance.into_inner(),
+            prev_fall_distance: item.prev_fall_distance.into_inner(),
             in_fluid: item.in_fluid.into_inner(),
             prev_in_fluid: item.prev_in_fluid.into_inner(),
         }
@@ -398,6 +431,8 @@ impl<'a> From<&'a mut PhysicsMutItem<'_, '_, '_>> for PhysicsMut<'a> {
             prev_acceleration: &mut item.prev_acceleration,
             on_ground: &mut item.on_ground,
             prev_on_ground: &mut item.prev_on_ground,
+            fall_distance: &mut item.fall_distance,
+            prev_fall_distance: &mut item.prev_fall_distance,
             in_fluid: &mut item.in_fluid,
             prev_in_fluid: &mut item.prev_in_fluid,
         }
@@ -422,6 +457,8 @@ impl<'a> From<PhysicsMutReadOnlyItem<'a, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: item.prev_acceleration,
             on_ground: item.on_ground,
             prev_on_ground: item.prev_on_ground,
+            fall_distance: item.fall_distance,
+            prev_fall_distance: item.prev_fall_distance,
             in_fluid: item.in_fluid,
             prev_in_fluid: item.prev_in_fluid,
         }
@@ -445,6 +482,8 @@ impl<'a> From<&'a PhysicsMutReadOnlyItem<'_, '_, '_>> for PhysicsRef<'a> {
             prev_acceleration: item.prev_acceleration,
             on_ground: item.on_ground,
             prev_on_ground: item.prev_on_ground,
+            fall_distance: item.fall_distance,
+            prev_fall_distance: item.prev_fall_distance,
             in_fluid: item.in_fluid,
             prev_in_fluid: item.prev_in_fluid,
         }
