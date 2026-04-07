@@ -5,12 +5,18 @@ mod acceleration;
 pub use acceleration::{Acceleration, PreviousAcceleration};
 
 #[cfg(feature = "bevy")]
-mod collision;
+mod collision_bevy;
 #[cfg(feature = "bevy")]
-pub use collision::{CollidingWith, EntityCollisions};
+pub use collision_bevy::{CollidingWith, EntityCollisions};
+
+mod collision;
+pub use collision::{PreviousWorldCollision, WorldCollision};
 
 mod controller;
 pub use controller::PhysicsController;
+
+mod fluid;
+pub use fluid::{InFluid, PreviousInFluid};
 
 mod ground;
 pub use ground::{OnGround, PreviousOnGround};

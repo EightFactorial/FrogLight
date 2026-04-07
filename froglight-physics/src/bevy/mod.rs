@@ -20,11 +20,13 @@ pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
+        app.register_type::<PhysicsState>().register_type::<PhysicsController>();
+        app.register_type::<WorldCollision>().register_type::<PreviousWorldCollision>();
         app.register_type::<Transform>().register_type::<PreviousTransform>();
         app.register_type::<Velocity>().register_type::<PreviousVelocity>();
         app.register_type::<Acceleration>().register_type::<PreviousAcceleration>();
         app.register_type::<OnGround>().register_type::<PreviousOnGround>();
-        app.register_type::<PhysicsState>().register_type::<PhysicsController>();
+        app.register_type::<InFluid>().register_type::<PreviousInFluid>();
 
         app.init_resource::<EntityCollisions>().register_type::<EntityCollisions>();
 
@@ -59,7 +61,7 @@ impl PhysicsPlugin {
 pub fn entity_as_input(
     entity: Entity,
     world: &mut World,
-    f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>>),
+    f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>, Entity>),
 ) {
     many_as_input::<1>([entity], world, f);
 }
@@ -73,7 +75,7 @@ pub fn entity_as_input(
 pub fn many_as_input<const N: usize>(
     entities: [Entity; N],
     world: &mut World,
-    mut f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>>),
+    mut f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>, Entity>),
 ) {
     let mut physics = world.query::<PhysicsMut<'static>>();
     let mut colliders = world.query::<&CollidingWith>();
@@ -110,16 +112,14 @@ pub struct PhysQuery<'a> {
     query: Query<'a, 'a, PhysicsMut<'static>, ()>,
 }
 
-impl EntityQuery for PhysQuery<'_> {
-    type ID = Entity;
-
+impl EntityQuery<Entity> for PhysQuery<'_> {
     #[inline]
-    fn get_entity(&self, entity: Self::ID) -> Option<PhysicsRef<'_>> {
+    fn get_entity(&self, entity: Entity) -> Option<PhysicsRef<'_>> {
         self.query.get(entity).ok().map(Into::into)
     }
 
     #[inline]
-    fn get_entity_mut(&mut self, entity: Self::ID) -> Option<PhysicsMut<'_>> {
+    fn get_entity_mut(&mut self, entity: Entity) -> Option<PhysicsMut<'_>> {
         self.query.get_mut(entity).ok().map(Into::into)
     }
 }
@@ -129,9 +129,7 @@ pub struct ColliderQuery<'a> {
     query: Query<'a, 'a, &'static CollidingWith, ()>,
 }
 
-impl CollidingQuery for ColliderQuery<'_> {
-    type ID = Entity;
-
+impl CollidingQuery<Entity> for ColliderQuery<'_> {
     fn get_colliding(&self, entity: Entity) -> Option<impl Iterator<Item = Entity> + '_> {
         self.query.get(entity).ok().map(|c| c.iter().copied())
     }
