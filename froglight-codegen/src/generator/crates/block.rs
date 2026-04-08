@@ -5,7 +5,9 @@ use cafebabe::{
     ClassFile,
     attributes::CodeData,
     bytecode::Opcode,
-    constant_pool::{BootstrapArgument, InvokeDynamic, LiteralConstant, Loadable, MemberRef},
+    constant_pool::{
+        BootstrapArgument, InvokeDynamic, LiteralConstant, Loadable, MemberRef, NameAndType,
+    },
 };
 use convert_case::{Case, Casing};
 use facet::Facet;
@@ -32,6 +34,7 @@ pub struct BlockData {
 #[derive(Debug, Clone, PartialEq)]
 #[expect(clippy::struct_excessive_bools, reason = "False")]
 pub struct BlockSettings {
+    pub display: String,
     pub ident: String,
     pub classes: Vec<String>,
 
@@ -53,6 +56,7 @@ pub struct BlockSettings {
 impl Default for BlockSettings {
     fn default() -> Self {
         Self {
+            display: String::new(),
             ident: String::new(),
             classes: Vec::new(),
             is_air: false,
@@ -394,7 +398,8 @@ impl BlockData {
                             }
                         }
                     }
-                    Opcode::Getstatic(member @ MemberRef { class_name, name_and_type }) if name_and_type.descriptor == "Lnet/minecraft/world/level/block/Block;" => {
+
+                    Opcode::Getstatic(member @ MemberRef { class_name, name_and_type }) if matches!(name_and_type.descriptor.as_ref(), "Lnet/minecraft/world/level/block/Block;" | "Lnet/minecraft/world/level/block/WeatheringCopperCollection;") => {
                         retrieved = Some(member.clone());
                     }
 
@@ -411,6 +416,8 @@ impl BlockData {
                             );
                         }
 
+                        tracing::trace!("Adding block: {} -> {}", name_and_type.name, current.ident);
+
                         blocks
                             .insert(name_and_type.name.to_string(), core::mem::take(&mut current));
                         constants.clear();
@@ -418,8 +425,7 @@ impl BlockData {
                     }
                     Opcode::Putstatic(MemberRef { class_name, name_and_type })
                         if class_name == "net/minecraft/world/level/block/Blocks"
-                            && name_and_type.descriptor
-                                == "Lnet/minecraft/world/level/block/WeatheringCopperBlocks;" =>
+                            && matches!(name_and_type.descriptor.as_ref(), "Lnet/minecraft/world/level/block/WeatheringCopperBlocks;" | "Lnet/minecraft/world/level/block/WeatheringCopperCollection;") =>
                     {
                         if current.ident.is_empty() {
                             miette::bail!(
@@ -429,56 +435,28 @@ impl BlockData {
                         }
 
                         let original = core::mem::take(&mut current);
-                        blocks.insert(name_and_type.name.to_string(), original.clone());
-                        blocks.insert(
-                            format!("EXPOSED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":exposed_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("WEATHERED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":weathered_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("OXIDIZED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":oxidized_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("WAXED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":waxed_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("WAXED_EXPOSED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":waxed_exposed_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("WAXED_WEATHERED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":waxed_weathered_"),
-                                ..original.clone()
-                            },
-                        );
-                        blocks.insert(
-                            format!("WAXED_OXIDIZED_{}", name_and_type.name),
-                            BlockSettings {
-                                ident: original.ident.replace(':', ":waxed_oxidized_"),
-                                ..original.clone()
-                            },
-                        );
+                        tracing::trace!("Adding weathering blocks: {} -> {}", name_and_type.name, original.ident);
+
+                        add_weathering_blocks(original, name_and_type, &mut blocks, version);
+
+                        constants.clear();
+                        retrieved = None;
+                    }
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/level/block/Blocks"
+                            && matches!(name_and_type.descriptor.as_ref(), "Lnet/minecraft/world/level/block/ColorCollection;") =>
+                    {
+                        if current.ident.is_empty() {
+                            miette::bail!(
+                                "Failed to find block identifier for \"{}\"",
+                                name_and_type.name
+                            );
+                        }
+
+                        let original = core::mem::take(&mut current);
+                        tracing::trace!("Adding colored blocks: {} -> {}", name_and_type.name, original.ident);
+
+                        add_colored_blocks(original, name_and_type, &mut blocks, version);
 
                         constants.clear();
                         retrieved = None;
@@ -516,6 +494,20 @@ impl BlockData {
                             current
                                 .classes
                                 .push(String::from("net/minecraft/world/level/block/StairBlock"));
+                        } else if matches!(
+                            name_and_type.name.as_ref(),
+                            "registerSlab"
+                        ) {
+                            current
+                                .classes
+                                .push(String::from("net/minecraft/world/level/block/SlabBlock"));
+                        } else if matches!(
+                            name_and_type.name.as_ref(),
+                            "registerWall"
+                        ) {
+                            current
+                                .classes
+                                .push(String::from("net/minecraft/world/level/block/WallBlock"));
                         }
 
                         // Add block properties
@@ -556,8 +548,15 @@ impl BlockData {
                                 ("noOcclusion", _) => current.has_occlusion = false,
                                 ("noTerrainParticles", _) => {}
                                 ("ofFullCopy", _) => {
-                                    let retrieved = retrieved.as_ref().unwrap();
-                                    let retrieved = blocks.get(retrieved.name_and_type.name.as_ref()).unwrap();
+                                    let Some(retrieved) = retrieved.as_ref() else {
+                                        tracing::debug!("Last: {:?}", blocks.last().map(|(_, v)| &v.ident));
+                                        miette::bail!("Failed to find block reference for \"ofFullCopy\"!");
+                                    };
+                                    let Some(retrieved) = blocks.get(retrieved.name_and_type.name.as_ref()) else {
+                                        tracing::debug!("Last: {:?}", blocks.last().map(|(_, v)| &v.ident));
+                                        miette::bail!("Failed to find block for \"ofFullCopy\" reference: \"{}\"!", retrieved.name_and_type.name);
+                                    };
+
                                     // copyTo.jumpFactor = copyFrom.jumpFactor;
                                     // copyTo.isRedstoneConductor = copyFrom.isRedstoneConductor;
                                     // copyTo.isValidSpawn = copyFrom.isValidSpawn;
@@ -631,6 +630,7 @@ impl BlockData {
                                 ("vanillaBlockId", _) => {}
                                 ("wallVariant", _) => {}
                                 ("waterloggedMapColor", _) => {}
+                                ("bounceRestitution", _) => {}
                                 // ("", _) => {}
 
                                 // Ignore these
@@ -685,6 +685,13 @@ impl BlockData {
 
         JarData::get_for(version, storage, async |data| {
             for (block_name, block) in &mut blocks {
+                // Update the display name
+                block.display.clone_from(block_name);
+                block.display = block.display.replace("_DYED", "");
+                if !block.ident.contains("block") {
+                    block.display = block.display.trim_end_matches("_BLOCK").to_string();
+                }
+
                 if block.classes.is_empty() {
                     miette::bail!(
                         "Failed to find any classes for block \"{}\" ({block_name})!",
@@ -721,7 +728,6 @@ impl BlockData {
                     }
                 }
             }
-
             Ok(())
         })
         .await?;
@@ -748,6 +754,137 @@ impl BlockData {
         }
 
         Ok(BlockData { blocks, block_families, report })
+    }
+}
+
+fn add_weathering_blocks(
+    original: BlockSettings,
+    name_and_type: &NameAndType,
+    blocks: &mut IndexMap<String, BlockSettings>,
+    version: &Version,
+) {
+    let unwaxed: (String, String);
+    let unwaxed_exposed: (String, String);
+    let unwaxed_weathered: (String, String);
+    let unwaxed_oxidized: (String, String);
+    let waxed: (String, String);
+    let waxed_exposed: (String, String);
+    let waxed_weathered: (String, String);
+    let waxed_oxidized: (String, String);
+
+    match version.as_feature() {
+        version if version.as_str() >= "v26_2" => {
+            unwaxed = (name_and_type.name.to_string(), original.ident.clone());
+            waxed =
+                (format!("WAXED_{}", name_and_type.name), original.ident.replace(':', ":waxed_"));
+
+            // Note:
+            // v26_2 started removing the "_block" suffix from weathered copper block states
+            let trimmed = original.ident.trim_end_matches("_block");
+
+            unwaxed_exposed =
+                (format!("EXPOSED_{}", name_and_type.name), trimmed.replace(':', ":exposed_"));
+            waxed_exposed = (
+                format!("WAXED_EXPOSED_{}", name_and_type.name),
+                trimmed.replace(':', ":waxed_exposed_"),
+            );
+
+            unwaxed_weathered =
+                (format!("WEATHERED_{}", name_and_type.name), trimmed.replace(':', ":weathered_"));
+            waxed_weathered = (
+                format!("WAXED_WEATHERED_{}", name_and_type.name),
+                trimmed.replace(':', ":waxed_weathered_"),
+            );
+
+            unwaxed_oxidized =
+                (format!("OXIDIZED_{}", name_and_type.name), trimmed.replace(':', ":oxidized_"));
+            waxed_oxidized = (
+                format!("WAXED_OXIDIZED_{}", name_and_type.name),
+                trimmed.replace(':', ":waxed_oxidized_"),
+            );
+        }
+        _ => {
+            unwaxed = (name_and_type.name.to_string(), original.ident.clone());
+            waxed =
+                (format!("WAXED_{}", name_and_type.name), original.ident.replace(':', ":waxed_"));
+
+            unwaxed_exposed = (
+                format!("EXPOSED_{}", name_and_type.name),
+                original.ident.replace(':', ":exposed_"),
+            );
+            waxed_exposed = (
+                format!("WAXED_EXPOSED_{}", name_and_type.name),
+                original.ident.replace(':', ":waxed_exposed_"),
+            );
+
+            unwaxed_weathered = (
+                format!("WEATHERED_{}", name_and_type.name),
+                original.ident.replace(':', ":weathered_"),
+            );
+            waxed_weathered = (
+                format!("WAXED_WEATHERED_{}", name_and_type.name),
+                original.ident.replace(':', ":waxed_weathered_"),
+            );
+
+            unwaxed_oxidized = (
+                format!("OXIDIZED_{}", name_and_type.name),
+                original.ident.replace(':', ":oxidized_"),
+            );
+            waxed_oxidized = (
+                format!("WAXED_OXIDIZED_{}", name_and_type.name),
+                original.ident.replace(':', ":waxed_oxidized_"),
+            );
+        }
+    }
+
+    blocks.insert(unwaxed.0, BlockSettings { ident: unwaxed.1, ..original.clone() });
+    blocks
+        .insert(unwaxed_exposed.0, BlockSettings { ident: unwaxed_exposed.1, ..original.clone() });
+    blocks.insert(
+        unwaxed_weathered.0,
+        BlockSettings { ident: unwaxed_weathered.1, ..original.clone() },
+    );
+    blocks.insert(
+        unwaxed_oxidized.0,
+        BlockSettings { ident: unwaxed_oxidized.1, ..original.clone() },
+    );
+    blocks.insert(waxed.0, BlockSettings { ident: waxed.1, ..original.clone() });
+    blocks.insert(waxed_exposed.0, BlockSettings { ident: waxed_exposed.1, ..original.clone() });
+    blocks
+        .insert(waxed_weathered.0, BlockSettings { ident: waxed_weathered.1, ..original.clone() });
+    blocks.insert(waxed_oxidized.0, BlockSettings { ident: waxed_oxidized.1, ..original.clone() });
+}
+
+fn add_colored_blocks(
+    original: BlockSettings,
+    name_and_type: &NameAndType,
+    blocks: &mut IndexMap<String, BlockSettings>,
+    _version: &Version,
+) {
+    let colors = [
+        "WHITE",
+        "ORANGE",
+        "MAGENTA",
+        "LIGHT_BLUE",
+        "YELLOW",
+        "LIME",
+        "PINK",
+        "GRAY",
+        "LIGHT_GRAY",
+        "CYAN",
+        "PURPLE",
+        "BLUE",
+        "BROWN",
+        "GREEN",
+        "RED",
+        "BLACK",
+    ];
+
+    for color in colors {
+        let colored_name = format!("{}_{}", color, name_and_type.name);
+        let colored_ident = original.ident.replace(':', &format!(":{}_", color.to_lowercase()));
+
+        blocks.insert(colored_name, BlockSettings { ident: colored_ident, ..original.clone() });
     }
 }
 
@@ -1132,8 +1269,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 // Deduplicate and sort the block types
                 let mut blocks = IndexSet::<String>::new();
                 for versioned in global_blocks.values() {
-                    for (name, _id) in &versioned.blocks {
-                        blocks.insert(name.to_case(Case::Pascal));
+                    for block in versioned.blocks.values() {
+                        blocks.insert(block.display.to_case(Case::Pascal));
                     }
                 }
                 blocks.sort_unstable();
@@ -1206,15 +1343,24 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
     match result {
         Ok(global) => {
+            let path = WORKSPACE_DIR.join("froglight-block/src/generated");
+            let mut module = ModuleBuilder::new_after_marker(path).await?;
+
             for version in &config.versions {
                 let guard = DATA.owned_guard();
                 let storage =
                     DATA.get_or_insert_with(version.real.clone(), RwLock::default, &guard);
 
-                let mut storage = storage.write().await;
-                generate(version, global, &mut storage).await?;
+                module
+                    .with_submodule(&version.base.as_feature(), async |module, settings| {
+                        let mut storage = storage.write().await;
+                        generate(version, global, module, &mut storage).await?;
+                        Ok(settings.with_feature(version.base.as_feature()))
+                    })
+                    .await?;
             }
-            Ok(())
+
+            module.build().await
         }
         Err(err) => miette::bail!("Failed to generate global block data: {err}"),
     }
@@ -1224,101 +1370,94 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 async fn generate(
     version: &VersionPair,
     global: &GlobalBlockData,
+    module: &mut ModuleBuilder,
     storage: &mut VersionStorage,
 ) -> Result<()> {
     let global = global.global_shapes.get(&version.real).unwrap();
     BlockData::get_for(&version.real, storage, async |data| {
-        let path = WORKSPACE_DIR.join("froglight-block/src/generated");
-        let mut module = ModuleBuilder::new_after_marker(path).await?;
+        let mut content = String::new();
 
-        module
-            .with_submodule(&version.base.as_feature(), async |module, settings| {
-                let mut content = String::new();
+        let version_type = version.base.as_feature().to_ascii_uppercase();
+        content.push_str("\nuse froglight_common::version::");
+        content.push_str(&version_type);
+        content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, block::*, shape::*};\n\n");
 
-                let version_type = version.base.as_feature().to_ascii_uppercase();
-                content.push_str("\nuse froglight_common::version::");
-                content.push_str(&version_type);
-                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, block::*, shape::*};\n\n");
+        // Generate the block data macro invocation
+        content.push_str("generate! {\n    @version ");
+        content.push_str(&version_type);
+        content.push_str(",\n");
 
-                // Generate the block data macro invocation
-                content.push_str("generate! {\n    @version ");
-                content.push_str(&version_type);
-                content.push_str(",\n");
+        let mut global_index = 0usize;
+        for (index, (block, settings)) in data.blocks.iter().enumerate() {
+            content.push_str("    ");
+            content.push_str(&settings.display.to_case(Case::Pascal));
+            content.push_str(" => { ident: \"");
+            content.push_str(&settings.ident);
+            content.push_str("\", global: ");
+            content.push_str(&global_index.to_string());
+            content.push_str(", default: ");
+            content.push_str(&settings.default.to_string());
+            content.push_str(", air: ");
+            content.push_str(&settings.is_air.to_string());
+            content.push_str(", solid: ");
+            content.push_str(&settings.is_solid.to_string());
+            content.push_str(", liquid: ");
+            content.push_str(&settings.is_liquid.to_string());
+            content.push_str(", collision: ");
+            content.push_str(&settings.has_collision.to_string());
+            content.push_str(", occlusion: ");
+            content.push_str(&settings.has_occlusion.to_string());
 
-                let mut global_index = 0usize;
-                for (index, (block, settings)) in data.blocks.iter().enumerate() {
-                    content.push_str("    ");
-                    content.push_str(&block.to_case(Case::Pascal));
-                    content.push_str(" => { ident: \"");
-                    content.push_str(&settings.ident);
-                    content.push_str("\", global: ");
-                    content.push_str(&global_index.to_string());
-                    content.push_str(", default: ");
-                    content.push_str(&settings.default.to_string());
-                    content.push_str(", air: ");
-                    content.push_str(&settings.is_air.to_string());
-                    content.push_str(", solid: ");
-                    content.push_str(&settings.is_solid.to_string());
-                    content.push_str(", liquid: ");
-                    content.push_str(&settings.is_liquid.to_string());
-                    content.push_str(", collision: ");
-                    content.push_str(&settings.has_collision.to_string());
-                    content.push_str(", occlusion: ");
-                    content.push_str(&settings.has_occlusion.to_string());
+            content.push_str(",\n        ty: [ ");
+            for (attr_index, attr) in settings.attributes.iter().enumerate() {
+                content.push('"');
+                content.push_str(&attr.name);
+                content.push_str("\" => ");
+                content.push_str(&attr.ty);
+                if attr_index != settings.attributes.len() - 1 {
+                    content.push_str(", ");
+                }
+            }
+            content.push_str(" ], ");
 
-                    content.push_str(",\n        ty: [ ");
-                    for (attr_index, attr) in settings.attributes.iter().enumerate() {
-                        content.push('"');
-                        content.push_str(&attr.name);
-                        content.push_str("\" => ");
-                        content.push_str(&attr.ty);
-                        if attr_index != settings.attributes.len() - 1 {
-                            content.push_str(", ");
-                        }
-                    }
-                    content.push_str(" ], ");
+            let (_shape, shape_index) = global.get(block).unwrap();
+            content.push_str("shape: { SHAPE_");
+            content.push_str(&shape_index.to_string());
+            content.push_str(" }\n    }");
 
-                    let (_shape, shape_index) = global.get(block).unwrap();
-                    content.push_str("shape: { SHAPE_");
-                    content.push_str(&shape_index.to_string());
-                    content.push_str(" }\n    }");
+            if index != data.blocks.len() - 1 {
+                content.push(',');
+            }
+            content.push('\n');
+            global_index += settings.states;
+        }
 
-                    if index != data.blocks.len() - 1 {
-                        content.push(',');
-                    }
+        content.push('}');
+
+        // Generate the block storage macro invocation
+        content.push_str("\n\ngenerate! {\n    @version @storage ");
+        content.push_str(&version_type);
+        content.push_str(",\n    ");
+
+        let mut total_index = 1usize;
+        for (index, block) in data.blocks.values().enumerate() {
+            for _ in 0..block.states {
+                content.push_str(&block.display.to_case(Case::Pascal));
+                if index == data.blocks.len() - 1 {
                     content.push('\n');
-                    global_index += settings.states;
-                }
-
-                content.push('}');
-
-                // Generate the block storage macro invocation
-                content.push_str("\n\ngenerate! {\n    @version @storage ");
-                content.push_str(&version_type);
-                content.push_str(",\n    ");
-
-                let mut total_index = 1usize;
-                for (index, (ident, block)) in data.blocks.iter().enumerate() {
-                    for _ in 0..block.states {
-                        content.push_str(&ident.to_case(Case::Pascal));
-                        if index == data.blocks.len() - 1 {
-                            content.push('\n');
-                        } else {
-                            content.push_str(", ");
-                            if total_index.is_multiple_of(8)  {
-                                content.push_str("\n    ");
-                            }
-                        }
-                        total_index += 1;
+                } else {
+                    content.push_str(", ");
+                    if total_index.is_multiple_of(8)  {
+                        content.push_str("\n    ");
                     }
                 }
-                content.push('}');
+                total_index += 1;
+            }
+        }
+        content.push('}');
 
-                module.with_docs("Placeholder").with_content(&content);
-                Ok(settings.with_feature(version.base.as_feature()))
-            })
-            .await?;
+        module.with_docs("Placeholder").with_content(&content);
 
-        module.build().await
+        Ok(())
     }).await
 }

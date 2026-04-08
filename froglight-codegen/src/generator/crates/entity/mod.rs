@@ -533,6 +533,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                         Ok(settings.with_feature(version.base.as_feature()))
                     }).await?;
                 }
+
+                module.build().await?;
             }
 
             Ok(())

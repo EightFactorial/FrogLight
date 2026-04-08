@@ -138,6 +138,7 @@ generate! {
     Squid,
     Stray,
     Strider,
+    SulfurCube,
     Tadpole,
     TextDisplay,
     Tnt,

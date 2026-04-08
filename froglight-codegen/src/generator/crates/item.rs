@@ -25,6 +25,7 @@ pub struct ItemData {
 #[derive(Debug, Default, Clone)]
 pub struct ItemSettings {
     pub block: bool,
+    pub display: String,
     pub ident: String,
 }
 
@@ -72,7 +73,13 @@ impl ItemData {
                     }
                     Opcode::Getstatic(MemberRef { class_name, name_and_type })
                         if constant.is_none()
-                            && class_name == "net/minecraft/world/level/block/Blocks" =>
+                            && class_name == "net/minecraft/world/level/block/Blocks"
+                            && matches!(
+                                name_and_type.descriptor.as_ref(),
+                                "Lnet/minecraft/world/level/block/Block;"
+                                    | "Lnet/minecraft/world/level/block/WeatheringCopperBlocks;"
+                                    | "Lnet/minecraft/world/level/block/WeatheringCopperCollection;"
+                            ) =>
                     {
                         if let Some(settings) = block_data.blocks.get(name_and_type.name.as_ref()) {
                             name = Some(name_and_type.name.to_string());
@@ -80,7 +87,27 @@ impl ItemData {
                             block = Some(true);
                         } else {
                             miette::bail!(
-                                "Unknown block reference in Items <clinit>: {}",
+                                "Unknown block reference in `Items` <clinit>: {}",
+                                name_and_type.name
+                            );
+                        }
+                    }
+                    Opcode::Getstatic(MemberRef { class_name, name_and_type })
+                        if constant.is_none()
+                            && class_name == "net/minecraft/world/level/block/Blocks"
+                            && name_and_type.descriptor
+                                == "Lnet/minecraft/world/level/block/ColorCollection;" =>
+                    {
+                        if let Some(settings) =
+                            block_data.blocks.get(&format!("WHITE_{}", name_and_type.name))
+                        {
+                            name = Some(name_and_type.name.to_string());
+                            constant = Some(settings.ident.clone());
+                            block = Some(true);
+                        } else {
+                            miette::bail!(
+                                "Unknown colored block reference in {} `Items` <clinit>: {}",
+                                version.as_str(),
                                 name_and_type.name
                             );
                         }
@@ -140,16 +167,15 @@ impl ItemData {
                             && name_and_type.descriptor == "Lnet/minecraft/world/item/Item;" =>
                     {
                         let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
-                            tracing::warn!(
+                            miette::bail!(
                                 "Putstatic without preceding constant in Items <clinit>: {}",
                                 name_and_type.name
                             );
-                            continue;
                         };
 
                         items.insert(
                             name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
-                            ItemSettings { ident: constant, block },
+                            ItemSettings { ident: constant, display: String::new(), block },
                         );
                     }
                     Opcode::Putstatic(MemberRef { class_name, name_and_type })
@@ -158,57 +184,76 @@ impl ItemData {
                                 == "Lnet/minecraft/world/item/WeatheringCopperItems;" =>
                     {
                         let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
-                            tracing::warn!(
+                            miette::bail!(
                                 "Putstatic without preceding constant in Items <clinit>: {}",
                                 name_and_type.name
                             );
-                            continue;
                         };
 
-                        let key =
-                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal));
-                        items.insert(key.clone(), ItemSettings { ident: constant.clone(), block });
-
-                        items.insert(
-                            format!("Exposed{key}"),
-                            ItemSettings { ident: constant.replace(':', ":exposed_"), block },
-                        );
-                        items.insert(
-                            format!("Weathered{key}"),
-                            ItemSettings { ident: constant.replace(':', ":weathered_"), block },
-                        );
-                        items.insert(
-                            format!("Oxidized{key}"),
-                            ItemSettings { ident: constant.replace(':', ":oxidized_"), block },
-                        );
-                        items.insert(
-                            format!("Waxed{key}"),
-                            ItemSettings { ident: constant.replace(':', ":waxed_"), block },
-                        );
-                        items.insert(
-                            format!("WaxedExposed{key}"),
-                            ItemSettings { ident: constant.replace(':', ":waxed_exposed_"), block },
-                        );
-                        items.insert(
-                            format!("WaxedWeathered{key}"),
-                            ItemSettings {
-                                ident: constant.replace(':', ":waxed_weathered_"),
-                                block,
-                            },
-                        );
-                        items.insert(
-                            format!("WaxedOxidized{key}"),
-                            ItemSettings {
-                                ident: constant.replace(':', ":waxed_oxidized_"),
-                                block,
-                            },
+                        add_weathering_items(
+                            ItemSettings { ident: constant, display: String::new(), block },
+                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
+                            &mut items,
+                            version,
                         );
                     }
                     Opcode::Putstatic(MemberRef { class_name, name_and_type })
-                        if class_name == "net/minecraft/world/item/Items" =>
+                        if class_name == "net/minecraft/world/item/Items"
+                            && matches!(
+                                name_and_type.descriptor.as_ref(),
+                                "Lnet/minecraft/world/item/WeatheringCopperItems;"
+                                    | "Lnet/minecraft/world/level/block/WeatheringCopperCollection"
+                            ) =>
                     {
+                        let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
+                            miette::bail!(
+                                "Putstatic without preceding constant in Items <clinit>: {}",
+                                name_and_type.name
+                            );
+                        };
+
+                        add_weathering_items(
+                            ItemSettings { ident: constant, display: String::new(), block },
+                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
+                            &mut items,
+                            version,
+                        );
+                    }
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/item/Items"
+                            && name_and_type.descriptor
+                                == "Lnet/minecraft/world/level/block/ColorCollection;" =>
+                    {
+                        let (constant, block) = if let (Some(constant), Some(block)) =
+                            (constant.take(), block.take())
+                        {
+                            (constant, block)
+                        } else if name_and_type.name == "DYE" {
+                            (String::from("Dye"), false)
+                        } else {
+                            miette::bail!(
+                                "Putstatic without preceding constant in Items <clinit>: {}",
+                                name_and_type.name
+                            );
+                        };
+
+                        add_colored_items(
+                            ItemSettings { ident: constant, display: String::new(), block },
+                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
+                            &mut items,
+                            version,
+                        );
+                    }
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type }) => {
+                        if name_and_type.descriptor.ends_with(
+                            "Lnet/minecraft/world/level/block/WeatheringCopperCollection;",
+                        ) {
+                            continue;
+                        }
+
                         tracing::warn!(
-                            "Unexpected static in Items <clinit>: {}",
+                            "Unexpected static in Items <clinit>: {class_name}.{}:{}",
+                            name_and_type.name,
                             name_and_type.descriptor
                         );
                     }
@@ -221,9 +266,123 @@ impl ItemData {
         })
         .await?;
 
+        for (item_name, item) in &mut items {
+            // Update the display name
+            item.display.clone_from(item_name);
+            item.display = item.display.replace("_Dyed", "").replace("_DYED", "");
+            if !item.ident.contains("block") {
+                item.display = item.display.trim_end_matches("_BLOCK").to_string();
+            }
+
+            tracing::info!("{} -> {}", item_name, item.display);
+        }
+
         tracing::debug!("Found {} items for \"{}\"", items.len(), version.as_str());
 
         Ok(ItemData { items })
+    }
+}
+
+fn add_weathering_items(
+    original: ItemSettings,
+    key: String,
+    items: &mut IndexMap<String, ItemSettings>,
+    version: &Version,
+) {
+    let unwaxed: (String, String);
+    let unwaxed_exposed: (String, String);
+    let unwaxed_weathered: (String, String);
+    let unwaxed_oxidized: (String, String);
+    let waxed: (String, String);
+    let waxed_exposed: (String, String);
+    let waxed_weathered: (String, String);
+    let waxed_oxidized: (String, String);
+
+    match version.as_feature() {
+        version if version.as_str() >= "v26_2" => {
+            unwaxed = (key.clone(), original.ident.clone());
+            waxed = (format!("Waxed{key}"), original.ident.replace(':', ":waxed_"));
+
+            // Note:
+            // v26_2 started removing the "_block" suffix from weathered copper block states
+            let trimmed = original.ident.trim_end_matches("_block");
+
+            unwaxed_exposed = (format!("Exposed{key}"), trimmed.replace(':', ":exposed_"));
+            waxed_exposed = (format!("WaxedExposed{key}"), trimmed.replace(':', ":waxed_exposed_"));
+
+            unwaxed_weathered = (format!("Weathered{key}"), trimmed.replace(':', ":weathered_"));
+            waxed_weathered =
+                (format!("WaxedWeathered{key}"), trimmed.replace(':', ":waxed_weathered_"));
+
+            unwaxed_oxidized = (format!("Oxidized{key}"), trimmed.replace(':', ":oxidized_"));
+            waxed_oxidized =
+                (format!("WaxedOxidized{key}"), trimmed.replace(':', ":waxed_oxidized_"));
+        }
+        _ => {
+            unwaxed = (key.clone(), original.ident.clone());
+            waxed = (format!("Waxed{key}"), original.ident.replace(':', ":waxed_"));
+
+            unwaxed_exposed = (format!("Exposed{key}"), original.ident.replace(':', ":exposed_"));
+            waxed_exposed =
+                (format!("WaxedExposed{key}"), original.ident.replace(':', ":waxed_exposed_"));
+
+            unwaxed_weathered =
+                (format!("Weathered{key}"), original.ident.replace(':', ":weathered_"));
+            waxed_weathered =
+                (format!("WaxedWeathered{key}"), original.ident.replace(':', ":waxed_weathered_"));
+
+            unwaxed_oxidized =
+                (format!("Oxidized{key}"), original.ident.replace(':', ":oxidized_"));
+            waxed_oxidized =
+                (format!("WaxedOxidized{key}"), original.ident.replace(':', ":waxed_oxidized_"));
+        }
+    }
+
+    items.insert(unwaxed.0, ItemSettings { ident: unwaxed.1, ..original.clone() });
+    items.insert(unwaxed_exposed.0, ItemSettings { ident: unwaxed_exposed.1, ..original.clone() });
+    items.insert(
+        unwaxed_weathered.0,
+        ItemSettings { ident: unwaxed_weathered.1, ..original.clone() },
+    );
+    items
+        .insert(unwaxed_oxidized.0, ItemSettings { ident: unwaxed_oxidized.1, ..original.clone() });
+    items.insert(waxed.0, ItemSettings { ident: waxed.1, ..original.clone() });
+    items.insert(waxed_exposed.0, ItemSettings { ident: waxed_exposed.1, ..original.clone() });
+    items.insert(waxed_weathered.0, ItemSettings { ident: waxed_weathered.1, ..original.clone() });
+    items.insert(waxed_oxidized.0, ItemSettings { ident: waxed_oxidized.1, ..original.clone() });
+}
+
+fn add_colored_items(
+    original: ItemSettings,
+    key: String,
+    items: &mut IndexMap<String, ItemSettings>,
+    _version: &Version,
+) {
+    let colors = [
+        "WHITE",
+        "ORANGE",
+        "MAGENTA",
+        "LIGHT_BLUE",
+        "YELLOW",
+        "LIME",
+        "PINK",
+        "GRAY",
+        "LIGHT_GRAY",
+        "CYAN",
+        "PURPLE",
+        "BLUE",
+        "BROWN",
+        "GREEN",
+        "RED",
+        "BLACK",
+    ];
+
+    let fixed = original.ident.replace("white_", "");
+    for color in colors {
+        let colored_name = format!("{color}_{key}");
+        let colored_ident = fixed.replace(':', &format!(":{}_", color.to_lowercase()));
+
+        items.insert(colored_name, ItemSettings { ident: colored_ident, ..original.clone() });
     }
 }
 
@@ -246,14 +405,17 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             // Deduplicate and sort the item types
             let mut items = IndexMap::new();
             for versioned in global_items {
-                for (name, settings) in versioned.items {
-                    match items.entry(name.to_case(Case::Pascal)) {
+                for settings in versioned.items.values() {
+                    match items.entry(settings.display.to_case(Case::Pascal)) {
                         Entry::Vacant(entry) => {
                             entry.insert(settings.block);
                         }
                         Entry::Occupied(entry) => {
                             if entry.get() != &settings.block {
-                                miette::bail!("Inconsistent block status for item \"{name}\"");
+                                miette::bail!(
+                                    "Inconsistent block status for item \"{}\"",
+                                    settings.display
+                                );
                             }
                         }
                     }
@@ -292,60 +454,65 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
     match result {
         Ok(()) => {
+            let path = WORKSPACE_DIR.join("froglight-item/src/generated");
+            let mut module = ModuleBuilder::new_after_marker(path).await?;
+
             for version in &config.versions {
                 let guard = DATA.owned_guard();
                 let storage =
                     DATA.get_or_insert_with(version.real.clone(), RwLock::default, &guard);
 
-                let mut storage = storage.write().await;
-                generate(version, &mut storage).await?;
+                module
+                    .with_submodule(&version.base.as_feature(), async |module, settings| {
+                        let mut storage = storage.write().await;
+                        generate(version, module, &mut storage).await?;
+                        Ok(settings.with_feature(version.base.as_feature()))
+                    })
+                    .await?;
             }
-            Ok(())
+
+            module.build().await
         }
         Err(err) => miette::bail!("Failed to generate global biome data: {err}"),
     }
 }
 
 /// Generate `Version`-specific item data.
-async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+async fn generate(
+    version: &VersionPair,
+    module: &mut ModuleBuilder,
+    storage: &mut VersionStorage,
+) -> Result<()> {
     ItemData::get_for(&version.real, storage, async |data| {
-        let path = WORKSPACE_DIR.join("froglight-item/src/generated");
-        let mut module = ModuleBuilder::new_after_marker(path).await?;
+        let mut content = String::new();
 
-        module
-            .with_submodule(&version.base.as_feature(), async |module, settings| {
-                let mut content = String::new();
+        let version_type = version.base.as_feature().to_ascii_uppercase();
+        content.push_str("\nuse froglight_common::version::");
+        content.push_str(&version_type);
+        content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::{generated::item::*, item::ComponentData};\n\n");
 
-                let version_type = version.base.as_feature().to_ascii_uppercase();
-                content.push_str("\nuse froglight_common::version::");
-                content.push_str(&version_type);
-                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::{generated::item::*, item::ComponentData};\n\n");
+        content.push_str("generate! {\n    @version ");
+        content.push_str(&version_type);
+        content.push_str(",\n");
 
-                content.push_str("generate! {\n    @version ");
-                content.push_str(&version_type);
-                content.push_str(",\n");
+        for (index, settings) in data.items.values().enumerate() {
+            content.push_str("    ");
+            content.push_str(&settings.display.to_case(Case::Pascal));
+            content.push_str(" => { ident: \"");
+            content.push_str(&settings.ident);
+            content.push_str("\", global: ");
+            content.push_str(&index.to_string());
+            content.push_str(" }");
+            if index != data.items.len() - 1 {
+                content.push(',');
+            }
+            content.push('\n');
+        }
 
-                for (index, (item, settings)) in data.items.iter().enumerate() {
-                    content.push_str("    ");
-                    content.push_str(&item.to_case(Case::Pascal));
-                    content.push_str(" => { ident: \"");
-                    content.push_str(&settings.ident);
-                    content.push_str("\", global: ");
-                    content.push_str(&index.to_string());
-                    content.push_str(" }");
-                    if index != data.items.len() - 1 {
-                        content.push(',');
-                    }
-                    content.push('\n');
-                }
+        content.push('}');
+        module.with_docs("Placeholder").with_content(&content);
 
-                content.push('}');
-                module.with_docs("Placeholder").with_content(&content);
-                Ok(settings.with_feature(version.base.as_feature()))
-            })
-            .await?;
-
-        module.build().await
+        Ok(())
     })
     .await
 }

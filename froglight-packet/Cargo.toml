@@ -67,3 +67,4 @@ nightly = ["facet-minecraft?/nightly", "froglight-biome/nightly", "froglight-blo
 # Note: The following features are automatically @generated.
 
 v26_1 = ["froglight-common/v26_1"]
+v26_2 = ["froglight-common/v26_2"]

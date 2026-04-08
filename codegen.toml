@@ -1,3 +1,7 @@
 [[version]]
 base = "26.1"
 real = "26.1.1"
+
+[[version]]
+base = "26.2"
+real = "26.2-snapshot-1"

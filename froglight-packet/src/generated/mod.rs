@@ -5,4 +5,5 @@
 #![allow(clippy::wildcard_imports, missing_docs, reason = "Generated code")]
 
 pub mod v26_1;
+pub mod v26_2;
 

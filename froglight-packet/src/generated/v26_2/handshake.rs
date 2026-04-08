@@ -1,0 +1,23 @@
+//! @generated [`Handshake`](crate::version::Handshake) packets for v26.2
+
+pub use crate::generated::v26_1::handshake::IntentionC2SPacket;
+
+#[repr(u8)]
+#[cfg(feature = "v26_2")]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+pub enum ClientboundPackets {
+    None(froglight_common::impossible::Impossible) = 0x00,
+}
+
+#[repr(u8)]
+#[cfg(feature = "v26_2")]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+pub enum ServerboundPackets {
+    Intention(IntentionC2SPacket) = 0x00,
+}

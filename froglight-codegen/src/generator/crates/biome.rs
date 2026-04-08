@@ -342,13 +342,31 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
                 module.build().await?;
             }
-
             Ok(())
         })
         .await;
 
     match result {
-        Ok(()) => Ok(()),
+        Ok(()) => {
+            let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
+            let mut module = ModuleBuilder::new_after_marker(path).await?;
+
+            for version in &config.versions {
+                let guard = DATA.owned_guard();
+                let storage =
+                    DATA.get_or_insert_with(version.real.clone(), RwLock::default, &guard);
+
+                module
+                    .with_submodule(&version.base.as_feature(), async |module, settings| {
+                        let mut storage = storage.write().await;
+                        generate(version, module, &mut storage).await?;
+                        Ok(settings.with_feature(version.base.as_feature()))
+                    })
+                    .await?;
+            }
+
+            module.build().await
+        }
         Err(err) => miette::bail!("Failed to generate global biome data: {err}"),
     }
 }
@@ -423,79 +441,74 @@ fn generate_value(name: &str, value: &Value, content: &mut String) -> Result<Vec
 // -------------------------------------------------------------------------------------------------
 
 /// Generate `Version`-specific biome data.
-async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+async fn generate(
+    version: &VersionPair,
+    module: &mut ModuleBuilder,
+    storage: &mut VersionStorage,
+) -> Result<()> {
     BiomeData::get_for(&version.real, storage, async |data| {
-        let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
-        let mut module = ModuleBuilder::new_after_marker(path).await?;
+        let mut content = String::new();
 
-        module
-            .with_submodule(&version.base.as_feature(), async |module, settings| {
-                let mut content = String::new();
+        content.push_str("#![allow(clippy::unreadable_literal, clippy::wildcard_imports, reason = \"Generated code\")]\n\n");
 
-                content.push_str("#![allow(clippy::unreadable_literal, clippy::wildcard_imports, reason = \"Generated code\")]\n\n");
+        let version_type = version.base.as_feature().to_ascii_uppercase();
+        content.push_str("use froglight_common::version::");
+        content.push_str(&version_type);
+        content.push_str(";\n\n#[cfg(feature = \"biome_data\")]\nuse crate::generated::attribute::*;\nuse crate::generated::biome::*;\n\n");
 
-                let version_type = version.base.as_feature().to_ascii_uppercase();
-                content.push_str("use froglight_common::version::");
-                content.push_str(&version_type);
-                content.push_str(";\n\n#[cfg(feature = \"biome_data\")]\nuse crate::generated::attribute::*;\nuse crate::generated::biome::*;\n\n");
+        content.push_str("generate! {\n    @version ");
+        content.push_str(&version_type);
+        content.push_str(",\n");
 
-                content.push_str("generate! {\n    @version ");
-                content.push_str(&version_type);
-                content.push_str(",\n");
+        for (index, (biome, settings)) in data.biomes.iter().enumerate() {
+            content.push_str("    ");
+            content.push_str(&biome.to_case(Case::Pascal));
+            content.push_str(" => { ident: \"");
+            content.push_str(&settings.ident);
+            content.push_str("\", global: ");
+            content.push_str(&index.to_string());
+            writeln!(content, ", prop: {{ foliage: {}, dry_foliage: {}, grass: {}, water: {}, precip: {}, temp: {}f32, downfall: {}f32 }},", settings.foliage_color, settings.dry_foliage_color, settings.grass_color, settings.water_color, settings.precipitation, settings.temperature, settings.downfall).unwrap();
 
-                for (index, (biome, settings)) in data.biomes.iter().enumerate() {
-                    content.push_str("    ");
-                    content.push_str(&biome.to_case(Case::Pascal));
-                    content.push_str(" => { ident: \"");
-                    content.push_str(&settings.ident);
-                    content.push_str("\", global: ");
-                    content.push_str(&index.to_string());
-                    writeln!(content, ", prop: {{ foliage: {}, dry_foliage: {}, grass: {}, water: {}, precip: {}, temp: {}f32, downfall: {}f32 }},", settings.foliage_color, settings.dry_foliage_color, settings.grass_color, settings.water_color, settings.precipitation, settings.temperature, settings.downfall).unwrap();
-
-                    content.push_str("        attr: { ");
-                    for (index, (attr, val)) in settings.attr.iter().enumerate() {
-                        let attr_name = attr
-                            .trim_start_matches("minecraft:")
-                            .replace('/', " ")
-                            .to_case(Case::Pascal);
+            content.push_str("        attr: { ");
+            for (index, (attr, val)) in settings.attr.iter().enumerate() {
+                let attr_name = attr
+                    .trim_start_matches("minecraft:")
+                    .replace('/', " ")
+                    .to_case(Case::Pascal);
 
 
-                        content.push_str(&attr_name);
-                        content.push_str(": ");
+                content.push_str(&attr_name);
+                content.push_str(": ");
 
-                        let stringified = facet_value::format_value(val);
-                        let mut formatted = stringified.replace('\n', "");
-                        for _ in 0..4 {
-                            formatted = formatted.replace("  ", " ");
-                        }
-                        formatted = formatted.replace("}}", "} }");
-                        content.push_str(formatted.trim());
-
-                        if index != settings.attr.len() - 1 {
-                            content.push(',');
-                        }
-                        content.push(' ');
-                    }
-
-                    content.push_str("}\n    }");
-                    if index != data.biomes.len() - 1 {
-                        content.push(',');
-                    }
-                    content.push('\n');
+                let stringified = facet_value::format_value(val);
+                let mut formatted = stringified.replace('\n', "");
+                for _ in 0..4 {
+                    formatted = formatted.replace("  ", " ");
                 }
+                formatted = formatted.replace("}}", "} }");
+                content.push_str(formatted.trim());
 
-                content.push('}');
+                if index != settings.attr.len() - 1 {
+                    content.push(',');
+                }
+                content.push(' ');
+            }
 
-                let docs = format!(
-                    "Biome data for [`{version_type}`](froglight_common::version::{version_type}).\n\n@generated"
-                );
+            content.push_str("}\n    }");
+            if index != data.biomes.len() - 1 {
+                content.push(',');
+            }
+            content.push('\n');
+        }
 
-                module.with_docs(&docs).with_content(&content);
-                Ok(settings.with_feature(version.base.as_feature()))
-            })
-            .await?;
+        content.push('}');
 
-        module.build().await
+        let docs = format!(
+            "Biome data for [`{version_type}`](froglight_common::version::{version_type}).\n\n@generated"
+        );
+
+        module.with_docs(&docs).with_content(&content);
+        Ok(())
     })
     .await
 }

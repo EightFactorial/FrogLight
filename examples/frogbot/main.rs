@@ -5,21 +5,23 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use async_net::TcpStream;
 use bevy::{math::DVec3, prelude::*, tasks::block_on};
 use froglight::{
-    network::{
-        bevy::ClientDespawn,
-        connection::FuturesLite,
-        event::enums::{
-            ClientboundConfigEvent, ClientboundLoginEvent, ClientboundPlayEvent,
-            ServerboundConfigEvent, ServerboundHandshakeEvent, ServerboundLoginEvent,
-            ServerboundPlayEvent,
+    bevy::plugins::NetworkPlugin,
+    modules::{
+        network::{
+            bevy::ClientDespawn,
+            connection::FuturesLite,
+            event::enums::{
+                ClientboundConfigEvent, ClientboundLoginEvent, ClientboundPlayEvent,
+                ServerboundConfigEvent, ServerboundHandshakeEvent, ServerboundLoginEvent,
+                ServerboundPlayEvent,
+            },
+        },
+        packet::common::{
+            client_information::ClientInformation,
+            handshake::{ConnectionIntent, HandshakeContent},
+            login::LoginHelloContent,
         },
     },
-    packet::common::{
-        client_information::ClientInformation,
-        handshake::{ConnectionIntent, HandshakeContent},
-        login::LoginHelloContent,
-    },
-    plugins::NetworkPlugin,
     prelude::*,
 };
 

@@ -57,6 +57,7 @@ generate! {
     SparseJungle,
     StonyPeaks,
     StonyShore,
+    SulfurCaves,
     SunflowerPlains,
     Swamp,
     Taiga,

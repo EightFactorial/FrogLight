@@ -1,0 +1,47 @@
+//! [`NetworkVersion`] implementation for [`V26_2`].
+
+use bevy_ecs::world::EntityRef;
+use froglight_common::version::V26_2;
+use froglight_packet::{
+    generated::v26_2::login::ClientboundPackets as LoginClientboundPackets,
+    version::{Clientbound, Serverbound, VersionPacket},
+};
+
+use super::ConnectionUpdate;
+use crate::{bevy::NetworkVersion, connection::ConnectionError, event::EventVersion, prelude::*};
+
+impl NetworkVersion for V26_2 {
+    fn update_connection_details(
+        packet: &VersionPacket<Self, Clientbound>,
+    ) -> Option<ConnectionUpdate> {
+        match packet {
+            VersionPacket::Login(LoginClientboundPackets::LoginCompression(p)) => {
+                Some(ConnectionUpdate {
+                    compression_threshold: Some(p.threshold),
+                    ..ConnectionUpdate::default()
+                })
+            }
+            VersionPacket::Login(LoginClientboundPackets::Hello(p)) => Some(ConnectionUpdate {
+                encrypion_key: Some(p.public_key.clone()),
+                ..ConnectionUpdate::default()
+            }),
+            _ => None,
+        }
+    }
+
+    #[inline]
+    fn event_to_packet(
+        event: ServerboundEventEnum,
+        _: EntityRef<'_>,
+    ) -> Result<Option<VersionPacket<Self, Serverbound>>, ConnectionError> {
+        <V26_2 as EventVersion>::server_event_to_packet(event)
+    }
+
+    #[inline]
+    fn packet_to_event(
+        packet: VersionPacket<Self, Clientbound>,
+        _: EntityRef<'_>,
+    ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {
+        <V26_2 as EventVersion>::client_packet_to_event(packet)
+    }
+}
