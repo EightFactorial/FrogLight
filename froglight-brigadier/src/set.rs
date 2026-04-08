@@ -53,6 +53,9 @@ impl GameCommandSet {
         settings: B::BundleData,
         system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Result<(), CommandRegisterError> {
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_brigadier", "Registering \"{command}\" with {system:?}");
+
         if self.0.contains_key(&command) {
             Err(CommandRegisterError::AlreadyExists)
         } else {
@@ -72,6 +75,9 @@ impl GameCommandSet {
         command: &'a str,
         world: &mut World,
     ) -> Result<(), ParseOrExecuteError<'a>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_brigadier", "Entity {entity} executed command \"{command}\"");
+
         if let Some(info) = self.0.get(command) {
             info.run(entity, command, world)
         } else {

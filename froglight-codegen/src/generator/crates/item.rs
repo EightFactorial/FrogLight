@@ -262,11 +262,14 @@ impl ItemData {
 
         for (item_name, item) in &mut items {
             // Update the display name
-            item.display.clone_from(item_name);
-            item.display = item.display.replace("_Dyed", "").replace("_DYED", "");
+            let mut display = item_name.clone();
+
+            display = display.replace("_Dyed", "").replace("_DYED", "");
             if !item.ident.contains("block") {
-                item.display = item.display.trim_end_matches("_BLOCK").to_string();
+                display = display.trim_end_matches("_Block").trim_end_matches("_BLOCK").to_string();
             }
+
+            item.display = display;
         }
 
         tracing::debug!("Found {} items for \"{}\"", items.len(), version.as_str());
