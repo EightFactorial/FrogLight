@@ -202,7 +202,7 @@ impl ItemData {
                             && matches!(
                                 name_and_type.descriptor.as_ref(),
                                 "Lnet/minecraft/world/item/WeatheringCopperItems;"
-                                    | "Lnet/minecraft/world/level/block/WeatheringCopperCollection"
+                                    | "Lnet/minecraft/world/level/block/WeatheringCopperCollection;"
                             ) =>
                     {
                         let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
@@ -245,12 +245,6 @@ impl ItemData {
                         );
                     }
                     Opcode::Putstatic(MemberRef { class_name, name_and_type }) => {
-                        if name_and_type.descriptor.ends_with(
-                            "Lnet/minecraft/world/level/block/WeatheringCopperCollection;",
-                        ) {
-                            continue;
-                        }
-
                         tracing::warn!(
                             "Unexpected static in Items <clinit>: {class_name}.{}:{}",
                             name_and_type.name,
@@ -273,8 +267,6 @@ impl ItemData {
             if !item.ident.contains("block") {
                 item.display = item.display.trim_end_matches("_BLOCK").to_string();
             }
-
-            tracing::info!("{} -> {}", item_name, item.display);
         }
 
         tracing::debug!("Found {} items for \"{}\"", items.len(), version.as_str());
