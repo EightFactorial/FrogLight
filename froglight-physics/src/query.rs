@@ -2,7 +2,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::query::QueryData;
-use froglight_entity::prelude::*;
+use froglight_entity::{entity::EntityAttributeSet, prelude::*};
 
 use crate::prelude::*;
 
@@ -13,6 +13,11 @@ pub struct PhysicsRef<'a> {
     pub controller: Option<&'a PhysicsController>,
     /// The entity's physics state.
     pub state: &'a PhysicsState,
+
+    /// The entity's attributes.
+    pub attributes: &'a EntityAttributeSet,
+    /// The entity's data bundle.
+    pub bundle: &'a EntityBundle,
     /// The entity's AABB.
     pub bounding_box: &'a EntityAabb,
 
@@ -63,6 +68,8 @@ impl PhysicsRef<'_> {
                 None => None,
             },
             state: self.state,
+            attributes: self.attributes,
+            bundle: self.bundle,
             world_collision: self.world_collision,
             prev_world_collision: self.prev_world_collision,
             bounding_box: self.bounding_box,
@@ -88,6 +95,8 @@ impl<'a> From<PhysicsMut<'a>> for PhysicsRef<'a> {
         Self {
             controller: mutable.controller.map(|c| &*c),
             state: mutable.state,
+            attributes: mutable.attributes,
+            bundle: mutable.bundle,
             world_collision: mutable.world_collision,
             prev_world_collision: mutable.prev_world_collision,
             bounding_box: mutable.bounding_box,
@@ -112,6 +121,8 @@ impl<'a> From<&'a PhysicsMut<'_>> for PhysicsRef<'a> {
         Self {
             controller: mutable.controller.as_deref(),
             state: mutable.state,
+            attributes: mutable.attributes,
+            bundle: mutable.bundle,
             world_collision: mutable.world_collision,
             prev_world_collision: mutable.prev_world_collision,
             bounding_box: mutable.bounding_box,
@@ -138,6 +149,8 @@ impl<'a> From<PhysicsRefItem<'a, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller,
             state: item.state,
+            attributes: item.attributes,
+            bundle: item.bundle,
             world_collision: item.world_collision,
             prev_world_collision: item.prev_world_collision,
             bounding_box: item.bounding_box,
@@ -163,6 +176,8 @@ impl<'a> From<&'a PhysicsRefItem<'_, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller,
             state: item.state,
+            attributes: item.attributes,
+            bundle: item.bundle,
             world_collision: item.world_collision,
             prev_world_collision: item.prev_world_collision,
             bounding_box: item.bounding_box,
@@ -191,6 +206,11 @@ pub struct PhysicsMut<'a> {
     pub controller: Option<&'a mut PhysicsController>,
     /// The entity's physics state.
     pub state: &'a mut PhysicsState,
+
+    /// The entity's attributes.
+    pub attributes: &'a mut EntityAttributeSet,
+    /// The entity's data bundle.
+    pub bundle: &'a mut EntityBundle,
     /// The entity's AABB.
     pub bounding_box: &'a mut EntityAabb,
 
@@ -264,6 +284,8 @@ impl<'a> PhysicsMut<'a> {
                 None => None,
             },
             state: &mut *self.state,
+            attributes: &mut *self.attributes,
+            bundle: &mut *self.bundle,
             world_collision: &mut *self.world_collision,
             prev_world_collision: &mut *self.prev_world_collision,
             bounding_box: &mut *self.bounding_box,
@@ -291,6 +313,8 @@ impl<'a> PhysicsMut<'a> {
                 None => None,
             },
             state: &*self.state,
+            attributes: &*self.attributes,
+            bundle: &*self.bundle,
             world_collision: &*self.world_collision,
             prev_world_collision: &*self.prev_world_collision,
             bounding_box: &*self.bounding_box,
@@ -318,6 +342,8 @@ impl<'a> PhysicsMut<'a> {
                 None => None,
             },
             state: self.state,
+            attributes: self.attributes,
+            bundle: self.bundle,
             world_collision: self.world_collision,
             prev_world_collision: self.prev_world_collision,
             bounding_box: self.bounding_box,
@@ -344,6 +370,8 @@ impl<'a> From<PhysicsMutItem<'a, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller.map(|c| &*c.into_inner()),
             state: item.state.into_inner(),
+            attributes: item.attributes.into_inner(),
+            bundle: item.bundle.into_inner(),
             world_collision: item.world_collision.into_inner(),
             prev_world_collision: item.prev_world_collision.into_inner(),
             bounding_box: item.bounding_box.into_inner(),
@@ -369,6 +397,8 @@ impl<'a> From<&'a PhysicsMutItem<'_, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller.as_deref(),
             state: &item.state,
+            attributes: &item.attributes,
+            bundle: &item.bundle,
             world_collision: &item.world_collision,
             prev_world_collision: &item.prev_world_collision,
             bounding_box: &item.bounding_box,
@@ -395,6 +425,8 @@ impl<'a> From<PhysicsMutItem<'a, '_, '_>> for PhysicsMut<'a> {
         Self {
             controller: item.controller.map(bevy_ecs::change_detection::Mut::into_inner),
             state: item.state.into_inner(),
+            attributes: item.attributes.into_inner(),
+            bundle: item.bundle.into_inner(),
             world_collision: item.world_collision.into_inner(),
             prev_world_collision: item.prev_world_collision.into_inner(),
             bounding_box: item.bounding_box.into_inner(),
@@ -420,6 +452,8 @@ impl<'a> From<&'a mut PhysicsMutItem<'_, '_, '_>> for PhysicsMut<'a> {
         Self {
             controller: item.controller.as_deref_mut(),
             state: &mut item.state,
+            attributes: &mut item.attributes,
+            bundle: &mut item.bundle,
             world_collision: &mut item.world_collision,
             prev_world_collision: &mut item.prev_world_collision,
             bounding_box: &mut item.bounding_box,
@@ -446,6 +480,8 @@ impl<'a> From<PhysicsMutReadOnlyItem<'a, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller,
             state: item.state,
+            attributes: item.attributes,
+            bundle: item.bundle,
             world_collision: item.world_collision,
             prev_world_collision: item.prev_world_collision,
             bounding_box: item.bounding_box,
@@ -471,6 +507,8 @@ impl<'a> From<&'a PhysicsMutReadOnlyItem<'_, '_, '_>> for PhysicsRef<'a> {
         Self {
             controller: item.controller,
             state: item.state,
+            attributes: item.attributes,
+            bundle: item.bundle,
             world_collision: item.world_collision,
             prev_world_collision: item.prev_world_collision,
             bounding_box: item.bounding_box,

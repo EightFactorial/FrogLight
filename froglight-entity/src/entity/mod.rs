@@ -3,6 +3,9 @@
 mod aabb;
 pub use aabb::EntityAabb;
 
+pub mod attribute;
+pub use attribute::{EntityAttribute, EntityAttributeSet, EntityAttributeType};
+
 mod dataset;
 pub use dataset::EntityDataSet;
 

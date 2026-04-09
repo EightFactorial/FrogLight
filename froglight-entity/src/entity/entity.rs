@@ -3,20 +3,18 @@ use alloc::boxed::Box;
 use core::any::TypeId;
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::lifecycle::HookContext;
+use bevy_ecs::{
+    component::Component,
+    lifecycle::HookContext,
+    reflect::ReflectCommandExt,
+    reflect::ReflectComponent,
+    world::{DeferredWorld, EntityWorldMut},
+};
 #[cfg(feature = "bevy")]
-use bevy_ecs::reflect::ReflectCommandExt;
-#[cfg(feature = "bevy")]
-use bevy_ecs::world::{DeferredWorld, EntityWorldMut};
-#[cfg(feature = "bevy")]
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-#[cfg(feature = "bevy")]
-use bevy_reflect::PartialReflect;
-#[cfg(feature = "bevy")]
-use bevy_reflect::Reflect;
+use bevy_reflect::{PartialReflect, Reflect};
 #[cfg(feature = "facet")]
 use facet::Peek;
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 
 #[cfg(feature = "bevy")]
 use crate::bevy::EntityBundleEvent;
