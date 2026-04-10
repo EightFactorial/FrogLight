@@ -34,8 +34,8 @@ impl EntityAttributeSet {
     /// Insert the given [`EntityAttribute`] into this set,
     /// returning the old attribute of the same type if it was present.
     pub fn insert(&mut self, attribute: EntityAttribute) -> Option<EntityAttribute> {
-        if let Some(index) = self.0.iter().position(|attr| attr.attr_ty == attribute.attr_ty) {
-            Some(core::mem::replace(&mut self.0[index], attribute))
+        if let Some(attr) = self.0.iter_mut().find(|attr| attr.attr_ty == attribute.attr_ty) {
+            Some(core::mem::replace(attr, attribute))
         } else {
             self.0.push(attribute);
             None
@@ -47,7 +47,7 @@ impl EntityAttributeSet {
     pub fn remove<T: EntityAttributeType<V>, V: Version>(&mut self) -> Option<EntityAttribute> {
         let (attr_ty, version_ty) = (TypeId::of::<T>(), TypeId::of::<V>());
         self.0
-            .iter()
+            .iter_mut()
             .position(|attr| attr.attr_ty == attr_ty && attr.version_ty == version_ty)
             .map(|index| self.0.remove(index))
     }
@@ -142,9 +142,9 @@ impl EntityAttribute {
         &mut self,
         modifier: EntityAttributeModifier,
     ) -> Option<EntityAttributeModifier> {
-        if let Some(index) = self.modifiers.iter().position(|m| m.identifier == modifier.identifier)
+        if let Some(modif) = self.modifiers.iter_mut().find(|m| m.identifier == modifier.identifier)
         {
-            Some(core::mem::replace(&mut self.modifiers[index], modifier))
+            Some(core::mem::replace(modif, modifier))
         } else {
             self.modifiers.push(modifier);
             None

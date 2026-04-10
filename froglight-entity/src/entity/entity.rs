@@ -1,14 +1,11 @@
 #[cfg(feature = "bevy")]
-use alloc::boxed::Box;
+use alloc::{borrow::Cow, boxed::Box, string::String};
 use core::any::TypeId;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{
-    component::Component,
-    lifecycle::HookContext,
-    reflect::ReflectCommandExt,
-    reflect::ReflectComponent,
-    world::{DeferredWorld, EntityWorldMut},
+    component::Component, lifecycle::HookContext, reflect::ReflectCommandExt,
+    reflect::ReflectComponent, world::DeferredWorld,
 };
 #[cfg(feature = "bevy")]
 use bevy_reflect::{PartialReflect, Reflect};
@@ -17,7 +14,7 @@ use facet::Peek;
 use froglight_common::prelude::*;
 
 #[cfg(feature = "bevy")]
-use crate::bevy::EntityBundleEvent;
+use crate::{bevy::EntityBundleEvent, entity::EntityAabb};
 use crate::{
     entity::{EntityDataSet, GlobalId, metadata::EntityMetadata},
     generated::datatype::EntityDataType,
@@ -160,18 +157,19 @@ impl EntityBundle {
 impl EntityBundle {
     fn insert_hook(mut world: DeferredWorld, ctx: HookContext) {
         let (entities, mut commands) = world.entities_and_commands();
-        let entity = entities.get(ctx.entity).unwrap();
-        let mut commands = commands.entity(ctx.entity);
+        let Ok(entity) = entities.get(ctx.entity) else { return };
 
         let bundle = entity.get::<Self>().unwrap();
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_entity", "Applying EntityBundle \"{}\" to Entity {}", bundle.identifier(), ctx.entity);
+
+        let mut commands = commands.entity(ctx.entity);
         bundle.inspect_reflect(|c| {
             commands.insert_reflect(c);
         });
 
         commands.insert(*bundle.metadata().aabb());
-
-        #[cfg(feature = "tracing")]
-        tracing::trace!(target: "froglight_entity", "Applying EntityBundle \"{}\" to Entity {}", bundle.identifier(), ctx.entity);
         commands.trigger(EntityBundleEvent::new);
     }
 
@@ -179,18 +177,17 @@ impl EntityBundle {
         let (entities, mut commands) = world.entities_and_commands();
         let Ok(entity) = entities.get(ctx.entity) else { return };
 
-        let mut commands = commands.entity(ctx.entity);
-
         let bundle = entity.get::<Self>().unwrap();
-        bundle.inspect_reflect(|c| {
-            let type_path = alloc::string::String::from(c.reflect_type_path());
-            commands.queue_silenced(move |mut entity: EntityWorldMut| {
-                entity.remove_reflect(type_path.into());
-            });
-        });
 
         #[cfg(feature = "tracing")]
         tracing::trace!(target: "froglight_entity", "Removing EntityBundle \"{}\" from Entity {}", bundle.identifier(), ctx.entity);
+
+        let mut commands = commands.entity(ctx.entity);
+        bundle.inspect_reflect(|c| {
+            commands.remove_reflect(Cow::Owned(String::from(c.reflect_type_path())));
+        });
+
+        commands.remove::<EntityAabb>();
     }
 }
 
