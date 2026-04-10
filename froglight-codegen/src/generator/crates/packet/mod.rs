@@ -212,10 +212,7 @@ impl PacketData {
 pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     // Collect and sort versions by release time
     let mut versions = config.versions.clone();
-    {
-        let manifest = Manifest::get().await;
-        versions.sort_by_key(|v| manifest.version(&v.real).unwrap().release_time);
-    }
+    versions.sort_by_key(|v| v.base.as_feature());
 
     let mut generator =
         IndexMap::<VersionPair, VersionPackets>::with_capacity(config.versions.len());
