@@ -27,6 +27,10 @@ impl EntityAttributeSet {
     #[must_use]
     pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
 
+    /// Get all [`EntityAttribute`]s in this set as a slice.
+    #[must_use]
+    pub const fn as_slice(&self) -> &[EntityAttribute] { self.0.as_slice() }
+
     /// Insert the given [`EntityAttribute`] into this set,
     /// returning the old attribute of the same type if it was present.
     pub fn insert(&mut self, attribute: EntityAttribute) -> Option<EntityAttribute> {
@@ -37,10 +41,6 @@ impl EntityAttributeSet {
             None
         }
     }
-
-    /// Get a reference to the [`EntityAttribute`]s in this set.
-    #[must_use]
-    pub const fn as_ref(&self) -> &[EntityAttribute] { self.0.as_slice() }
 
     /// Remove the attribute of the given type and version from this set,
     /// returning it if it was present.
@@ -71,21 +71,21 @@ impl EntityAttributeSet {
     #[must_use]
     pub fn contains<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
         let (attr_ty, version_ty) = (TypeId::of::<T>(), TypeId::of::<V>());
-        self.as_ref().iter().any(|attr| attr.attr_ty == attr_ty && attr.version_ty == version_ty)
+        self.as_slice().iter().any(|attr| attr.attr_ty == attr_ty && attr.version_ty == version_ty)
     }
 
     /// Returns `true` if this set contains the attribute type.
     #[must_use]
     pub fn contains_type<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
         let attr_ty = TypeId::of::<T>();
-        self.as_ref().iter().any(|attr| attr.attr_ty == attr_ty)
+        self.as_slice().iter().any(|attr| attr.attr_ty == attr_ty)
     }
 
     /// Returns `true` if this set contains an attribute with the given
     /// [`Identifier`].
     #[must_use]
     pub fn contains_identifier(&self, ident: &str) -> bool {
-        self.as_ref().iter().any(|attr| &attr.ident == ident)
+        self.as_slice().iter().any(|attr| &attr.ident == ident)
     }
 }
 
@@ -98,6 +98,7 @@ impl EntityAttributeSet {
 pub struct EntityAttribute {
     ident: Identifier<'static>,
     value: EntityAttributeValue,
+    modifiers: Vec<EntityAttributeModifier>,
     attr_ty: TypeId,
     version_ty: TypeId,
 }
@@ -109,22 +110,69 @@ impl EntityAttribute {
         value: EntityAttributeValue,
     ) -> Self {
         Self {
-            ident: T::IDENTIFIER,
             value,
+            ident: T::IDENTIFIER,
+            modifiers: Vec::new(),
             attr_ty: TypeId::of::<T>(),
             version_ty: TypeId::of::<V>(),
         }
     }
 
-    /// Returns the [`Identifier`] of this attribute.
+    /// Get the [`Identifier`] of this attribute.
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.ident }
 
-    /// Returns the [`EntityAttributeValue`] of this attribute.
+    /// Get the [`EntityAttributeValue`] of this attribute.
+    ///
+    /// If you want the numeric value of this attribute,
+    /// use [`EntityAttribute::value`] instead.
     #[inline]
     #[must_use]
-    pub const fn value(&self) -> &EntityAttributeValue { &self.value }
+    pub const fn attribute_value(&self) -> &EntityAttributeValue { &self.value }
+
+    /// Get the [`EntityAttributeModifier`]s of this attribute.
+    #[inline]
+    #[must_use]
+    pub const fn modifiers(&self) -> &[EntityAttributeModifier] { self.modifiers.as_slice() }
+
+    /// Insert the given [`EntityAttributeModifier`] into this attribute,
+    /// returning the old modifier with the same identifier if present.
+    pub fn insert_modifier(
+        &mut self,
+        modifier: EntityAttributeModifier,
+    ) -> Option<EntityAttributeModifier> {
+        if let Some(index) = self.modifiers.iter().position(|m| m.identifier == modifier.identifier)
+        {
+            Some(core::mem::replace(&mut self.modifiers[index], modifier))
+        } else {
+            self.modifiers.push(modifier);
+            None
+        }
+    }
+
+    /// Remove the modifier with the given identifier from this attribute,
+    /// returning it if it was present.
+    pub fn remove_modifier(&mut self, ident: &str) -> Option<EntityAttributeModifier> {
+        self.modifiers
+            .iter()
+            .position(|m| &m.identifier == ident)
+            .map(|index| self.modifiers.remove(index))
+    }
+
+    /// Get the total value of this attribute, including all modifiers.
+    #[must_use]
+    pub fn value(&self) -> f64 {
+        let base = match self.value {
+            EntityAttributeValue::Ranged(value) => value.base(),
+        };
+
+        self.modifiers().iter().fold(base, |total, modifier| match modifier.modifier_type {
+            AttributeModifierType::AddValue => total + modifier.amount,
+            AttributeModifierType::AddMultipliedBase => total + (modifier.amount * base),
+            AttributeModifierType::AddMultipliedTotal => total * (modifier.amount + 1.0),
+        })
+    }
 
     /// Returns `true` if this attribute is of the given type.
     #[inline]
@@ -168,14 +216,14 @@ pub enum EntityAttributeValue {
 pub struct RangedAttributeValue {
     min: f64,
     max: f64,
-    value: f64,
+    base: f64,
 }
 
 impl RangedAttributeValue {
     /// Create a new [`RangedAttributeValue`].
     #[inline]
     #[must_use]
-    pub const fn new(min: f64, max: f64, value: f64) -> Self { Self { min, max, value } }
+    pub const fn new(min: f64, max: f64, base: f64) -> Self { Self { min, max, base } }
 
     /// Returns the minimum value of this attribute.
     #[inline]
@@ -187,32 +235,32 @@ impl RangedAttributeValue {
     #[must_use]
     pub const fn max(&self) -> f64 { self.max }
 
-    /// Returns the current value of this attribute.
+    /// Returns the base value of this attribute.
     #[inline]
     #[must_use]
-    pub const fn value(&self) -> f64 { self.value }
+    pub const fn base(&self) -> f64 { self.base }
 
-    /// Set the value of this attribute.
+    /// Set the base value of this attribute.
     ///
     /// # Errors
     ///
     /// Returns an error if the value is out of range.
-    pub const fn set_value(&mut self, value: f64) -> Result<(), f64> {
+    pub const fn set_base(&mut self, value: f64) -> Result<(), f64> {
         if value < self.min || value > self.max {
             Err(value)
         } else {
-            self.value = value;
+            self.base = value;
             Ok(())
         }
     }
 
-    /// Set the value of this attribute.
+    /// Set the base value of this attribute.
     ///
     /// # Errors
     ///
     /// Returns an error if the value is out of range.
-    pub const fn with_value(mut self, value: f64) -> Result<Self, f64> {
-        match self.set_value(value) {
+    pub const fn with_base(mut self, value: f64) -> Result<Self, f64> {
+        match self.set_base(value) {
             Ok(()) => Ok(self),
             Err(value) => Err(value),
         }
@@ -222,6 +270,35 @@ impl RangedAttributeValue {
 impl From<RangedAttributeValue> for EntityAttributeValue {
     #[inline]
     fn from(value: RangedAttributeValue) -> Self { Self::Ranged(value) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A modifier to an [`EntityAttribute`].
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+pub struct EntityAttributeModifier {
+    /// The identifier of this modifier.
+    pub identifier: Identifier<'static>,
+    /// The amount of this modifier.
+    pub amount: f64,
+    /// How to apply this modifier to the attribute's base value.
+    pub modifier_type: AttributeModifierType,
+}
+
+/// How to apply an [`EntityAttributeModifier`] to an attribute's base value.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+pub enum AttributeModifierType {
+    /// Add the modifier's value to the base value of the attribute.
+    AddValue,
+    /// Multiply the base value of the attribute by the modifier's value.
+    AddMultipliedBase,
+    /// Multiply the total value of the attribute by the modifier's value plus
+    /// 1.
+    AddMultipliedTotal,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -237,7 +314,14 @@ pub trait EntityAttributeType<V: Version>: 'static {
     const DEFAULT: Self::Value;
 
     /// Create a new [`EntityAttribute`] of this type with the given value.
+    #[must_use]
     fn attribute(value: Self::Value) -> EntityAttribute {
         EntityAttribute::new::<Self, V>(value.into())
     }
+
+    /// Create a new [`EntityAttribute`] of this type using the
+    /// [`EntityAttributeType::DEFAULT`] value.
+    #[inline]
+    #[must_use]
+    fn default() -> EntityAttribute { Self::attribute(Self::DEFAULT) }
 }

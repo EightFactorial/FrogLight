@@ -65,7 +65,7 @@ blocking = { default-features = false, version = "1.6" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "=0.30" }
-hashbrown = { default-features = false, version = "0.16" }
+hashbrown = { default-features = false, version = "0.17" }
 hickory-resolver = { default-features = false, version = "0.25" }
 indexmap = { default-features = false, version = "2.13" }
 lexical = { default-features = false, version = "7.0" }
