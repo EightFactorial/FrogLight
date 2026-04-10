@@ -19,8 +19,7 @@ pub struct EntityAttributeSet(Vec<EntityAttribute>);
 impl EntityAttributeSet {
     /// Create a new, empty [`EntityAttributeSet`].
     #[must_use]
-    #[expect(clippy::new_without_default, reason = "WIP")]
-    pub const fn new() -> Self { Self(Vec::new()) }
+    pub const fn new_empty() -> Self { Self(Vec::new()) }
 
     /// Create a new, empty [`EntityAttributeSet`] with at least the specified
     /// capacity.
@@ -32,9 +31,9 @@ impl EntityAttributeSet {
     pub const fn as_slice(&self) -> &[EntityAttribute] { self.0.as_slice() }
 
     /// Insert the given [`EntityAttribute`] into this set,
-    /// returning the old attribute of the same type if it was present.
+    /// returning the old attribute of the same type or identifier if present.
     pub fn insert(&mut self, attribute: EntityAttribute) -> Option<EntityAttribute> {
-        if let Some(attr) = self.0.iter_mut().find(|attr| attr.attr_ty == attribute.attr_ty) {
+        if let Some(attr) = self.0.iter_mut().find(|attr| attr.identifier == attribute.identifier) {
             Some(core::mem::replace(attr, attribute))
         } else {
             self.0.push(attribute);
@@ -42,50 +41,33 @@ impl EntityAttributeSet {
         }
     }
 
-    /// Remove the attribute of the given type and version from this set,
-    /// returning it if it was present.
-    pub fn remove<T: EntityAttributeType<V>, V: Version>(&mut self) -> Option<EntityAttribute> {
-        let (attr_ty, version_ty) = (TypeId::of::<T>(), TypeId::of::<V>());
-        self.0
-            .iter_mut()
-            .position(|attr| attr.attr_ty == attr_ty && attr.version_ty == version_ty)
-            .map(|index| self.0.remove(index))
+    /// Returns `true` if this set contains an attribute with the given
+    /// [`Identifier`].
+    #[must_use]
+    pub fn contains(&self, ident: &str) -> bool {
+        self.as_slice().iter().any(|attr| &attr.identifier == ident)
     }
 
-    /// Remove the attribute of the given type from this set,
-    /// returning it if it was present.
-    pub fn remove_type<T: EntityAttributeType<V>, V: Version>(
-        &mut self,
-    ) -> Option<EntityAttribute> {
-        let attr_ty = TypeId::of::<T>();
-        self.0.iter().position(|attr| attr.attr_ty == attr_ty).map(|index| self.0.remove(index))
+    /// Returns `true` if this set contains the attribute type.
+    #[inline]
+    #[must_use]
+    pub fn contains_type<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
+        self.contains(&T::IDENTIFIER)
     }
 
     /// Remove the attribute with the given identifier from this set,
     /// returning it if it was present.
-    pub fn remove_identifier(&mut self, ident: &str) -> Option<EntityAttribute> {
-        self.0.iter().position(|attr| &attr.ident == ident).map(|index| self.0.remove(index))
+    pub fn remove(&mut self, ident: &str) -> Option<EntityAttribute> {
+        self.0.iter().position(|attr| &attr.identifier == ident).map(|index| self.0.remove(index))
     }
 
-    /// Returns `true` if this set contains the attribute type and version.
-    #[must_use]
-    pub fn contains<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
-        let (attr_ty, version_ty) = (TypeId::of::<T>(), TypeId::of::<V>());
-        self.as_slice().iter().any(|attr| attr.attr_ty == attr_ty && attr.version_ty == version_ty)
-    }
-
-    /// Returns `true` if this set contains the attribute type.
-    #[must_use]
-    pub fn contains_type<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
-        let attr_ty = TypeId::of::<T>();
-        self.as_slice().iter().any(|attr| attr.attr_ty == attr_ty)
-    }
-
-    /// Returns `true` if this set contains an attribute with the given
-    /// [`Identifier`].
-    #[must_use]
-    pub fn contains_identifier(&self, ident: &str) -> bool {
-        self.as_slice().iter().any(|attr| &attr.ident == ident)
+    /// Remove the attribute of the given type and version from this set,
+    /// returning it if it was present.
+    #[inline]
+    pub fn remove_type<T: EntityAttributeType<V>, V: Version>(
+        &mut self,
+    ) -> Option<EntityAttribute> {
+        self.remove(&T::IDENTIFIER)
     }
 }
 
@@ -96,11 +78,9 @@ impl EntityAttributeSet {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub struct EntityAttribute {
-    ident: Identifier<'static>,
+    identifier: Identifier<'static>,
     value: EntityAttributeValue,
     modifiers: Vec<EntityAttributeModifier>,
-    attr_ty: TypeId,
-    version_ty: TypeId,
 }
 
 impl EntityAttribute {
@@ -109,19 +89,21 @@ impl EntityAttribute {
     pub const fn new<T: EntityAttributeType<V> + ?Sized, V: Version>(
         value: EntityAttributeValue,
     ) -> Self {
-        Self {
-            value,
-            ident: T::IDENTIFIER,
-            modifiers: Vec::new(),
-            attr_ty: TypeId::of::<T>(),
-            version_ty: TypeId::of::<V>(),
-        }
+        Self { value, identifier: T::IDENTIFIER, modifiers: Vec::new() }
+    }
+
+    /// Create a new [`EntityAttribute`] without a type.
+    ///
+    /// Used where the attribute type is unknown, but still needs to be tracked.
+    #[must_use]
+    pub const fn new_untyped(identifier: Identifier<'static>, value: EntityAttributeValue) -> Self {
+        Self { value, identifier, modifiers: Vec::new() }
     }
 
     /// Get the [`Identifier`] of this attribute.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.ident }
+    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
 
     /// Get the [`EntityAttributeValue`] of this attribute.
     ///
@@ -163,38 +145,13 @@ impl EntityAttribute {
     /// Get the total value of this attribute, including all modifiers.
     #[must_use]
     pub fn value(&self) -> f64 {
-        let base = match self.value {
-            EntityAttributeValue::Ranged(value) => value.base(),
-        };
-
+        let base = self.value.base();
         self.modifiers().iter().fold(base, |total, modifier| match modifier.modifier_type {
             AttributeModifierType::AddValue => total + modifier.amount,
             AttributeModifierType::AddMultipliedBase => total + (modifier.amount * base),
             AttributeModifierType::AddMultipliedTotal => total * (modifier.amount + 1.0),
         })
     }
-
-    /// Returns `true` if this attribute is of the given type.
-    #[inline]
-    #[must_use]
-    pub fn is_type<T: EntityAttributeType<V>, V: Version>(&self) -> bool {
-        self.is_type_id(TypeId::of::<T>())
-    }
-
-    /// Returns `true` if this attribute is of the given type.
-    #[inline]
-    #[must_use]
-    pub fn is_type_id(&self, attr_ty: TypeId) -> bool { self.attr_ty == attr_ty }
-
-    /// Returns `true` if this attribute is of the given version.
-    #[inline]
-    #[must_use]
-    pub fn is_version<V: Version>(&self) -> bool { self.is_version_type(TypeId::of::<V>()) }
-
-    /// Returns `true` if this attribute is of the given version.
-    #[inline]
-    #[must_use]
-    pub fn is_version_type(&self, version_ty: TypeId) -> bool { self.version_ty == version_ty }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -207,6 +164,41 @@ impl EntityAttribute {
 pub enum EntityAttributeValue {
     /// A value with a minimum and maximum.
     Ranged(RangedAttributeValue),
+}
+
+impl EntityAttributeValue {
+    /// Returns the base value of this attribute.
+    #[must_use]
+    pub const fn base(&self) -> f64 {
+        match self {
+            EntityAttributeValue::Ranged(value) => value.base(),
+        }
+    }
+
+    /// Set the base value of this attribute.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the value is out of range.
+    pub const fn set_base(&mut self, value: f64) -> Result<(), f64> {
+        match self {
+            EntityAttributeValue::Ranged(attr) => attr.set_base(value),
+        }
+    }
+
+    /// Set the base value of this attribute.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the value is out of range.
+    pub const fn with_base(self, value: f64) -> Result<Self, f64> {
+        match self {
+            EntityAttributeValue::Ranged(attr) => match attr.with_base(value) {
+                Ok(attr) => Ok(Self::Ranged(attr)),
+                Err(value) => Err(value),
+            },
+        }
+    }
 }
 
 /// An [`EntityAttribute`] with a minimum and maximum value.
@@ -324,4 +316,52 @@ pub trait EntityAttributeType<V: Version>: 'static {
     #[inline]
     #[must_use]
     fn default() -> EntityAttribute { Self::attribute(Self::DEFAULT) }
+}
+
+/// A container for the functions of an [`EntityAttributeType`].
+#[derive(Clone)]
+pub struct EntityAttributeData {
+    identifier: Identifier<'static>,
+    attribute_fn: fn(EntityAttributeValue) -> EntityAttribute,
+    attribute_ty: TypeId,
+    default_fn: fn() -> EntityAttribute,
+}
+
+impl EntityAttributeData {
+    /// Create a new [`EntityAttributeData`].
+    #[must_use]
+    pub const fn new<T: EntityAttributeType<V> + ?Sized, V: Version>() -> Self {
+        Self {
+            identifier: T::IDENTIFIER,
+            attribute_fn: EntityAttribute::new::<T, V>,
+            attribute_ty: TypeId::of::<T::Value>(),
+            default_fn: T::default,
+        }
+    }
+
+    /// Get the [`Identifier`] for this [`EntityAttributeData`].
+    #[inline]
+    #[must_use]
+    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+
+    /// Create an [`EntityAttribute`] using the default value.
+    #[inline]
+    #[must_use]
+    pub fn default_attribute(&self) -> EntityAttribute { (self.default_fn)() }
+
+    /// Try to create a new [`EntityAttribute`] from the given value.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the value is not of the correct type.
+    pub fn try_new_attribute<T: Into<EntityAttributeValue> + 'static>(
+        &self,
+        value: T,
+    ) -> Result<EntityAttribute, T> {
+        if TypeId::of::<T>() == self.attribute_ty {
+            Ok((self.attribute_fn)(value.into()))
+        } else {
+            Err(value)
+        }
+    }
 }

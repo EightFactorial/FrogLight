@@ -7,7 +7,7 @@ use tokio::sync::RwLock;
 use crate::{
     common::{DATA, Version, VersionStorage},
     config::{ConfigBundle, VersionPair},
-    source::{JarData, JarFile, Manifest},
+    source::{JarData, JarFile},
 };
 
 mod analyze;
