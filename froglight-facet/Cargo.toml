@@ -1,0 +1,71 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-facet"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dev-dependencies]
+criterion = { features = ["default", "html_reports"], workspace = true }
+rand = { workspace = true }
+
+[dependencies]
+facet = { features = ["alloc", "uuid"], workspace = true }
+uuid = { workspace = true }
+
+# Optional dependencies
+cranelift = { features = ["jit", "module", "std"], workspace = true, optional = true }
+cranelift-jit = { workspace = true, optional = true }
+cranelift-module = { features = ["std"], workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+
+# --- Tests/Benchmarks ---
+
+[[bench]]
+name = "varint"
+required-features = ["simd", "std"]
+harness = false
+
+[[test]]
+name = "simd_arch"
+required-features = ["simd", "std"]
+
+[[test]]
+name = "simd_fallback"
+required-features = ["simd", "std"]
+
+# --- Features ---
+
+[features]
+default = ["std"]
+
+# Enable support for JIT using Cranelift.
+jit = ["dep:cranelift", "dep:cranelift-jit", "dep:cranelift-module", "std"]
+# Enable support for SIMD optimizations.
+simd = ["nightly"]
+# Force the use of the generic fallback SIMD implementation.
+# This is typically used for testing and debugging.
+simd_fallback = ["simd"]
+
+# Enable `tracing` support.
+tracing = ["dep:tracing"]
+# Enable extended `tracing` support.
+tracing_ext = ["tracing"]
+
+# Enable support for the standard library
+std = ["facet/std", "tracing?/std", "uuid/std"]
+# Enable optimizations using the nightly toolchain
+nightly = []

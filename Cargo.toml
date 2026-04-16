@@ -10,6 +10,7 @@ froglight-block = { default-features = false, path = "froglight-block", version 
 froglight-brigadier = { default-features = false, path = "froglight-brigadier", version = "0.0.1" }
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
 froglight-entity = { default-features = false, path = "froglight-entity", version = "0.0.1" }
+froglight-facet = { default-features = false, path = "froglight-facet", version = "0.0.1" }
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
 froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
@@ -38,6 +39,11 @@ facet-minecraft = { default-features = false, git = "https://github.com/EightFac
 facet-toml = { default-features = false, version = "0.44" }
 facet-value = { default-features = false, version = "0.44" }
 
+# Cranelift Dependencies
+cranelift = { default-features = false, version = "0.130" }
+cranelift-jit = { default-features = false, version = "0.130" }
+cranelift-module = { default-features = false, version = "0.130" }
+
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.8.4" }
 base64 = { default-features = false, version = "0.22.1" }
@@ -62,6 +68,7 @@ async-trait = { default-features = false, version = "0.1" }
 bitflags = { default-features = false, version = "2.11" }
 bitvec = { default-features = false, version = "1.0" }
 blocking = { default-features = false, version = "1.6" }
+criterion = { default-features = false, version = "0.8" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "=0.30" }
@@ -74,6 +81,7 @@ once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
 petgraph = { default-features = false, version = "0.8" }
 quick_cache = { default-features = false, version = "0.6" }
+rand = { default-features = false, version = "0.10" }
 replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
@@ -119,6 +127,7 @@ members = [
   "froglight-codegen",
   "froglight-common",
   "froglight-entity",
+  "froglight-facet",
   "froglight-internal",
   "froglight-inventory",
   "froglight-item",
