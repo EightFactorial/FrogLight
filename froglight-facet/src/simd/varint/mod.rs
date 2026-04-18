@@ -1,31 +1,30 @@
 //! TODO
 #![expect(clippy::inline_always, reason = "Performance")]
 
-#[cfg(all(target_arch = "aarch64", not(feature = "simd_fallback")))]
-pub mod aarch64;
-#[cfg(all(target_arch = "aarch64", not(feature = "simd_fallback")))]
-pub use aarch64::*;
-/// The SIMD module currently being used.
-#[cfg(all(target_arch = "aarch64", not(feature = "simd_fallback")))]
-pub const ARCH: &str = "aarch64";
+cfg_select! {
+    all(target_arch = "aarch64", not(feature = "simd_fallback")) => {
+        /// The SIMD module currently being used.
+        pub const ARCH: &str = "aarch64";
 
-#[cfg(all(target_arch = "x86_64", not(feature = "simd_fallback")))]
-pub mod x86_64;
-#[cfg(all(target_arch = "x86_64", not(feature = "simd_fallback")))]
-pub use x86_64::*;
-/// The SIMD module currently being used.
-#[cfg(all(target_arch = "x86_64", not(feature = "simd_fallback")))]
-pub const ARCH: &str = "x86_64";
+        pub mod aarch64;
+        pub use aarch64::*;
+    }
+    all(target_arch = "x86_64", not(feature = "simd_fallback")) => {
+        /// The SIMD module currently being used.
+        pub const ARCH: &str = "x86_64";
+
+        pub mod x86_64;
+        pub use x86_64::*;
+    }
+    _ => {
+        /// The SIMD module currently being used.
+        pub const ARCH: &str = "fallback";
+
+        pub use fallback::*;
+    }
+}
 
 pub mod fallback;
-#[cfg(any(
-    not(any(target_arch = "aarch64", target_arch = "x86_64")),
-    feature = "simd_fallback"
-))]
-pub use fallback::*;
-/// The SIMD module currently being used.
-#[cfg(any(not(any(target_arch = "aarch64", target_arch = "x86_64")), feature = "simd_fallback"))]
-pub const ARCH: &str = "fallback";
 
 mod traits;
 pub use traits::VarIntType;

@@ -60,32 +60,13 @@ pub fn encode<T: VarIntType>(value: T) -> ([u8; 31], u8) { encode_inline::<T>(va
 /// Encode integers using SIMD.
 #[must_use]
 #[inline(always)]
+#[allow(clippy::missing_panics_doc, reason = "Cannot panic")]
 fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     match T::MAX_BYTES {
         0..=5 => unsafe { encode_small(value) },
-        6..=32 => unsafe { encode_large(value) },
-        _ => panic!("Encoding unsupported for types larger than 32 bytes!"),
+        6..=19 => unsafe { encode_large(value) },
+        _ => panic!("Encoding unsupported for types larger than 19 bytes!"),
     }
-}
-
-/// Set all MSBs expect the last one, and return the number of non-zero bytes.
-#[inline(always)]
-fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {
-    #[inline(always)]
-    #[expect(clippy::cast_possible_truncation, reason = "<= N")]
-    const fn usize_to_u8(i: usize) -> u8 { i as u8 }
-
-    // Note: Requires `const_array` and `const_trait_impl`
-    // to guarantee this is a compile-time constant.
-    let ascending: Simd<u8, N> = const { Simd::from_array(core::array::from_fn(usize_to_u8)) };
-    let msbs: Simd<u8, N> = const { Simd::splat(0x80) };
-    let zero: Simd<u8, N> = const { Simd::splat(0x00) };
-
-    #[expect(clippy::cast_possible_truncation, reason = "<= 64")]
-    let bytes = 64u32.saturating_sub(input.simd_ne(zero).to_bitmask().leading_zeros()) as u8;
-    let msbmask = ascending.simd_lt(Simd::splat(bytes)).shift_elements_left::<1>(false);
-
-    (input | (msbmask.to_simd().cast::<u8>() & msbs), bytes)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -108,7 +89,7 @@ unsafe fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
         | ((v & 0xf000_0000) << 4);
 
     // Set all but the last MSBs.
-    let (bytes, length) = mark_bytes(Simd::from_array(bytes.to_ne_bytes()));
+    let (bytes, length) = super::fallback::mark_bytes(Simd::from_array(bytes.to_ne_bytes()));
 
     (super::arr8_to_31(bytes.to_array()), length.max(1))
 }
@@ -173,7 +154,7 @@ unsafe fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
 
     // Set all but the last MSBs.
     let bytes = Simd::from_array(unsafe { core::mem::transmute::<[u64; 3], [u8; 24]>(bytes) });
-    let (bytes, length) = mark_bytes(bytes);
+    let (bytes, length) = super::fallback::mark_bytes(bytes);
 
     (super::arr24_to_31(bytes.to_array()), length.max(1))
 }

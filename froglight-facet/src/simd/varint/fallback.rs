@@ -62,17 +62,18 @@ pub fn encode<T: VarIntType>(value: T) -> ([u8; 31], u8) { encode_inline::<T>(va
 /// This is the fallback implementation which should support any platform.
 #[must_use]
 #[inline(always)]
+#[allow(clippy::missing_panics_doc, reason = "Cannot panic")]
 fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     match T::MAX_BYTES {
         0..=5 => encode_small(value),
-        6..=24 => encode_large(value),
-        _ => panic!("Encoding unsupported for types larger than 24 bytes!"),
+        6..=19 => encode_large(value),
+        _ => panic!("Encoding unsupported for types larger than 19 bytes!"),
     }
 }
 
 /// Set all MSBs expect the last one, and return the number of non-zero bytes.
 #[inline(always)]
-fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {
+pub(super) fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {
     #[inline(always)]
     #[expect(clippy::cast_possible_truncation, reason = "<= N")]
     const fn usize_to_u8(i: usize) -> u8 { i as u8 }
@@ -95,7 +96,7 @@ fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {
 /// Encode [`u8`]s, [`u16`]s, and [`u32`]s using SIMD.
 #[must_use]
 #[inline(always)]
-fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
+pub(super) fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     // Separate the bits into groups of 7 and shift them.
     let v = value.to_u64().to_le();
 
@@ -119,7 +120,7 @@ fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
 #[must_use]
 #[inline(always)]
 #[expect(clippy::cast_possible_truncation, reason = "Avoids truncation")]
-fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
+pub(super) fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     // Separate the bits into groups of 7 and shift them.
     let v = value.to_u128().to_le();
 
