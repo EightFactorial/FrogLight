@@ -1,3 +1,7 @@
+[default.extend-words]
+# Don't correct "Nd" from "NdArray"
+Nd = "Nd"
+
 [files]
 extend-exclude = [
   "froglight-biome/src/generated/**/*.rs",

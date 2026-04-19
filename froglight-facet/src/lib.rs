@@ -12,3 +12,4 @@ pub mod jit;
 pub mod simd;
 
 pub mod facet;
+pub mod format;

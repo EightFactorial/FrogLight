@@ -23,13 +23,13 @@ criterion = { features = ["default", "html_reports"], workspace = true }
 rand = { workspace = true }
 
 [dependencies]
-facet = { features = ["alloc", "uuid"], workspace = true }
+facet = { features = ["alloc", "reflect", "uuid"], workspace = true }
+facet-path = { features = ["alloc"], workspace = true }
+smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-cranelift = { features = ["jit", "module", "std"], workspace = true, optional = true }
-cranelift-jit = { workspace = true, optional = true }
-cranelift-module = { features = ["std"], workspace = true, optional = true }
+cranelift = { features = ["frontend", "jit", "module", "std"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---
@@ -53,7 +53,7 @@ required-features = ["simd", "std"]
 default = ["std"]
 
 # Enable support for JIT using Cranelift.
-jit = ["dep:cranelift", "dep:cranelift-jit", "dep:cranelift-module", "std"]
+jit = ["dep:cranelift", "std"]
 # Enable support for SIMD optimizations.
 simd = ["nightly"]
 # Force the use of the generic fallback SIMD implementation.
@@ -66,6 +66,6 @@ tracing = ["dep:tracing"]
 tracing_ext = ["tracing"]
 
 # Enable support for the standard library
-std = ["facet/std", "tracing?/std", "uuid/std"]
+std = ["facet/std", "facet-path/std", "smallvec/write", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = []
+nightly = ["smallvec/specialization"]

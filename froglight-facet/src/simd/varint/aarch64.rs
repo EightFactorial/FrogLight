@@ -162,6 +162,7 @@ unsafe fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
 // # Note: This one is ~10% faster on M4 Max
 // Using masks and shifts:
 //
+// let mut bytes = [0u64; 3];
 // bytes[0] = ((v & 0x0000_0000_0000_0000_0000_0000_0000_007f)
 //     | ((v & 0x0000_0000_0000_0000_0000_0000_0000_3f80) << 1)
 //     | ((v & 0x0000_0000_0000_0000_0000_0000_001f_c000) << 2)
@@ -184,38 +185,37 @@ unsafe fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
 
 // Using SIMD masks and shifts:
 //
-// const MASK_1: Simd<u64, 4> = Simd::from_array([
+// const MASK_8: Simd<u64, 8> = Simd::from_array([
 //     0x0000_0000_0000_007f,
 //     0x0000_0000_0000_3f80,
 //     0x0000_0000_001f_c000,
 //     0x0000_0000_0fe0_0000,
-// ]);
-// const MASK_2: Simd<u64, 4> = Simd::from_array([
 //     0x0000_0007_f000_0000,
 //     0x0000_03f8_0000_0000,
 //     0x0001_fc00_0000_0000,
 //     0x00fe_0000_0000_0000,
 // ]);
-// const MASK_3: Simd<u64, 4> = Simd::from_array([
+//
+// const SHIFT_A: Simd<u64, 8> =
+//     Simd::from_array([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
+//
+// const MASK_4: Simd<u64, 4> = Simd::from_array([
 //     0x0000_0000_0000_007f,
 //     0x0000_0000_0000_3f80,
 //     0x0000_0000_0000_c000,
 //     0x0000_0000_0000_0000,
 // ]);
+// const SHIFT_4: Simd<u64, 4> = Simd::from_array([0x00, 0x01, 0x02, 0x03]);
 //
-// const SHIFT_A: Simd<u64, 4> = Simd::from_array([0x00, 0x01, 0x02, 0x03]);
-// const SHIFT_B: Simd<u64, 4> = Simd::from_array([0x04, 0x05, 0x06, 0x07]);
-//
+// // Separate the bits into groups of 7 and shift them.
 // let [part_a, part_b]: [u64; 2] = unsafe {
-// core::mem::transmute(value.to_u128().to_le()) };
+// core::mem::transmute(value.to_u128().to_le()) }; let mut bytes = [0u64; 3];
 //
-// let splat = Simd::<u64, 4>::splat(part_a);
-// bytes[0] = (((splat & MASK_1) << SHIFT_A) | ((splat & MASK_2) <<
-// SHIFT_B)).reduce_or();
+// let splat = Simd::<u64, 8>::splat(part_a);
+// bytes[0] = ((splat & MASK_8) << SHIFT_A).reduce_or();
 //
-// let splat = Simd::<u64, 4>::splat(part_a << 56 | part_b >> 8);
-// bytes[1] = (((splat & MASK_1) << SHIFT_A) | ((splat & MASK_2) <<
-// SHIFT_B)).reduce_or();
+// let splat = Simd::<u64, 8>::splat(part_a << 56 | part_b >> 8);
+// bytes[1] = ((splat & MASK_8) << SHIFT_A).reduce_or();
 //
 // let splat = Simd::<u64, 4>::splat(part_b >> 16);
-// bytes[2] = ((splat & MASK_3) << SHIFT_A).reduce_or();
+// bytes[2] = ((splat & MASK_4) << SHIFT_4).reduce_or();

@@ -71,8 +71,8 @@ pub fn encode<T: VarIntType>(value: T) -> ([u8; 31], u8) { encode_inline::<T>(va
 pub fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     match T::MAX_BYTES {
         0..=5 => unsafe { encode_small(value) },
-        6..=24 => unsafe { encode_large(value) },
-        _ => panic!("Encoding unsupported for types larger than 24 bytes!"),
+        6..=19 => unsafe { encode_large(value) },
+        _ => panic!("Encoding unsupported for types larger than 19 bytes!"),
     }
 }
 
