@@ -37,7 +37,7 @@ facet-format = { default-features = false, version = "0.44" }
 facet-json = { default-features = false, version = "0.44" }
 facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
 facet-toml = { default-features = false, version = "0.44" }
-facet-value = { default-features = false, version = "0.44" }
+facet-value = { default-features = false, version = "0.46" }
 
 # Cranelift Dependencies
 cranelift = { default-features = false, version = "0.130" }
