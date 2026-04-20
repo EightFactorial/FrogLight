@@ -1,7 +1,5 @@
 //! TODO
 
-use core::any::TypeId;
-
 pub use ::facet;
 use facet::{Facet, Partial, Peek, ReflectError, ReflectErrorKind};
 
@@ -28,23 +26,22 @@ facet::define_attr_grammar! {
 #[derive(Debug, Clone, Copy, Facet)]
 #[facet(opaque)]
 pub struct WithFnAttr {
-    ty: TypeId,
     ser: SerFn,
     de_owned: DeFn,
     de_borrowed: Option<DeBorrowFn>,
 }
 
 impl WithFnAttr {
-    /// Create a new [`WithFns`].
+    /// Create a new [`WithFns`] using the provided template type.
     #[inline]
     #[must_use]
-    pub const fn new<T: FacetTemplate>() -> Self { Self::using::<T>(T::serialize, T::deserialize) }
+    pub const fn template<T: FacetTemplate>() -> Self { Self::using(T::serialize, T::deserialize) }
 
     /// Create a new [`WithFns`] using the provided functions.
     #[inline]
     #[must_use]
-    pub const fn using<T: 'static>(ser: SerFn, de: DeFn) -> Self {
-        Self { ty: TypeId::of::<T>(), ser, de_owned: de, de_borrowed: None }
+    pub const fn using(ser: SerFn, de: DeFn) -> Self {
+        Self { ser, de_owned: de, de_borrowed: None }
     }
 
     /// Set the borrowed deserialization function.
@@ -54,11 +51,6 @@ impl WithFnAttr {
         self.de_borrowed = Some(borrow);
         self
     }
-
-    /// Returns `true` if this attribute is for the type `T`.
-    #[inline]
-    #[must_use]
-    pub fn is_for<T: 'static>(&self) -> bool { self.ty == TypeId::of::<T>() }
 
     /// Serialize using this attribute's serialization function.
     #[inline]
@@ -138,7 +130,7 @@ pub trait FacetTemplate: 'static {
 /// A template trait for custom borrowed deserialization functions.
 ///
 /// Must be used with [`WithFnAttr::with_borrow`] to take effect.
-pub trait FacetBorrowdedTemplate<'facet> {
+pub trait FacetBorrowedTemplate<'facet> {
     /// The borrowed deserialization function.
     ///
     /// # Errors

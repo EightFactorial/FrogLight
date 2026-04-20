@@ -6,7 +6,7 @@ mod error;
 // pub use error::SerializeError;
 
 mod iterator;
-// pub use iterator::SerializeIterator;
+pub use iterator::{IteratorStack, SerIter, SerializeIterator};
 
 /// A trait for types that can be deserialized.
 pub trait Serialize<'de> {}

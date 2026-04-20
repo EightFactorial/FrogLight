@@ -25,6 +25,7 @@ rand = { workspace = true }
 [dependencies]
 facet = { features = ["alloc", "reflect", "uuid"], workspace = true }
 facet-path = { features = ["alloc"], workspace = true }
+replace_with = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 uuid = { workspace = true }
 
@@ -66,6 +67,6 @@ tracing = ["dep:tracing"]
 tracing_ext = ["tracing"]
 
 # Enable support for the standard library
-std = ["facet/std", "facet-path/std", "smallvec/write", "tracing?/std", "uuid/std"]
+std = ["facet/std", "facet-path/std", "replace_with/std", "smallvec/write", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["smallvec/specialization"]
+nightly = ["replace_with/nightly", "smallvec/specialization"]
