@@ -12,4 +12,6 @@ pub mod jit;
 pub mod simd;
 
 pub mod facet;
+
 pub mod format;
+pub use format::{deserialize::functions::*, serialize::functions::*};

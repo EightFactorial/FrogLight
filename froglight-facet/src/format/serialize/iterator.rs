@@ -8,7 +8,13 @@ pub struct SerializeIterator<'mem, 'facet> {
 }
 
 /// A stack of serialization frames.
-pub type IteratorStack<'mem, 'facet> = SmallVec<[(); 12]>;
+pub type IteratorStack<'mem, 'facet> = SmallVec<[SerItem; 12]>;
+
+/// An item on the serializer stack
+#[derive(Debug, Clone)]
+pub enum SerItem {}
+
+// -------------------------------------------------------------------------------------------------
 
 impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     /// Create a new [`SerializeIterator`] for the given type.

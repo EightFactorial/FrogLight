@@ -30,6 +30,7 @@ smallvec = { features = ["const_generics", "const_new", "union"], workspace = tr
 uuid = { workspace = true }
 
 # Optional dependencies
+ariadne = { workspace = true, optional = true }
 cranelift = { features = ["frontend", "jit", "module", "std"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
@@ -51,10 +52,12 @@ required-features = ["simd", "std"]
 # --- Features ---
 
 [features]
-default = ["std"]
+default = ["report", "std"]
 
 # Enable support for JIT using Cranelift.
 jit = ["dep:cranelift", "std"]
+# Enable support for error reports.
+report = ["dep:ariadne", "std"]
 # Enable support for SIMD optimizations.
 simd = ["nightly"]
 # Force the use of the generic fallback SIMD implementation.

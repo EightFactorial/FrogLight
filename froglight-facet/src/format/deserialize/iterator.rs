@@ -9,7 +9,13 @@ pub struct DeserializeIterator<'facet, const BORROW: bool> {
 }
 
 /// A stack of deserialization frames.
-pub type IteratorStack = SmallVec<[(); 12]>;
+pub type IteratorStack = SmallVec<[DeserItem; 12]>;
+
+/// An item on the deserializer stack
+#[derive(Debug, Clone)]
+pub enum DeserItem {}
+
+// -------------------------------------------------------------------------------------------------
 
 impl DeserializeIterator<'static, false> {
     /// Create a new [`DeserializeIterator`] for the given type.
@@ -67,7 +73,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             &mut IteratorStack,
         ) -> Result<Partial<'facet, BORROW>, ReflectError>,
     ) -> Result<Self, ReflectError> {
-        while self.partial.frame_count() > 1 {
+        while !self.is_finished() {
             self.partial = f(self.partial, &mut self.stack)?;
         }
         Ok(self)
@@ -165,7 +171,6 @@ where
 {
     type Item = Result<(), ReflectError>;
 
-    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_finished() {
             return None;
