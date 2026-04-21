@@ -1,8 +1,9 @@
 //! TODO
 #![expect(clippy::inline_always, reason = "Wrapper Functions")]
-#![expect(clippy::result_unit_err, reason = "WIP")]
 
-use super::Deserialize;
+use facet::Facet;
+
+use super::{Deserialize, DeserializeError};
 
 /// TODO
 ///
@@ -10,7 +11,7 @@ use super::Deserialize;
 ///
 /// TODO
 #[inline(always)]
-pub fn from_slice<T: Deserialize<'static>>(slice: &[u8]) -> Result<T, ()> {
+pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
     <T as Deserialize>::from_slice(slice)
 }
 
@@ -20,7 +21,9 @@ pub fn from_slice<T: Deserialize<'static>>(slice: &[u8]) -> Result<T, ()> {
 ///
 /// TODO
 #[inline(always)]
-pub fn from_slice_remainder<T: Deserialize<'static>>(slice: &[u8]) -> Result<(T, &[u8]), ()> {
+pub fn from_slice_remainder<T: Facet<'static>>(
+    slice: &[u8],
+) -> Result<(T, &[u8]), DeserializeError> {
     <T as Deserialize>::from_slice_remainder(slice)
 }
 
@@ -30,8 +33,8 @@ pub fn from_slice_remainder<T: Deserialize<'static>>(slice: &[u8]) -> Result<(T,
 ///
 /// TODO
 #[inline(always)]
-pub fn from_slice_borrowed<'facet, T: Deserialize<'facet>>(
+pub fn from_slice_borrowed<'facet, T: Facet<'facet>>(
     slice: &'facet [u8],
-) -> Result<(T, &'facet [u8]), ()> {
+) -> Result<(T, &'facet [u8]), DeserializeError> {
     <T as Deserialize>::from_slice_borrowed(slice)
 }

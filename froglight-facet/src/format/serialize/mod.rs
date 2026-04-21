@@ -5,12 +5,15 @@ use alloc::vec::Vec;
 use facet::Facet;
 
 mod error;
-// pub use error::SerializeError;
+pub use error::SerializeError;
 
 pub mod functions;
 
-mod iterator;
-pub use iterator::{IteratorStack, SerItem, SerIter, SerializeIterator};
+pub(crate) mod iterator;
+pub use iterator::IteratorStack;
+
+pub(crate) mod logic;
+pub use logic::Serializer;
 
 /// A trait for types that can be deserialized.
 #[expect(clippy::result_unit_err, clippy::missing_errors_doc, missing_docs, reason = "WIP")]
