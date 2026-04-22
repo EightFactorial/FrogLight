@@ -1,45 +1,29 @@
 //! TODO
 
-use facet::{AllocError, Facet, Partial, ReflectError};
+use facet::{Partial, ReflectError};
 
 use crate::format::deserialize::{
     DeserializeError,
     iterator::{DeserializeIterator, IteratorStack},
 };
 
-pub(crate) struct Deserializer<'facet, const BORROW: bool, C> {
+/// TODO
+pub struct Deserializer<'facet, const BORROW: bool, C> {
     iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
     core: C,
 }
 
-impl Deserializer<'static, false, ()> {
+impl<'facet, const BORROW: bool> Deserializer<'facet, BORROW, ()> {
     /// Create a new [`Deserializer`] for the given type.
-    ///
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the type cannot be allocated.
     #[inline]
-    pub(crate) fn new_owned<T: Facet<'static>>(
-        core: impl FnMut(Partial<'static, false>) -> Result<Partial<'static, false>, ReflectError>,
-    ) -> Result<Deserializer<'static, false, impl DeserializerCore<'static, false>>, AllocError>
-    {
-        DeserializeIterator::<false>::new::<T>()
-            .map(move |iter| Deserializer { iter: Ok(iter), core: create_core(core) })
-    }
-
-    /// Create a new [`Deserializer`] for the given type.
-    ///
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the type cannot be allocated.
-    #[inline]
-    pub(crate) fn new_borrowed<'facet, T: Facet<'facet>>(
-        core: impl FnMut(Partial<'facet>) -> Result<Partial<'facet>, ReflectError>,
-    ) -> Result<Deserializer<'facet, true, impl DeserializerCore<'facet, true>>, AllocError> {
-        DeserializeIterator::<true>::new::<T>()
-            .map(move |iter| Deserializer { iter: Ok(iter), core: create_core(core) })
+    pub(crate) fn new(
+        partial: Partial<'facet, BORROW>,
+        core: impl FnMut(Partial<'facet, BORROW>) -> Result<Partial<'facet, BORROW>, ReflectError>,
+    ) -> Deserializer<'facet, BORROW, impl DeserializerCore<'facet, BORROW>> {
+        Deserializer {
+            iter: Ok(DeserializeIterator::new_partial(partial)),
+            core: create_core(core),
+        }
     }
 }
 
@@ -63,8 +47,8 @@ impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>>
     /// Returns an error if some data was not initialized,
     /// or the output type does not match the input type.
     #[inline]
-    pub(crate) fn build<T: Facet<'facet>>(self) -> Result<T, DeserializeError> {
-        self.iter.and_then(|iter| iter.build::<T>().map_err(Into::into))
+    pub(crate) fn into_partial(self) -> Result<Partial<'facet, BORROW>, DeserializeError> {
+        self.iter.map(DeserializeIterator::into_partial)
     }
 }
 
@@ -92,7 +76,6 @@ impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>> Iterator
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for deserializer cores.
-#[expect(unreachable_pub, reason = "Internal trait")]
 pub trait DeserializerCore<'facet, const BORROW: bool> {
     fn as_fn_once(
         &mut self,

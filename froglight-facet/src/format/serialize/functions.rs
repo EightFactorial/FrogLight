@@ -1,10 +1,10 @@
 //! TODO
 #![expect(clippy::inline_always, reason = "Wrapper Functions")]
-#![expect(clippy::result_unit_err, reason = "WIP")]
 
 use alloc::vec::Vec;
 
-use super::Serialize;
+use super::{Serialize, SerializeError};
+use crate::format::writer::{Writer, WriterType};
 
 /// TODO
 ///
@@ -12,7 +12,7 @@ use super::Serialize;
 ///
 /// TODO
 #[inline(always)]
-pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, ()> {
+pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, SerializeError> {
     <T as Serialize>::to_vec(value)
 }
 
@@ -22,6 +22,9 @@ pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, ()> {
 ///
 /// TODO
 #[inline(always)]
-pub fn to_buffer<T: Serialize<'static>>(value: &T, buffer: &mut ()) -> Result<usize, ()> {
-    <T as Serialize>::to_buffer(value, buffer)
+pub fn to_writer<T: Serialize<'static>, W: WriterType>(
+    value: &T,
+    writer: &mut W,
+) -> Result<usize, SerializeError> {
+    <T as Serialize>::to_writer(value, Writer::new(writer))
 }

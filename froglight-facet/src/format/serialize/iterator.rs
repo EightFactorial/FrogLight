@@ -1,4 +1,4 @@
-use facet::{Facet, Peek};
+use facet::Peek;
 use smallvec::SmallVec;
 
 /// TODO
@@ -17,14 +17,9 @@ pub enum SerItem {}
 // -------------------------------------------------------------------------------------------------
 
 impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
-    /// Create a new [`SerializeIterator`] for the given type.
-    #[inline]
-    #[must_use]
-    pub fn new<T: Facet<'facet>>(value: &'mem T) -> Self { Self::new_from(Peek::new(value)) }
-
     /// Create a new [`SerializeIterator`] from the given [`Peek`].
     #[must_use]
-    pub fn new_from(_peek: Peek<'mem, 'facet>) -> Self {
+    pub fn new(_peek: Peek<'mem, 'facet>) -> Self {
         Self { stack: IteratorStack::new_const(), _phantom: core::marker::PhantomData }
     }
 

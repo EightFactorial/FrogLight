@@ -1,4 +1,4 @@
-use facet::{AllocError, ReflectError};
+use facet::{AllocError, ReflectError, ShapeMismatchError};
 
 /// TODO
 #[derive(Debug, Clone)]
@@ -9,4 +9,7 @@ impl From<AllocError> for DeserializeError {
 }
 impl From<ReflectError> for DeserializeError {
     fn from(_value: ReflectError) -> Self { todo!() }
+}
+impl From<ShapeMismatchError> for DeserializeError {
+    fn from(_value: ShapeMismatchError) -> Self { todo!() }
 }
