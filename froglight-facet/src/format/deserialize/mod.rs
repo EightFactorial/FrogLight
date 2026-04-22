@@ -11,7 +11,7 @@ pub(crate) mod iterator;
 pub use iterator::IteratorStack;
 
 pub(crate) mod logic;
-pub use logic::Deserializer;
+pub use logic::{Deserializer, Item};
 
 use crate::format::reader::Reader;
 
@@ -61,7 +61,7 @@ fn deserialize_owned(
     partial: Partial<'static, false>,
     reader: &mut Reader<'_>,
 ) -> Result<HeapValue<'static, false>, DeserializeError> {
-    let core = move |_partial| {
+    let core = move |_item| {
         #[expect(clippy::no_effect_underscore_binding, reason = "move |_| { ... }")]
         let _reader = &mut *reader;
 
@@ -79,7 +79,7 @@ fn deserialize_borrowed<'facet>(
     partial: Partial<'facet, true>,
     reader: &mut Reader<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
-    let core = move |_partial| {
+    let core = move |_item| {
         #[expect(clippy::no_effect_underscore_binding, reason = "move |_| { ... }")]
         let _reader = &mut *reader;
 

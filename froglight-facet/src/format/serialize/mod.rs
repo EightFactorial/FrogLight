@@ -13,7 +13,7 @@ pub(crate) mod iterator;
 pub use iterator::IteratorStack;
 
 pub(crate) mod logic;
-pub use logic::Serializer;
+pub use logic::{Item, Serializer};
 
 use crate::format::writer::Writer;
 
@@ -45,7 +45,7 @@ impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
 // -------------------------------------------------------------------------------------------------
 
 fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, SerializeError> {
-    let core = |_peek| {
+    let core = |_item| {
         #[expect(clippy::no_effect_underscore_binding, reason = "|_| { ... }")]
         let _writer = &mut writer;
 

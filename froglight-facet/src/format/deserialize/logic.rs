@@ -13,12 +13,20 @@ pub struct Deserializer<'facet, const BORROW: bool, C> {
     core: C,
 }
 
+/// A deserializer item.
+pub enum Item<'facet, const BORROW: bool> {
+    /// A size to be deserialized.
+    Size(u32),
+    /// A value to be deserialized.
+    Partial(Partial<'facet, BORROW>),
+}
+
 impl<'facet, const BORROW: bool> Deserializer<'facet, BORROW, ()> {
     /// Create a new [`Deserializer`] for the given type.
     #[inline]
     pub(crate) fn new(
         partial: Partial<'facet, BORROW>,
-        core: impl FnMut(Partial<'facet, BORROW>) -> Result<Partial<'facet, BORROW>, ReflectError>,
+        core: impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReflectError>,
     ) -> Deserializer<'facet, BORROW, impl DeserializerCore<'facet, BORROW>> {
         Deserializer {
             iter: Ok(DeserializeIterator::new_partial(partial)),
@@ -110,7 +118,7 @@ where
 /// A generic [`DeserializerCore`] wrapper that only calls the provided
 /// function on values to be deserialized.
 fn create_core<'facet, const BORROW: bool>(
-    mut core: impl FnMut(Partial<'facet, BORROW>) -> Result<Partial<'facet, BORROW>, ReflectError>,
+    mut core: impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReflectError>,
 ) -> impl FnMut(
     Partial<'facet, BORROW>,
     &mut IteratorStack,

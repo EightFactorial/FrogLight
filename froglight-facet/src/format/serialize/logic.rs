@@ -1,11 +1,22 @@
-use facet::{Peek, ReflectError};
+use facet::Peek;
 
-use crate::format::serialize::iterator::{IteratorStack, SerializeIterator};
+use crate::format::serialize::{
+    SerializeError,
+    iterator::{IteratorStack, SerializeIterator},
+};
 
 /// TODO
 pub struct Serializer<'mem, 'facet, C> {
     iter: SerializeIterator<'mem, 'facet>,
     core: C,
+}
+
+/// A serializer item.
+pub enum Item<'mem, 'facet> {
+    /// A size to be serialized.
+    Size(u32),
+    /// A value to be serialized.
+    Partial(Peek<'mem, 'facet>),
 }
 
 impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
@@ -14,7 +25,7 @@ impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
     #[must_use]
     pub fn new(
         peek: Peek<'mem, 'facet>,
-        core: impl FnMut(Peek<'mem, 'facet>),
+        core: impl FnMut(Item<'mem, 'facet>) -> Result<(), SerializeError>,
     ) -> Serializer<'mem, 'facet, impl SerializerCore<'mem, 'facet>> {
         Serializer { iter: SerializeIterator::new(peek), core: create_core(core) }
     }
@@ -33,7 +44,7 @@ impl<'mem, 'facet, C: SerializerCore<'mem, 'facet>> Serializer<'mem, 'facet, C> 
 }
 
 impl<'mem, 'facet, C: SerializerCore<'mem, 'facet>> Iterator for Serializer<'mem, 'facet, C> {
-    type Item = Result<(), ReflectError>;
+    type Item = Result<(), SerializeError>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> { self.iter.next(self.core.as_fn_once()) }
@@ -45,18 +56,25 @@ impl<'mem, 'facet, C: SerializerCore<'mem, 'facet>> Iterator for Serializer<'mem
 pub trait SerializerCore<'mem, 'facet> {
     fn as_fn_once(
         &mut self,
-    ) -> impl FnOnce(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), ReflectError> + '_;
+    ) -> impl FnOnce(
+        Peek<'mem, 'facet>,
+        &mut IteratorStack<'mem, 'facet>,
+    ) -> Result<(), SerializeError>
+    + '_;
 }
 
 impl<'mem, 'facet, F> SerializerCore<'mem, 'facet> for F
 where
-    F: FnMut(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), ReflectError>,
+    F: FnMut(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError>,
 {
     #[inline]
     fn as_fn_once(
         &mut self,
-    ) -> impl FnOnce(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), ReflectError> + '_
-    {
+    ) -> impl FnOnce(
+        Peek<'mem, 'facet>,
+        &mut IteratorStack<'mem, 'facet>,
+    ) -> Result<(), SerializeError>
+    + '_ {
         self
     }
 }
@@ -64,7 +82,8 @@ where
 // -------------------------------------------------------------------------------------------------
 
 fn create_core<'mem, 'facet>(
-    _core: impl FnMut(Peek<'mem, 'facet>),
-) -> impl FnMut(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), ReflectError> {
+    _core: impl FnMut(Item<'mem, 'facet>) -> Result<(), SerializeError>,
+) -> impl FnMut(Peek<'mem, 'facet>, &mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError>
+{
     move |_peek, _stack| todo!()
 }

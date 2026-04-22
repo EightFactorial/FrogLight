@@ -8,11 +8,11 @@ pub(super) struct DeserializeIterator<'facet, const BORROW: bool> {
 }
 
 /// A stack of deserialization frames.
-pub type IteratorStack = SmallVec<[DeserItem; 12]>;
+pub type IteratorStack = SmallVec<[StackItem; 12]>;
 
 /// An item on the deserializer stack
 #[derive(Debug, Clone)]
-pub enum DeserItem {}
+pub enum StackItem {}
 
 // -------------------------------------------------------------------------------------------------
 
