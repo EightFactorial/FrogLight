@@ -3,6 +3,8 @@
 pub use ::facet;
 use facet::{Facet, Partial, Peek, ReflectError, ReflectErrorKind};
 
+use crate::format::{reader::Reader, serialize::SerializeError, writer::Writer};
+
 facet::define_attr_grammar! {
     ns "mc";
     crate_path ::froglight_facet::facet;
@@ -53,21 +55,31 @@ impl WithFnAttr {
     }
 
     /// Serialize using this attribute's serialization function.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if serialization fails.
     #[inline]
-    pub fn serialize(&self, peek: Peek<'_, 'static>) { (self.ser)(peek) }
+    pub fn serialize<'w>(
+        &self,
+        peek: Peek<'_, 'static>,
+        writer: Writer<'w>,
+    ) -> Result<Writer<'w>, SerializeError> {
+        (self.ser)(peek, writer)
+    }
 
     /// Deserialize using this attribute's deserialization function.
     ///
     /// # Errors
-    ///
     ///
     /// Returns an error if deserialization fails.
     #[inline]
     pub fn deserialize(
         &self,
         partial: Partial<'static, false>,
+        reader: &mut Reader<'_>,
     ) -> Result<Partial<'static, false>, ReflectError> {
-        (self.de_owned)(partial)
+        (self.de_owned)(partial, reader)
     }
 
     /// Returns `true` if this attribute has a borrowed deserialization
@@ -81,13 +93,14 @@ impl WithFnAttr {
     /// # Errors
     ///
     /// Returns an error if this attribute does not have a borrowed
-    /// deserialization function or if deserialization fails.
+    /// deserializer function or if deserialization fails.
     pub fn deserialize_borrowed<'facet>(
         &self,
         partial: Partial<'facet, true>,
+        reader: &mut Reader<'facet>,
     ) -> Result<Partial<'facet, true>, ReflectError> {
         match self.de_borrowed {
-            Some(de) => de(partial),
+            Some(de) => de(partial, reader),
             None => Err(ReflectError {
                 path: partial.path(),
                 kind: ReflectErrorKind::OperationFailed {
@@ -100,12 +113,15 @@ impl WithFnAttr {
 }
 
 /// A serialization function.
-pub type SerFn = fn(Peek<'_, 'static>);
+pub type SerFn = for<'w> fn(Peek<'_, 'static>, Writer<'w>) -> Result<Writer<'w>, SerializeError>;
 /// A deserialization function.
-pub type DeFn = fn(Partial<'static, false>) -> Result<Partial<'static, false>, ReflectError>;
+pub type DeFn =
+    fn(Partial<'static, false>, &mut Reader<'_>) -> Result<Partial<'static, false>, ReflectError>;
 /// A borrowed deserialization function.
-pub type DeBorrowFn =
-    for<'facet> fn(Partial<'facet, true>) -> Result<Partial<'facet, true>, ReflectError>;
+pub type DeBorrowFn = for<'facet> fn(
+    Partial<'facet, true>,
+    &mut Reader<'facet>,
+) -> Result<Partial<'facet, true>, ReflectError>;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -115,7 +131,14 @@ pub type DeBorrowFn =
 /// effect.
 pub trait FacetTemplate: 'static {
     /// The serialization function.
-    fn serialize(peek: Peek<'_, 'static>);
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if serialization fails.
+    fn serialize<'w>(
+        peek: Peek<'_, 'static>,
+        writer: Writer<'w>,
+    ) -> Result<Writer<'w>, SerializeError>;
 
     /// The deserialization function.
     ///
@@ -124,6 +147,7 @@ pub trait FacetTemplate: 'static {
     /// Returns an error if deserialization fails.
     fn deserialize(
         partial: Partial<'static, false>,
+        reader: &mut Reader<'_>,
     ) -> Result<Partial<'static, false>, ReflectError>;
 }
 
@@ -138,5 +162,6 @@ pub trait FacetBorrowedTemplate<'facet> {
     /// Returns an error if deserialization fails.
     fn deserialize_borrowed(
         partial: Partial<'facet, true>,
+        reader: &mut Reader<'facet>,
     ) -> Result<Partial<'facet, true>, ReflectError>;
 }

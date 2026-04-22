@@ -49,8 +49,7 @@ impl<'a> Writer<'a> {
     ///
     /// Returns an error if the writer cannot be written to.
     pub fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), WriterError> {
-        let written = self.inner.write_bytes(bytes)?;
-        self.written += written;
+        self.written += self.inner.write_bytes(bytes)?;
         Ok(())
     }
 }

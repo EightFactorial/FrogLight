@@ -45,8 +45,8 @@ impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
 // -------------------------------------------------------------------------------------------------
 
 fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, SerializeError> {
-    let core = move |_peek| {
-        #[expect(clippy::no_effect_underscore_binding, reason = "move |_| { ... }")]
+    let core = |_peek| {
+        #[expect(clippy::no_effect_underscore_binding, reason = "|_| { ... }")]
         let _writer = &mut writer;
 
         todo!();
@@ -56,5 +56,7 @@ fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, Serial
     while let Some(result) = Iterator::next(&mut ser) {
         result?;
     }
-    Ok(0) // TODO: Return length
+
+    drop(ser);
+    Ok(writer.total_written())
 }

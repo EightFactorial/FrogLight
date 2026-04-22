@@ -72,7 +72,7 @@ fn deserialize_owned(
     while let Some(result) = Iterator::next(&mut de) {
         result?;
     }
-    de.into_partial().and_then(|part| part.build().map_err(|_err| todo!()))
+    de.into_partial()?.build().map_err(|_err| todo!())
 }
 
 fn deserialize_borrowed<'facet>(
@@ -90,5 +90,5 @@ fn deserialize_borrowed<'facet>(
     while let Some(result) = Iterator::next(&mut de) {
         result?;
     }
-    de.into_partial().and_then(|part| part.build().map_err(|_err| todo!()))
+    de.into_partial()?.build().map_err(|_err| todo!())
 }
