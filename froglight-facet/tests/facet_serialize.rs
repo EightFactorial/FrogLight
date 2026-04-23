@@ -3,8 +3,10 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
+use core::num::ParseIntError;
 
+use facet::Facet;
 use froglight_facet::{to_vec, to_writer, to_writer_variable};
 
 macro_rules! assert_eq_bytes {
@@ -41,3 +43,47 @@ assert_eq_bytes!(i16: i16::MIN, -2i16, -1i16, 0i16, 1i16, 2i16, i16::MAX);
 assert_eq_bytes!(i32: i32::MIN, -2i32, -1i32, 0i32, 1i32, 2i32, i32::MAX);
 assert_eq_bytes!(i64: i64::MIN, -2i64, -1i64, 0i64, 1i64, 2i64, i64::MAX);
 assert_eq_bytes!(i128: i128::MIN, -2i128, -1i128, 0i128, 1i128, 2i128, i128::MAX);
+
+// -------------------------------------------------------------------------------------------------
+
+#[test]
+fn proxy() {
+    #[derive(Facet)]
+    #[facet(mc::proxy = ByteString)]
+    struct Bytes(u8, u8, u8, u8);
+
+    #[derive(Facet)]
+    struct ByteString(String);
+
+    impl From<&Bytes> for ByteString {
+        fn from(bytes: &Bytes) -> Self {
+            Self(alloc::format!("{},{},{},{}", bytes.0, bytes.1, bytes.2, bytes.3))
+        }
+    }
+    impl TryFrom<ByteString> for Bytes {
+        type Error = String;
+
+        fn try_from(value: ByteString) -> Result<Self, Self::Error> {
+            let f = |res: Result<u8, ParseIntError>| {
+                res.map_err(|err| alloc::format!("Failed to parse byte: {err}"))
+            };
+
+            let mut iter = value.0.split(',').map(str::parse::<u8>);
+            Ok(Self(
+                iter.next().map_or_else(|| Err(String::from("Missing byte 0")), f)?,
+                iter.next().map_or_else(|| Err(String::from("Missing byte 1")), f)?,
+                iter.next().map_or_else(|| Err(String::from("Missing byte 2")), f)?,
+                iter.next().map_or_else(|| Err(String::from("Missing byte 3")), f)?,
+            ))
+        }
+    }
+
+    // Serialize `Bytes`
+    let bytes = Bytes(1, 2, 3, 4);
+    let serialized = to_vec(&bytes).unwrap();
+
+    // Check that `ByteString` was serialized
+    let (length, content) = serialized.split_first().unwrap();
+    assert_eq!(*length, 7, "Expected length to be `7`, got `{length}`");
+    assert_eq!(content, b"1,2,3,4");
+}

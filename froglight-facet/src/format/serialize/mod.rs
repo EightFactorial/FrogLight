@@ -188,7 +188,8 @@ fn serialize(
 
         // Handle strings
         get_as!(peek => String, Cow<'_, str>, str: |value: &str| -> Result<(), WriterError> {
-            // todo!("Variable-length encode `value.len()`");
+            let (bytes, len) = varint::encode_u32(value.len().try_into()?);
+            writer.write_bytes(&bytes[..len as usize])?;
             writer.write_bytes(value.as_bytes())
         });
 

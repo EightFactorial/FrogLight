@@ -1,5 +1,7 @@
 //! TODO
 
+use core::num::TryFromIntError;
+
 /// A `no_std`-compatible writer.
 pub struct Writer<'a> {
     written: usize,
@@ -130,8 +132,20 @@ impl<T: std::io::Write> WriterType for T {
 pub enum WriterError {
     /// The writer is full and cannot accept more bytes.
     WriterFull,
+    /// An integer conversion error occurred.
+    TryFromInt(TryFromIntError),
 
     /// An I/O error occurred while writing.
     #[cfg(feature = "std")]
     IO(std::io::Error),
+}
+
+impl From<TryFromIntError> for WriterError {
+    #[inline]
+    fn from(err: TryFromIntError) -> Self { Self::TryFromInt(err) }
+}
+#[cfg(feature = "std")]
+impl From<std::io::Error> for WriterError {
+    #[inline]
+    fn from(err: std::io::Error) -> Self { Self::IO(err) }
 }

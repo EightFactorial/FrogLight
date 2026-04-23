@@ -8,20 +8,19 @@ macro_rules! create_encode {
                     pub use crate::simd::varint::{$fn, $fn_into};
                 }
                 _ => {
-                    #[must_use]
                     #[allow(trivial_numeric_casts, reason = "Ignored")]
                     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
                     #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128.")]
                     #[must_use]
-                    pub fn $fn(value: $ty) -> ([u8; $len], u8) {
+                    pub fn $fn(mut value: $ty) -> ([u8; $len], u8) {
                         let mut output = [0u8; $len];
                         let mut count = 0;
                         let mut byte;
 
-                        while (number != 0 || count == 0) && count < $len {
-                            byte = (number & 0b0111_1111) as u8;
-                            number = (number >> 7) & (<$ty>::MAX >> 6);
-                            if number != 0 {
+                        while (value != 0 || count == 0) && count < $len {
+                            byte = (value & 0b0111_1111) as u8;
+                            value = (value >> 7) & (<$ty>::MAX >> 6);
+                            if value != 0 {
                                 byte |= 0b1000_0000;
                             }
 

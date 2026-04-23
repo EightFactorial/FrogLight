@@ -86,11 +86,11 @@ fn create_core<'mem, 'facet>(
         loop {
             match stack.pop() {
                 // Process the item into values.
-                Some(item @ StackItem { ty: ItemType::Value, .. }) => {
+                Some(item @ StackItem { ty: ItemType::Other, .. }) => {
                     handle_unknown(&mut core, item, stack)?;
                 }
-                // Return the `core` result.
-                Some(item @ StackItem { ty: ItemType::Other, .. }) => {
+                // Pass the value to the `core` function.
+                Some(item @ StackItem { ty: ItemType::Value, .. }) => {
                     return core(Item::Item(item)).map_err(SerializeError::from);
                 }
                 // Return `Ok`.
@@ -115,7 +115,6 @@ fn handle_unknown<'mem, 'facet>(
 
     // Set `item.variable` and `with` using the field and type attributes.
     let mut with = false;
-
     if let Some(field) = item.field.as_ref() {
         // #[facet(mc::variable)]
         item.variable |= field.has_attr(Some("mc"), "variable");
