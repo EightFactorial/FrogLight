@@ -3,11 +3,7 @@
 pub use ::facet;
 use facet::{Facet, Partial, ReflectError, ReflectErrorKind};
 
-use crate::format::{
-    reader::Reader,
-    serialize::iterator::StackItem as SerStackItem,
-    writer::{Writer, WriterError},
-};
+use crate::format::{Reader, Writer, WriterError, serialize::iterator::StackItem as SerStackItem};
 
 facet::define_attr_grammar! {
     ns "mc";

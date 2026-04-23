@@ -15,6 +15,8 @@ pub use iterator::IteratorStack;
 pub(crate) mod logic;
 pub use logic::{Item, Serializer};
 
+pub mod varint;
+
 use crate::{
     facet::WithFnAttr,
     format::{
@@ -29,22 +31,27 @@ pub trait Serialize<'facet> {
     #[inline]
     fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError> {
         let mut buffer = Vec::new();
-        <Self as Serialize>::to_writer(value, Writer::new(&mut buffer)).map(|_| buffer)
+        <Self as Serialize>::to_writer(value, false, Writer::new(&mut buffer)).map(|_| buffer)
     }
 
-    fn to_writer(value: &Self, writer: Writer<'_>) -> Result<usize, SerializeError>;
+    fn to_writer(value: &Self, variable: bool, writer: Writer<'_>)
+    -> Result<usize, SerializeError>;
 }
 
 impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
     #[inline]
     fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError> {
-        let mut buffer = Vec::with_capacity(64); // TODO: Size hint
-        <Self as Serialize>::to_writer(value, Writer::new(&mut buffer)).map(|_| buffer)
+        let mut buffer = Vec::with_capacity(8); // TODO: Size hint
+        <Self as Serialize>::to_writer(value, false, Writer::new(&mut buffer)).map(|_| buffer)
     }
 
     #[inline]
-    fn to_writer(value: &Self, writer: Writer<'_>) -> Result<usize, SerializeError> {
-        serialize(Peek::new(value), writer)
+    fn to_writer(
+        value: &Self,
+        variable: bool,
+        writer: Writer<'_>,
+    ) -> Result<usize, SerializeError> {
+        serialize(Peek::new(value), variable, writer)
     }
 }
 
@@ -58,11 +65,20 @@ macro_rules! get_as {
     };
 }
 
-fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, SerializeError> {
+#[expect(clippy::too_many_lines, reason = "TODO: Compact integer handling")]
+fn serialize(
+    peek: Peek<'_, '_>,
+    variable: bool,
+    mut writer: Writer<'_>,
+) -> Result<usize, SerializeError> {
     let core = |item| {
-        let item @ StackItem { peek, variable: var, field, .. } = match item {
+        let item @ StackItem { peek, variable, field, .. } = match item {
             Item::Item(item) => item,
-            Item::Size(_size) => todo!("Variable-length encode `size`"),
+            Item::Size(size) => {
+                let (bytes, len) = varint::encode_u32(size);
+                writer.write_bytes(&bytes[..len as usize])?;
+                return Ok(());
+            }
         };
 
         if let Some(field) = field {
@@ -85,68 +101,83 @@ fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, Serial
         }
 
         if let Ok(u8) = peek.get::<u8>() {
-            if var {
-                todo!("Variable-length encode `u8`");
+            return if variable {
+                let (bytes, len) = varint::encode_u8(*u8);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_byte(*u8);
-            }
+                writer.write_byte(*u8)
+            };
         } else if let Ok(u16) = peek.get::<u16>() {
-            if var {
-                todo!("Variable-length encode `u16`");
+            return if variable {
+                let (bytes, len) = varint::encode_u16(*u16);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&u16.to_le_bytes());
-            }
+                writer.write_bytes(&u16.to_le_bytes())
+            };
         } else if let Ok(u32) = peek.get::<u32>() {
-            if var {
-                todo!("Variable-length encode `u32`");
+            return if variable {
+                let (bytes, len) = varint::encode_u32(*u32);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&u32.to_le_bytes());
-            }
+                writer.write_bytes(&u32.to_le_bytes())
+            };
         } else if let Ok(u64) = peek.get::<u64>() {
-            if var {
-                todo!("Variable-length encode `u64`");
+            return if variable {
+                let (bytes, len) = varint::encode_u64(*u64);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&u64.to_le_bytes());
-            }
+                writer.write_bytes(&u64.to_le_bytes())
+            };
         } else if let Ok(u128) = peek.get::<u128>() {
-            if var {
-                todo!("Variable-length encode `u128`");
+            return if variable {
+                let (bytes, len) = varint::encode_u128(*u128);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&u128.to_le_bytes());
-            }
+                writer.write_bytes(&u128.to_le_bytes())
+            };
         }
 
+        #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
         if let Ok(i8) = peek.get::<i8>() {
-            if var {
-                todo!("Variable-length encode `i8`");
+            let u8 = *i8 as u8;
+            return if variable {
+                let (bytes, len) = varint::encode_u8(u8);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
-                return writer.write_byte(*i8 as u8);
-            }
+                writer.write_byte(u8)
+            };
         } else if let Ok(i16) = peek.get::<i16>() {
-            if var {
-                todo!("Variable-length encode `i16`");
+            let u16 = *i16 as u16;
+            return if variable {
+                let (bytes, len) = varint::encode_u16(u16);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&i16.to_le_bytes());
-            }
+                writer.write_bytes(&u16.to_le_bytes())
+            };
         } else if let Ok(i32) = peek.get::<i32>() {
-            if var {
-                todo!("Variable-length encode `i32`");
+            let u32 = *i32 as u32;
+            return if variable {
+                let (bytes, len) = varint::encode_u32(u32);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&i32.to_le_bytes());
-            }
+                writer.write_bytes(&u32.to_le_bytes())
+            };
         } else if let Ok(i64) = peek.get::<i64>() {
-            if var {
-                todo!("Variable-length encode `i64`");
+            let u64 = *i64 as u64;
+            return if variable {
+                let (bytes, len) = varint::encode_u64(u64);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&i64.to_le_bytes());
-            }
+                writer.write_bytes(&u64.to_le_bytes())
+            };
         } else if let Ok(i128) = peek.get::<i128>() {
-            if var {
-                todo!("Variable-length encode `i128`");
+            let u128 = *i128 as u128;
+            return if variable {
+                let (bytes, len) = varint::encode_u128(u128);
+                writer.write_bytes(&bytes[..len as usize])
             } else {
-                return writer.write_bytes(&i128.to_le_bytes());
-            }
+                writer.write_bytes(&u128.to_le_bytes())
+            };
         }
 
         if let Ok(f32) = peek.get::<f32>() {
@@ -164,7 +195,7 @@ fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, Serial
         todo!("Unhandled type `{}`: {peek:?}", peek.shape().type_name());
     };
 
-    let mut ser = Serializer::new(peek, core);
+    let mut ser = Serializer::new(peek, variable, core);
     while let Some(result) = Iterator::next(&mut ser) {
         result?;
     }

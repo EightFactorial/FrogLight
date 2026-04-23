@@ -54,6 +54,11 @@ impl<'a> Writer<'a> {
     }
 }
 
+impl<'a, T: WriterType> From<&'a mut T> for Writer<'a> {
+    #[inline]
+    fn from(inner: &'a mut T) -> Self { Self::new(inner) }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for types that can be written to using a [`Writer`].

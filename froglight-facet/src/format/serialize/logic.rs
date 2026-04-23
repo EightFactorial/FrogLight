@@ -30,9 +30,10 @@ impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
     #[must_use]
     pub fn new(
         peek: Peek<'mem, 'facet>,
+        variable: bool,
         core: impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
     ) -> Serializer<'mem, 'facet, impl SerializerCore<'mem, 'facet>> {
-        Serializer { iter: SerializeIterator::new(peek), core: create_core(core) }
+        Serializer { iter: SerializeIterator::new(peek, variable), core: create_core(core) }
     }
 }
 

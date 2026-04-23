@@ -1,6 +1,10 @@
 //! TODO
 
 pub mod deserialize;
-pub mod reader;
 pub mod serialize;
-pub mod writer;
+
+mod reader;
+pub use reader::{Reader, ReaderError};
+
+mod writer;
+pub use writer::{Writer, WriterError, WriterType};

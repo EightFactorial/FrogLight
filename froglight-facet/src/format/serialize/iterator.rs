@@ -49,9 +49,9 @@ impl<'mem, 'facet> StackItem<'mem, 'facet> {
 impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     /// Create a new [`SerializeIterator`] from the given [`Peek`].
     #[must_use]
-    pub fn new(peek: Peek<'mem, 'facet>) -> Self {
+    pub fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
         let mut stack = IteratorStack::new_const();
-        stack.push(StackItem::new(peek, ItemType::Other, false));
+        stack.push(StackItem::new(peek, ItemType::Other, variable));
         Self { shape: peek.shape(), stack }
     }
 

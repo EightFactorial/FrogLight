@@ -1,17 +1,33 @@
 //! TODO
 #![no_std]
 
-use froglight_facet::to_vec;
+extern crate alloc;
+
+use alloc::vec::Vec;
+
+use froglight_facet::{to_vec, to_writer, to_writer_variable};
 
 macro_rules! assert_eq_bytes {
     ($ident:ident: $($input:expr),*) => {
         #[test]
         fn $ident() {
+            let mut bytes = Vec::new();
             $(
-                assert_eq!(to_vec(&$input).unwrap(), $input.to_le_bytes());
+                bytes.clear();
+                to_writer(&$input, &mut bytes).unwrap();
+                assert_eq!(bytes, $input.to_le_bytes());
+
+                bytes.clear();
+                to_writer_variable(&$input, &mut bytes).unwrap();
             )*
         }
     };
+}
+
+#[test]
+fn bool() {
+    assert_eq!(to_vec(&true).unwrap(), [1]);
+    assert_eq!(to_vec(&false).unwrap(), [0]);
 }
 
 assert_eq_bytes!(u8: 0u8, 1u8, 2u8, 254u8, u8::MAX);
