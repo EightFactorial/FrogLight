@@ -104,10 +104,11 @@ fn create_core<'mem, 'facet>(
 #[expect(clippy::inline_always, reason = "Used once per `core` type")]
 fn handle_unknown<'mem, 'facet>(
     core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
-    mut peek: Peek<'mem, 'facet>,
+    peek: Peek<'mem, 'facet>,
     mut var: bool,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
+    // Set `var` and `with` using the type's attributes.
     let mut with = false;
     for attr in peek.shape().attributes {
         if attr.ns.is_some_and(|ns| ns == "mc") {
@@ -118,25 +119,33 @@ fn handle_unknown<'mem, 'facet>(
         }
     }
 
+    // If the type has a proxy, convert `peek` into the proxy type.
     if let Some(proxy) = peek.shape().effective_proxy(Some("mc")) {
-        let proxy_ptr =
-            unsafe { (proxy.convert_out)(peek.data(), proxy.shape.allocate().unwrap()).unwrap() };
-        let proxy = unsafe { Peek::unchecked_new(proxy_ptr.as_const(), proxy.shape) };
-        peek = proxy;
+        let ptr = proxy.shape.allocate().unwrap();
+        // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to` types.
+        let ptr = unsafe { (proxy.convert_out)(peek.data(), ptr).unwrap() };
+        // SAFETY: `ptr` and `shape` are guaranteed to be for the same type.
+        let proxy = unsafe { Peek::unchecked_new(ptr.as_const(), proxy.shape) };
+        // Then restart `handle_unknown` with the proxy type.
+        return handle_unknown(core, proxy, var, stack);
     }
 
+    // If the type has a custom serializer, treat it as a value.
     if with {
         stack.push((peek, StackItem::Value(var)));
         return Ok(());
     }
 
     match peek.shape().ty {
+        // Directly serialize primitives.
         Type::Primitive(_ty) => stack.push((peek, StackItem::Value(var))),
 
         Type::Sequence(_ty) => {
             let list = peek.into_list_like()?;
+            // Serialize the length of the list.
             core(Item::Size(list.len().try_into().map_err(|_err| SerializeError)?))?;
 
+            // Push the items in reverse order.
             let iter = list.iter();
             for item in iter.collect::<SmallVec<[_; 8]>>().into_iter().rev() {
                 stack.push((item, StackItem::Other(var)));
@@ -144,12 +153,15 @@ fn handle_unknown<'mem, 'facet>(
         }
 
         Type::User(UserType::Struct(_)) => {
+            // Push the fields in reverse order.
             let iter = peek.into_struct()?.fields_for_serialize();
             for (field, item) in iter.collect::<SmallVec<[_; 8]>>().into_iter().rev() {
+                // Update `var` using the field's attributes.
                 if let Some(field) = field.field {
                     var = field.has_attr(Some("mc"), "variable");
                 }
 
+                // If the field has a custom serializer, treat it as a value.
                 if let Some(field) = field.field
                     && field.has_attr(Some("mc"), "with")
                 {
@@ -162,16 +174,20 @@ fn handle_unknown<'mem, 'facet>(
         Type::User(UserType::Enum(_)) => {
             let enum_ = peek.into_enum()?;
 
+            // Serialize the discriminant of the enum.
             #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
             let disc = (enum_.discriminant() as u64).try_into().map_err(|_err| SerializeError)?;
             core(Item::Size(disc))?;
 
+            // Push the fields in reverse order.
             let iter = enum_.fields_for_serialize();
             for (field, item) in iter.collect::<SmallVec<[_; 8]>>().into_iter().rev() {
+                // Update `var` using the field's attributes.
                 if let Some(field) = field.field {
                     var = field.has_attr(Some("mc"), "variable");
                 }
 
+                // If the field has a custom serializer, treat it as a value.
                 if let Some(field) = field.field
                     && field.has_attr(Some("mc"), "with")
                 {
