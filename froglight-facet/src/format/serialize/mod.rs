@@ -15,7 +15,13 @@ pub use iterator::IteratorStack;
 pub(crate) mod logic;
 pub use logic::{Item, Serializer};
 
-use crate::format::writer::{Writer, WriterError};
+use crate::{
+    facet::WithFnAttr,
+    format::{
+        serialize::iterator::StackItem,
+        writer::{Writer, WriterError},
+    },
+};
 
 /// A trait for types that can be deserialized.
 #[expect(clippy::missing_errors_doc, missing_docs, reason = "WIP")]
@@ -54,10 +60,21 @@ macro_rules! get_as {
 
 fn serialize(peek: Peek<'_, '_>, mut writer: Writer<'_>) -> Result<usize, SerializeError> {
     let core = |item| {
-        let (peek, var) = match item {
+        let item @ StackItem { peek, variable: var, field, .. } = match item {
+            Item::Item(item) => item,
             Item::Size(_size) => todo!("Variable-length encode `size`"),
-            Item::Peek(peek, var) => (peek, var),
         };
+
+        if let Some(field) = field {
+            // Handle field attributes
+
+            // Run the custom serializer.
+            if let Some(with) = field.get_attr(Some("mc"), "with")
+                && let Some(with) = with.get_as::<WithFnAttr>()
+            {
+                return with.serialize(item, &mut writer);
+            }
+        }
 
         if let Ok(()) = peek.get::<()>() {
             return Ok(());

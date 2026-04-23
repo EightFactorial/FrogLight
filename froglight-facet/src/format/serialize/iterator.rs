@@ -1,4 +1,4 @@
-use facet::{Peek, Shape};
+use facet::{Field, Peek, Shape};
 use smallvec::SmallVec;
 
 /// TODO
@@ -8,14 +8,40 @@ pub struct SerializeIterator<'mem, 'facet> {
 }
 
 /// A stack of serialization frames.
-pub type IteratorStack<'mem, 'facet> = SmallVec<[(Peek<'mem, 'facet>, StackItem); 12]>;
+pub type IteratorStack<'mem, 'facet> = SmallVec<[StackItem<'mem, 'facet>; 12]>;
+
+#[derive(Debug, Clone)]
+pub struct StackItem<'mem, 'facet> {
+    pub peek: Peek<'mem, 'facet>,
+    pub ty: ItemType,
+    pub variable: bool,
+    pub field: Option<Field>,
+}
 
 /// An item on the serializer stack
-pub enum StackItem {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ItemType {
     /// A value to serialize.
-    Value(bool),
+    Value,
     /// A value to process.
-    Other(bool),
+    Other,
+}
+
+impl<'mem, 'facet> StackItem<'mem, 'facet> {
+    /// Create a new [`StackItem`].
+    #[inline]
+    #[must_use]
+    pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
+        Self { peek, ty, variable: var, field: None }
+    }
+
+    /// Set the [`Field`] this [`StackItem`] came from.
+    #[inline]
+    #[must_use]
+    pub const fn with_field(mut self, field: Option<Field>) -> Self {
+        self.field = field;
+        self
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -25,7 +51,7 @@ impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     #[must_use]
     pub fn new(peek: Peek<'mem, 'facet>) -> Self {
         let mut stack = IteratorStack::new_const();
-        stack.push((peek, StackItem::Other(false)));
+        stack.push(StackItem::new(peek, ItemType::Other, false));
         Self { shape: peek.shape(), stack }
     }
 

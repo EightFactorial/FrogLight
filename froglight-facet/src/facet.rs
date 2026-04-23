@@ -1,9 +1,13 @@
 //! TODO
 
 pub use ::facet;
-use facet::{Facet, Partial, Peek, ReflectError, ReflectErrorKind};
+use facet::{Facet, Partial, ReflectError, ReflectErrorKind};
 
-use crate::format::{reader::Reader, serialize::SerializeError, writer::Writer};
+use crate::format::{
+    reader::Reader,
+    serialize::iterator::StackItem as SerStackItem,
+    writer::{Writer, WriterError},
+};
 
 facet::define_attr_grammar! {
     ns "mc";
@@ -60,12 +64,12 @@ impl WithFnAttr {
     ///
     /// Returns an error if serialization fails.
     #[inline]
-    pub fn serialize<'w>(
+    pub fn serialize(
         &self,
-        peek: Peek<'_, 'static>,
-        writer: Writer<'w>,
-    ) -> Result<Writer<'w>, SerializeError> {
-        (self.ser)(peek, writer)
+        item: SerStackItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        (self.ser)(item, writer)
     }
 
     /// Deserialize using this attribute's deserialization function.
@@ -113,7 +117,7 @@ impl WithFnAttr {
 }
 
 /// A serialization function.
-pub type SerFn = for<'w> fn(Peek<'_, 'static>, Writer<'w>) -> Result<Writer<'w>, SerializeError>;
+pub type SerFn = fn(SerStackItem<'_, '_>, &mut Writer<'_>) -> Result<(), WriterError>;
 /// A deserialization function.
 pub type DeFn =
     fn(Partial<'static, false>, &mut Reader<'_>) -> Result<Partial<'static, false>, ReflectError>;
@@ -135,10 +139,7 @@ pub trait FacetTemplate: 'static {
     /// # Errors
     ///
     /// Returns an error if serialization fails.
-    fn serialize<'w>(
-        peek: Peek<'_, 'static>,
-        writer: Writer<'w>,
-    ) -> Result<Writer<'w>, SerializeError>;
+    fn serialize(item: SerStackItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError>;
 
     /// The deserialization function.
     ///
