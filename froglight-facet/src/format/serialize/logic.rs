@@ -159,7 +159,7 @@ fn handle_unknown<'mem, 'facet>(
         Def::Map(_) => {
             let map = item.peek.into_map()?;
             // Serialize the length of the map.
-            core(Item::Size(map.len().try_into().map_err(|_err| SerializeError)?))?;
+            core(Item::Size(map.len().try_into().map_err(WriterError::TryFromInt)?))?;
 
             // Push the items in reverse order.
             let iter = map.iter();
@@ -171,7 +171,7 @@ fn handle_unknown<'mem, 'facet>(
         Def::Set(_) => {
             let set = item.peek.into_set()?;
             // Serialize the length of the set.
-            core(Item::Size(set.len().try_into().map_err(|_err| SerializeError)?))?;
+            core(Item::Size(set.len().try_into().map_err(WriterError::TryFromInt)?))?;
 
             // Push the items in reverse order.
             let iter = set.iter();
@@ -183,7 +183,7 @@ fn handle_unknown<'mem, 'facet>(
         Def::List(_) | Def::Slice(_) => {
             let list = item.peek.into_list()?;
             // Serialize the length of the list.
-            core(Item::Size(list.len().try_into().map_err(|_err| SerializeError)?))?;
+            core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
 
             // Push the items in reverse order.
             let iter = list.iter();
@@ -247,7 +247,7 @@ fn handle_unknown<'mem, 'facet>(
                 Type::Sequence(_) => {
                     let list = item.peek.into_list_like()?;
                     // Serialize the length of the list.
-                    core(Item::Size(list.len().try_into().map_err(|_err| SerializeError)?))?;
+                    core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
 
                     // Push the items in reverse order.
                     let iter = list.iter();
@@ -283,9 +283,11 @@ fn handle_unknown<'mem, 'facet>(
 
                     // Serialize the discriminant of the enum.
                     #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
-                    let disc =
-                        (enum_.discriminant() as u64).try_into().map_err(|_err| SerializeError)?;
-                    core(Item::Size(disc))?;
+                    core(Item::Size(
+                        (enum_.discriminant() as u64)
+                            .try_into()
+                            .map_err(WriterError::TryFromInt)?,
+                    ))?;
 
                     // Push the fields in reverse order.
                     let iter = enum_.fields_for_serialize();
