@@ -64,11 +64,11 @@ macro_rules! get_as {
 
 #[expect(clippy::too_many_lines, reason = "TODO: Compact integer handling")]
 fn serialize(
-    peek: Peek<'_, '_>,
-    variable: bool,
+    serialize_peek: Peek<'_, '_>,
+    serialize_variable: bool,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
-    let core = |item: Item<'_, '_>| -> Result<(), WriterError> {
+    let mut core = |item: Item<'_, '_>| -> Result<(), WriterError> {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(size) => {
@@ -78,7 +78,11 @@ fn serialize(
             }
         };
 
-        if let Some(field) = item.field() {
+        let field = item.field();
+        let peek = item.peek();
+        let variable = item.is_variable();
+
+        if let Some(field) = field {
             // Handle field attributes
 
             // Run the custom serializer.
@@ -97,7 +101,6 @@ fn serialize(
             return writer.write_byte(u8::from(*bool));
         }
 
-        let variable = item.is_variable();
         if let Ok(u8) = peek.get::<u8>() {
             return if variable {
                 let (bytes, len) = varint::encode_u8(*u8);
@@ -191,10 +194,10 @@ fn serialize(
             writer.write_bytes(value.as_bytes())
         });
 
-        todo!("Unhandled type `{}`: {peek:?}", peek.shape().type_name());
+        todo!("Unhandled type `{}`: {:?}", item.shape().type_name(), item.peek());
     };
 
-    let mut ser = Serializer::new(peek, variable, core);
+    let mut ser = Serializer::new(serialize_peek, serialize_variable, &mut core);
     while let Some(result) = Iterator::next(&mut ser) {
         result?;
     }

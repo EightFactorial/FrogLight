@@ -31,7 +31,7 @@ impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
     pub fn new(
         peek: Peek<'mem, 'facet>,
         variable: bool,
-        core: impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+        core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
     ) -> Serializer<'mem, 'facet, impl SerializerCore<'mem, 'facet>> {
         Serializer { iter: SerializeIterator::new(peek, variable), core: create_core(core) }
     }
@@ -80,14 +80,14 @@ where
 // -------------------------------------------------------------------------------------------------
 
 fn create_core<'mem, 'facet>(
-    mut core: impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
 ) -> impl FnMut(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError> {
     move |stack| {
         while let Some(item) = stack.pop() {
             match item.ty() {
                 // Process the item into values.
                 ItemType::Other => {
-                    handle_unknown(&mut core, item, stack)?;
+                    handle_unknown(core, item, stack)?;
                 }
                 // Pass the value to the `core` function.
                 ItemType::Value => {
@@ -141,18 +141,44 @@ fn handle_unknown<'mem, 'facet>(
     }
 
     // If the type has a proxy, convert `peek` into the proxy type.
-    if let Some(_proxy) = item.shape().effective_proxy(Some("mc")) {
-        // TODO: MANUALLY TRACK LIFETIMES, ALLOC, AND DEALLOC!
-        // let ptr = proxy.shape.allocate().unwrap();
-        // // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to`
-        // types. let ptr = unsafe {
-        // (proxy.convert_out)(item.peek().data(), ptr).unwrap() }; // SAFETY:
-        // `ptr` and `shape` are guaranteed to be for the same type.
-        // item.peek = unsafe { Peek::unchecked_new(ptr.as_const(), proxy.shape)
-        // };
-        //
-        // // Restart `handle_unknown` with the proxy type.
-        // return handle_unknown(core, item, stack);
+    if let Some(proxy) = item.shape().effective_proxy(Some("mc")) {
+        // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to` types.
+        let proxy_ptr = proxy.shape.allocate().unwrap();
+        let proxy_ptr = unsafe { (proxy.convert_out)(item.peek().data(), proxy_ptr).unwrap() };
+
+        // SAFETY: `ptr` and `shape` are guaranteed to be for the same type.
+        let proxy_peek = unsafe { Peek::unchecked_new(proxy_ptr.as_const(), proxy.shape) };
+
+        // Create a new serializer and serialize the proxy type.
+        let mut ser = Serializer::new(proxy_peek, item.is_variable(), core);
+        while let Some(result) = Iterator::next(&mut ser) {
+            if let Err(err) = result {
+                // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
+
+                // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
+                unsafe {
+                    proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
+                }
+                // SAFETY: `ptr` was allocated via `shape.allocate()`.
+                unsafe {
+                    proxy.shape.deallocate_mut(proxy_ptr).unwrap();
+                }
+
+                return Err(err);
+            }
+        }
+        drop(ser);
+
+        // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
+        unsafe {
+            proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
+        }
+        // SAFETY: `ptr` was allocated via `shape.allocate()`.
+        unsafe {
+            proxy.shape.deallocate_mut(proxy_ptr).unwrap();
+        }
+
+        return Ok(());
     }
 
     match item.shape().def {
