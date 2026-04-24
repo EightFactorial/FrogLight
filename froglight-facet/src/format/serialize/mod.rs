@@ -19,10 +19,7 @@ pub mod varint;
 
 use crate::{
     facet::WithFnAttr,
-    format::{
-        serialize::iterator::StackItem,
-        writer::{Writer, WriterError},
-    },
+    format::writer::{Writer, WriterError},
 };
 
 /// A trait for types that can be deserialized.
@@ -71,8 +68,8 @@ fn serialize(
     variable: bool,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
-    let core = |item| {
-        let item @ StackItem { peek, variable, field, .. } = match item {
+    let core = |item: Item<'_, '_>| -> Result<(), WriterError> {
+        let item = match item {
             Item::Item(item) => item,
             Item::Size(size) => {
                 let (bytes, len) = varint::encode_u32(size);
@@ -81,7 +78,7 @@ fn serialize(
             }
         };
 
-        if let Some(field) = field {
+        if let Some(field) = item.field() {
             // Handle field attributes
 
             // Run the custom serializer.
@@ -100,6 +97,7 @@ fn serialize(
             return writer.write_byte(u8::from(*bool));
         }
 
+        let variable = item.is_variable();
         if let Ok(u8) = peek.get::<u8>() {
             return if variable {
                 let (bytes, len) = varint::encode_u8(*u8);

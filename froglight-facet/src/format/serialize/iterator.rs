@@ -10,12 +10,12 @@ pub struct SerializeIterator<'mem, 'facet> {
 /// A stack of serialization frames.
 pub type IteratorStack<'mem, 'facet> = SmallVec<[StackItem<'mem, 'facet>; 12]>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct StackItem<'mem, 'facet> {
-    pub peek: Peek<'mem, 'facet>,
-    pub ty: ItemType,
-    pub variable: bool,
-    pub field: Option<Field>,
+    peek: Peek<'mem, 'facet>,
+    ty: ItemType,
+    variable: bool,
+    field: Option<Field>,
 }
 
 /// An item on the serializer stack
@@ -34,6 +34,43 @@ impl<'mem, 'facet> StackItem<'mem, 'facet> {
     pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
         Self { peek, ty, variable: var, field: None }
     }
+
+    /// Get the [`Peek`] for this [`StackItem`].
+    #[inline]
+    #[must_use]
+    pub const fn peek(&self) -> &Peek<'mem, 'facet> { &self.peek }
+
+    /// Get the [`Shape`] for this [`StackItem`].
+    #[inline]
+    #[must_use]
+    pub const fn shape(&self) -> &'static Shape { self.peek.shape() }
+
+    /// Get the [`ItemType`] for this [`StackItem`].
+    #[inline]
+    #[must_use]
+    pub const fn ty(&self) -> ItemType { self.ty }
+
+    /// Set the [`ItemType`] for this [`StackItem`].
+    #[inline]
+    #[must_use]
+    pub const fn with_ty(mut self, ty: ItemType) -> Self {
+        self.ty = ty;
+        self
+    }
+
+    /// Returns `true` if this [`StackItem`] is variable-length.
+    #[inline]
+    #[must_use]
+    pub const fn is_variable(&self) -> bool { self.variable }
+
+    /// Set whether this [`StackItem`] is variable-length.
+    #[inline]
+    pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
+
+    /// Get the [`Field`] this [`StackItem`] came from, if any.
+    #[inline]
+    #[must_use]
+    pub const fn field(&self) -> Option<Field> { self.field }
 
     /// Set the [`Field`] this [`StackItem`] came from.
     #[inline]
