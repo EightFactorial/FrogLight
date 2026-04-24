@@ -3,7 +3,7 @@
 pub use ::facet;
 use facet::{Facet, Partial, ReflectError, ReflectErrorKind};
 
-use crate::format::{Reader, Writer, WriterError, serialize::iterator::StackItem as SerStackItem};
+use crate::format::{Reader, Writer, WriterError, serialize::SerializeItem};
 
 facet::define_attr_grammar! {
     ns "mc";
@@ -62,7 +62,7 @@ impl WithFnAttr {
     #[inline]
     pub fn serialize(
         &self,
-        item: SerStackItem<'_, '_>,
+        item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
     ) -> Result<(), WriterError> {
         (self.ser)(item, writer)
@@ -113,7 +113,7 @@ impl WithFnAttr {
 }
 
 /// A serialization function.
-pub type SerFn = fn(SerStackItem<'_, '_>, &mut Writer<'_>) -> Result<(), WriterError>;
+pub type SerFn = fn(SerializeItem<'_, '_>, &mut Writer<'_>) -> Result<(), WriterError>;
 /// A deserialization function.
 pub type DeFn =
     fn(Partial<'static, false>, &mut Reader<'_>) -> Result<Partial<'static, false>, ReflectError>;
@@ -129,13 +129,16 @@ pub type DeBorrowFn = for<'facet> fn(
 ///
 /// Must be used with [`WithFnAttr::new`] or [`WithFnAttr::using`] to take
 /// effect.
-pub trait FacetTemplate: 'static {
+pub trait FacetTemplate: 'static + Sized {
+    /// A [`WithFnAttr`] that uses this template.
+    const WITH: WithFnAttr = WithFnAttr::template::<Self>();
+
     /// The serialization function.
     ///
     /// # Errors
     ///
     /// Returns an error if serialization fails.
-    fn serialize(item: SerStackItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError>;
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError>;
 
     /// The deserialization function.
     ///

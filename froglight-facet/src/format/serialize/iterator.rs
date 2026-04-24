@@ -8,10 +8,11 @@ pub struct SerializeIterator<'mem, 'facet> {
 }
 
 /// A stack of serialization frames.
-pub type IteratorStack<'mem, 'facet> = SmallVec<[StackItem<'mem, 'facet>; 12]>;
+pub type IteratorStack<'mem, 'facet> = SmallVec<[SerializeItem<'mem, 'facet>; 12]>;
 
+/// An item to be serialized.
 #[derive(Debug)]
-pub struct StackItem<'mem, 'facet> {
+pub struct SerializeItem<'mem, 'facet> {
     peek: Peek<'mem, 'facet>,
     ty: ItemType,
     variable: bool,
@@ -27,7 +28,7 @@ pub enum ItemType {
     Other,
 }
 
-impl<'mem, 'facet> StackItem<'mem, 'facet> {
+impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     /// Create a new [`StackItem`].
     #[inline]
     #[must_use]
@@ -88,7 +89,7 @@ impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     #[must_use]
     pub fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
         let mut stack = IteratorStack::new_const();
-        stack.push(StackItem::new(peek, ItemType::Other, variable));
+        stack.push(SerializeItem::new(peek, ItemType::Other, variable));
         Self { shape: peek.shape(), stack }
     }
 

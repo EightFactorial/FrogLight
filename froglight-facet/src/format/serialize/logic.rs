@@ -4,7 +4,7 @@ use smallvec::SmallVec;
 use crate::format::{
     serialize::{
         SerializeError,
-        iterator::{ItemType, IteratorStack, SerializeIterator, StackItem},
+        iterator::{ItemType, IteratorStack, SerializeItem, SerializeIterator},
     },
     writer::WriterError,
 };
@@ -21,7 +21,7 @@ pub enum Item<'mem, 'facet> {
     /// A size to be serialized.
     Size(u32),
     /// An item to be serialized.
-    Item(StackItem<'mem, 'facet>),
+    Item(SerializeItem<'mem, 'facet>),
 }
 
 impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
@@ -104,7 +104,7 @@ fn create_core<'mem, 'facet>(
 #[expect(clippy::too_many_lines, reason = "Complex matching behavior")]
 fn handle_unknown<'mem, 'facet>(
     core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
-    mut item: StackItem<'mem, 'facet>,
+    mut item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
     /// A tiny cache for keeping collected values on the stack.
@@ -193,8 +193,8 @@ fn handle_unknown<'mem, 'facet>(
             // Push the items in reverse order.
             let iter = map.iter();
             for (key, value) in iter.collect::<Cache<_>>().into_iter().rev() {
-                stack.push(StackItem::new(value, ItemType::Other, item.is_variable()));
-                stack.push(StackItem::new(key, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(key, ItemType::Other, item.is_variable()));
             }
         }
         Def::Set(_) => {
@@ -205,7 +205,7 @@ fn handle_unknown<'mem, 'facet>(
             // Push the items in reverse order.
             let iter = set.iter();
             for value in iter.collect::<Cache<_>>().into_iter().rev() {
-                stack.push(StackItem::new(value, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
         }
 
@@ -217,7 +217,7 @@ fn handle_unknown<'mem, 'facet>(
             // Push the items in reverse order.
             let iter = list.iter();
             for list_item in iter.collect::<Cache<_>>().into_iter().rev() {
-                stack.push(StackItem::new(list_item, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(list_item, ItemType::Other, item.is_variable()));
             }
         }
         Def::Array(_) => {
@@ -226,7 +226,7 @@ fn handle_unknown<'mem, 'facet>(
             // Push the items in reverse order.
             let iter = array.iter();
             for array_item in iter.collect::<Cache<_>>().into_iter().rev() {
-                stack.push(StackItem::new(array_item, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(array_item, ItemType::Other, item.is_variable()));
             }
         }
 
@@ -236,7 +236,7 @@ fn handle_unknown<'mem, 'facet>(
             // Push the items in reverse order.
             let iter = (0..array.count()).filter_map(|i| array.get(i));
             for array_item in iter.collect::<Cache<_>>().into_iter().rev() {
-                stack.push(StackItem::new(array_item, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(array_item, ItemType::Other, item.is_variable()));
             }
         }
 
@@ -247,7 +247,7 @@ fn handle_unknown<'mem, 'facet>(
 
             // If the option is `Some`, push the value.
             if let Some(value) = option.value() {
-                stack.push(StackItem::new(value, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
         }
         Def::Result(_) => {
@@ -257,10 +257,10 @@ fn handle_unknown<'mem, 'facet>(
 
             if let Some(value) = result.ok() {
                 // Push `Ok(_)`.
-                stack.push(StackItem::new(value, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             } else if let Some(value) = result.err() {
                 // Push `Err(_)`.
-                stack.push(StackItem::new(value, ItemType::Other, item.is_variable()));
+                stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
         }
 
@@ -278,7 +278,11 @@ fn handle_unknown<'mem, 'facet>(
                     // Push the items in reverse order.
                     let iter = list.iter();
                     for list_item in iter.collect::<Cache<_>>().into_iter().rev() {
-                        stack.push(StackItem::new(list_item, ItemType::Other, item.is_variable()));
+                        stack.push(SerializeItem::new(
+                            list_item,
+                            ItemType::Other,
+                            item.is_variable(),
+                        ));
                     }
                 }
 
@@ -300,7 +304,8 @@ fn handle_unknown<'mem, 'facet>(
                         }
 
                         stack.push(
-                            StackItem::new(field_item, field_ty, variable).with_field(field.field),
+                            SerializeItem::new(field_item, field_ty, variable)
+                                .with_field(field.field),
                         );
                     }
                 }
@@ -332,7 +337,8 @@ fn handle_unknown<'mem, 'facet>(
                         }
 
                         stack.push(
-                            StackItem::new(field_item, field_ty, variable).with_field(field.field),
+                            SerializeItem::new(field_item, field_ty, variable)
+                                .with_field(field.field),
                         );
                     }
                 }
