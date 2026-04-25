@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use facet::{Field, Peek, Shape};
 use smallvec::SmallVec;
 
@@ -5,6 +7,8 @@ use smallvec::SmallVec;
 pub struct SerializeIterator<'mem, 'facet> {
     shape: &'static Shape,
     stack: IteratorStack<'mem, 'facet>,
+    #[expect(clippy::type_complexity, reason = "Force invariance over 'facet")]
+    _invariant: PhantomData<(&'mem (), fn(&'facet ()) -> &'facet ())>,
 }
 
 /// A stack of serialization frames.
@@ -90,7 +94,7 @@ impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     pub fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
         let mut stack = IteratorStack::new_const();
         stack.push(SerializeItem::new(peek, ItemType::Other, variable));
-        Self { shape: peek.shape(), stack }
+        Self { shape: peek.shape(), stack, _invariant: PhantomData }
     }
 
     /// Get the [`Shape`] that is being serialized.

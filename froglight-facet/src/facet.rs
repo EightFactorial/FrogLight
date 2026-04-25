@@ -127,8 +127,45 @@ pub type DeBorrowFn = for<'facet> fn(
 
 /// A template trait for custom serialization and deserialization functions.
 ///
-/// Must be used with [`WithFnAttr::new`] or [`WithFnAttr::using`] to take
+/// Must be used with the `#[facet(mc::with = T::WITH)]` attribute to take
 /// effect.
+///
+/// # Example
+///
+/// ```rust
+/// use facet::{Facet, Partial, ReflectError};
+/// use froglight_facet::{
+///     self as mc,
+///     facet::FacetTemplate,
+///     format::{Reader, Writer, WriterError, serialize::SerializeItem},
+///     to_vec,
+/// };
+///
+/// #[derive(Facet)]
+/// #[facet(mc::with = MyType::WITH)]
+/// struct MyType(u32);
+///
+/// impl FacetTemplate for MyType {
+///     fn serialize(
+///         item: SerializeItem<'_, '_>,
+///         writer: &mut Writer<'_>,
+///     ) -> Result<(), WriterError> {
+///         let val = item.peek().get::<MyType>().unwrap();
+///         writer.write_bytes(&val.0.to_be_bytes())
+///     }
+///
+///     fn deserialize(
+///         _: Partial<'static, false>,
+///         _: &mut Reader<'_>,
+///     ) -> Result<Partial<'static, false>, ReflectError> {
+///         todo!()
+///     }
+/// }
+///
+/// // Check that `MyType` was serialized correctly.
+/// let serialized = to_vec(&MyType(42)).unwrap();
+/// assert_eq!(serialized, [0, 0, 0, 42]);
+/// ```
 pub trait FacetTemplate: 'static + Sized {
     /// A [`WithFnAttr`] that uses this template.
     const WITH: WithFnAttr = WithFnAttr::template::<Self>();
@@ -153,14 +190,19 @@ pub trait FacetTemplate: 'static + Sized {
 
 /// A template trait for custom borrowed deserialization functions.
 ///
-/// Must be used with [`WithFnAttr::with_borrow`] to take effect.
-pub trait FacetBorrowedTemplate<'facet> {
+/// Must be used with the `#[facet(mc::with = T::WITH_BORROW)]` attribute to
+/// take effect.
+pub trait FacetBorrowedTemplate: FacetTemplate {
+    /// A [`WithFnAttr`] that uses this template.
+    const WITH_BORROW: WithFnAttr =
+        WithFnAttr::template::<Self>().with_borrow(Self::deserialize_borrowed);
+
     /// The borrowed deserialization function.
     ///
     /// # Errors
     ///
     /// Returns an error if deserialization fails.
-    fn deserialize_borrowed(
+    fn deserialize_borrowed<'facet>(
         partial: Partial<'facet, true>,
         reader: &mut Reader<'facet>,
     ) -> Result<Partial<'facet, true>, ReflectError>;

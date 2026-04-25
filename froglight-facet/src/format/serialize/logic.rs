@@ -86,9 +86,7 @@ fn create_core<'mem, 'facet>(
         while let Some(item) = stack.pop() {
             match item.ty() {
                 // Process the item into values.
-                ItemType::Other => {
-                    handle_unknown(core, item, stack)?;
-                }
+                ItemType::Other => handle_other(core, item, stack)?,
                 // Pass the value to the `core` function.
                 ItemType::Value => {
                     return core(Item::Item(item)).map_err(SerializeError::from);
@@ -101,15 +99,11 @@ fn create_core<'mem, 'facet>(
 
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Used once per `core` type")]
-#[expect(clippy::too_many_lines, reason = "Complex matching behavior")]
-fn handle_unknown<'mem, 'facet>(
+fn handle_other<'mem, 'facet>(
     core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
     mut item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
-    /// A tiny cache for keeping collected values on the stack.
-    type Cache<T> = SmallVec<[T; 8]>;
-
     {
         // Set `var` and `with` using the field and type attributes.
         let mut var = item.is_variable();
@@ -140,27 +134,37 @@ fn handle_unknown<'mem, 'facet>(
         }
     }
 
-    // If the type has a proxy, convert `peek` into the proxy type.
+    // If the type has a proxy, serialize the proxy type instead.
+    // Can't be pushed to the stack since the proxy does not live long enough.
     if let Some(proxy) = item.shape().effective_proxy(Some("mc")) {
-        // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to` types.
+        // Create the proxy value using the original as input.
         let proxy_ptr = proxy.shape.allocate().unwrap();
-        let proxy_ptr = unsafe { (proxy.convert_out)(item.peek().data(), proxy_ptr).unwrap() };
+        let proxy_ptr = unsafe {
+            // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to` types.
+            (proxy.convert_out)(item.peek().data(), proxy_ptr).unwrap_or_else(|_err| {
+                // !! MUST DEALLOC BEFORE RETURNING !!
+
+                // SAFETY: `ptr` was allocated via `shape.allocate()`.
+                // SAFETY: `ptr` was not initialized since `convert_out` failed.
+                proxy.shape.deallocate_uninit(proxy_ptr).unwrap();
+
+                todo!();
+            })
+        };
 
         // SAFETY: `ptr` and `shape` are guaranteed to be for the same type.
         let proxy_peek = unsafe { Peek::unchecked_new(proxy_ptr.as_const(), proxy.shape) };
 
-        // Create a new serializer and serialize the proxy type.
+        // Create a new serializer and serialize the proxy value.
         let mut ser = Serializer::new(proxy_peek, item.is_variable(), core);
         while let Some(result) = Iterator::next(&mut ser) {
             if let Err(err) = result {
                 // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
 
                 // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
-                unsafe {
-                    proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
-                }
                 // SAFETY: `ptr` was allocated via `shape.allocate()`.
                 unsafe {
+                    proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
                     proxy.shape.deallocate_mut(proxy_ptr).unwrap();
                 }
 
@@ -169,21 +173,41 @@ fn handle_unknown<'mem, 'facet>(
         }
         drop(ser);
 
+        // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
+
         // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
-        unsafe {
-            proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
-        }
         // SAFETY: `ptr` was allocated via `shape.allocate()`.
         unsafe {
+            proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
             proxy.shape.deallocate_mut(proxy_ptr).unwrap();
         }
 
         return Ok(());
     }
 
+    // Handle the item based on its definition.
+    match item.shape().def {
+        Def::Undefined => handle_type(core, item, stack),
+        _ => handle_def(core, item, stack),
+    }
+}
+
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Used once per `core` type")]
+fn handle_def<'mem, 'facet>(
+    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    item: SerializeItem<'mem, 'facet>,
+    stack: &mut IteratorStack<'mem, 'facet>,
+) -> Result<(), SerializeError> {
+    /// A tiny cache for keeping collected values on the stack.
+    type Cache<T> = SmallVec<[T; 8]>;
+
     match item.shape().def {
         // Directly serialize primitives.
-        Def::Scalar => stack.push(item.with_ty(ItemType::Value)),
+        Def::Scalar => {
+            stack.push(item.with_ty(ItemType::Value));
+            Ok(())
+        }
 
         Def::Map(_) => {
             let map = item.peek().into_map()?;
@@ -196,6 +220,8 @@ fn handle_unknown<'mem, 'facet>(
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
                 stack.push(SerializeItem::new(key, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
         Def::Set(_) => {
             let set = item.peek().into_set()?;
@@ -207,6 +233,8 @@ fn handle_unknown<'mem, 'facet>(
             for value in iter.collect::<Cache<_>>().into_iter().rev() {
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
 
         Def::List(_) | Def::Slice(_) => {
@@ -219,6 +247,8 @@ fn handle_unknown<'mem, 'facet>(
             for list_item in iter.collect::<Cache<_>>().into_iter().rev() {
                 stack.push(SerializeItem::new(list_item, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
         Def::Array(_) => {
             let array = item.peek().into_list_like()?;
@@ -228,6 +258,8 @@ fn handle_unknown<'mem, 'facet>(
             for array_item in iter.collect::<Cache<_>>().into_iter().rev() {
                 stack.push(SerializeItem::new(array_item, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
 
         Def::NdArray(_) => {
@@ -238,6 +270,8 @@ fn handle_unknown<'mem, 'facet>(
             for array_item in iter.collect::<Cache<_>>().into_iter().rev() {
                 stack.push(SerializeItem::new(array_item, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
 
         Def::Option(_) => {
@@ -249,6 +283,8 @@ fn handle_unknown<'mem, 'facet>(
             if let Some(value) = option.value() {
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
         Def::Result(_) => {
             let result = item.peek().into_result()?;
@@ -262,98 +298,110 @@ fn handle_unknown<'mem, 'facet>(
                 // Push `Err(_)`.
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
+
+            Ok(())
         }
 
-        // Fall back to `Type` for undefined types.
-        Def::Undefined => {
-            match item.shape().ty {
-                // Directly serialize primitives.
-                Type::Primitive(_) => stack.push(item.with_ty(ItemType::Value)),
-
-                Type::Sequence(_) => {
-                    let list = item.peek().into_list_like()?;
-                    // Serialize the length of the list.
-                    core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
-
-                    // Push the items in reverse order.
-                    let iter = list.iter();
-                    for list_item in iter.collect::<Cache<_>>().into_iter().rev() {
-                        stack.push(SerializeItem::new(
-                            list_item,
-                            ItemType::Other,
-                            item.is_variable(),
-                        ));
-                    }
-                }
-
-                Type::User(UserType::Struct(_)) => {
-                    // Push the fields in reverse order.
-                    let iter = item.peek().into_struct()?.fields_for_serialize();
-                    for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
-                        let mut field_ty = ItemType::Other;
-                        let mut variable = false;
-
-                        if let Some(field) = field.field {
-                            // Update `variable` using the field's attributes.
-                            variable = field.has_attr(Some("mc"), "variable");
-
-                            // If the field has a custom serializer, treat it as a value.
-                            if field.has_attr(Some("mc"), "with") {
-                                field_ty = ItemType::Value;
-                            }
-                        }
-
-                        stack.push(
-                            SerializeItem::new(field_item, field_ty, variable)
-                                .with_field(field.field),
-                        );
-                    }
-                }
-                Type::User(UserType::Enum(_)) => {
-                    let enum_ = item.peek().into_enum()?;
-
-                    // Serialize the discriminant of the enum.
-                    #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
-                    core(Item::Size(
-                        (enum_.discriminant() as u64)
-                            .try_into()
-                            .map_err(WriterError::TryFromInt)?,
-                    ))?;
-
-                    // Push the fields in reverse order.
-                    let iter = enum_.fields_for_serialize();
-                    for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
-                        let mut field_ty = ItemType::Other;
-                        let mut variable = false;
-
-                        if let Some(field) = field.field {
-                            // Update `variable` using the field's attributes.
-                            variable = field.has_attr(Some("mc"), "variable");
-
-                            // If the field has a custom serializer, treat it as a value.
-                            if field.has_attr(Some("mc"), "with") {
-                                field_ty = ItemType::Value;
-                            }
-                        }
-
-                        stack.push(
-                            SerializeItem::new(field_item, field_ty, variable)
-                                .with_field(field.field),
-                        );
-                    }
-                }
-                Type::User(_) => todo!(),
-
-                Type::Pointer(_) => todo!(),
-
-                Type::Undefined => {
-                    todo!("Unsupported type `{}`: {:?}", item.shape().type_name(), item.peek())
-                }
-            }
-        }
+        // Fallback to `Type` for undefined types.
+        Def::Undefined => handle_type(core, item, stack),
 
         _ => todo!("Unsupported type `{}`: {:?}", item.shape().type_name(), item.peek()),
     }
+}
 
-    Ok(())
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Used once per `core` type")]
+fn handle_type<'mem, 'facet>(
+    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    item: SerializeItem<'mem, 'facet>,
+    stack: &mut IteratorStack<'mem, 'facet>,
+) -> Result<(), SerializeError> {
+    /// A tiny cache for keeping collected values on the stack.
+    type Cache<T> = SmallVec<[T; 8]>;
+
+    match item.shape().ty {
+        // Directly serialize primitives.
+        Type::Primitive(_) => {
+            stack.push(item.with_ty(ItemType::Value));
+            Ok(())
+        }
+
+        Type::Sequence(_) => {
+            let list = item.peek().into_list_like()?;
+            // Serialize the length of the list.
+            core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
+
+            // Push the items in reverse order.
+            let iter = list.iter();
+            for list_item in iter.collect::<Cache<_>>().into_iter().rev() {
+                stack.push(SerializeItem::new(list_item, ItemType::Other, item.is_variable()));
+            }
+
+            Ok(())
+        }
+
+        Type::User(UserType::Struct(_)) => {
+            // Push the fields in reverse order.
+            let iter = item.peek().into_struct()?.fields_for_serialize();
+            for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
+                let mut field_ty = ItemType::Other;
+                let mut variable = false;
+
+                if let Some(field) = field.field {
+                    // Update `variable` using the field's attributes.
+                    variable = field.has_attr(Some("mc"), "variable");
+
+                    // If the field has a custom serializer, treat it as a value.
+                    if field.has_attr(Some("mc"), "with") {
+                        field_ty = ItemType::Value;
+                    }
+                }
+
+                stack.push(
+                    SerializeItem::new(field_item, field_ty, variable).with_field(field.field),
+                );
+            }
+
+            Ok(())
+        }
+        Type::User(UserType::Enum(_)) => {
+            let enum_ = item.peek().into_enum()?;
+
+            // Serialize the discriminant of the enum.
+            #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
+            core(Item::Size(
+                (enum_.discriminant() as u64).try_into().map_err(WriterError::TryFromInt)?,
+            ))?;
+
+            // Push the fields in reverse order.
+            let iter = enum_.fields_for_serialize();
+            for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
+                let mut field_ty = ItemType::Other;
+                let mut variable = false;
+
+                if let Some(field) = field.field {
+                    // Update `variable` using the field's attributes.
+                    variable = field.has_attr(Some("mc"), "variable");
+
+                    // If the field has a custom serializer, treat it as a value.
+                    if field.has_attr(Some("mc"), "with") {
+                        field_ty = ItemType::Value;
+                    }
+                }
+
+                stack.push(
+                    SerializeItem::new(field_item, field_ty, variable).with_field(field.field),
+                );
+            }
+
+            Ok(())
+        }
+        Type::User(_) => todo!(),
+
+        Type::Pointer(_) => todo!(),
+
+        Type::Undefined => {
+            todo!("Unsupported type `{}`: {:?}", item.shape().type_name(), item.peek())
+        }
+    }
 }
