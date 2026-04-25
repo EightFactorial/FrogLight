@@ -51,12 +51,12 @@ impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
 
 // -------------------------------------------------------------------------------------------------
 
-fn serialize(
-    serialize_peek: Peek<'_, '_>,
+fn serialize<'mem, 'facet>(
+    serialize_peek: Peek<'mem, 'facet>,
     serialize_variable: bool,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
-    let mut core = |item: Item<'_, '_>| -> Result<(), WriterError> {
+    let mut core = |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(size) => {
@@ -69,8 +69,9 @@ fn serialize(
         // Handle field attributes.
         if let Some(field) = item.field() {
             // Run the custom serializer.
-            if let Some(with) = field.get_attr(Some("mc"), "with")
-                && let Some(with) = with.get_as::<crate::facet::WithFnAttr>()
+            if let Some(attr) = field.get_attr(Some("mc"), "with")
+                && let Some(crate::facet::Attr::With(Some(with))) =
+                    attr.get_as::<crate::facet::Attr>()
             {
                 return with.serialize(item, &mut writer);
             }

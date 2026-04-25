@@ -18,6 +18,11 @@ facet::define_attr_grammar! {
         /// or [Wikipedia](https://en.wikipedia.org/wiki/LEB128) for more details.
         Variable,
 
+        /// Mark whether a struct or enum should pass it's variable-length encoding state to its fields.
+        ///
+        /// This is useful for newtypes that want to pass outer `#[facet(mc::variable)]` attributes to their inner fields.
+        VariableInner,
+
         /// Use custom serialization and deserialization functions for a type or field.
         With(fn_ptr WithFnAttr),
     }

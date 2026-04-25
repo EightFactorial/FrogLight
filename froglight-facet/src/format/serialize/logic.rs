@@ -31,7 +31,7 @@ impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
     pub fn new(
         peek: Peek<'mem, 'facet>,
         variable: bool,
-        core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+        core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
     ) -> Serializer<'mem, 'facet, impl SerializerCore<'mem, 'facet>> {
         Serializer { iter: SerializeIterator::new(peek, variable), core: create_core(core) }
     }
@@ -80,7 +80,7 @@ where
 // -------------------------------------------------------------------------------------------------
 
 fn create_core<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
 ) -> impl FnMut(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError> {
     move |stack| {
         while let Some(item) = stack.pop() {
@@ -100,7 +100,7 @@ fn create_core<'mem, 'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Used once per `core` type")]
 fn handle_other<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
     mut item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
@@ -164,6 +164,7 @@ fn handle_other<'mem, 'facet>(
                 // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
                 // SAFETY: `ptr` was allocated via `shape.allocate()`.
                 unsafe {
+                    drop(ser);
                     proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
                     proxy.shape.deallocate_mut(proxy_ptr).unwrap();
                 }
@@ -171,13 +172,13 @@ fn handle_other<'mem, 'facet>(
                 return Err(err);
             }
         }
-        drop(ser);
 
         // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
 
         // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
         // SAFETY: `ptr` was allocated via `shape.allocate()`.
         unsafe {
+            drop(ser);
             proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
             proxy.shape.deallocate_mut(proxy_ptr).unwrap();
         }
@@ -195,7 +196,7 @@ fn handle_other<'mem, 'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Used once per `core` type")]
 fn handle_def<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
     item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
@@ -312,7 +313,7 @@ fn handle_def<'mem, 'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Used once per `core` type")]
 fn handle_type<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'_, '_>) -> Result<(), WriterError>,
+    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
     item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
@@ -343,13 +344,24 @@ fn handle_type<'mem, 'facet>(
         Type::User(UserType::Struct(_)) => {
             // Push the fields in reverse order.
             let iter = item.peek().into_struct()?.fields_for_serialize();
+
+            // Determine whether the struct should pass the variable flag to its fields.
+            let variable_base =
+                if item.shape().attributes.iter().any(|attr| {
+                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
+                }) {
+                    item.is_variable()
+                } else {
+                    false
+                };
+
             for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
                 let mut field_ty = ItemType::Other;
-                let mut variable = false;
+                let mut variable = variable_base;
 
                 if let Some(field) = field.field {
                     // Update `variable` using the field's attributes.
-                    variable = field.has_attr(Some("mc"), "variable");
+                    variable |= field.has_attr(Some("mc"), "variable");
 
                     // If the field has a custom serializer, treat it as a value.
                     if field.has_attr(Some("mc"), "with") {
@@ -367,6 +379,16 @@ fn handle_type<'mem, 'facet>(
         Type::User(UserType::Enum(_)) => {
             let enum_ = item.peek().into_enum()?;
 
+            // Determine whether the enum should pass the variable flag to its fields.
+            let variable_base =
+                if item.shape().attributes.iter().any(|attr| {
+                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
+                }) {
+                    item.is_variable()
+                } else {
+                    false
+                };
+
             // Serialize the discriminant of the enum.
             #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
             core(Item::Size(
@@ -377,11 +399,11 @@ fn handle_type<'mem, 'facet>(
             let iter = enum_.fields_for_serialize();
             for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
                 let mut field_ty = ItemType::Other;
-                let mut variable = false;
+                let mut variable = variable_base;
 
                 if let Some(field) = field.field {
                     // Update `variable` using the field's attributes.
-                    variable = field.has_attr(Some("mc"), "variable");
+                    variable |= field.has_attr(Some("mc"), "variable");
 
                     // If the field has a custom serializer, treat it as a value.
                     if field.has_attr(Some("mc"), "with") {
