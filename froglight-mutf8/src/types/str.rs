@@ -1,8 +1,13 @@
 //! TODO
 
+#[cfg(feature = "alloc")]
+use alloc::{borrow::ToOwned, boxed::Box};
 use core::{borrow::Borrow, fmt, str::from_utf8 as from_utf8_core};
 
 use simdutf8::basic::from_utf8 as from_utf8_simd;
+
+#[cfg(feature = "alloc")]
+use crate::types::MString;
 
 /// MUTF-8 string slices.
 ///
@@ -20,6 +25,13 @@ impl fmt::Display for MStr {
 }
 
 impl MStr {
+    /// Returns the length of `self`.
+    ///
+    /// This length is in bytes, not [`char`]s or graphemes.
+    #[inline]
+    #[must_use]
+    pub const fn len(&self) -> usize { self.0.len() }
+
     /// Returns `true` if the string is empty.
     #[inline]
     #[must_use]
@@ -30,14 +42,32 @@ impl MStr {
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8] { &self.0 }
 
-    /// Creates a new [`MStr`] from a slice.
+    /// Creates a new [`MStr`] from a string slice.
+    ///
+    /// This is slightly faster than [`Self::try_from_bytes`] because it can
+    /// skip the UTF-8 validation step.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bytes are not valid MUTF-8.
+    #[expect(clippy::result_unit_err, reason = "WIP")]
+    pub fn try_from_str(str: &str) -> Result<&Self, ()> {
+        if contains_null_or_4_byte_header(str.as_bytes()) {
+            Err(())
+        } else {
+            // SAFETY: The bytes were just checked to be valid MUTF-8.
+            Ok(unsafe { Self::from_bytes_unchecked(str.as_bytes()) })
+        }
+    }
+
+    /// Creates a new [`MStr`] from a byte slice.
     ///
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
     #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn try_from_bytes(bytes: &[u8]) -> Result<&Self, ()> {
-        if contains_null_or_4_byte_header(bytes) && from_utf8_simd(bytes).is_ok() {
+        if !contains_null_or_4_byte_header(bytes) && from_utf8_simd(bytes).is_ok() {
             // SAFETY: The bytes were just checked to be valid MUTF-8.
             Ok(unsafe { Self::from_bytes_unchecked(bytes) })
         } else {
@@ -55,21 +85,12 @@ impl MStr {
     /// Returns `None` if the bytes are not valid MUTF-8.
     #[must_use]
     pub const fn const_try_from_bytes(bytes: &[u8]) -> Option<&Self> {
-        if fallback::const_contains_null_or_4_byte_header(bytes) && from_utf8_core(bytes).is_ok() {
+        if !fallback::const_contains_null_or_4_byte_header(bytes) && from_utf8_core(bytes).is_ok() {
             // SAFETY: The bytes were just checked to be valid MUTF-8.
             Some(unsafe { Self::from_bytes_unchecked(bytes) })
         } else {
             None
         }
-    }
-
-    /// Converts the string slice to an owned [`MString`].
-    #[inline]
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn to_mstring(&self) -> super::MString {
-        // SAFETY: The bytes are guaranteed to be valid MUTF-8.
-        unsafe { super::MString::from_mutf8_unchecked(self.0.to_vec()) }
     }
 
     /// Creates a new [`MStr`] from a slice without checking if the bytes are
@@ -97,6 +118,38 @@ impl MStr {
     }
 }
 
+#[cfg(feature = "alloc")]
+impl MStr {
+    /// Converts the string slice to an owned [`MString`].
+    #[inline]
+    #[must_use]
+    pub fn to_mstring(&self) -> MString {
+        // SAFETY: The bytes are guaranteed to be valid MUTF-8.
+        unsafe { MString::from_mutf8_unchecked(self.0.to_vec()) }
+    }
+
+    /// Converts the given boxed [`MStr`] slice to a [`MString`].
+    /// It is notable that the [`MStr`] slice is owned.
+    #[inline]
+    #[must_use]
+    pub fn into_mstring(self: Box<Self>) -> MString {
+        // SAFETY: `MStr` is `repr(transparent)` over `[u8]`.
+        let bytes: Box<[u8]> = unsafe { core::mem::transmute(self) };
+        // SAFETY: The bytes are guaranteed to be valid MUTF-8.
+        unsafe { MString::from_mutf8_unchecked(bytes.into_vec()) }
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl ToOwned for MStr {
+    type Owned = MString;
+
+    #[inline]
+    fn to_owned(&self) -> Self::Owned { self.to_mstring() }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 impl AsRef<[u8]> for MStr {
     #[inline]
     fn as_ref(&self) -> &[u8] { self.as_bytes() }
@@ -106,27 +159,58 @@ impl Borrow<[u8]> for MStr {
     fn borrow(&self) -> &[u8] { self.as_bytes() }
 }
 
+impl<'a> TryFrom<&'a str> for &'a MStr {
+    type Error = ();
+
+    #[inline]
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> { MStr::try_from_str(value) }
+}
 impl<'a> TryFrom<&'a [u8]> for &'a MStr {
     type Error = ();
 
     #[inline]
     fn try_from(value: &'a [u8]) -> Result<Self, Self::Error> { MStr::try_from_bytes(value) }
 }
-impl<'a> TryFrom<&'a str> for &'a MStr {
-    type Error = ();
 
-    #[inline]
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
-        MStr::try_from_bytes(value.as_bytes())
-    }
-}
+#[cfg(feature = "facet")]
+unsafe impl facet::Facet<'_> for MStr {
+    const SHAPE: &'static facet::Shape = &const {
+        #[allow(clippy::wildcard_imports, reason = "For this span")]
+        use facet::*;
 
-#[cfg(feature = "alloc")]
-impl alloc::borrow::ToOwned for MStr {
-    type Owned = super::MString;
+        const VTABLE: VTableIndirect = vtable_indirect!(MStr =>
+            Debug,
+            Display,
+            PartialEq,
+            PartialOrd,
+            Ord,
+            Hash,
+        );
 
-    #[inline]
-    fn to_owned(&self) -> Self::Owned { self.to_mstring() }
+        static MSTR_TYPE_OPS: TypeOpsIndirect = TypeOpsIndirect {
+            clone_into: None,
+            default_in_place: None,
+            drop_in_place: mstr_drop,
+            is_truthy: Some(mstr_truthy),
+        };
+
+        const unsafe fn mstr_drop(_: OxPtrMut) {}
+
+        #[inline(always)]
+        unsafe fn mstr_truthy(value: PtrConst) -> bool {
+            !unsafe { value.get::<MStr>() }.is_empty()
+        }
+
+        ShapeBuilder::for_unsized::<MStr>("MStr")
+            .ty(Type::User(UserType::Opaque))
+            .def(Def::Undefined)
+            .vtable_indirect(&VTABLE)
+            .type_ops_indirect(&MSTR_TYPE_OPS)
+            .eq()
+            .send()
+            .sync()
+            .build()
+    };
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -182,47 +266,4 @@ pub mod fallback {
         }
         false
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-#[cfg(feature = "facet")]
-unsafe impl facet::Facet<'_> for MStr {
-    const SHAPE: &'static facet::Shape = &const {
-        #[allow(clippy::wildcard_imports, reason = "For this span")]
-        use facet::*;
-
-        const VTABLE: VTableIndirect = vtable_indirect!(MStr =>
-            Debug,
-            Display,
-            PartialEq,
-            PartialOrd,
-            Ord,
-            Hash,
-        );
-
-        static MSTR_TYPE_OPS: TypeOpsIndirect = TypeOpsIndirect {
-            clone_into: None,
-            default_in_place: None,
-            drop_in_place: mstr_drop,
-            is_truthy: Some(mstr_truthy),
-        };
-
-        const unsafe fn mstr_drop(_: OxPtrMut) {}
-
-        #[inline(always)]
-        unsafe fn mstr_truthy(value: PtrConst) -> bool {
-            !unsafe { value.get::<MStr>() }.is_empty()
-        }
-
-        ShapeBuilder::for_unsized::<MStr>("MStr")
-            .ty(Type::User(UserType::Opaque))
-            .def(Def::Undefined)
-            .vtable_indirect(&VTABLE)
-            .type_ops_indirect(&MSTR_TYPE_OPS)
-            .eq()
-            .send()
-            .sync()
-            .build()
-    };
 }

@@ -1,10 +1,10 @@
 //! TODO
 
-use alloc::vec::Vec;
+use alloc::{borrow::Cow, boxed::Box, vec::Vec};
 use core::{
     borrow::{Borrow, BorrowMut},
     fmt,
-    ops::{Deref, DerefMut},
+    ops::{Add, AddAssign, Deref, DerefMut},
 };
 
 use crate::prelude::MStr;
@@ -32,10 +32,65 @@ impl fmt::Display for MString {
 }
 
 impl MString {
-    /// Creates a new, empty [`MString`].
+    /// Creates a new empty [`MString`].
     #[inline]
     #[must_use]
     pub const fn new() -> Self { Self(Vec::new()) }
+
+    /// Creates a new empty [`MString`] with at least the specified capacity.
+    #[inline]
+    #[must_use]
+    pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
+
+    /// Returns this [`MString`]'s capacity, in bytes.
+    #[inline]
+    #[must_use]
+    pub const fn capacity(&self) -> usize { self.0.capacity() }
+
+    /// Returns the length of this [`MString`], in bytes, not chars or
+    /// graphemes.
+    #[inline]
+    #[must_use]
+    pub const fn len(&self) -> usize { self.0.len() }
+
+    /// Returns true if this [`MString`] has a length of zero, and false
+    /// otherwise.
+    #[inline]
+    #[must_use]
+    pub const fn is_empty(&self) -> bool { self.0.is_empty() }
+
+    /// Reserves capacity for at least `additional` bytes more than the
+    /// current length. The allocator may reserve more space to speculatively
+    /// avoid frequent allocations. After calling `reserve`,
+    /// capacity will be greater than or equal to `self.len() + additional`.
+    /// Does nothing if capacity is already sufficient.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the new capacity exceeds `isize::MAX` _bytes_.
+    #[inline]
+    pub fn reserve(&mut self, additional: usize) { self.0.reserve(additional); }
+
+    /// Reserves the minimum capacity for at least `additional` bytes more than
+    /// the current length. Unlike [`reserve`](Self::reserve), this will not
+    /// deliberately over-allocate to speculatively avoid frequent allocations.
+    /// After calling `reserve_exact`, capacity will be greater than or equal to
+    /// `self.len() + additional`. Does nothing if the capacity is already
+    /// sufficient.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the new capacity exceeds `isize::MAX` _bytes_.
+    #[inline]
+    pub fn reserve_exact(&mut self, additional: usize) { self.0.reserve_exact(additional); }
+
+    /// Appends a given string slice onto the end of this [`MString`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the new capacity exceeds `isize::MAX` _bytes_.
+    #[inline]
+    pub fn push_mstr(&mut self, string: &MStr) { self.0.extend_from_slice(string.as_bytes()); }
 
     /// Extract a [`MStr`] slice containing the entire string.
     #[inline]
@@ -62,6 +117,16 @@ impl MString {
     #[inline]
     #[must_use]
     pub const unsafe fn from_mutf8_unchecked(bytes: Vec<u8>) -> Self { Self(bytes) }
+
+    /// Converts a [`MString`] into a byte vector.
+    ///
+    /// This consumes the [`MString`], so we do not need to copy its contents.
+    #[inline]
+    #[must_use]
+    pub const fn into_bytes(self) -> Vec<u8> {
+        // SAFETY: `MString` is `repr(transparent)` over `Vec<u8>`.
+        unsafe { core::mem::transmute(self) }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -112,7 +177,75 @@ impl PartialEq<MString> for MStr {
     fn eq(&self, other: &MString) -> bool { self == other.as_mstr() }
 }
 
+// -------------------------------------------------------------------------------------------------
+
+impl Add<&MStr> for MString {
+    type Output = Self;
+
+    #[inline]
+    fn add(mut self, rhs: &MStr) -> Self::Output {
+        self.push_mstr(rhs);
+        self
+    }
+}
+impl AddAssign<&MStr> for MString {
+    #[inline]
+    fn add_assign(&mut self, rhs: &MStr) { self.push_mstr(rhs); }
+}
+
+impl<'a> Extend<&'a MStr> for MString {
+    #[inline]
+    fn extend<T: IntoIterator<Item = &'a MStr>>(&mut self, iter: T) {
+        iter.into_iter().for_each(move |mstr| self.push_mstr(mstr));
+    }
+}
+impl<'a> Extend<&'a mut MStr> for MString {
+    #[inline]
+    fn extend<T: IntoIterator<Item = &'a mut MStr>>(&mut self, iter: T) {
+        iter.into_iter().for_each(move |mstr| self.push_mstr(mstr));
+    }
+}
+impl Extend<Box<MStr>> for MString {
+    #[inline]
+    fn extend<T: IntoIterator<Item = Box<MStr>>>(&mut self, iter: T) {
+        iter.into_iter().for_each(move |mstr| self.push_mstr(&mstr));
+    }
+}
+impl<'a> Extend<Cow<'a, MStr>> for MString {
+    #[inline]
+    fn extend<T: IntoIterator<Item = Cow<'a, MStr>>>(&mut self, iter: T) {
+        iter.into_iter().for_each(move |mstr| self.push_mstr(&mstr));
+    }
+}
+
 impl From<&MStr> for MString {
     #[inline]
     fn from(value: &MStr) -> Self { value.to_mstring() }
+}
+impl From<&mut MStr> for MString {
+    #[inline]
+    fn from(value: &mut MStr) -> Self { value.to_mstring() }
+}
+
+impl From<&MString> for MString {
+    #[inline]
+    fn from(value: &MString) -> Self { value.clone() }
+}
+impl From<&mut MString> for MString {
+    #[inline]
+    fn from(value: &mut MString) -> Self { value.clone() }
+}
+
+impl From<Box<MStr>> for MString {
+    #[inline]
+    fn from(value: Box<MStr>) -> Self { value.into_mstring() }
+}
+impl<'a> From<Cow<'a, MStr>> for MString {
+    #[inline]
+    fn from(value: Cow<'a, MStr>) -> Self {
+        match value {
+            Cow::Borrowed(mstr) => mstr.to_mstring(),
+            Cow::Owned(mstr) => mstr,
+        }
+    }
 }
