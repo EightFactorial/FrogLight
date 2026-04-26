@@ -127,6 +127,17 @@ impl MString {
         // SAFETY: `MString` is `repr(transparent)` over `Vec<u8>`.
         unsafe { core::mem::transmute(self) }
     }
+
+    /// Converts a [`MString`] into a [`Box<MStr>`].
+    ///
+    /// Before doing the conversion, this method discards excess capacity.
+    #[inline]
+    #[must_use]
+    pub fn into_boxed_mstr(self) -> Box<MStr> {
+        let bytes = self.0.into_boxed_slice();
+        // SAFETY: `MStr` is `repr(transparent)` over `[u8]`.
+        unsafe { core::mem::transmute(bytes) }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
