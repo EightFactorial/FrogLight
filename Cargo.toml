@@ -15,11 +15,14 @@ froglight-internal = { default-features = false, path = "froglight-internal", ve
 froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
 froglight-math = { default-features = false, path = "froglight-math", version = "0.0.1" }
+froglight-mutf8 = { default-features = false, path = "froglight-mutf8", version = "0.0.1" }
+froglight-nbt = { default-features = false, path = "froglight-nbt", version = "0.0.1" }
 froglight-network = { default-features = false, path = "froglight-network", version = "0.0.1" }
 froglight-packet = { default-features = false, path = "froglight-packet" }
 froglight-physics = { default-features = false, path = "froglight-physics", version = "0.0.1" }
 froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
+froglight-snbt = { default-features = false, path = "froglight-snbt", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
@@ -87,6 +90,7 @@ replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, version = "1.0" }
+simdutf8 = { default-features = false, version = "0.1" }
 smallvec = { default-features = false, version = "1.15" }
 socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "1.0" }
@@ -133,11 +137,14 @@ members = [
   "froglight-inventory",
   "froglight-item",
   "froglight-math",
+  "froglight-mutf8",
+  "froglight-nbt",
   "froglight-network",
   "froglight-packet",
   "froglight-physics",
   "froglight-player",
   "froglight-registry",
+  "froglight-snbt",
   "froglight-world",
 ]
 resolver = "2"

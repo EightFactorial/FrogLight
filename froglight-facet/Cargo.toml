@@ -23,7 +23,7 @@ criterion = { features = ["default", "html_reports"], workspace = true }
 rand = { workspace = true }
 
 [dependencies]
-facet = { features = ["alloc", "reflect", "uuid"], workspace = true }
+facet = { features = ["alloc", "reflect", "smallvec", "uuid"], workspace = true }
 facet-path = { features = ["alloc"], workspace = true }
 replace_with = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
@@ -52,7 +52,7 @@ required-features = ["simd", "std"]
 # --- Features ---
 
 [features]
-default = ["report", "std"]
+default = ["std"]
 
 # Enable support for JIT using Cranelift.
 jit = ["dep:cranelift", "std"]
