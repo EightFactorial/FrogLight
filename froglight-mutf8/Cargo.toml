@@ -19,8 +19,11 @@ workspace = true
 # --- Dependencies ---
 
 [dev-dependencies]
+cesu8 = { version = "1.1" }
 criterion = { features = ["default", "html_reports"], workspace = true }
+pretty_assertions = { workspace = true }
 rand = { workspace = true }
+simd_cesu8 = { features = ["default", "nightly"], version = "1.1" }
 
 [dependencies]
 simdutf8 = { workspace = true }
