@@ -21,7 +21,7 @@ macro_rules! as_simd {
 /// headers.
 #[must_use]
 pub fn contains_null_or_4_byte_header(mut bytes: &[u8]) -> bool {
-    as_simd!(bytes => 32, 16, 8: {
+    as_simd!(bytes => 32, 16, 8, 4: {
         |simd: Simd<u8, _>| {
             let zero   = Simd::<u8, _>::splat(0b0000_0000);
             let mask   = Simd::<u8, _>::splat(0b1111_1000);
@@ -37,7 +37,7 @@ pub fn contains_null_or_4_byte_header(mut bytes: &[u8]) -> bool {
 /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
 #[must_use]
 pub fn contains_4_byte_header(mut bytes: &[u8]) -> bool {
-    as_simd!(bytes => 32, 16, 8: {
+    as_simd!(bytes => 32, 16, 8, 4: {
         |simd: Simd<u8, _>| {
             let mask   = Simd::<u8, _>::splat(0b1111_1000);
             let header = Simd::<u8, _>::splat(0b1111_0000);

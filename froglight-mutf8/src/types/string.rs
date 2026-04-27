@@ -381,7 +381,8 @@ impl FromStr for MString {
 
 /// Convert a UTF-8 string to MUTF-8.
 #[must_use]
-fn utf8_to_mutf8(str: &str) -> MString {
+#[doc(hidden)]
+pub fn utf8_to_mutf8(str: &str) -> MString {
     macro_rules! debug_panic {
         () => {{
             #[cfg(debug_assertions)]
@@ -395,46 +396,67 @@ fn utf8_to_mutf8(str: &str) -> MString {
         }};
     }
 
-    let cap = str.len().checked_mul(2).unwrap_or(isize::MAX as usize);
-    let mut encoded = Vec::<u8>::with_capacity(cap);
+    let cap = str.len().saturating_mul(2).min(isize::MAX as usize);
+    let mut output = Vec::<u8>::with_capacity(cap);
 
     let mut iter = str.as_bytes().iter();
     while let Some(a) = iter.next() {
         match a {
             // U+0000 is encoded as [0xC0, 0x80] in MUTF-8.
             0x00 => {
-                encoded.push(0xC0);
-                encoded.push(0x80);
+                output.push(0xC0);
+                output.push(0x80);
             }
             // U+0001 to U+007F are 1-byte UTF-8 sequences.
             0x01..=0x7F => {
-                encoded.push(*a);
+                output.push(*a);
             }
             // U+0080 to U+07FF are 2-byte UTF-8 sequences.
             0x80..=0xDF => {
                 let Some(b) = iter.next() else { debug_panic!() };
-                encoded.push(*a);
-                encoded.push(*b);
+                output.push(*a);
+                output.push(*b);
             }
             // U+0800 to U+FFFF are 3-byte UTF-8 sequences.
             0xE0..=0xEF => {
                 let Some(b) = iter.next() else { debug_panic!() };
                 let Some(c) = iter.next() else { debug_panic!() };
-                encoded.push(*a);
-                encoded.push(*b);
-                encoded.push(*c);
+                output.push(*a);
+                output.push(*b);
+                output.push(*c);
             }
             // U+10000 to U+10FFFF are 4-byte UTF-8 sequences. (UTF-8 max is U+10FFFF)
             _ => {
-                let Some(_b) = iter.next() else { debug_panic!() };
-                let Some(_c) = iter.next() else { debug_panic!() };
-                let Some(_d) = iter.next() else { debug_panic!() };
-
-                todo!("Handle 4-byte UTF-8 sequences");
+                let Some(b) = iter.next() else { debug_panic!() };
+                let Some(c) = iter.next() else { debug_panic!() };
+                let Some(d) = iter.next() else { debug_panic!() };
+                output.extend_from_slice(&encode_4_byte_utf8([*a, *b, *c, *d]));
             }
         }
     }
 
     // SAFETY: The output is valid MUTF-8
-    unsafe { MString::from_mutf8_unchecked(encoded) }
+    unsafe { MString::from_mutf8_unchecked(output) }
+}
+
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Performance")]
+fn encode_4_byte_utf8([a, b, c, d]: [u8; 4]) -> [u8; 6] {
+    let codepoint = (u32::from(a & 0x07) << 18)
+        | (u32::from(b & 0x3F) << 12)
+        | (u32::from(c & 0x3F) << 6)
+        | u32::from(d & 0x3F);
+
+    let codepoint = codepoint - 0x0001_0000;
+    let high = (codepoint >> 10) | 0xD800;
+    let low = (codepoint & 0x03FF) | 0xDC00;
+
+    [
+        0xE0 | ((high & 0xF000) >> 12) as u8,
+        0x80 | ((high & 0x0FC0) >> 6) as u8,
+        0x80 | ((high & 0x003F) as u8),
+        0xE0 | ((low & 0xF000) >> 12) as u8,
+        0x80 | ((low & 0x0FC0) >> 6) as u8,
+        0x80 | ((low & 0x003F) as u8),
+    ]
 }
