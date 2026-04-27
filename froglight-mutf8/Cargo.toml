@@ -37,6 +37,17 @@ simdutf8 = { features = ["aarch64_neon"], workspace = true }
 
 # --- Tests/Benchmarks ---
 
+[[test]]
+name = "static_mutf8"
+
+[[test]]
+name = "verify_cesu8"
+required-features = ["std"]
+
+[[test]]
+name = "verify_simd_cesu8"
+required-features = ["std", "simd", "nightly"]
+
 # --- Features ---
 
 [features]

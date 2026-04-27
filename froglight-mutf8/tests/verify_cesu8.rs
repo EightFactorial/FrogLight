@@ -1,6 +1,7 @@
 //! TODO
 
 use froglight_mutf8::prelude::MString;
+use pretty_assertions::StrComparison;
 use rand::{distr::Uniform, prelude::*, rngs::Xoshiro128PlusPlus};
 
 #[test]
@@ -9,11 +10,12 @@ fn cesu8_ascii() {
         let mstr = MString::from_utf8(&string);
         let cesu8 = cesu8::to_java_cesu8(&string);
 
-        pretty_assertions::assert_str_eq!(
-            format!("{:?}", mstr.as_bytes()),
-            format!("{:?}", cesu8.as_ref()),
-            "Froglight and CESU-8 outputs differ for string: {string:?}"
-        );
+        if mstr.as_bytes() != cesu8.as_ref() {
+            let mstr = format!("{:?}", mstr.as_bytes());
+            let cesu8 = format!("{:?}", cesu8.as_ref());
+
+            panic!("{}", StrComparison::new(&mstr, &cesu8));
+        }
     }
 }
 
@@ -23,18 +25,19 @@ fn cesu8_utf8() {
         let mstr = MString::from_utf8(&string);
         let cesu8 = cesu8::to_java_cesu8(&string);
 
-        pretty_assertions::assert_str_eq!(
-            format!("{:?}", mstr.as_bytes()),
-            format!("{:?}", cesu8.as_ref()),
-            "Froglight and CESU-8 outputs differ for string: {string:?}"
-        );
+        if mstr.as_bytes() != cesu8.as_ref() {
+            let mstr = format!("{:?}", mstr.as_bytes());
+            let cesu8 = format!("{:?}", cesu8.as_ref());
+
+            panic!("{}", StrComparison::new(&mstr, &cesu8));
+        }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// How many random strings to generate for tests.
-const GENERATE_SIZE: usize = 128_000;
+const GENERATE_SIZE: usize = 512_000;
 
 /// Generate a set of random strings using a fixed seed.
 fn generate<const ASCII: bool>() -> Vec<String> {
