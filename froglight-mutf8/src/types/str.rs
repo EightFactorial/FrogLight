@@ -42,21 +42,30 @@ impl MStr {
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8] { &self.0 }
 
+    /// Converts a string slice to a mutable byte slice.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the bytes are valid MUTF-8 after mutation.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn as_bytes_mut(&mut self) -> &mut [u8] { &mut self.0 }
+
     /// Creates a new [`MStr`] from a string slice.
     ///
-    /// This is slightly faster than [`Self::try_from_bytes`] because it can
+    /// This is slightly faster than [`Self::from_mutf8`] because it can
     /// skip the UTF-8 validation step.
     ///
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
     #[expect(clippy::result_unit_err, reason = "WIP")]
-    pub fn try_from_str(str: &str) -> Result<&Self, ()> {
+    pub fn from_utf8(str: &str) -> Result<&Self, ()> {
         if contains_null_or_4_byte_header(str.as_bytes()) {
             Err(())
         } else {
             // SAFETY: The bytes were just checked to be valid MUTF-8.
-            Ok(unsafe { Self::from_bytes_unchecked(str.as_bytes()) })
+            Ok(unsafe { Self::from_mutf8_unchecked(str.as_bytes()) })
         }
     }
 
@@ -66,31 +75,39 @@ impl MStr {
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
     #[expect(clippy::result_unit_err, reason = "WIP")]
-    pub fn try_from_bytes(bytes: &[u8]) -> Result<&Self, ()> {
-        if !contains_null_or_4_byte_header(bytes) && from_utf8_simd(bytes).is_ok() {
-            // SAFETY: The bytes were just checked to be valid MUTF-8.
-            Ok(unsafe { Self::from_bytes_unchecked(bytes) })
-        } else {
-            Err(())
-        }
+    pub fn from_mutf8(bytes: &[u8]) -> Result<&Self, ()> {
+        from_utf8_simd(bytes).map_or_else(|_err| Err(()), Self::from_utf8)
     }
 
-    /// Creates a new [`MStr`] from a slice.
+    /// Creates a new [`MStr`] from a string slice.
     ///
-    /// This is a `const` version of [`Self::try_from_bytes`],
+    /// This is a `const` version of [`Self::from_utf8`],
     /// and may be slower due to the lack of optimizations.
     ///
     /// # Errors
     ///
     /// Returns `None` if the bytes are not valid MUTF-8.
     #[must_use]
-    pub const fn const_try_from_bytes(bytes: &[u8]) -> Option<&Self> {
-        if !fallback::const_contains_null_or_4_byte_header(bytes) && from_utf8_core(bytes).is_ok() {
-            // SAFETY: The bytes were just checked to be valid MUTF-8.
-            Some(unsafe { Self::from_bytes_unchecked(bytes) })
-        } else {
+    pub const fn const_from_utf8(str: &str) -> Option<&Self> {
+        if fallback::const_contains_null_or_4_byte_header(str.as_bytes()) {
             None
+        } else {
+            // SAFETY: The bytes were just checked to be valid MUTF-8.
+            Some(unsafe { Self::from_mutf8_unchecked(str.as_bytes()) })
         }
+    }
+
+    /// Creates a new [`MStr`] from a byte slice.
+    ///
+    /// This is a `const` version of [`Self::from_mutf8`],
+    /// and may be slower due to the lack of optimizations.
+    ///
+    /// # Errors
+    ///
+    /// Returns `None` if the bytes are not valid MUTF-8.
+    #[must_use]
+    pub const fn const_from_mutf8(bytes: &[u8]) -> Option<&Self> {
+        if let Ok(str) = from_utf8_core(bytes) { Self::const_from_utf8(str) } else { None }
     }
 
     /// Creates a new [`MStr`] from a slice without checking if the bytes are
@@ -101,7 +118,7 @@ impl MStr {
     /// The caller must ensure the slice is valid MUTF-8.
     #[inline]
     #[must_use]
-    pub const unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &Self {
+    pub const unsafe fn from_mutf8_unchecked(bytes: &[u8]) -> &Self {
         unsafe { &*(core::ptr::from_ref::<[u8]>(bytes) as *const Self) }
     }
 
@@ -113,7 +130,7 @@ impl MStr {
     /// The caller must ensure the slice is valid MUTF-8.
     #[inline]
     #[must_use]
-    pub const unsafe fn from_bytes_mut_unchecked(bytes: &mut [u8]) -> &mut Self {
+    pub const unsafe fn from_mutf8_mut_unchecked(bytes: &mut [u8]) -> &mut Self {
         unsafe { &mut *(core::ptr::from_mut::<[u8]>(bytes) as *mut Self) }
     }
 }
@@ -163,13 +180,13 @@ impl<'a> TryFrom<&'a str> for &'a MStr {
     type Error = ();
 
     #[inline]
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> { MStr::try_from_str(value) }
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> { MStr::from_utf8(value) }
 }
 impl<'a> TryFrom<&'a [u8]> for &'a MStr {
     type Error = ();
 
     #[inline]
-    fn try_from(value: &'a [u8]) -> Result<Self, Self::Error> { MStr::try_from_bytes(value) }
+    fn try_from(value: &'a [u8]) -> Result<Self, Self::Error> { MStr::from_mutf8(value) }
 }
 
 #[cfg(feature = "facet")]

@@ -1,10 +1,11 @@
 //! TODO
 
-use alloc::{borrow::Cow, boxed::Box, vec::Vec};
+use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
 use core::{
     borrow::{Borrow, BorrowMut},
     fmt,
     ops::{Add, AddAssign, Deref, DerefMut},
+    str::FromStr,
 };
 
 use crate::prelude::MStr;
@@ -59,6 +60,102 @@ impl MString {
     #[must_use]
     pub const fn is_empty(&self) -> bool { self.0.is_empty() }
 
+    /// Converts a vector of bytes to a [`MString`].
+    ///
+    /// This method will take care to not copy the vector, for efficiency's
+    /// sake.
+    ///
+    /// If you need a [`&MStr`](MStr) instead of a [`MString`], consider
+    /// [`MStr::from_mutf8`].
+    ///
+    /// The inverse of this method is [`into_bytes`].
+    ///
+    /// # Errors
+    ///
+    /// TODO
+    #[expect(clippy::result_unit_err, reason = "WIP")]
+    pub fn from_mutf8(vec: Vec<u8>) -> Result<Self, ()> {
+        match MStr::from_mutf8(&vec) {
+            Ok(..) => Ok(Self(vec)),
+            Err(err) => Err(err),
+        }
+    }
+
+    /// Converts a [`String`] to a [`MString`].
+    ///
+    /// This method will take care to not copy the vector, for efficiency's
+    /// sake.
+    ///
+    /// If you need a [`&MStr`](MStr) instead of a [`MString`], consider
+    /// [`MStr::from_utf8`].
+    ///
+    /// # Errors
+    ///
+    /// TODO
+    #[expect(clippy::result_unit_err, reason = "WIP")]
+    pub fn from_utf8(str: String) -> Result<Self, ()> {
+        match MStr::from_utf8(&str) {
+            Ok(..) => Ok(Self(str.into_bytes())),
+            Err(err) => Err(err),
+        }
+    }
+
+    /// Converts a slice of bytes to a string, including invalid characters.
+    ///
+    /// During this conversion, `from_mutf8_lossy()` will replace any invalid
+    /// UTF-8 sequences with [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD], which
+    /// looks like this: �
+    #[must_use]
+    pub fn from_mutf8_lossy(_v: &[u8]) -> Cow<'_, MStr> { todo!() }
+
+    /// Converts a UTF-8 string slice to a MUTF-8 string, including invalid
+    /// characters.
+    ///
+    /// During this conversion, `from_mutf8_lossy()` will replace any invalid
+    /// UTF-8 sequences with [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD], which
+    /// looks like this: �
+    #[must_use]
+    pub fn from_utf8_lossy(_s: &str) -> Cow<'_, MStr> { todo!() }
+
+    /// Converts a [`Vec<u8>`] to a [`MString`], substituting invalid MUTF-8
+    /// sequences with replacement characters.
+    ///
+    /// See [`from_mutf8_lossy`](Self::from_mutf8_lossy) for more details.
+    ///
+    /// Note that this function does not guarantee reuse of the original [`Vec`]
+    /// allocation.
+    #[must_use]
+    pub fn from_mutf8_lossy_owned(v: Vec<u8>) -> Self {
+        match Self::from_mutf8_lossy(&v) {
+            // SAFETY: `Borrowed` means the input was valid MUTF-8.
+            Cow::Borrowed(_) => unsafe { Self::from_mutf8_unchecked(v) },
+            Cow::Owned(mstr) => mstr,
+        }
+    }
+
+    /// Converts a [`String`] to a [`MString`], substituting invalid MUTF-8
+    /// sequences with replacement characters.
+    ///
+    /// See [`from_utf8_lossy`](Self::from_utf8_lossy) for more details.
+    ///
+    /// Note that this function does not guarantee reuse of the original
+    /// [`String`] allocation.
+    #[must_use]
+    pub fn from_utf8_lossy_owned(s: String) -> Self {
+        match Self::from_utf8_lossy(&s) {
+            // SAFETY: `Borrowed` means the input was valid MUTF-8.
+            Cow::Borrowed(_) => unsafe { Self::from_mutf8_unchecked(s.into_bytes()) },
+            Cow::Owned(mstr) => mstr,
+        }
+    }
+
+    /// Truncates this [`MString`], removing all contents.
+    ///
+    /// While this means the [`MString`] will have a length of zero, it does not
+    /// touch its capacity.
+    #[inline]
+    pub fn clear(&mut self) { self.0.clear(); }
+
     /// Reserves capacity for at least `additional` bytes more than the
     /// current length. The allocator may reserve more space to speculatively
     /// avoid frequent allocations. After calling `reserve`,
@@ -97,7 +194,7 @@ impl MString {
     #[must_use]
     pub const fn as_mstr(&self) -> &MStr {
         // SAFETY: The bytes are guaranteed to be valid MUTF-8.
-        unsafe { MStr::from_bytes_unchecked(self.0.as_slice()) }
+        unsafe { MStr::from_mutf8_unchecked(self.0.as_slice()) }
     }
 
     /// Converts a [`MString`] into a mutable string slice.
@@ -105,18 +202,13 @@ impl MString {
     #[must_use]
     pub const fn as_mstr_mut(&mut self) -> &mut MStr {
         // SAFETY: The bytes are guaranteed to be valid MUTF-8.
-        unsafe { MStr::from_bytes_mut_unchecked(self.0.as_mut_slice()) }
+        unsafe { MStr::from_mutf8_mut_unchecked(self.0.as_mut_slice()) }
     }
 
-    /// Converts a vector of bytes to a [`MString`] without checking that the
-    /// bytes contain valid MUTF-8.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the bytes are valid MUTF-8.
+    /// Extract a byte slice containing the entire string.
     #[inline]
     #[must_use]
-    pub const unsafe fn from_mutf8_unchecked(bytes: Vec<u8>) -> Self { Self(bytes) }
+    pub const fn as_bytes(&self) -> &[u8] { self.0.as_slice() }
 
     /// Converts a [`MString`] into a byte vector.
     ///
@@ -138,6 +230,16 @@ impl MString {
         // SAFETY: `MStr` is `repr(transparent)` over `[u8]`.
         unsafe { core::mem::transmute(bytes) }
     }
+
+    /// Converts a vector of bytes to a [`MString`] without checking that the
+    /// bytes contain valid MUTF-8.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the bytes are valid MUTF-8.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn from_mutf8_unchecked(bytes: Vec<u8>) -> Self { Self(bytes) }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -257,6 +359,19 @@ impl<'a> From<Cow<'a, MStr>> for MString {
         match value {
             Cow::Borrowed(mstr) => mstr.to_mstring(),
             Cow::Owned(mstr) => mstr,
+        }
+    }
+}
+
+impl FromStr for MString {
+    type Err = ();
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match MStr::from_utf8(s) {
+            // SAFETY: `Ok` means the input was valid MUTF-8.
+            Ok(..) => Ok(unsafe { Self::from_mutf8_unchecked(s.as_bytes().into()) }),
+            Err(err) => Err(err),
         }
     }
 }
