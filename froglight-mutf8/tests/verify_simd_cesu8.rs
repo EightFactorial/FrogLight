@@ -1,15 +1,16 @@
 //! TODO
 
+use froglight_mutf8::prelude::MString;
 use rand::{distr::Uniform, prelude::*, rngs::Xoshiro128PlusPlus};
 
 #[test]
-fn ascii() {
+fn simd_cesu8_ascii() {
     for string in generate::<true>() {
-        let froglight = froglight_mutf8::prelude::MString::from_utf8(&string);
-        let cesu8 = cesu8::to_cesu8(&string);
+        let mstr = MString::from_utf8(&string);
+        let cesu8 = simd_cesu8::mutf8::encode(&string);
 
-        pretty_assertions::assert_eq!(
-            format!("{:?}", froglight.as_bytes()),
+        pretty_assertions::assert_str_eq!(
+            format!("{:?}", mstr.as_bytes()),
             format!("{:?}", cesu8.as_ref()),
             "Froglight and SIMD-CESU-8 outputs differ for string: {string:?}"
         );
@@ -17,13 +18,13 @@ fn ascii() {
 }
 
 #[test]
-fn utf8() {
+fn simd_cesu8_utf8() {
     for string in generate::<false>() {
-        let froglight = froglight_mutf8::prelude::MString::from_utf8(&string);
-        let cesu8 = cesu8::to_cesu8(&string);
+        let mstr = MString::from_utf8(&string);
+        let cesu8 = simd_cesu8::mutf8::encode(&string);
 
-        pretty_assertions::assert_eq!(
-            format!("{:?}", froglight.as_bytes()),
+        pretty_assertions::assert_str_eq!(
+            format!("{:?}", mstr.as_bytes()),
             format!("{:?}", cesu8.as_ref()),
             "Froglight and SIMD-CESU-8 outputs differ for string: {string:?}"
         );
@@ -32,10 +33,10 @@ fn utf8() {
 
 // -------------------------------------------------------------------------------------------------
 
-/// How many random numbers to generate for the benchmarks.
+/// How many random strings to generate for tests.
 const GENERATE_SIZE: usize = 128_000;
 
-/// Generate a set of random numbers using a fixed seed.
+/// Generate a set of random strings using a fixed seed.
 fn generate<const ASCII: bool>() -> Vec<String> {
     let mut rand = Xoshiro128PlusPlus::seed_from_u64(0x0655_E4BA_22F5_A61D);
     let ascii = Uniform::<char>::new_inclusive(0x01 as char, 0x7F as char).unwrap();

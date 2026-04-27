@@ -408,17 +408,17 @@ pub fn utf8_to_mutf8(str: &str) -> MString {
                 output.push(0x80);
             }
             // U+0001 to U+007F are 1-byte UTF-8 sequences.
-            0x01..=0x7F => {
+            ..=0x7F => {
                 output.push(*a);
             }
             // U+0080 to U+07FF are 2-byte UTF-8 sequences.
-            0x80..=0xDF => {
+            ..=0xDF => {
                 let Some(b) = iter.next() else { debug_panic!() };
                 output.push(*a);
                 output.push(*b);
             }
             // U+0800 to U+FFFF are 3-byte UTF-8 sequences.
-            0xE0..=0xEF => {
+            ..=0xEF => {
                 let Some(b) = iter.next() else { debug_panic!() };
                 let Some(c) = iter.next() else { debug_panic!() };
                 output.push(*a);

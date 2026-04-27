@@ -16,7 +16,7 @@ pub mod types;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::types::MStr;
     #[cfg(feature = "alloc")]
     pub use crate::types::MString;
+    pub use crate::{mutf8, types::MStr};
 }
