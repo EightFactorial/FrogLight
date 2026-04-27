@@ -81,41 +81,29 @@ impl MString {
         }
     }
 
-    /// Converts a [`String`] to a [`MString`].
-    ///
-    /// This method will take care to not copy the vector, for efficiency's
-    /// sake.
-    ///
-    /// If you need a [`&MStr`](MStr) instead of a [`MString`], consider
-    /// [`MStr::from_utf8`].
-    ///
-    /// # Errors
-    ///
-    /// TODO
-    #[expect(clippy::result_unit_err, reason = "WIP")]
-    pub fn from_utf8(str: String) -> Result<Self, ()> {
-        match MStr::from_utf8(&str) {
-            Ok(..) => Ok(Self(str.into_bytes())),
-            Err(err) => Err(err),
-        }
-    }
-
     /// Converts a slice of bytes to a string, including invalid characters.
     ///
     /// During this conversion, `from_mutf8_lossy()` will replace any invalid
     /// UTF-8 sequences with [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD], which
     /// looks like this: �
     #[must_use]
-    pub fn from_mutf8_lossy(_v: &[u8]) -> Cow<'_, MStr> { todo!() }
+    pub fn from_mutf8_lossy(v: &[u8]) -> Cow<'_, MStr> {
+        match simdutf8::compat::from_utf8(v) {
+            Ok(s) => Self::from_utf8(s),
+            Err(err) => {
+                // SAFETY: The index returned is within bounds.
+                let (valid, invalid) = unsafe { v.split_at_unchecked(err.valid_up_to()) };
+                let mut string = String::from_utf8_lossy(invalid).into_owned();
 
-    /// Converts a UTF-8 string slice to a MUTF-8 string, including invalid
-    /// characters.
-    ///
-    /// During this conversion, `from_mutf8_lossy()` will replace any invalid
-    /// UTF-8 sequences with [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD], which
-    /// looks like this: �
-    #[must_use]
-    pub fn from_utf8_lossy(_s: &str) -> Cow<'_, MStr> { todo!() }
+                // SAFETY: `valid` is guaranteed to be valid UTF-8.
+                string.push_str(unsafe { str::from_utf8_unchecked(valid) });
+                // SAFETY: `string` is rotated along char byte boundaries.
+                unsafe { string.as_bytes_mut().rotate_right(invalid.len()) };
+
+                Cow::Owned(Self::from_utf8_owned(string))
+            }
+        }
+    }
 
     /// Converts a [`Vec<u8>`] to a [`MString`], substituting invalid MUTF-8
     /// sequences with replacement characters.
@@ -133,16 +121,29 @@ impl MString {
         }
     }
 
-    /// Converts a [`String`] to a [`MString`], substituting invalid MUTF-8
-    /// sequences with replacement characters.
+    /// Converts a [`str`] to a [`MStr`].
+    #[must_use]
+    pub fn from_utf8(str: &str) -> Cow<'_, MStr> {
+        match MStr::from_utf8(str) {
+            // SAFETY: `Ok` means the input was valid MUTF-8.
+            Ok(..) => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+            // SAFETY: `utf8_to_mutf8` produces valid MUTF-8.
+            Err(..) => Cow::Owned(utf8_to_mutf8(str)),
+        }
+    }
+
+    /// Converts a [`String`] to a [`MString`].
     ///
-    /// See [`from_utf8_lossy`](Self::from_utf8_lossy) for more details.
+    /// If you need a [`&MStr`](MStr) instead of a [`MString`], consider
+    /// [`MStr::from_utf8`].
+    ///
+    /// See [`from_utf8`](Self::from_utf8) for more details.
     ///
     /// Note that this function does not guarantee reuse of the original
     /// [`String`] allocation.
     #[must_use]
-    pub fn from_utf8_lossy_owned(s: String) -> Self {
-        match Self::from_utf8_lossy(&s) {
+    pub fn from_utf8_owned(s: String) -> Self {
+        match Self::from_utf8(&s) {
             // SAFETY: `Borrowed` means the input was valid MUTF-8.
             Cow::Borrowed(_) => unsafe { Self::from_mutf8_unchecked(s.into_bytes()) },
             Cow::Owned(mstr) => mstr,
@@ -374,4 +375,66 @@ impl FromStr for MString {
             Err(err) => Err(err),
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// Convert a UTF-8 string to MUTF-8.
+#[must_use]
+fn utf8_to_mutf8(str: &str) -> MString {
+    macro_rules! debug_panic {
+        () => {{
+            #[cfg(debug_assertions)]
+            panic!("Invalid UTF-8, was expecting another byte!");
+
+            // SAFETY: This should never be reachable for a valid UTF-8 string
+            #[cfg(not(debug_assertions))]
+            unsafe {
+                core::hint::unreachable_unchecked()
+            }
+        }};
+    }
+
+    let cap = str.len().checked_mul(2).unwrap_or(isize::MAX as usize);
+    let mut encoded = Vec::<u8>::with_capacity(cap);
+
+    let mut iter = str.as_bytes().iter();
+    while let Some(a) = iter.next() {
+        match a {
+            // U+0000 is encoded as [0xC0, 0x80] in MUTF-8.
+            0x00 => {
+                encoded.push(0xC0);
+                encoded.push(0x80);
+            }
+            // U+0001 to U+007F are 1-byte UTF-8 sequences.
+            0x01..=0x7F => {
+                encoded.push(*a);
+            }
+            // U+0080 to U+07FF are 2-byte UTF-8 sequences.
+            0x80..=0xDF => {
+                let Some(b) = iter.next() else { debug_panic!() };
+                encoded.push(*a);
+                encoded.push(*b);
+            }
+            // U+0800 to U+FFFF are 3-byte UTF-8 sequences.
+            0xE0..=0xEF => {
+                let Some(b) = iter.next() else { debug_panic!() };
+                let Some(c) = iter.next() else { debug_panic!() };
+                encoded.push(*a);
+                encoded.push(*b);
+                encoded.push(*c);
+            }
+            // U+10000 to U+10FFFF are 4-byte UTF-8 sequences. (UTF-8 max is U+10FFFF)
+            _ => {
+                let Some(_b) = iter.next() else { debug_panic!() };
+                let Some(_c) = iter.next() else { debug_panic!() };
+                let Some(_d) = iter.next() else { debug_panic!() };
+
+                todo!("Handle 4-byte UTF-8 sequences");
+            }
+        }
+    }
+
+    // SAFETY: The output is valid MUTF-8
+    unsafe { MString::from_mutf8_unchecked(encoded) }
 }
