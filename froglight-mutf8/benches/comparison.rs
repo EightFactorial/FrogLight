@@ -12,6 +12,7 @@ fn main() {
 
     encode(&mut c);
     encode_ascii(&mut c);
+    valid_mutf8(&mut c);
 
     c.final_summary();
 }
@@ -57,7 +58,7 @@ macro_rules! bench {
             $(
                 group.bench_with_input(stringify!($name), &input, |b, input| {
                     let mut iter = input.iter().cycle();
-                    b.iter(|| unsafe { black_box($fn(black_box(iter.next().unwrap_unchecked()))) });
+                    b.iter(|| unsafe { black_box($fn(black_box(iter.next().unwrap_unchecked().as_ref()))) });
                 });
             )*
         }
@@ -81,3 +82,16 @@ bench!(
     cesu8 => cesu8::to_java_cesu8,
     simd_cesu8 => simd_cesu8::mutf8::encode
 );
+
+bench!(
+    valid_mutf8 = true:
+    froglight_simd => froglight_mutf8::simd::mutf8::contains_null_or_4_byte_header,
+    froglight_fallback => froglight_mutf8::simd::mutf8::fallback::contains_null_or_4_byte_header,
+    froglight_naive => froglight_mutf8::types::str::fallback::contains_null_or_4_byte_header,
+    cesu8 => cesu8_is_valid,
+    simd_cesu8 => simd_cesu8::implementation::active::contains_null_or_utf8_4_byte_char_header
+);
+
+fn cesu8_is_valid(bytes: &[u8]) -> bool {
+    simdutf8::basic::from_utf8(bytes).is_ok_and(cesu8::is_valid_java_cesu8)
+}
