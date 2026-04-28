@@ -38,6 +38,11 @@ simdutf8 = { features = ["aarch64_neon"], workspace = true }
 # --- Tests/Benchmarks ---
 
 [[bench]]
+name = "basic"
+required-features = ["std"]
+harness = false
+
+[[bench]]
 name = "comparison"
 required-features = ["simd", "std"]
 harness = false

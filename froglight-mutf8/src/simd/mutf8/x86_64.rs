@@ -1,8 +1,6 @@
 //! TODO
-#![allow(clippy::wildcard_imports, reason = "`x86_64` module")]
 
-#[allow(unused_imports, reason = "WIP")]
-use core::{arch::x86_64::*, simd::prelude::*};
+use core::simd::prelude::*;
 
 /// Convert a UTF-8 string to MUTF-8.
 #[must_use]
@@ -69,35 +67,28 @@ pub fn utf8_to_mutf8(str: &str) -> crate::prelude::MString {
 #[cfg(feature = "alloc")]
 #[allow(clippy::items_after_statements, reason = "Readablility")]
 fn encode_4_byte_utf8(array: [u8; 4]) -> [u8; 6] {
-    cfg_select! {
-        // Use BMI2 instructions if available.
-        all(target_arch = "x86_64", target_feature = "bmi2", not(slow_bmi2)) => {
-            const CODEPOINT_AND: Simd<u8, 4> = Simd::from_array([0x07, 0x3F, 0x3F, 0x3F]);
-            const CODEPOINT_SHIFT: Simd<u32, 4> = Simd::from_array([18, 12, 6, 0]);
+    const CODEPOINT_AND: Simd<u8, 4> = Simd::from_array([0x07, 0x3F, 0x3F, 0x3F]);
+    const CODEPOINT_SHIFT: Simd<u32, 4> = Simd::from_array([18, 12, 6, 0]);
 
-            let codepoint = Simd::from_array(array);
-            let codepoint = (codepoint & CODEPOINT_AND).cast::<u32>() << CODEPOINT_SHIFT;
+    let codepoint = Simd::from_array(array);
+    let codepoint = (codepoint & CODEPOINT_AND).cast::<u32>() << CODEPOINT_SHIFT;
 
-            const SURROGATE_AND: Simd<u32, 2> = Simd::from_array([0xFFFF_FFFF, 0x0000_03FF]);
-            const SURROGATE_SHIFT: Simd<u32, 2> = Simd::from_array([10, 0]);
-            const SURROGATE_OR: Simd<u32, 2> = Simd::from_array([0xD800, 0xDC00]);
+    const SURROGATE_AND: Simd<u32, 2> = Simd::from_array([0xFFFF_FFFF, 0x0000_03FF]);
+    const SURROGATE_SHIFT: Simd<u32, 2> = Simd::from_array([10, 0]);
+    const SURROGATE_OR: Simd<u32, 2> = Simd::from_array([0xD800, 0xDC00]);
 
-            let surrogate = Simd::splat(codepoint.reduce_or() - 0x0001_0000);
-            let surrogate = ((surrogate & SURROGATE_AND) >> SURROGATE_SHIFT) | SURROGATE_OR;
+    let surrogate = Simd::splat(codepoint.reduce_or() - 0x0001_0000);
+    let surrogate = ((surrogate & SURROGATE_AND) >> SURROGATE_SHIFT) | SURROGATE_OR;
 
-            const PAIR_AND: Simd<u16, 6> = Simd::from_array([0xF000, 0x0FC0, 0x003F, 0xF000, 0x0FC0, 0x003F]);
-            const PAIR_SHIFT: Simd<u16, 6> = Simd::from_array([12, 6, 0, 12, 6, 0]);
-            const PAIR_OR: Simd<u16, 6> = Simd::from_array([0xE0, 0x80, 0x80, 0xE0, 0x80, 0x80]);
+    const PAIR_AND: Simd<u16, 6> =
+        Simd::from_array([0xF000, 0x0FC0, 0x003F, 0xF000, 0x0FC0, 0x003F]);
+    const PAIR_SHIFT: Simd<u16, 6> = Simd::from_array([12, 6, 0, 12, 6, 0]);
+    const PAIR_OR: Simd<u16, 6> = Simd::from_array([0xE0, 0x80, 0x80, 0xE0, 0x80, 0x80]);
 
-            let pairs = simd_swizzle!(surrogate.cast::<u16>(), [0, 0, 0, 1, 1, 1]);
-            let pairs = ((pairs & PAIR_AND) >> PAIR_SHIFT) | PAIR_OR;
+    let pairs = simd_swizzle!(surrogate.cast::<u16>(), [0, 0, 0, 1, 1, 1]);
+    let pairs = ((pairs & PAIR_AND) >> PAIR_SHIFT) | PAIR_OR;
 
-            pairs.cast::<u8>().to_array()
-        }
-        // Otherwise use the fallback implementation.
-        _ => super::fallback::encode_4_byte_utf8(array)
-
-    }
+    pairs.cast::<u8>().to_array()
 }
 
 // -------------------------------------------------------------------------------------------------
