@@ -1,8 +1,13 @@
 //! TODO
+#![allow(clippy::match_bool, reason = "Readability")]
 
+extern crate alloc;
+
+use alloc::borrow::Cow;
 use core::hint::black_box;
 
 use criterion::Criterion;
+use froglight_mutf8::prelude::MStr;
 use rand::{distr::Uniform, prelude::*, rngs::Xoshiro128PlusPlus};
 
 fn main() {
@@ -67,21 +72,47 @@ macro_rules! bench {
 
 bench!(
     encode = false:
-    froglight_simd => froglight_mutf8::simd::mutf8::utf8_to_mutf8,
-    froglight_fallback => froglight_mutf8::simd::mutf8::fallback::utf8_to_mutf8,
-    froglight_naive => froglight_mutf8::types::string::fallback::utf8_to_mutf8,
+    froglight_simd => simd_utf8_to_mutf8,
+    froglight_fallback => fallback_utf8_to_mutf8,
+    froglight_naive => naive_utf8_to_mutf8,
     cesu8 => cesu8::to_java_cesu8,
     simd_cesu8 => simd_cesu8::mutf8::encode
 );
 
 bench!(
     encode_ascii = true:
-    froglight_simd => froglight_mutf8::simd::mutf8::utf8_to_mutf8,
-    froglight_fallback => froglight_mutf8::simd::mutf8::fallback::utf8_to_mutf8,
-    froglight_naive => froglight_mutf8::types::string::fallback::utf8_to_mutf8,
+    froglight_simd => simd_utf8_to_mutf8,
+    froglight_fallback => fallback_utf8_to_mutf8,
+    froglight_naive => naive_utf8_to_mutf8,
     cesu8 => cesu8::to_java_cesu8,
     simd_cesu8 => simd_cesu8::mutf8::encode
 );
+
+fn simd_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
+    match froglight_mutf8::simd::mutf8::contains_null_or_4_byte_header(str.as_bytes()) {
+        // SAFETY: `true` means the input was valid MUTF-8.
+        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        false => Cow::Owned(froglight_mutf8::simd::mutf8::utf8_to_mutf8(str)),
+    }
+}
+
+fn fallback_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
+    match froglight_mutf8::simd::mutf8::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
+        // SAFETY: `true` means the input was valid MUTF-8.
+        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        false => Cow::Owned(froglight_mutf8::simd::mutf8::fallback::utf8_to_mutf8(str)),
+    }
+}
+
+fn naive_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
+    match froglight_mutf8::types::str::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
+        // SAFETY: `true` means the input was valid MUTF-8.
+        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        false => Cow::Owned(froglight_mutf8::types::string::fallback::utf8_to_mutf8(str)),
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 bench!(
     valid_mutf8 = true:
