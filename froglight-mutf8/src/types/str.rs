@@ -254,7 +254,7 @@ macro_rules! mutf8 {
 
 cfg_select! {
     feature = "simd" => {
-        pub use crate::simd::string::{contains_null_or_4_byte_header, contains_4_byte_header};
+        pub use crate::simd::mutf8::{contains_null_or_4_byte_header, contains_4_byte_header};
     }
     _ => {
         pub use fallback::{contains_null_or_4_byte_header, contains_4_byte_header};
@@ -266,12 +266,16 @@ pub mod fallback {
     /// Returns `true` if the given slice contains any null bytes or 4-byte
     /// UTF-8 headers.
     #[must_use]
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Performance")]
     pub fn contains_null_or_4_byte_header(bytes: &[u8]) -> bool {
         bytes.iter().copied().any(|b| b == 0b0000_0000 || (b & 0b1111_1000) == 0b1111_0000)
     }
 
     /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
     #[must_use]
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Performance")]
     pub fn contains_4_byte_header(bytes: &[u8]) -> bool {
         bytes.iter().copied().any(|b| (b & 0b1111_1000) == 0b1111_0000)
     }
@@ -279,6 +283,8 @@ pub mod fallback {
     /// Returns `true` if the given slice contains any null bytes or 4-byte
     /// UTF-8 headers.
     #[must_use]
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Performance")]
     pub const fn const_contains_null_or_4_byte_header(bytes: &[u8]) -> bool {
         let mut i = 0;
         while i < bytes.len() {
@@ -293,6 +299,8 @@ pub mod fallback {
 
     /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
     #[must_use]
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Performance")]
     pub const fn const_contains_4_byte_header(bytes: &[u8]) -> bool {
         let mut i = 0;
         while i < bytes.len() {

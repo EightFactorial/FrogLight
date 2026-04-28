@@ -37,6 +37,11 @@ simdutf8 = { features = ["aarch64_neon"], workspace = true }
 
 # --- Tests/Benchmarks ---
 
+[[bench]]
+name = "comparison"
+required-features = ["simd", "std"]
+harness = false
+
 [[test]]
 name = "static_mutf8"
 
@@ -57,6 +62,9 @@ default = ["std"]
 facet = ["alloc", "dep:facet"]
 # Enable support for SIMD optimizations.
 simd = ["nightly"]
+# Force the use of the generic fallback SIMD implementation.
+# This is typically used for testing and debugging.
+simd_fallback = ["simd"]
 
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
