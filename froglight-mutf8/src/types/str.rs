@@ -79,6 +79,20 @@ impl MStr {
         from_utf8_simd(bytes).map_or_else(|_err| Err(()), Self::from_utf8)
     }
 
+    /// Creates a [`str`] from a MUTF-8 string slice.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bytes are not valid UTF-8.
+    #[expect(clippy::result_unit_err, reason = "WIP")]
+    pub fn to_utf8(&self) -> Result<&str, ()> {
+        if contains_null_or_4_byte_header(self.as_bytes()) {
+            Err(())
+        } else {
+            from_utf8_simd(self.as_bytes()).map_err(|_| ())
+        }
+    }
+
     /// Creates a new [`MStr`] from a string slice.
     ///
     /// This is a `const` version of [`Self::from_utf8`],
@@ -108,6 +122,26 @@ impl MStr {
     #[must_use]
     pub const fn const_from_mutf8(bytes: &[u8]) -> Option<&Self> {
         if let Ok(str) = from_utf8_core(bytes) { Self::const_from_utf8(str) } else { None }
+    }
+
+    /// Creates a new [`MStr`] from a string slice.
+    ///
+    /// This is a `const` version of [`Self::to_utf8`],
+    /// and may be slower due to the lack of optimizations.
+    ///
+    /// # Errors
+    ///
+    /// Returns `None` if the bytes are not valid UTF-8.
+    #[must_use]
+    pub const fn const_to_utf8(&self) -> Option<&str> {
+        if fallback::const_contains_null_or_4_byte_header(self.as_bytes()) {
+            None
+        } else {
+            match from_utf8_core(self.as_bytes()) {
+                Ok(str) => Some(str),
+                Err(_) => None,
+            }
+        }
     }
 
     /// Creates a new [`MStr`] from a slice without checking if the bytes are

@@ -16,6 +16,11 @@ fn simd_cesu8_ascii() {
 
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
+
+        let mstr = mstr.into_owned().into_utf8();
+        let cesu8 = simd_cesu8::mutf8::decode(&cesu8).unwrap();
+
+        pretty_assertions::assert_str_eq!(mstr, cesu8);
     }
 }
 
@@ -31,6 +36,11 @@ fn simd_cesu8_utf8() {
 
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
+
+        let mstr = mstr.into_owned().into_utf8();
+        let cesu8 = simd_cesu8::mutf8::decode(&cesu8).unwrap();
+
+        pretty_assertions::assert_str_eq!(mstr, cesu8);
     }
 }
 

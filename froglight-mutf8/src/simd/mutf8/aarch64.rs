@@ -2,7 +2,7 @@
 
 use core::simd::prelude::*;
 
-pub use super::fallback::utf8_to_mutf8;
+pub use super::fallback::{mutf8_to_utf8, utf8_to_mutf8};
 
 // -------------------------------------------------------------------------------------------------
 

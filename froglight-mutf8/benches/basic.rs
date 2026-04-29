@@ -9,8 +9,16 @@ use rand::{distr::Uniform, prelude::*, rngs::Xoshiro128PlusPlus};
 macro_rules! time {
     ($fn:path => $input:expr) => {{
         let start = Instant::now();
-        for string in &$input {
-            black_box($fn(string));
+        for input in &$input {
+            black_box($fn(input));
+        }
+        println!(" - {}: {:?}", stringify!($fn), start.elapsed());
+    }};
+    (@ref $fn:path as $ty:ty => $input:expr) => {{
+        let start = Instant::now();
+        for input in &$input {
+            let input: &$ty = input.as_ref();
+            let _ = black_box($fn(input));
         }
         println!(" - {}: {:?}", stringify!($fn), start.elapsed());
     }};
@@ -33,6 +41,24 @@ fn main() {
         time!(MString::from_utf8 => input);
         time!(simd_cesu8::mutf8::encode => input);
         time!(cesu8::to_java_cesu8 => input);
+    }
+
+    {
+        println!("Decode UTF8:");
+        let input =
+            generate::<false>().into_iter().map(MString::from_utf8_owned).collect::<Vec<_>>();
+        time!(MString::to_utf8 => input);
+        time!(@ref simd_cesu8::mutf8::decode as [u8] => input);
+        time!(@ref cesu8::from_java_cesu8 as [u8] => input);
+    }
+
+    {
+        println!("Decode ASCII:");
+        let input =
+            generate::<true>().into_iter().map(MString::from_utf8_owned).collect::<Vec<_>>();
+        time!(MString::to_utf8 => input);
+        time!(@ref simd_cesu8::mutf8::decode as [u8] => input);
+        time!(@ref cesu8::from_java_cesu8 as [u8] => input);
     }
 }
 
