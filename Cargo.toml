@@ -36,7 +36,7 @@ bevy_transform = { default-features = false, version = "0.18" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "0.44" }
-facet-format = { default-features = false, version = "0.44" }
+facet-format = { default-features = false, version = "0.47" }
 facet-json = { default-features = false, version = "0.44" }
 facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
 facet-path = { default-features = false, version = "0.44" }
