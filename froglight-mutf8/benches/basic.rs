@@ -10,7 +10,7 @@ macro_rules! time {
     ($fn:path => $input:expr) => {{
         let start = Instant::now();
         for input in &$input {
-            black_box($fn(input));
+            let _value = black_box($fn(black_box(input)));
         }
         println!(" - {}: {:?}", stringify!($fn), start.elapsed());
     }};
@@ -18,7 +18,7 @@ macro_rules! time {
         let start = Instant::now();
         for input in &$input {
             let input: &$ty = input.as_ref();
-            let _ = black_box($fn(input));
+            let _value = black_box($fn(black_box(input)));
         }
         println!(" - {}: {:?}", stringify!($fn), start.elapsed());
     }};

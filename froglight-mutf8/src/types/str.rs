@@ -18,10 +18,26 @@ use crate::types::MString;
 pub struct MStr([u8]);
 
 impl fmt::Debug for MStr {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_str("TODO") }
+    #[cfg(feature = "alloc")]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.to_mstring().into_utf8(), f)
+    }
+
+    #[cfg(not(feature = "alloc"))]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.as_bytes(), f)
+    }
 }
 impl fmt::Display for MStr {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_str("TODO") }
+    #[cfg(feature = "alloc")]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.to_mstring().into_utf8(), f)
+    }
+
+    #[cfg(not(feature = "alloc"))]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.as_bytes(), f)
+    }
 }
 
 impl MStr {
@@ -76,7 +92,7 @@ impl MStr {
     /// Returns an error if the bytes are not valid MUTF-8.
     #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn from_mutf8(bytes: &[u8]) -> Result<&Self, ()> {
-        from_utf8_simd(bytes).map_or_else(|_err| Err(()), Self::from_utf8)
+        from_utf8_simd(bytes).map_or_else(|_| Err(()), Self::from_utf8)
     }
 
     /// Creates a [`str`] from a MUTF-8 string slice.
@@ -86,10 +102,10 @@ impl MStr {
     /// Returns an error if the bytes are not valid UTF-8.
     #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn to_utf8(&self) -> Result<&str, ()> {
-        if contains_null_or_4_byte_header(self.as_bytes()) {
-            Err(())
+        if from_utf8_simd(self.as_bytes()).is_ok() {
+            Ok(unsafe { str::from_utf8_unchecked(self.as_bytes()) })
         } else {
-            from_utf8_simd(self.as_bytes()).map_err(|_| ())
+            Err(())
         }
     }
 
@@ -210,6 +226,24 @@ impl Borrow<[u8]> for MStr {
     fn borrow(&self) -> &[u8] { self.as_bytes() }
 }
 
+impl PartialEq<str> for MStr {
+    #[inline]
+    fn eq(&self, other: &str) -> bool { self.as_bytes() == other.as_bytes() }
+}
+impl PartialEq<MStr> for str {
+    #[inline]
+    fn eq(&self, other: &MStr) -> bool { self.as_bytes() == other.as_bytes() }
+}
+
+impl PartialEq<[u8]> for MStr {
+    #[inline]
+    fn eq(&self, other: &[u8]) -> bool { self.as_bytes() == other }
+}
+impl PartialEq<MStr> for [u8] {
+    #[inline]
+    fn eq(&self, other: &MStr) -> bool { self == other.as_bytes() }
+}
+
 impl<'a> TryFrom<&'a str> for &'a MStr {
     type Error = ();
 
@@ -248,6 +282,7 @@ unsafe impl facet::Facet<'_> for MStr {
         const unsafe fn mstr_drop(_: OxPtrMut) {}
 
         #[inline(always)]
+        #[allow(clippy::inline_always, reason = "Inline")]
         unsafe fn mstr_truthy(value: PtrConst) -> bool {
             !unsafe { value.get::<MStr>() }.is_empty()
         }
@@ -303,7 +338,7 @@ pub mod fallback {
     #[inline(always)]
     #[expect(clippy::inline_always, reason = "Performance")]
     pub fn contains_null_or_4_byte_header(bytes: &[u8]) -> bool {
-        bytes.iter().copied().any(|b| b == 0b0000_0000 || (b & 0b1111_1000) == 0b1111_0000)
+        bytes.iter().any(|b| *b == 0b0000_0000 || (*b & 0b1111_1000) == 0b1111_0000)
     }
 
     /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
@@ -311,7 +346,7 @@ pub mod fallback {
     #[inline(always)]
     #[expect(clippy::inline_always, reason = "Performance")]
     pub fn contains_4_byte_header(bytes: &[u8]) -> bool {
-        bytes.iter().copied().any(|b| (b & 0b1111_1000) == 0b1111_0000)
+        bytes.iter().any(|b| (*b & 0b1111_1000) == 0b1111_0000)
     }
 
     /// Returns `true` if the given slice contains any null bytes or 4-byte

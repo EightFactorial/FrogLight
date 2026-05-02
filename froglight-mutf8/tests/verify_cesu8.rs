@@ -17,7 +17,7 @@ fn cesu8_ascii() {
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
 
-        let mstr = mstr.into_owned().into_utf8();
+        let mstr = mstr.to_utf8().unwrap();
         let cesu8 = cesu8::from_java_cesu8(&cesu8).unwrap();
 
         pretty_assertions::assert_str_eq!(mstr, cesu8);
@@ -37,7 +37,7 @@ fn cesu8_utf8() {
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
 
-        let mstr = mstr.into_owned().into_utf8();
+        let mstr = mstr.to_utf8().unwrap();
         let cesu8 = cesu8::from_java_cesu8(&cesu8).unwrap();
 
         pretty_assertions::assert_str_eq!(mstr, cesu8);

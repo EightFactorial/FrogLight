@@ -98,8 +98,6 @@ fn encode_4_byte_utf8(array: [u8; 4]) -> [u8; 6] {
 
 // -------------------------------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------------------------------
-
 /// Convert a UTF-8 string to MUTF-8.
 #[must_use]
 #[cfg(feature = "alloc")]
@@ -211,7 +209,7 @@ macro_rules! as_simd {
                 let (chunks, remainder) = $input.as_chunks::<$n>();
                 $input = remainder;
 
-                if chunks.into_iter().copied().any(|arr| ($fn)(Simd::from_array(arr))) {
+                if chunks.into_iter().any(|arr| ($fn)(Simd::from_array(*arr))) {
                     return true;
                 }
             }
@@ -234,7 +232,7 @@ pub fn contains_null_or_4_byte_header(mut bytes: &[u8]) -> bool {
         }
     });
 
-    bytes.iter().copied().any(|b| b == 0b0000_0000 || (b & 0b1111_1000) == 0b1111_0000)
+    bytes.iter().any(|b| *b == 0b0000_0000 || (*b & 0b1111_1000) == 0b1111_0000)
 }
 
 /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
@@ -250,5 +248,5 @@ pub fn contains_4_byte_header(mut bytes: &[u8]) -> bool {
         }
     });
 
-    bytes.iter().copied().any(|b| (b & 0b1111_1000) == 0b1111_0000)
+    bytes.iter().any(|b| (*b & 0b1111_1000) == 0b1111_0000)
 }
