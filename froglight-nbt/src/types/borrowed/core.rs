@@ -7,6 +7,7 @@ use super::IndexedEntry;
 
 /// The core of an [`IndexedNbtRef`].
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 pub(super) struct IndexedCoreRef<'data> {
     root: &'data [u8],
     entries: Cow<'data, [IndexedEntry]>,
@@ -74,6 +75,7 @@ impl<'data> IndexedCoreRef<'data> {
 
 /// The core of an [`IndexedNbtMut`].
 #[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 pub(super) struct IndexedCoreMut<'data> {
     root: &'data mut [u8],
     entries: Cow<'data, [IndexedEntry]>,

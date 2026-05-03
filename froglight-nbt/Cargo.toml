@@ -29,7 +29,7 @@ smallvec = { features = ["const_generics", "const_new", "union"], workspace = tr
 uuid = { workspace = true }
 
 # Optional dependencies
-facet = { features = ["alloc", "reflect", "smallvec"], workspace = true, optional = true }
+facet = { features = ["alloc", "nonzero", "reflect", "smallvec"], workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 

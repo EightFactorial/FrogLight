@@ -10,9 +10,12 @@ use compound::{IndexedCompoundMut, IndexedCompoundRef, IndexedEntry};
 pub mod core;
 use core::{IndexedCoreMut, IndexedCoreRef};
 
-use crate::types::borrowed::reference::{BorrowedIndex, BorrowedRef};
+pub mod list;
 
 pub mod reference;
+use reference::{BorrowedIndex, BorrowedRef};
+
+pub mod value;
 
 /// A borrowed NBT structure with an index of its contents.
 #[derive(Debug, Clone, PartialEq, Eq)]

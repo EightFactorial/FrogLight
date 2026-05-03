@@ -44,7 +44,7 @@ impl<'data, T: ?Sized> BorrowedRef<'data, T> {
     }
 }
 
-impl<T: BorrowedInteger> BorrowedRef<'_, T> {
+impl<T: BorrowedPOD> BorrowedRef<'_, T> {
     /// Get the value of this [`BorrowedRef`].
     #[inline]
     #[must_use]
@@ -54,11 +54,11 @@ impl<T: BorrowedInteger> BorrowedRef<'_, T> {
     }
 }
 
-impl<T: BorrowedSlice + ?Sized> BorrowedRef<'_, T> {
+impl<'data, T: BorrowedSlice + ?Sized> BorrowedRef<'data, T> {
     /// Get a reference to the [`BorrowedRef`]'s slice.
     #[inline]
     #[must_use]
-    pub fn get_ref(&self) -> &T {
+    pub fn get_ref(&self) -> &'data T {
         // SAFETY: `BorrowedRef` guarantees this is valid
         unsafe { T::get_slice_ref(self.root, self.index) }
     }
@@ -126,7 +126,7 @@ impl<'data, T: ?Sized> BorrowedMut<'data, T> {
     }
 }
 
-impl<T: BorrowedInteger> BorrowedMut<'_, T> {
+impl<T: BorrowedPOD> BorrowedMut<'_, T> {
     /// Get the value of this [`BorrowedMut`].
     #[inline]
     #[must_use]
@@ -176,9 +176,9 @@ impl<T: BorrowedSlice> BorrowedMut<'_, T> {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A trait for integer types that can be used with [`BorrowedRef`] and
+/// A trait for POD types that can be used with [`BorrowedRef`] and
 /// [`BorrowedMut`].
-pub trait BorrowedInteger: Copy + Any {
+pub trait BorrowedPOD: Any + Copy + sealed::Sealed {
     /// Read a value of this type from the given data and index.
     ///
     /// # Safety
@@ -198,7 +198,7 @@ pub trait BorrowedInteger: Copy + Any {
 
 /// A trait for slice-like types that can be used with [`BorrowedRef`] and
 /// [`BorrowedMut`].
-pub trait BorrowedSlice {
+pub trait BorrowedSlice: sealed::Sealed {
     /// Read the length of this slice from the given data and index.
     ///
     /// # Safety
@@ -227,7 +227,7 @@ pub trait BorrowedSlice {
 macro_rules! impl_trait {
     (@integer $($ty:ty),*) => {
         $(
-            impl BorrowedInteger for $ty {
+            impl BorrowedPOD for $ty {
                 #[inline]
                 unsafe fn read_unaligned(root: &[u8], index: BorrowedIndex<Self>) -> Self {
                     // SAFETY: The caller ensures that `read_unaligned` is valid.
@@ -240,11 +240,33 @@ macro_rules! impl_trait {
                     unsafe { core::ptr::write_unaligned(root.as_mut_ptr().add(index.index()).cast::<Self>(), value.to_be()); }
                 }
             }
+
+            impl sealed::Sealed for $ty {}
+        )*
+    };
+    (@float $($ty:ty),*) => {
+        $(
+            impl BorrowedPOD for $ty {
+                #[inline]
+                unsafe fn read_unaligned(root: &[u8], index: BorrowedIndex<Self>) -> Self {
+                    // SAFETY: The caller ensures that `read_unaligned` is valid.
+                    unsafe { core::ptr::read_unaligned(root.as_ptr().add(index.index()).cast::<Self>()) }
+                }
+
+                #[inline]
+                unsafe fn write_unaligned(root: &mut [u8], value: Self, index: BorrowedIndex<Self>) {
+                    // SAFETY: The caller ensures that `read_unaligned` is valid.
+                    unsafe { core::ptr::write_unaligned(root.as_mut_ptr().add(index.index()).cast::<Self>(), value); }
+                }
+            }
+
+            impl sealed::Sealed for $ty {}
         )*
     };
 }
 
 impl_trait!(@integer i8, i16, i32, i64, i128, u8, u16, u32, u64, u128);
+impl_trait!(@float f32, f64);
 
 impl BorrowedSlice for [u8] {
     #[inline]
@@ -307,9 +329,16 @@ impl BorrowedSlice for MStr {
     }
 }
 
+mod sealed {
+    pub trait Sealed {}
+
+    impl Sealed for [u8] {}
+    impl Sealed for froglight_mutf8::prelude::MStr {}
+}
+
 // -------------------------------------------------------------------------------------------------
 
-/// An index to a type `T`.
+/// A byte-index to a type `T`.
 #[repr(transparent)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct BorrowedIndex<T: ?Sized>(usize, PhantomData<T>);

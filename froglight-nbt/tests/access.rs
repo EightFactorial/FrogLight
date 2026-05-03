@@ -7,7 +7,10 @@ use alloc::borrow::Cow;
 use core::range::Range;
 
 use froglight_mutf8::mutf8;
-use froglight_nbt::{prelude::*, types::borrowed::reference::BorrowedIndex};
+use froglight_nbt::{
+    prelude::*,
+    types::borrowed::{reference::BorrowedIndex, value::IndexedValue},
+};
 
 #[test]
 fn read() {
@@ -18,8 +21,8 @@ fn read() {
     ];
     static ENTRIES: &[IndexedEntry] = unsafe {
         &[
-            IndexedEntry::new(BorrowedIndex::new(0), BorrowedIndex::new(12)),
-            IndexedEntry::new(BorrowedIndex::new(25), BorrowedIndex::new(32)),
+            IndexedEntry::new(BorrowedIndex::new(0), IndexedValue::String(BorrowedIndex::new(12))),
+            IndexedEntry::new(BorrowedIndex::new(25), IndexedValue::Short(BorrowedIndex::new(32))),
         ]
     };
     static INDEXES: &[Range<usize>] = &[Range { start: 0, end: ENTRIES.len() }];
@@ -30,14 +33,14 @@ fn read() {
 
     let compound = NBT.as_compound();
 
-    if let Some(_entry) = compound.get("entry_name") {
-        // assert_eq!(entry.as_string().unwrap(), mutf8!("entry_value"));
+    if let Some(value) = compound.get("entry_name") {
+        assert_eq!(value.as_string().unwrap(), mutf8!("entry_value"));
     } else {
         panic!("`entry_name` not found!");
     }
 
-    if let Some(_entry) = compound.get("Short") {
-        // assert_eq!(entry.as_short().unwrap(), 0x1234);
+    if let Some(value) = compound.get("Short") {
+        assert_eq!(value.as_short().unwrap(), 0x1234);
     } else {
         panic!("`Short` not found!");
     }
@@ -46,12 +49,11 @@ fn read() {
         match index {
             0 => {
                 assert_eq!(entry.name().get_ref(), mutf8!("entry_name"));
-                // assert_eq!(entry.as_string().unwrap(),
-                // mutf8!("entry_value"));
+                assert_eq!(entry.value().as_string().unwrap(), mutf8!("entry_value"));
             }
             1 => {
                 assert_eq!(entry.name().get_ref(), mutf8!("Short"));
-                // assert_eq!(entry.as_short().unwrap(), 0x1234);
+                assert_eq!(entry.value().as_short().unwrap(), 0x1234);
             }
             _ => unreachable!(),
         }
