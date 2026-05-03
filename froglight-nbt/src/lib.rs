@@ -10,5 +10,8 @@ pub mod types;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::types::borrowed::{IndexedCompound, IndexedNbt};
+    pub use crate::types::borrowed::{
+        compound::{IndexedCompoundMut, IndexedCompoundRef, IndexedEntry},
+        reference::{BorrowedIndex, BorrowedMut, BorrowedRef},
+    };
 }

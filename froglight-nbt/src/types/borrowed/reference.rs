@@ -1,305 +1,404 @@
+//! TODO
+
 use core::{
-    any::TypeId,
-    fmt::{self, Debug},
-    hash::Hash,
+    any::{Any, TypeId},
+    cmp::Ordering,
+    fmt,
+    hash::{Hash, Hasher},
     marker::PhantomData,
     ops::{Add, AddAssign, Sub, SubAssign},
 };
 
-use froglight_mutf8::prelude::*;
+use froglight_mutf8::prelude::MStr;
 
-use crate::types::borrowed::{Mut, NbtMut, Ref};
-
-/// A reference to a type stored in NBT data.
-pub struct NbtItem<'a, T: ?Sized + 'a, Mut: NbtMut> {
-    root: Mut::Of<'a, [u8]>,
-    index: NbtIndex<T>,
+/// A reference to a type `T` in a byte slice.
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+pub struct BorrowedRef<'data, T: ?Sized> {
+    root: &'data [u8],
+    index: BorrowedIndex<T>,
 }
 
-impl<'a, T: ?Sized, Mut: NbtMut> NbtItem<'a, T, Mut> {
-    /// Create a new [`NbtItem`] with the given root and index.
+impl<'data, T: ?Sized> BorrowedRef<'data, T> {
+    /// Create a new [`BorrowedRef`] using the given data and index.
     ///
     /// # Safety
     ///
-    /// The caller must ensure that `root` is valid for reads and/or writes,
-    /// and that it contains a valid `T` at the given index.
+    /// The caller must ensure that `root` is valid for reads,
+    /// and that it contains a valid `T` at the position specified by `index`.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(root: Mut::Of<'a, [u8]>, index: usize) -> Self {
-        Self { root, index: NbtIndex::new(index) }
-    }
-
-    /// Create a new [`NbtItem`] with the given root and index.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that `root` is valid for reads and/or writes,
-    /// and that it contains a valid `T` at the given index.
-    #[inline]
-    #[must_use]
-    pub const unsafe fn new_indexed(root: Mut::Of<'a, [u8]>, index: NbtIndex<T>) -> Self {
+    pub const unsafe fn new(root: &'data [u8], index: BorrowedIndex<T>) -> Self {
         Self { root, index }
     }
-}
 
-impl<'a, T: ?Sized> NbtItem<'a, T, Mut> {
-    /// Get this [`Mut`] as a [`Ref`].
+    /// Cast this [`BorrowedRef`] to a different type.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` contains a valid `U` at the index's
+    /// position.
     #[inline]
     #[must_use]
-    pub const fn as_ref(&self) -> NbtItem<'_, T, Ref> {
-        NbtItem { root: self.root, index: self.index }
-    }
-
-    /// Convert this [`Mut`] into a [`Ref`].
-    #[inline]
-    #[must_use]
-    pub const fn into_ref(self) -> NbtItem<'a, T, Ref> {
-        NbtItem { root: self.root, index: self.index }
+    pub const unsafe fn cast<U: ?Sized>(self) -> BorrowedRef<'data, U> {
+        BorrowedRef { root: self.root, index: unsafe { self.index.cast() } }
     }
 }
 
-impl<T: Copy + Sized, Mut: NbtMut> NbtItem<'_, T, Mut> {
-    /// Read the type from the root data slice.
-    ///
-    /// # Note
-    ///
-    /// This function does not flip the endianness of the value!
-    ///
-    /// For integer types you may want to use `to_be` on little-endian
-    /// platforms, as NBT data is big-endian.
+impl<T: BorrowedInteger> BorrowedRef<'_, T> {
+    /// Get the value of this [`BorrowedRef`].
     #[inline]
     #[must_use]
-    pub fn get(&self) -> T { unsafe { self.index.read(&self.root) } }
+    pub fn get_value(&self) -> T {
+        // SAFETY: `BorrowedRef` guarantees this is valid
+        unsafe { T::read_unaligned(self.root, self.index) }
+    }
 }
 
-impl<T: Copy + Sized> NbtItem<'_, T, Mut> {
-    /// Write the type to the root data slice.
-    #[inline]
-    pub fn set(&mut self, value: T) { unsafe { self.index.write(value, self.root) } }
-}
-
-impl<Mut: NbtMut> NbtItem<'_, [u8], Mut> {
-    /// Read the byte slice from the root data slice.
+impl<T: BorrowedSlice + ?Sized> BorrowedRef<'_, T> {
+    /// Get a reference to the [`BorrowedRef`]'s slice.
     #[inline]
     #[must_use]
-    pub fn get(&self) -> &[u8] { unsafe { self.index.read(&self.root) } }
-}
+    pub fn get_ref(&self) -> &T {
+        // SAFETY: `BorrowedRef` guarantees this is valid
+        unsafe { T::get_slice_ref(self.root, self.index) }
+    }
 
-impl<Mut: NbtMut> NbtItem<'_, MStr, Mut> {
-    /// Read the string from the root data slice.
+    /// Get the length of this [`BorrowedRef`]'s slice.
     #[inline]
     #[must_use]
-    pub fn get(&self) -> &MStr { unsafe { self.index.read(&self.root) } }
+    pub fn len(&self) -> usize {
+        // SAFETY: `BorrowedRef` guarantees this is valid
+        unsafe { T::read_length(self.root, self.index) }
+    }
+
+    /// Returns `true` if this [`BorrowedRef`]'s slice is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.len() == 0 }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// An index to a type stored in NBT data.
+/// A mutable reference to a type `T` in a byte slice.
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+pub struct BorrowedMut<'data, T: ?Sized> {
+    root: &'data mut [u8],
+    index: BorrowedIndex<T>,
+}
+
+impl<'data, T: ?Sized> BorrowedMut<'data, T> {
+    /// Create a new [`BorrowedRef`] using the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for reads and writes,
+    /// and that it contains a valid `T` at the position specified by `index`.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn new(root: &'data mut [u8], index: BorrowedIndex<T>) -> Self {
+        Self { root, index }
+    }
+
+    /// Get this [`BorrowedMut`] as a [`BorrowedRef`].
+    #[inline]
+    #[must_use]
+    pub const fn as_ref(&self) -> BorrowedRef<'_, T> {
+        BorrowedRef { root: self.root, index: self.index }
+    }
+
+    /// Convert this [`BorrowedMut`] into a [`BorrowedRef`].
+    #[inline]
+    #[must_use]
+    pub const fn into_ref(self) -> BorrowedRef<'data, T> {
+        BorrowedRef { root: self.root, index: self.index }
+    }
+
+    /// Cast this [`BorrowedMut`] to a different type.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` contains a valid `U` at the index's
+    /// position.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn cast<U: ?Sized>(self) -> BorrowedMut<'data, U> {
+        BorrowedMut { root: self.root, index: unsafe { self.index.cast() } }
+    }
+}
+
+impl<T: BorrowedInteger> BorrowedMut<'_, T> {
+    /// Get the value of this [`BorrowedMut`].
+    #[inline]
+    #[must_use]
+    pub fn get_value(&self) -> T {
+        // SAFETY: `BorrowedMut` guarantees this is valid
+        unsafe { T::read_unaligned(self.root, self.index) }
+    }
+
+    /// Set the value of this [`BorrowedMut`].
+    #[inline]
+    pub fn set_value(&mut self, value: T) {
+        // SAFETY: `BorrowedMut` guarantees this is valid
+        unsafe { T::write_unaligned(self.root, value, self.index) }
+    }
+}
+
+impl<T: BorrowedSlice> BorrowedMut<'_, T> {
+    /// Get a reference to the [`BorrowedMut`]'s slice.
+    #[inline]
+    #[must_use]
+    pub fn get_ref(&self) -> &T {
+        // SAFETY: `BorrowedMut` guarantees this is valid
+        unsafe { T::get_slice_ref(self.root, self.index) }
+    }
+
+    /// Get a mutable reference to the [`BorrowedMut`]'s slice.
+    #[inline]
+    #[must_use]
+    pub fn get_mut(&mut self) -> &mut T {
+        // SAFETY: `BorrowedMut` guarantees this is valid
+        unsafe { T::get_slice_mut(self.root, self.index) }
+    }
+
+    /// Get the length of this [`BorrowedMut`]'s slice.
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize {
+        // SAFETY: `BorrowedMut` guarantees this is valid
+        unsafe { T::read_length(self.root, self.index) }
+    }
+
+    /// Returns `true` if this [`BorrowedMut`]'s slice is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.len() == 0 }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A trait for integer types that can be used with [`BorrowedRef`] and
+/// [`BorrowedMut`].
+pub trait BorrowedInteger: Copy + Any {
+    /// Read a value of this type from the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for reads,
+    /// and that it contains a valid value of this type at given index.
+    unsafe fn read_unaligned(root: &[u8], index: BorrowedIndex<Self>) -> Self;
+
+    /// Write a value of this type to the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for writes,
+    /// and that it can hold a valid value of this type at given index.
+    unsafe fn write_unaligned(root: &mut [u8], value: Self, index: BorrowedIndex<Self>);
+}
+
+/// A trait for slice-like types that can be used with [`BorrowedRef`] and
+/// [`BorrowedMut`].
+pub trait BorrowedSlice {
+    /// Read the length of this slice from the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for reads,
+    /// and that it contains a valid slice of this type at given index.
+    unsafe fn read_length(root: &[u8], index: BorrowedIndex<Self>) -> usize;
+
+    /// Get a reference to this slice from the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for reads,
+    /// and that it contains a valid slice of this type at given index.
+    unsafe fn get_slice_ref(root: &[u8], index: BorrowedIndex<Self>) -> &Self;
+
+    /// Get a mutable reference to this slice from the given data and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `root` is valid for reads and writes,
+    /// and that it contains a valid slice of this type at given index.
+    unsafe fn get_slice_mut(root: &mut [u8], index: BorrowedIndex<Self>) -> &mut Self;
+}
+
+macro_rules! impl_trait {
+    (@integer $($ty:ty),*) => {
+        $(
+            impl BorrowedInteger for $ty {
+                #[inline]
+                unsafe fn read_unaligned(root: &[u8], index: BorrowedIndex<Self>) -> Self {
+                    // SAFETY: The caller ensures that `read_unaligned` is valid.
+                    unsafe { core::ptr::read_unaligned(root.as_ptr().add(index.index()).cast::<Self>()).to_be() }
+                }
+
+                #[inline]
+                unsafe fn write_unaligned(root: &mut [u8], value: Self, index: BorrowedIndex<Self>) {
+                    // SAFETY: The caller ensures that `read_unaligned` is valid.
+                    unsafe { core::ptr::write_unaligned(root.as_mut_ptr().add(index.index()).cast::<Self>(), value.to_be()); }
+                }
+            }
+        )*
+    };
+}
+
+impl_trait!(@integer i8, i16, i32, i64, i128, u8, u16, u32, u64, u128);
+
+impl BorrowedSlice for [u8] {
+    #[inline]
+    unsafe fn read_length(root: &[u8], index: BorrowedIndex<Self>) -> usize {
+        // SAFETY: The caller ensures that `read_length` is valid.
+        unsafe {
+            #[expect(clippy::cast_ptr_alignment, reason = "Using with `read_unaligned`")]
+            let ptr = root.as_ptr().add(index.index()).cast::<u16>();
+            usize::from(core::ptr::read_unaligned(ptr).to_be())
+        }
+    }
+
+    #[inline]
+    unsafe fn get_slice_ref(root: &[u8], index: BorrowedIndex<Self>) -> &Self {
+        // SAFETY: The caller ensures that `get_slice_ref` is valid.
+        unsafe {
+            let length = Self::read_length(root, index);
+            let ptr = root.as_ptr().add(index.index() + 2);
+            core::slice::from_raw_parts(ptr, length)
+        }
+    }
+
+    #[inline]
+    unsafe fn get_slice_mut(root: &mut [u8], index: BorrowedIndex<Self>) -> &mut Self {
+        // SAFETY: The caller ensures that `get_slice_mut` is valid.
+        unsafe {
+            let length = Self::read_length(root, index);
+            let ptr = root.as_mut_ptr().add(index.index() + 2);
+            core::slice::from_raw_parts_mut(ptr, length)
+        }
+    }
+}
+
+impl BorrowedSlice for MStr {
+    #[inline]
+    unsafe fn read_length(root: &[u8], index: BorrowedIndex<Self>) -> usize {
+        // SAFETY: The caller ensures that `read_length` is valid.
+        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
+        unsafe { <[u8] as BorrowedSlice>::read_length(root, index.cast()) }
+    }
+
+    #[inline]
+    unsafe fn get_slice_ref(root: &[u8], index: BorrowedIndex<Self>) -> &Self {
+        // SAFETY: The caller ensures that `get_slice_ref` is valid.
+        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
+        unsafe {
+            let slice = <[u8] as BorrowedSlice>::get_slice_ref(root, index.cast());
+            MStr::from_mutf8_unchecked(slice)
+        }
+    }
+
+    #[inline]
+    unsafe fn get_slice_mut(root: &mut [u8], index: BorrowedIndex<Self>) -> &mut Self {
+        // SAFETY: The caller ensures that `get_slice_mut` is valid.
+        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
+        unsafe {
+            let slice = <[u8] as BorrowedSlice>::get_slice_mut(root, index.cast());
+            MStr::from_mutf8_mut_unchecked(slice)
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// An index to a type `T`.
 #[repr(transparent)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct NbtIndex<T: ?Sized>(usize, PhantomData<T>);
+pub struct BorrowedIndex<T: ?Sized>(usize, PhantomData<T>);
 
-impl<T: ?Sized> NbtIndex<T> {
-    /// Create a new [`NbtIndex`] with the given index.
-    #[inline]
-    #[must_use]
-    pub const fn new(index: usize) -> Self { Self(index, PhantomData) }
-
-    /// Get the index of the data in the NBT structure.
-    #[inline]
-    #[must_use]
-    pub const fn index(self) -> usize { self.0 }
-
-    /// Cast this [`NbtIndex`] to a different type.
+impl<T: ?Sized> BorrowedIndex<T> {
+    /// Create a new [`BorrowedIndex`] using the given index.
     ///
     /// # Safety
     ///
-    /// The caller must ensure that the data at this index is valid for type
-    /// `U`.
+    /// The caller must ensure that the index is valid for the type `T` in
+    /// whatever context it is used.
     #[inline]
     #[must_use]
-    pub const unsafe fn cast<U: ?Sized>(self) -> NbtIndex<U> { NbtIndex(self.0, PhantomData) }
+    pub const unsafe fn new(index: usize) -> Self { Self(index, PhantomData) }
+
+    /// Cast this [`BorrowedIndex`] to a different type.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the index is valid for the new type `U` in
+    /// whatever context it is used.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn cast<U: ?Sized>(self) -> BorrowedIndex<U> {
+        BorrowedIndex(self.0, PhantomData)
+    }
+
+    /// Get the index contained in this [`BorrowedIndex`].
+    #[inline]
+    #[must_use]
+    pub const fn index(&self) -> usize { self.0 }
 }
 
-impl<T: Copy + Sized> NbtIndex<T> {
-    /// Read the type from the given data slice.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for reads,
-    /// and that it contains a valid `T` at this index.
-    #[inline]
-    #[must_use]
-    #[allow(clippy::missing_panics_doc, reason = "Debug sanity check")]
-    pub const unsafe fn read(&self, data: &[u8]) -> T {
-        #[cfg(debug_assertions)]
-        assert!((self.0 + core::mem::size_of::<T>()) <= data.len(), "Slice is too small to read!");
-
-        // SAFETY: The caller ensures that `data` is valid for reads.
-        // SAFETY: The caller ensures that `data` contains a valid `T` at the index.
-        unsafe { core::ptr::read_unaligned(data.as_ptr().add(self.0).cast::<T>()) }
-    }
-
-    /// Write the type to the given data slice.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for writes,
-    /// and that it can hold a valid `T` at this index.
-    #[inline]
-    #[allow(clippy::missing_panics_doc, reason = "Debug sanity check")]
-    pub const unsafe fn write(&self, value: T, data: &mut [u8]) {
-        #[cfg(debug_assertions)]
-        assert!((self.0 + core::mem::size_of::<T>()) <= data.len(), "Slice is too small to write!");
-
-        // SAFETY: The caller ensures that `data` is valid for writes.
-        // SAFETY: The caller ensures that `data` can hold a valid `T` at the index.
-        unsafe { core::ptr::write_unaligned(data.as_mut_ptr().add(self.0).cast::<T>(), value) }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl NbtIndex<[u8]> {
-    /// Read the length of the byte slice from the given data slice.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for reads,
-    /// and that it contains a valid byte slice at this index.
-    #[inline]
-    #[must_use]
-    pub const unsafe fn len(self, data: &[u8]) -> u16 {
-        // SAFETY: The caller ensures that `data` is valid for reads.
-        // SAFETY: The caller ensures that `data` contains a valid byte slice at the
-        // index.
-        unsafe { NbtIndex::<u16>::new(self.0).read(data) }.to_be()
-    }
-
-    /// Read the byte slice from the given data slice.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for reads,
-    /// and that it contains a valid byte slice at this index.
-    #[inline]
-    #[must_use]
-    #[allow(clippy::missing_panics_doc, reason = "Debug sanity check")]
-    pub const unsafe fn read<'data>(&self, data: &'data [u8]) -> &'data [u8] {
-        #[cfg(debug_assertions)]
-        {
-            // SAFETY: The caller ensures that `data` is valid for reads.
-            // SAFETY: The caller ensures that `data` contains a valid byte slice at the
-            // index.
-            let len = unsafe { self.len(data) } as usize;
-            assert!((self.0 + 2 + len) <= data.len(), "Slice is too small to read the slice!");
-        }
-
-        // SAFETY: The caller ensures that `data` is valid for reads.
-        // SAFETY: The caller ensures that `data` contains a valid byte slice at the
-        // index.
-        unsafe {
-            let len = self.len(data) as usize;
-            let ptr = data.as_ptr().add(self.0 + 2);
-            core::slice::from_raw_parts(ptr, len)
-        }
-    }
-}
-
-impl NbtIndex<MStr> {
-    /// Read the length of the string from the given data slice.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for reads,
-    /// and that it contains a valid [`MStr`] at this index.
-    #[inline]
-    #[must_use]
-    pub const unsafe fn len(self, data: &[u8]) -> u16 {
-        // SAFETY: The caller ensures that `data` is valid for reads.
-        // SAFETY: The caller ensures that `data` contains a valid `MStr` at the index.
-        unsafe { NbtIndex::<u16>::new(self.0).read(data) }.to_be()
-    }
-
-    /// Read the string from the given data slice.
-    ///
-    /// # Note
-    ///
-    /// This function does not perform any MUTF-8 validation!
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure the slice is valid for reads,
-    /// and that it contains a valid [`MStr`] at this index.
-    #[inline]
-    #[must_use]
-    #[allow(clippy::missing_panics_doc, reason = "Debug sanity check")]
-    pub const unsafe fn read<'data>(&self, data: &'data [u8]) -> &'data MStr {
-        #[cfg(debug_assertions)]
-        {
-            // SAFETY: The caller ensures that `data` is valid for reads.
-            // SAFETY: The caller ensures that `data` contains a valid `MStr` at the index.
-            let len = unsafe { self.len(data) } as usize;
-            assert!((self.0 + 2 + len) <= data.len(), "Slice is too small to read the string!");
-        }
-
-        // SAFETY: The caller ensures that `data` is valid for reads.
-        // SAFETY: The caller ensures that `data` contains a valid `MStr` at the index.
-        unsafe {
-            let len = self.len(data) as usize;
-            let ptr = data.as_ptr().add(self.0 + 2);
-            MStr::from_mutf8_unchecked(core::slice::from_raw_parts(ptr, len))
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl<T: ?Sized> Debug for NbtIndex<T> {
-    #[inline]
+impl<T: ?Sized> fmt::Debug for BorrowedIndex<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("NbtRef").field(&self.0).finish()
+        f.debug_tuple("BorrowedIndex").field(&self.0).finish()
     }
 }
+impl<T: ?Sized> fmt::Display for BorrowedIndex<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { self.0.fmt(f) }
+}
 
-impl<T: ?Sized> Copy for NbtIndex<T> {}
-impl<T: ?Sized> Clone for NbtIndex<T> {
+impl<T: ?Sized> Copy for BorrowedIndex<T> {}
+impl<T: ?Sized> Clone for BorrowedIndex<T> {
     #[inline]
     fn clone(&self) -> Self { *self }
 }
 
-impl<T: ?Sized> Eq for NbtIndex<T> {}
-impl<T1: ?Sized, T2: ?Sized> PartialEq<NbtIndex<T2>> for NbtIndex<T1> {
+impl<T: ?Sized> Eq for BorrowedIndex<T> {}
+impl<T: ?Sized> PartialEq for BorrowedIndex<T> {
     #[inline]
-    fn eq(&self, other: &NbtIndex<T2>) -> bool { self.0 == other.0 }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
-impl<T: ?Sized + 'static> Hash for NbtIndex<T> {
+impl<T: ?Sized> Ord for BorrowedIndex<T> {
     #[inline]
-    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+    fn cmp(&self, other: &Self) -> Ordering { self.0.cmp(&other.0) }
+}
+impl<T: ?Sized> PartialOrd for BorrowedIndex<T> {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) }
+}
+
+impl<T: Any> Hash for BorrowedIndex<T> {
+    #[inline]
+    fn hash<H: Hasher>(&self, state: &mut H) {
         TypeId::of::<T>().hash(state);
         self.0.hash(state);
     }
 }
 
-impl<T: ?Sized> Add<usize> for NbtIndex<T> {
+impl<T: ?Sized> Add<usize> for BorrowedIndex<T> {
     type Output = Self;
 
     #[inline]
-    fn add(self, rhs: usize) -> Self::Output { Self::new(self.0 + rhs) }
+    fn add(self, rhs: usize) -> Self::Output { BorrowedIndex(self.0 + rhs, PhantomData) }
 }
-impl<T: ?Sized> AddAssign<usize> for NbtIndex<T> {
+impl<T: ?Sized> AddAssign<usize> for BorrowedIndex<T> {
     #[inline]
     fn add_assign(&mut self, rhs: usize) { self.0 += rhs; }
 }
 
-impl<T: ?Sized> Sub<usize> for NbtIndex<T> {
+impl<T: ?Sized> Sub<usize> for BorrowedIndex<T> {
     type Output = Self;
 
     #[inline]
-    fn sub(self, rhs: usize) -> Self::Output { Self::new(self.0 - rhs) }
+    fn sub(self, rhs: usize) -> Self::Output { BorrowedIndex(self.0 - rhs, PhantomData) }
 }
-impl<T: ?Sized> SubAssign<usize> for NbtIndex<T> {
+impl<T: ?Sized> SubAssign<usize> for BorrowedIndex<T> {
     #[inline]
     fn sub_assign(&mut self, rhs: usize) { self.0 -= rhs; }
 }
