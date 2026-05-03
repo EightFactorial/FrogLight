@@ -22,14 +22,10 @@ fn read() {
             IndexedEntry::new(BorrowedIndex::new(25), BorrowedIndex::new(32)),
         ]
     };
+    static INDEXES: &[Range<usize>] = &[Range { start: 0, end: ENTRIES.len() }];
 
     static NBT: IndexedNbtRef<'static> = unsafe {
-        IndexedNbtRef::new_unchecked(
-            None,
-            SLICE,
-            Cow::Borrowed(ENTRIES),
-            Range { start: 0, end: ENTRIES.len() },
-        )
+        IndexedNbtRef::new_unchecked(SLICE, None, Cow::Borrowed(ENTRIES), Cow::Borrowed(INDEXES))
     };
 
     let compound = NBT.as_compound();

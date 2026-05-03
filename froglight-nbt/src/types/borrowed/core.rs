@@ -1,6 +1,7 @@
 //! TODO
 
 use alloc::borrow::Cow;
+use core::range::Range;
 
 use super::IndexedEntry;
 
@@ -9,18 +10,23 @@ use super::IndexedEntry;
 pub(super) struct IndexedCoreRef<'data> {
     root: &'data [u8],
     entries: Cow<'data, [IndexedEntry]>,
+    indexes: Cow<'data, [Range<usize>]>,
 }
 impl<'data> IndexedCoreRef<'data> {
     /// Create a new [`IndexedCoreRef`] from the given root and entries.
     ///
     /// # Safety
     ///
-    /// The caller must ensure that the given list of entries is valid for the
-    /// given root.
+    /// The caller must ensure that the given list of entries and indexes
+    /// is valid for the given root slice.
     #[inline]
     #[must_use]
-    pub(super) const unsafe fn new(root: &'data [u8], entries: Cow<'data, [IndexedEntry]>) -> Self {
-        Self { root, entries }
+    pub(super) const unsafe fn new(
+        root: &'data [u8],
+        entries: Cow<'data, [IndexedEntry]>,
+        indexes: Cow<'data, [Range<usize>]>,
+    ) -> Self {
+        Self { root, entries, indexes }
     }
 
     /// Get the core byte slice.
@@ -37,6 +43,15 @@ impl<'data> IndexedCoreRef<'data> {
         }
     }
 
+    /// Get the core list of index ranges.
+    #[must_use]
+    pub(super) const fn indexes(&self) -> &[Range<usize>] {
+        match self.indexes {
+            Cow::Borrowed(i) => i,
+            Cow::Owned(ref i) => i.as_slice(),
+        }
+    }
+
     /// Reborrow this [`IndexedCoreRef`] with a shorter lifetime.
     #[inline]
     #[must_use]
@@ -46,6 +61,10 @@ impl<'data> IndexedCoreRef<'data> {
             entries: match self.entries {
                 Cow::Borrowed(e) => Cow::Borrowed(e),
                 Cow::Owned(ref e) => Cow::Borrowed(e.as_slice()),
+            },
+            indexes: match self.indexes {
+                Cow::Borrowed(i) => Cow::Borrowed(i),
+                Cow::Owned(ref i) => Cow::Borrowed(i.as_slice()),
             },
         }
     }
@@ -58,6 +77,7 @@ impl<'data> IndexedCoreRef<'data> {
 pub(super) struct IndexedCoreMut<'data> {
     root: &'data mut [u8],
     entries: Cow<'data, [IndexedEntry]>,
+    indexes: Cow<'data, [Range<usize>]>,
 }
 
 impl<'data> IndexedCoreMut<'data> {
@@ -65,15 +85,16 @@ impl<'data> IndexedCoreMut<'data> {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that the given list of entries is valid for the
-    /// given root.
+    /// The caller must ensure that the given list of entries and indexes
+    /// is valid for the given root slice.
     #[inline]
     #[must_use]
     pub(super) const unsafe fn new(
         root: &'data mut [u8],
         entries: Cow<'data, [IndexedEntry]>,
+        indexes: Cow<'data, [Range<usize>]>,
     ) -> Self {
-        Self { root, entries }
+        Self { root, entries, indexes }
     }
 
     /// Get the core byte slice.
@@ -95,6 +116,15 @@ impl<'data> IndexedCoreMut<'data> {
         }
     }
 
+    /// Get the core list of index ranges.
+    #[must_use]
+    pub(super) const fn indexes(&self) -> &[Range<usize>] {
+        match self.indexes {
+            Cow::Borrowed(i) => i,
+            Cow::Owned(ref i) => i.as_slice(),
+        }
+    }
+
     /// Reborrow this [`IndexedCoreMut`] with a shorter lifetime.
     #[inline]
     #[must_use]
@@ -104,6 +134,10 @@ impl<'data> IndexedCoreMut<'data> {
             entries: match self.entries {
                 Cow::Borrowed(e) => Cow::Borrowed(e),
                 Cow::Owned(ref e) => Cow::Borrowed(e.as_slice()),
+            },
+            indexes: match self.indexes {
+                Cow::Borrowed(i) => Cow::Borrowed(i),
+                Cow::Owned(ref i) => Cow::Borrowed(i.as_slice()),
             },
         }
     }
@@ -118,6 +152,10 @@ impl<'data> IndexedCoreMut<'data> {
                 Cow::Borrowed(e) => Cow::Borrowed(e),
                 Cow::Owned(ref e) => Cow::Borrowed(e.as_slice()),
             },
+            indexes: match self.indexes {
+                Cow::Borrowed(i) => Cow::Borrowed(i),
+                Cow::Owned(ref i) => Cow::Borrowed(i.as_slice()),
+            },
         }
     }
 
@@ -125,6 +163,6 @@ impl<'data> IndexedCoreMut<'data> {
     #[inline]
     #[must_use]
     pub(super) fn into_ref(self) -> IndexedCoreRef<'data> {
-        IndexedCoreRef { root: self.root, entries: self.entries }
+        IndexedCoreRef { root: self.root, entries: self.entries, indexes: self.indexes }
     }
 }

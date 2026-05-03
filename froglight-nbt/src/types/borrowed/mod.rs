@@ -19,7 +19,6 @@ pub mod reference;
 pub struct IndexedNbtRef<'data> {
     name: Option<BorrowedIndex<MStr>>,
     core: IndexedCoreRef<'data>,
-    range: Range<usize>,
 }
 
 impl<'data> IndexedNbtRef<'data> {
@@ -41,7 +40,7 @@ impl<'data> IndexedNbtRef<'data> {
     #[must_use]
     pub const fn as_compound(&self) -> IndexedCompoundRef<'_> {
         // SAFETY: `IndexedNbtRef` ensures this is valid.
-        unsafe { IndexedCompoundRef::new(self.core.reborrow(), self.range) }
+        unsafe { IndexedCompoundRef::new(self.core.reborrow(), 0) }
     }
 
     /// Create a new [`IndexedNbtRef`] from the given root and entries.
@@ -51,17 +50,17 @@ impl<'data> IndexedNbtRef<'data> {
     /// The caller must ensure that:
     /// - The name's index is valid for the given root (if it exists).
     /// - The list of entries is valid for the given root.
-    /// - The root's range is valid for the list of entries.
+    /// - The list of indexes is valid for the list of entries.
     #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(
-        name: Option<BorrowedIndex<MStr>>,
         root: &'data [u8],
+        name: Option<BorrowedIndex<MStr>>,
         entries: Cow<'data, [IndexedEntry]>,
-        range: Range<usize>,
+        indexes: Cow<'data, [Range<usize>]>,
     ) -> Self {
         // SAFETY: The caller ensured this is safe.
-        Self { name, core: unsafe { IndexedCoreRef::new(root, entries) }, range }
+        Self { name, core: unsafe { IndexedCoreRef::new(root, entries, indexes) } }
     }
 }
 
@@ -72,7 +71,6 @@ impl<'data> IndexedNbtRef<'data> {
 pub struct IndexedNbtMut<'data> {
     name: Option<BorrowedIndex<MStr>>,
     core: IndexedCoreMut<'data>,
-    range: Range<usize>,
 }
 
 impl<'data> IndexedNbtMut<'data> {
@@ -94,7 +92,7 @@ impl<'data> IndexedNbtMut<'data> {
     #[must_use]
     pub const fn as_compound(&self) -> IndexedCompoundRef<'_> {
         // SAFETY: `IndexedNbtMut` ensures this is valid.
-        unsafe { IndexedCompoundRef::new(self.core.as_ref(), self.range) }
+        unsafe { IndexedCompoundRef::new(self.core.as_ref(), 0) }
     }
 
     /// Get the root compound of this NBT structure.
@@ -102,7 +100,7 @@ impl<'data> IndexedNbtMut<'data> {
     #[must_use]
     pub const fn as_compound_mut(&mut self) -> IndexedCompoundMut<'_> {
         // SAFETY: `IndexedNbtMut` ensures this is valid.
-        unsafe { IndexedCompoundMut::new(self.core.reborrow(), self.range) }
+        unsafe { IndexedCompoundMut::new(self.core.reborrow(), 0) }
     }
 
     /// Create a new [`IndexedNbtMut`] from the given root and entries.
@@ -112,16 +110,16 @@ impl<'data> IndexedNbtMut<'data> {
     /// The caller must ensure that:
     /// - The name's index is valid for the given root (if it exists).
     /// - The list of entries is valid for the given root.
-    /// - The root's range is valid for the list of entries.
+    /// - The list of indexes is valid for the list of entries.
     #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(
-        name: Option<BorrowedIndex<MStr>>,
         root: &'data mut [u8],
+        name: Option<BorrowedIndex<MStr>>,
         entries: Cow<'data, [IndexedEntry]>,
-        range: Range<usize>,
+        indexes: Cow<'data, [Range<usize>]>,
     ) -> Self {
         // SAFETY: The caller ensured this is safe.
-        Self { name, core: unsafe { IndexedCoreMut::new(root, entries) }, range }
+        Self { name, core: unsafe { IndexedCoreMut::new(root, entries, indexes) } }
     }
 }
