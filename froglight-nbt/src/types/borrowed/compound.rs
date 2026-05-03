@@ -1,21 +1,26 @@
 //! TODO
 
+use core::range::Range;
+
 use froglight_mutf8::prelude::MStr;
 
-use crate::types::borrowed::reference::{BorrowedIndex, BorrowedMut, BorrowedRef};
+use crate::types::borrowed::{
+    IndexedCoreMut, IndexedCoreRef,
+    reference::{BorrowedIndex, BorrowedMut, BorrowedRef},
+};
 
 /// An NBT compound tag with a reference to its data.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IndexedCompoundRef<'data> {
-    root: &'data [u8],
-    entries: &'data [IndexedEntry],
+    core: IndexedCoreRef<'data>,
+    range: Range<usize>,
 }
 
 /// A reference to an entry in an [`IndexedCompound`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BorrowedEntryRef<'data> {
     root: &'data [u8],
-    entry: &'data IndexedEntry,
+    entry: IndexedEntry,
 }
 
 impl<'data> IndexedCompoundRef<'data> {
@@ -23,33 +28,37 @@ impl<'data> IndexedCompoundRef<'data> {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that `entries` are valid indexes into `root`.
+    /// The caller must ensure that `range` is a valid range of `core`.
     #[must_use]
-    pub const unsafe fn new(root: &'data [u8], entries: &'data [IndexedEntry]) -> Self {
-        Self { root, entries }
+    pub(super) const unsafe fn new(core: IndexedCoreRef<'data>, range: Range<usize>) -> Self {
+        Self { core, range }
     }
 
     /// Get the number of entries in this [`IndexedCompoundRef`].
     #[inline]
     #[must_use]
-    pub const fn len(&self) -> usize { self.entries.len() }
+    pub const fn len(&self) -> usize { self.range.end.saturating_sub(self.range.start) }
 
     /// Returns `true` if the compound is empty.
     #[inline]
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.entries.is_empty() }
+    pub const fn is_empty(&self) -> bool { self.len() == 0 }
 
     /// Get a reference to the entry with the given key, if it exists.
     ///
     /// Returns `None` if no entry with the given key exists.
     #[must_use]
     pub fn get<'a, T: PartialEq<MStr> + ?Sized>(&'a self, key: &T) -> Option<BorrowedRef<'a, ()>> {
-        for entry in self.entries {
-            // SAFETY: This entry corresponds to this `root`, so the index is valid.
-            let key_ref = unsafe { BorrowedRef::new(self.root, entry.name) };
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        for entry in entries {
+            // SAFETY: The entry uses the same `root` so the index is valid.
+            let key_ref = unsafe { BorrowedRef::new(self.core.root(), entry.name) };
+
             if key == key_ref.get_ref() {
-                // SAFETY: This entry corresponds to this `root`, so the index is valid.
-                return Some(unsafe { BorrowedRef::new(self.root, entry.contents) });
+                // SAFETY: The ref uses the same `root` so the index is valid.
+                return Some(unsafe { BorrowedRef::new(self.core.root(), entry.contents) });
             }
         }
         None
@@ -60,12 +69,25 @@ impl<'data> IndexedCompoundRef<'data> {
     /// Returns `None` if no entry at the given index exists.
     #[must_use]
     pub fn get_index(&self, index: usize) -> Option<BorrowedEntryRef<'_>> {
-        self.entries.get(index).map(|entry| BorrowedEntryRef { root: self.root, entry })
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        entries.get(index).copied().map(|entry| BorrowedEntryRef { root: self.core.root(), entry })
     }
 
     /// Get an iterator over all entries in this compound.
     pub fn iter(&self) -> impl Iterator<Item = BorrowedEntryRef<'_>> {
-        self.entries.iter().map(|entry| BorrowedEntryRef { root: self.root, entry })
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        entries.iter().copied().map(|entry| BorrowedEntryRef { root: self.core.root(), entry })
+    }
+
+    /// Reborrow this [`IndexedCompoundRef`] with a shorter lifetime.
+    #[inline]
+    #[must_use]
+    pub const fn reborrow(&self) -> IndexedCompoundRef<'_> {
+        IndexedCompoundRef { core: self.core.reborrow(), range: self.range }
     }
 }
 
@@ -92,15 +114,15 @@ impl<'data> BorrowedEntryRef<'data> {
 /// An NBT compound tag with a mutable reference to its data.
 #[derive(Debug, PartialEq, Eq)]
 pub struct IndexedCompoundMut<'data> {
-    root: &'data mut [u8],
-    entries: &'data [IndexedEntry],
+    core: IndexedCoreMut<'data>,
+    range: Range<usize>,
 }
 
 /// A mutable reference to an entry in an [`IndexedCompound`].
 #[derive(Debug, PartialEq, Eq)]
 pub struct BorrowedEntryMut<'data> {
     root: &'data mut [u8],
-    entry: &'data IndexedEntry,
+    entry: IndexedEntry,
 }
 
 impl<'data> IndexedCompoundMut<'data> {
@@ -108,33 +130,36 @@ impl<'data> IndexedCompoundMut<'data> {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that `entries` are valid indexes into `root`.
+    /// The caller must ensure that `range` is a valid range of `core`.
     #[must_use]
-    pub const unsafe fn new(root: &'data mut [u8], entries: &'data [IndexedEntry]) -> Self {
-        Self { root, entries }
+    pub(super) const unsafe fn new(core: IndexedCoreMut<'data>, range: Range<usize>) -> Self {
+        Self { core, range }
     }
 
     /// Get the number of entries in this [`IndexedCompoundRef`].
     #[inline]
     #[must_use]
-    pub const fn len(&self) -> usize { self.entries.len() }
+    pub const fn len(&self) -> usize { self.range.end.saturating_sub(self.range.start) }
 
     /// Returns `true` if the compound is empty.
     #[inline]
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.entries.is_empty() }
+    pub const fn is_empty(&self) -> bool { self.len() == 0 }
 
     /// Get a reference to the entry with the given key, if it exists.
     ///
     /// Returns `None` if no entry with the given key exists.
     #[must_use]
     pub fn get<'a, T: PartialEq<MStr> + ?Sized>(&'a self, key: &T) -> Option<BorrowedRef<'a, ()>> {
-        for entry in self.entries {
-            // SAFETY: This entry corresponds to this `root`, so the index is valid.
-            let key_ref = unsafe { BorrowedRef::new(self.root, entry.name) };
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        for entry in entries {
+            // SAFETY: The entry uses the same `root` so the index is valid.
+            let key_ref = unsafe { BorrowedRef::new(self.core.root(), entry.name) };
             if key == key_ref.get_ref() {
-                // SAFETY: This entry corresponds to this `root`, so the index is valid.
-                return Some(unsafe { BorrowedRef::new(self.root, entry.contents) });
+                // SAFETY: The ref uses the same `root` so the index is valid.
+                return Some(unsafe { BorrowedRef::new(self.core.root(), entry.contents) });
             }
         }
         None
@@ -148,12 +173,16 @@ impl<'data> IndexedCompoundMut<'data> {
         &'a mut self,
         key: &T,
     ) -> Option<BorrowedMut<'a, ()>> {
-        for entry in self.entries {
-            // SAFETY: This entry corresponds to this `root`, so the index is valid.
-            let key_ref = unsafe { BorrowedRef::new(self.root, entry.name) };
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        for entry in entries {
+            // SAFETY: The entry uses the same `root` so the index is valid.
+            let key_ref = unsafe { BorrowedRef::new(self.core.root(), entry.name) };
             if key == key_ref.get_ref() {
-                // SAFETY: This entry corresponds to this `root`, so the index is valid.
-                return Some(unsafe { BorrowedMut::new(self.root, entry.contents) });
+                // SAFETY: The ref uses the same `root` so the index is valid.
+                let index = entry.contents;
+                return Some(unsafe { BorrowedMut::new(self.core.root_mut(), index) });
             }
         }
         None
@@ -164,7 +193,10 @@ impl<'data> IndexedCompoundMut<'data> {
     /// Returns `None` if no entry at the given index exists.
     #[must_use]
     pub fn get_index(&self, index: usize) -> Option<BorrowedEntryRef<'_>> {
-        self.entries.get(index).map(|entry| BorrowedEntryRef { root: self.root, entry })
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        entries.get(index).copied().map(|entry| BorrowedEntryRef { root: self.core.root(), entry })
     }
 
     /// Get a mutable reference to the entry at the given index, if it exists.
@@ -172,26 +204,42 @@ impl<'data> IndexedCompoundMut<'data> {
     /// Returns `None` if no entry at the given index exists.
     #[must_use]
     pub fn get_index_mut(&mut self, index: usize) -> Option<BorrowedEntryMut<'_>> {
-        self.entries.get(index).map(|entry| BorrowedEntryMut { root: self.root, entry })
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        entries
+            .get(index)
+            .copied()
+            .map(|entry| BorrowedEntryMut { root: self.core.root_mut(), entry })
     }
 
     /// Get an iterator over all entries in this compound.
     pub fn iter(&self) -> impl Iterator<Item = BorrowedEntryRef<'_>> {
-        self.entries.iter().map(|entry| BorrowedEntryRef { root: self.root, entry })
+        // SAFETY: `range` is always guaranteed to be within bounds
+        let entries = unsafe { self.core.entries().get_unchecked(self.range) };
+
+        entries.iter().copied().map(|entry| BorrowedEntryRef { root: self.core.root(), entry })
+    }
+
+    /// Reborrow this [`IndexedCompoundMut`] with a shorter lifetime.
+    #[inline]
+    #[must_use]
+    pub const fn reborrow(&mut self) -> IndexedCompoundMut<'_> {
+        IndexedCompoundMut { core: self.core.reborrow(), range: self.range }
     }
 
     /// Get this [`IndexedCompoundMut`] as a [`IndexedCompoundRef`].
     #[inline]
     #[must_use]
     pub const fn as_ref(&self) -> IndexedCompoundRef<'_> {
-        IndexedCompoundRef { root: self.root, entries: self.entries }
+        IndexedCompoundRef { core: self.core.as_ref(), range: self.range }
     }
 
-    /// Convert this [`IndexedCompoundMut`] into a [`IndexedCompoundRef`].
+    /// Convert this [`IndexedCompoundMut`] into an [`IndexedCompoundRef`].
     #[inline]
     #[must_use]
-    pub const fn into_ref(self) -> IndexedCompoundRef<'data> {
-        IndexedCompoundRef { root: self.root, entries: self.entries }
+    pub fn into_ref(self) -> IndexedCompoundRef<'data> {
+        IndexedCompoundRef { core: self.core.into_ref(), range: self.range }
     }
 }
 

@@ -3,8 +3,11 @@
 
 extern crate alloc;
 
+use alloc::borrow::Cow;
+use core::range::Range;
+
 use froglight_mutf8::mutf8;
-use froglight_nbt::prelude::*;
+use froglight_nbt::{prelude::*, types::borrowed::reference::BorrowedIndex};
 
 #[test]
 fn read() {
@@ -20,21 +23,30 @@ fn read() {
         ]
     };
 
-    static NBT: IndexedCompoundRef<'static> = unsafe { IndexedCompoundRef::new(SLICE, ENTRIES) };
+    static NBT: IndexedNbtRef<'static> = unsafe {
+        IndexedNbtRef::new_unchecked(
+            None,
+            SLICE,
+            Cow::Borrowed(ENTRIES),
+            Range { start: 0, end: ENTRIES.len() },
+        )
+    };
 
-    if let Some(_entry) = NBT.get("entry_name") {
+    let compound = NBT.as_compound();
+
+    if let Some(_entry) = compound.get("entry_name") {
         // assert_eq!(entry.as_string().unwrap(), mutf8!("entry_value"));
     } else {
         panic!("`entry_name` not found!");
     }
 
-    if let Some(_entry) = NBT.get("Short") {
+    if let Some(_entry) = compound.get("Short") {
         // assert_eq!(entry.as_short().unwrap(), 0x1234);
     } else {
         panic!("`Short` not found!");
     }
 
-    for (index, entry) in NBT.iter().enumerate() {
+    for (index, entry) in compound.iter().enumerate() {
         match index {
             0 => {
                 assert_eq!(entry.name().get_ref(), mutf8!("entry_name"));

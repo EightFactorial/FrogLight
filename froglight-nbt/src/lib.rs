@@ -11,7 +11,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::types::borrowed::{
+        IndexedNbtMut, IndexedNbtRef,
         compound::{IndexedCompoundMut, IndexedCompoundRef, IndexedEntry},
-        reference::{BorrowedIndex, BorrowedMut, BorrowedRef},
     };
 }
