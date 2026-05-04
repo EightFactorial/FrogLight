@@ -12,6 +12,7 @@ use froglight_nbt::{
     types::borrowed::{reference::BorrowedIndex, value::IndexedValue},
 };
 
+// TODO: Replace this with valid NBT
 #[test]
 fn read() {
     static SLICE: &[u8] = &[

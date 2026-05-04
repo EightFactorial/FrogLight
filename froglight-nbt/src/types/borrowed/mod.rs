@@ -10,12 +10,13 @@ use compound::{IndexedCompoundMut, IndexedCompoundRef, IndexedEntry};
 pub mod core;
 use core::{IndexedCoreMut, IndexedCoreRef};
 
-pub mod list;
-
 pub mod reference;
 use reference::{BorrowedIndex, BorrowedRef};
 
+pub mod list;
 pub mod value;
+
+mod parse;
 
 /// A borrowed NBT structure with an index of its contents.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,6 +26,22 @@ pub struct IndexedNbtRef<'data> {
 }
 
 impl<'data> IndexedNbtRef<'data> {
+    /// Parse a named NBT structure from the given slice.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the slice does not contain valid NBT data.
+    #[allow(clippy::result_unit_err, reason = "WIP")]
+    pub fn new_named(data: &'data [u8]) -> Result<Self, ()> { parse::parse_nbt_ref(data, true) }
+
+    /// Parse an unnamed NBT structure from the given slice.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the slice does not contain valid NBT data.
+    #[allow(clippy::result_unit_err, reason = "WIP")]
+    pub fn new_unnamed(data: &'data [u8]) -> Result<Self, ()> { parse::parse_nbt_ref(data, false) }
+
     /// Get the name of this NBT structure, if it has one.
     ///
     /// Returns `None` if this NBT structure is unnamed.
@@ -77,6 +94,24 @@ pub struct IndexedNbtMut<'data> {
 }
 
 impl<'data> IndexedNbtMut<'data> {
+    /// Parse a named NBT structure from the given slice.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the slice does not contain valid NBT data.
+    #[allow(clippy::result_unit_err, reason = "WIP")]
+    pub fn new_named(data: &'data mut [u8]) -> Result<Self, ()> { parse::parse_nbt_mut(data, true) }
+
+    /// Parse an unnamed NBT structure from the given slice.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the slice does not contain valid NBT data.
+    #[allow(clippy::result_unit_err, reason = "WIP")]
+    pub fn new_unnamed(data: &'data mut [u8]) -> Result<Self, ()> {
+        parse::parse_nbt_mut(data, false)
+    }
+
     /// Get the name of this NBT structure, if it has one.
     ///
     /// Returns `None` if this NBT structure is unnamed.
