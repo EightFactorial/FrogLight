@@ -2,38 +2,24 @@
 #![no_std]
 
 extern crate alloc;
-
-use alloc::borrow::Cow;
-use core::range::Range;
+extern crate std;
 
 use froglight_mutf8::mutf8;
-use froglight_nbt::{
-    prelude::*,
-    types::borrowed::{reference::BorrowedIndex, value::IndexedValue},
-};
+use froglight_nbt::prelude::*;
 
-// TODO: Replace this with valid NBT
 #[test]
 fn read() {
     static SLICE: &[u8] = &[
-        0x00, 0x0A, b'e', b'n', b't', b'r', b'y', b'_', b'n', b'a', b'm', b'e', 0x00, 0x0B, b'e',
-        b'n', b't', b'r', b'y', b'_', b'v', b'a', b'l', b'u', b'e', 0x00, 0x05, b'S', b'h', b'o',
-        b'r', b't', 0x12, 0x34,
+        0x0A, 0x08, 0x00, 0x0A, b'e', b'n', b't', b'r', b'y', b'_', b'n', b'a', b'm', b'e', 0x00,
+        0x0B, b'e', b'n', b't', b'r', b'y', b'_', b'v', b'a', b'l', b'u', b'e', 0x02, 0x00, 0x05,
+        b'S', b'h', b'o', b'r', b't', 0x12, 0x34,
     ];
-    static ENTRIES: &[IndexedEntry] = unsafe {
-        &[
-            IndexedEntry::new(BorrowedIndex::new(0), IndexedValue::String(BorrowedIndex::new(12))),
-            IndexedEntry::new(BorrowedIndex::new(25), IndexedValue::Short(BorrowedIndex::new(32))),
-        ]
-    };
-    static INDEXES: &[Range<usize>] = &[Range { start: 0, end: ENTRIES.len() }];
 
-    static NBT: IndexedNbtRef<'static> = unsafe {
-        IndexedNbtRef::new_unchecked(SLICE, None, Cow::Borrowed(ENTRIES), Cow::Borrowed(INDEXES))
-    };
+    // Parse `SLICE`
+    let nbt = IndexedNbtRef::new_unnamed(SLICE).unwrap();
+    let compound = nbt.as_compound();
 
-    let compound = NBT.as_compound();
-
+    // Test getting entries by name
     if let Some(value) = compound.get("entry_name") {
         assert_eq!(value.as_string().unwrap(), mutf8!("entry_value"));
     } else {
@@ -46,6 +32,7 @@ fn read() {
         panic!("`Short` not found!");
     }
 
+    // Test iterating over entries
     for (index, entry) in compound.iter().enumerate() {
         match index {
             0 => {

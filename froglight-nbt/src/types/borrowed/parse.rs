@@ -6,7 +6,10 @@ use core::range::Range;
 
 use froglight_mutf8::prelude::MStr;
 
-use crate::{prelude::*, types::borrowed::reference::BorrowedIndex};
+use crate::{
+    prelude::*,
+    types::borrowed::{reference::BorrowedIndex, value::IndexedValue},
+};
 
 #[allow(clippy::unnecessary_wraps, reason = "WIP")]
 pub(super) fn parse_nbt_ref(root: &[u8], named: bool) -> Result<IndexedNbtRef<'_>, ()> {
@@ -26,15 +29,14 @@ pub(super) fn parse_nbt_mut(root: &mut [u8], named: bool) -> Result<IndexedNbtMu
     })
 }
 
-#[expect(unreachable_code, unused_variables, reason = "WIP")]
 #[expect(clippy::type_complexity, reason = "Returns multiple parsed components")]
 fn parse_nbt(
     root: &[u8],
     named: bool,
 ) -> Result<(Option<BorrowedIndex<MStr>>, Vec<IndexedEntry>, Vec<Range<usize>>), ()> {
     let mut cursor = SliceCursor::new(root);
-    let entries = Vec::new();
-    let indexes = Vec::new();
+    let mut entries = Vec::new();
+    let mut indexes = Vec::new();
 
     // All NBT starts with a compound tag
     if !matches!(cursor.next()?, NbtTagType::COMPOUND) {
@@ -42,9 +44,70 @@ fn parse_nbt(
     }
 
     // Read a name if this is a named structure
-    let name = if named { Some(read_string(&mut cursor)?) } else { None };
+    let name = named.then(|| read_string(&mut cursor)).transpose()?;
 
-    todo!("Parse NBT");
+    while let Ok(tag) = cursor.next() {
+        match tag {
+            NbtTagType::END => break,
+            NbtTagType::BYTE => {
+                let name = read_string(&mut cursor)?;
+                let value = read_byte(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Byte(value)));
+            }
+            NbtTagType::SHORT => {
+                let name = read_string(&mut cursor)?;
+                let value = read_short(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Short(value)));
+            }
+            NbtTagType::INT => {
+                let name = read_string(&mut cursor)?;
+                let value = read_int(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Int(value)));
+            }
+            NbtTagType::LONG => {
+                let name = read_string(&mut cursor)?;
+                let value = read_long(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Long(value)));
+            }
+            NbtTagType::FLOAT => {
+                let name = read_string(&mut cursor)?;
+                let value = read_float(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Float(value)));
+            }
+            NbtTagType::DOUBLE => {
+                let name = read_string(&mut cursor)?;
+                let value = read_double(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::Double(value)));
+            }
+            NbtTagType::STRING => {
+                let name = read_string(&mut cursor)?;
+                let value = read_string(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::String(value)));
+            }
+            NbtTagType::BYTE_ARRAY => {
+                let name = read_string(&mut cursor)?;
+                let value = read_byte_array(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::ByteArray(value)));
+            }
+            NbtTagType::INT_ARRAY => {
+                let name = read_string(&mut cursor)?;
+                let value = read_int_array(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::IntArray(value)));
+            }
+            NbtTagType::LONG_ARRAY => {
+                let name = read_string(&mut cursor)?;
+                let value = read_long_array(&mut cursor)?;
+                entries.push(IndexedEntry::new(name, IndexedValue::LongArray(value)));
+            }
+
+            NbtTagType::LIST => todo!(),
+            NbtTagType::COMPOUND => todo!(),
+
+            _ => return Err(()),
+        }
+    }
+
+    indexes.push(Range { start: 0, end: entries.len() });
 
     Ok((name, entries, indexes))
 }
@@ -155,14 +218,45 @@ fn read_string(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<MStr>, ()> 
 /// Parse a byte array from the cursor.
 ///
 /// # Errors
+///
 /// Returns an error if the byte array is invalid.
 #[inline]
 fn read_byte_array(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<[u8]>, ()> {
     let position = cursor.position();
     let length = u16::from_be_bytes(cursor.take::<2>()?);
-    let _ = cursor.take_slice(usize::from(length))?;
+    let _ = cursor.take_slice(usize::from(length) * core::mem::size_of::<u8>())?;
 
     // SAFETY: We just validated that cursor held a byte array
+    Ok(unsafe { BorrowedIndex::new(position) })
+}
+
+/// Parse an int array from the cursor.
+///
+/// # Errors
+///
+/// Returns an error if the int array is invalid.
+#[inline]
+fn read_int_array(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<[u32]>, ()> {
+    let position = cursor.position();
+    let length = u16::from_be_bytes(cursor.take::<2>()?);
+    let _ = cursor.take_slice(usize::from(length) * core::mem::size_of::<u32>())?;
+
+    // SAFETY: We just validated that cursor held an int array
+    Ok(unsafe { BorrowedIndex::new(position) })
+}
+
+/// Parse a long array from the cursor.
+///
+/// # Errors
+///
+/// Returns an error if the long array is invalid.
+#[inline]
+fn read_long_array(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<[u64]>, ()> {
+    let position = cursor.position();
+    let length = u16::from_be_bytes(cursor.take::<2>()?);
+    let _ = cursor.take_slice(usize::from(length) * core::mem::size_of::<u64>())?;
+
+    // SAFETY: We just validated that cursor held a long array
     Ok(unsafe { BorrowedIndex::new(position) })
 }
 
