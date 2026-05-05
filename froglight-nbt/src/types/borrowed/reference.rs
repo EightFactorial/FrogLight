@@ -250,13 +250,15 @@ macro_rules! impl_trait {
                 #[inline]
                 unsafe fn read_unaligned(root: &[u8], index: BorrowedIndex<Self>) -> Self {
                     // SAFETY: The caller ensures that `read_unaligned` is valid.
-                    unsafe { core::ptr::read_unaligned(root.as_ptr().add(index.index()).cast::<Self>()) }
+                    let be_value = unsafe { core::ptr::read_unaligned(root.as_ptr().add(index.index()).cast::<Self>()) };
+                    Self::from_be_bytes(be_value.to_ne_bytes())
                 }
 
                 #[inline]
                 unsafe fn write_unaligned(root: &mut [u8], value: Self, index: BorrowedIndex<Self>) {
                     // SAFETY: The caller ensures that `read_unaligned` is valid.
-                    unsafe { core::ptr::write_unaligned(root.as_mut_ptr().add(index.index()).cast::<Self>(), value); }
+                    let be_value = Self::from_be_bytes(value.to_ne_bytes());
+                    unsafe { core::ptr::write_unaligned(root.as_mut_ptr().add(index.index()).cast::<Self>(), be_value); }
                 }
             }
 
@@ -274,6 +276,38 @@ impl BorrowedSlice for [u8] {
         // SAFETY: The caller ensures that `read_length` is valid.
         unsafe {
             #[expect(clippy::cast_ptr_alignment, reason = "Using with `read_unaligned`")]
+            let ptr = root.as_ptr().add(index.index()).cast::<u32>();
+            usize::try_from(core::ptr::read_unaligned(ptr).to_be()).unwrap_or(0)
+        }
+    }
+
+    #[inline]
+    unsafe fn get_slice_ref(root: &[u8], index: BorrowedIndex<Self>) -> &Self {
+        // SAFETY: The caller ensures that `get_slice_ref` is valid.
+        unsafe {
+            let length = Self::read_length(root, index);
+            let ptr = root.as_ptr().add(index.index() + 4);
+            core::slice::from_raw_parts(ptr, length)
+        }
+    }
+
+    #[inline]
+    unsafe fn get_slice_mut(root: &mut [u8], index: BorrowedIndex<Self>) -> &mut Self {
+        // SAFETY: The caller ensures that `get_slice_mut` is valid.
+        unsafe {
+            let length = Self::read_length(root, index);
+            let ptr = root.as_mut_ptr().add(index.index() + 4);
+            core::slice::from_raw_parts_mut(ptr, length)
+        }
+    }
+}
+
+impl BorrowedSlice for MStr {
+    #[inline]
+    unsafe fn read_length(root: &[u8], index: BorrowedIndex<Self>) -> usize {
+        // SAFETY: The caller ensures that `read_length` is valid.
+        unsafe {
+            #[expect(clippy::cast_ptr_alignment, reason = "Using with `read_unaligned`")]
             let ptr = root.as_ptr().add(index.index()).cast::<u16>();
             usize::from(core::ptr::read_unaligned(ptr).to_be())
         }
@@ -285,7 +319,8 @@ impl BorrowedSlice for [u8] {
         unsafe {
             let length = Self::read_length(root, index);
             let ptr = root.as_ptr().add(index.index() + 2);
-            core::slice::from_raw_parts(ptr, length)
+            let slice = core::slice::from_raw_parts(ptr, length);
+            MStr::from_mutf8_unchecked(slice)
         }
     }
 
@@ -295,35 +330,7 @@ impl BorrowedSlice for [u8] {
         unsafe {
             let length = Self::read_length(root, index);
             let ptr = root.as_mut_ptr().add(index.index() + 2);
-            core::slice::from_raw_parts_mut(ptr, length)
-        }
-    }
-}
-
-impl BorrowedSlice for MStr {
-    #[inline]
-    unsafe fn read_length(root: &[u8], index: BorrowedIndex<Self>) -> usize {
-        // SAFETY: The caller ensures that `read_length` is valid.
-        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
-        unsafe { <[u8] as BorrowedSlice>::read_length(root, index.cast()) }
-    }
-
-    #[inline]
-    unsafe fn get_slice_ref(root: &[u8], index: BorrowedIndex<Self>) -> &Self {
-        // SAFETY: The caller ensures that `get_slice_ref` is valid.
-        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
-        unsafe {
-            let slice = <[u8] as BorrowedSlice>::get_slice_ref(root, index.cast());
-            MStr::from_mutf8_unchecked(slice)
-        }
-    }
-
-    #[inline]
-    unsafe fn get_slice_mut(root: &mut [u8], index: BorrowedIndex<Self>) -> &mut Self {
-        // SAFETY: The caller ensures that `get_slice_mut` is valid.
-        // SAFETY: The layouts of `MStr` and `[u8]` are the same.
-        unsafe {
-            let slice = <[u8] as BorrowedSlice>::get_slice_mut(root, index.cast());
+            let slice = core::slice::from_raw_parts_mut(ptr, length);
             MStr::from_mutf8_mut_unchecked(slice)
         }
     }

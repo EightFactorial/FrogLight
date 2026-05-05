@@ -87,24 +87,94 @@ fn inttest1023() {
     }
 }
 
-// #[test]
-// fn bigtest() {
-//     static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
-//
-//     std::println!("Slice: {:?}", &SLICE[..64]);
-//     let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
-//     let compound = nbt.as_compound();
-//
-//     std::println!("Compound: {compound:?}");
-// }
+#[test]
+fn bigtest() {
+    static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
 
-// #[test]
-// fn complex_player() {
-//     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
-//
-//     std::println!("Slice: {:?}", &SLICE[..64]);
-//     let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
-//     let compound = nbt.as_compound();
-//
-//     std::println!("Compound: {compound:?}");
-// }
+    let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
+    let compound = nbt.as_compound();
+
+    // Test getting entries by name
+    if let Some(long_test) = compound.get("longTest") {
+        assert_eq!(long_test.as_long().unwrap(), 9_223_372_036_854_775_807);
+    } else {
+        panic!("`longTest` not found!");
+    }
+
+    if let Some(int_test) = compound.get("intTest") {
+        assert_eq!(int_test.as_int().unwrap(), 2_147_483_647);
+    } else {
+        panic!("`intTest` not found!");
+    }
+
+    if let Some(short_test) = compound.get("shortTest") {
+        assert_eq!(short_test.as_short().unwrap(), 32767);
+    } else {
+        panic!("`shortTest` not found!");
+    }
+
+    if let Some(byte_test) = compound.get("byteTest") {
+        assert_eq!(byte_test.as_byte().unwrap(), 127);
+    } else {
+        panic!("`byteTest` not found!");
+    }
+
+    if let Some(string_test) = compound.get("stringTest") {
+        assert_eq!(
+            string_test.as_string().unwrap(),
+            mutf8!("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")
+        );
+    } else {
+        panic!("`stringTest` not found!");
+    }
+
+    if let Some(float_test) = compound.get("floatTest") {
+        assert_eq!(float_test.as_float(), Some(0.498_231_47));
+    } else {
+        panic!("`floatTest` not found!");
+    }
+
+    if let Some(double_test) = compound.get("doubleTest") {
+        assert_eq!(double_test.as_double(), Some(0.493_128_713_218_231_5));
+    } else {
+        panic!("`doubleTest` not found!");
+    }
+
+    if let Some(nested) = compound.get("nested compound test") {
+        let nested = nested.as_compound().unwrap();
+
+        let Some(ham) = nested.get("ham") else {
+            panic!("`ham` not found!");
+        };
+        let Some(ham) = ham.as_compound() else {
+            panic!("`ham` is not a compound!");
+        };
+        let Some(name) = ham.get("name") else {
+            panic!("`ham` does not contain `name`!");
+        };
+
+        assert_eq!(name.as_string().unwrap(), mutf8!("Hampus"));
+
+        let Some(egg) = nested.get("egg") else {
+            panic!("`egg` not found!");
+        };
+        let Some(egg) = egg.as_compound() else {
+            panic!("`egg` is not a compound!");
+        };
+        let Some(name) = egg.get("name") else {
+            panic!("`egg` does not contain `name`!");
+        };
+
+        assert_eq!(name.as_string().unwrap(), mutf8!("Eggbert"));
+    } else {
+        panic!("`nested compound test` not found!");
+    }
+}
+
+#[test]
+fn complex_player() {
+    static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
+
+    let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
+    let _compound = nbt.as_compound();
+}

@@ -1,13 +1,13 @@
 //! TODO
 
-use core::{fmt, num::NonZeroUsize};
+use core::fmt;
 
 use froglight_mutf8::prelude::MStr;
 
 use crate::types::borrowed::{
     IndexedCore,
     reference::{BorrowedIndex, BorrowedMut, BorrowedRef},
-    value::{BorrowedValueIndex, BorrowedValueMut, BorrowedValueRef, BorrowedValueType},
+    value::{BorrowedValueIndex, BorrowedValueMut, BorrowedValueRef},
 };
 
 /// An NBT compound tag with a reference to its data.
@@ -24,7 +24,6 @@ pub struct BorrowedEntryRef<'data> {
     root: &'data [u8],
     core: &'data IndexedCore,
     entry: IndexedEntry,
-    index: Option<NonZeroUsize>,
 }
 
 impl<'data> IndexedCompoundRef<'data> {
@@ -68,18 +67,13 @@ impl<'data> IndexedCompoundRef<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        for (i, entry) in entries.iter().enumerate() {
+        for entry in entries {
             // SAFETY: The entry uses the same `root` so the index is valid.
             let key_ref = unsafe { BorrowedRef::new(self.root, entry.name()) };
 
             if key == key_ref.get_ref() {
-                // SAFETY: `i` is a valid index of `entries`.
-                let index = unsafe { get_index(self.index, i, entries) };
-
                 // SAFETY: The ref uses the same `root` so the index is valid.
-                return Some(unsafe {
-                    BorrowedValueRef::new(self.root, self.core, entry.value(), index)
-                });
+                return Some(unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) });
             }
         }
         None
@@ -96,16 +90,10 @@ impl<'data> IndexedCompoundRef<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        entries.get(index).copied().map(|entry| {
-            // SAFETY: `i` is a valid index of `entries`.
-            let index = unsafe { get_index(self.index, index, entries) };
-
-            BorrowedEntryRef {
-                entry,
-                root: self.root,
-                core: self.core,
-                index: NonZeroUsize::new(index),
-            }
+        entries.get(index).map(|&entry| BorrowedEntryRef {
+            entry,
+            root: self.root,
+            core: self.core,
         })
     }
 
@@ -117,17 +105,7 @@ impl<'data> IndexedCompoundRef<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        entries.iter().copied().enumerate().map(|(i, entry)| {
-            // SAFETY: `i` is a valid index of `entries`.
-            let index = unsafe { get_index(self.index, i, entries) };
-
-            BorrowedEntryRef {
-                entry,
-                root: self.root,
-                core: self.core,
-                index: NonZeroUsize::new(index),
-            }
-        })
+        entries.iter().map(|&entry| BorrowedEntryRef { entry, root: self.root, core: self.core })
     }
 }
 
@@ -145,9 +123,7 @@ impl<'data> BorrowedEntryRef<'data> {
     #[must_use]
     pub fn value(&self) -> BorrowedValueRef<'data> {
         // SAFETY: This entry corresponds to this `root`, so the index is valid.
-        unsafe {
-            BorrowedValueRef::new_nonzero(self.root, self.core, self.entry.value(), self.index)
-        }
+        unsafe { BorrowedValueRef::new(self.root, self.core, self.entry.value()) }
     }
 }
 
@@ -177,7 +153,6 @@ pub struct BorrowedEntryMut<'data> {
     root: &'data mut [u8],
     core: &'data IndexedCore,
     entry: IndexedEntry,
-    index: Option<NonZeroUsize>,
 }
 
 impl<'data> IndexedCompoundMut<'data> {
@@ -221,18 +196,13 @@ impl<'data> IndexedCompoundMut<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        for (i, entry) in entries.iter().enumerate() {
+        for entry in entries {
             // SAFETY: The entry uses the same `root` so the index is valid.
             let key_ref = unsafe { BorrowedRef::new(self.root, entry.name()) };
 
             if key == key_ref.get_ref() {
-                // SAFETY: `i` is a valid index of `entries`.
-                let index = unsafe { get_index(self.index, i, entries) };
-
                 // SAFETY: The ref uses the same `root` so the index is valid.
-                return Some(unsafe {
-                    BorrowedValueRef::new(self.root, self.core, entry.value(), index)
-                });
+                return Some(unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) });
             }
         }
         None
@@ -252,17 +222,14 @@ impl<'data> IndexedCompoundMut<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        for (i, entry) in entries.iter().enumerate() {
+        for entry in entries {
             // SAFETY: The entry uses the same `root` so the index is valid.
             let key_ref = unsafe { BorrowedRef::new(self.root, entry.name()) };
 
             if key == key_ref.get_ref() {
-                // SAFETY: `i` is a valid index of `entries`.
-                let index = unsafe { get_index(self.index, i, entries) };
-
                 // SAFETY: The ref uses the same `root` so the index is valid.
                 let value = entry.value();
-                return Some(unsafe { BorrowedValueMut::new(self.root, self.core, value, index) });
+                return Some(unsafe { BorrowedValueMut::new(self.root, self.core, value) });
             }
         }
         None
@@ -279,16 +246,10 @@ impl<'data> IndexedCompoundMut<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        entries.get(index).copied().map(|entry| {
-            // SAFETY: `i` is a valid index of `entries`.
-            let index = unsafe { get_index(self.index, index, entries) };
-
-            BorrowedEntryRef {
-                entry,
-                root: self.root,
-                core: self.core,
-                index: NonZeroUsize::new(index),
-            }
+        entries.get(index).map(|&entry| BorrowedEntryRef {
+            entry,
+            root: self.root,
+            core: self.core,
         })
     }
 
@@ -303,20 +264,11 @@ impl<'data> IndexedCompoundMut<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        if let Some(entry) = entries.get(index).copied() {
-            // SAFETY: `i` is a valid index of `entries`.
-            let index = unsafe { get_index(self.index, index, entries) };
-
-            // SAFETY: The ref uses the same `root` so the index is valid.
-            Some(BorrowedEntryMut {
-                entry,
-                root: self.root,
-                core: self.core,
-                index: NonZeroUsize::new(index),
-            })
-        } else {
-            None
-        }
+        entries.get(index).map(|&entry| BorrowedEntryMut {
+            entry,
+            root: self.root,
+            core: self.core,
+        })
     }
 
     /// Get an iterator over all entries in this compound.
@@ -327,16 +279,7 @@ impl<'data> IndexedCompoundMut<'data> {
             self.core.entries().get_unchecked(*range)
         };
 
-        entries.iter().copied().enumerate().map(|(i, entry)| {
-            // SAFETY: `i` is a valid index of `entries`.
-            let index = unsafe { get_index(self.index, i, entries) };
-            BorrowedEntryRef {
-                entry,
-                root: self.root,
-                core: self.core,
-                index: NonZeroUsize::new(index),
-            }
-        })
+        entries.iter().map(|&entry| BorrowedEntryRef { entry, root: self.root, core: self.core })
     }
 
     /// Reborrow this [`IndexedCompoundMut`] with a shorter lifetime.
@@ -383,9 +326,7 @@ impl BorrowedEntryMut<'_> {
     #[must_use]
     pub const fn value(&self) -> BorrowedValueRef<'_> {
         // SAFETY: This entry corresponds to this `root`, so the index is valid.
-        unsafe {
-            BorrowedValueRef::new_nonzero(self.root, self.core, self.entry.value(), self.index)
-        }
+        unsafe { BorrowedValueRef::new(self.root, self.core, self.entry.value()) }
     }
 
     /// Get a mutable reference to the value of this entry.
@@ -393,9 +334,7 @@ impl BorrowedEntryMut<'_> {
     #[must_use]
     pub const fn value_mut(&mut self) -> BorrowedValueMut<'_> {
         // SAFETY: This entry corresponds to this `root`, so the index is valid.
-        unsafe {
-            BorrowedValueMut::new_nonzero(self.root, self.core, self.entry.value(), self.index)
-        }
+        unsafe { BorrowedValueMut::new(self.root, self.core, self.entry.value()) }
     }
 }
 
@@ -434,36 +373,4 @@ impl IndexedEntry {
     /// Get the value of this entry.
     #[must_use]
     pub const fn value(&self) -> BorrowedValueIndex { self.value }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// Get the index of the entry at `entry_index`.
-///
-/// # Safety
-///
-/// `entry_index` must be a valid index of `entries`.
-#[inline]
-pub(super) unsafe fn get_index(
-    compound_index: usize,
-    entry_index: usize,
-    entries: &[IndexedEntry],
-) -> usize {
-    // SAFETY: `entry_index` is a valid index of `entries`
-    let entry = unsafe { entries.get_unchecked(entry_index) };
-
-    // Only `Compound` and `List` entries have indexes.
-    if !matches!(entry.value().ty(), BorrowedValueType::Compound | BorrowedValueType::List) {
-        return 0;
-    }
-
-    // Increment the index for each previous `Compound` or `List` entry
-    let mut index = compound_index.max(1);
-    for entry in entries.iter().take(entry_index) {
-        index += usize::from(matches!(
-            entry.value().ty(),
-            BorrowedValueType::Compound | BorrowedValueType::List
-        ));
-    }
-    index
 }

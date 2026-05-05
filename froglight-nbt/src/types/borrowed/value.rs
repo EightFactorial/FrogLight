@@ -1,6 +1,6 @@
 //! TODO
 
-use core::{fmt, num::NonZeroUsize};
+use core::fmt;
 
 use froglight_mutf8::prelude::MStr;
 
@@ -20,7 +20,6 @@ pub struct BorrowedValueRef<'data> {
     root: &'data [u8],
     core: &'data IndexedCore,
     value: BorrowedValueIndex,
-    index: Option<NonZeroUsize>,
 }
 
 impl<'data> BorrowedValueRef<'data> {
@@ -38,28 +37,8 @@ impl<'data> BorrowedValueRef<'data> {
         root: &'data [u8],
         core: &'data IndexedCore,
         value: BorrowedValueIndex,
-        index: usize,
     ) -> Self {
-        Self { root, core, value, index: NonZeroUsize::new(index) }
-    }
-
-    /// Create a new [`BorrowedValueRef`] using the given data and index.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that:
-    /// - The `root` slice is valid for reads
-    /// - `root` contains the value in `value`
-    /// - `index` is a valid index into `core`
-    #[inline]
-    #[must_use]
-    pub(super) const unsafe fn new_nonzero(
-        root: &'data [u8],
-        core: &'data IndexedCore,
-        value: BorrowedValueIndex,
-        index: Option<NonZeroUsize>,
-    ) -> Self {
-        Self { root, core, value, index }
+        Self { root, core, value }
     }
 
     /// Get the [`IndexedValueType`] of this value.
@@ -219,18 +198,10 @@ impl<'data> BorrowedValueRef<'data> {
     /// Returns `None` if the value is not a list.
     #[must_use]
     pub fn as_list(&self) -> Option<IndexedListRef<'data, IndexedList>> {
-        let BorrowedValueIndex::List(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::List must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::List(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.index()) })
     }
 
     /// Get the compound of named entries.
@@ -238,18 +209,10 @@ impl<'data> BorrowedValueRef<'data> {
     /// Returns `None` if the value is not a compound.
     #[must_use]
     pub fn as_compound(&self) -> Option<IndexedCompoundRef<'data>> {
-        let BorrowedValueIndex::Compound(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::Compound must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::Compound(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.index()) })
     }
 
     /// Get the value as a [`u32`] array.
@@ -257,18 +220,10 @@ impl<'data> BorrowedValueRef<'data> {
     /// Returns `None` if the value is not a [`u32`] array.
     #[must_use]
     pub fn as_int_array(&self) -> Option<IndexedListRef<'data, u32>> {
-        let BorrowedValueIndex::IntArray(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::IntArray must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::IntArray(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.index()) })
     }
 
     /// Get the value as a [`u64`] array.
@@ -276,18 +231,10 @@ impl<'data> BorrowedValueRef<'data> {
     /// Returns `None` if the value is not a [`u64`] array.
     #[must_use]
     pub fn as_long_array(&self) -> Option<IndexedListRef<'data, u64>> {
-        let BorrowedValueIndex::LongArray(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::LongArray must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::LongArray(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.index()) })
     }
 }
 
@@ -306,7 +253,6 @@ pub struct BorrowedValueMut<'data> {
     root: &'data mut [u8],
     core: &'data IndexedCore,
     value: BorrowedValueIndex,
-    index: Option<NonZeroUsize>,
 }
 
 impl<'data> BorrowedValueMut<'data> {
@@ -322,26 +268,8 @@ impl<'data> BorrowedValueMut<'data> {
         root: &'data mut [u8],
         core: &'data IndexedCore,
         value: BorrowedValueIndex,
-        index: usize,
     ) -> Self {
-        Self { root, core, value, index: NonZeroUsize::new(index) }
-    }
-
-    /// Create a new [`BorrowedValueMut`] using the given data and index.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that `root` is valid for reads,
-    /// and that it contains a valid value at the position specified by `index`.
-    #[inline]
-    #[must_use]
-    pub(super) const unsafe fn new_nonzero(
-        root: &'data mut [u8],
-        core: &'data IndexedCore,
-        value: BorrowedValueIndex,
-        index: Option<NonZeroUsize>,
-    ) -> Self {
-        Self { root, core, value, index }
+        Self { root, core, value }
     }
 
     /// Get the [`IndexedValueType`] of this value.
@@ -585,18 +513,10 @@ impl<'data> BorrowedValueMut<'data> {
     /// Returns `None` if the value is not a list.
     #[must_use]
     pub fn as_list(&self) -> Option<IndexedListRef<'_, IndexedList>> {
-        let BorrowedValueIndex::List(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::List must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::List(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.index()) })
     }
 
     /// Get the list of values mutably.
@@ -604,18 +524,10 @@ impl<'data> BorrowedValueMut<'data> {
     /// Returns `None` if the value is not a list.
     #[must_use]
     pub fn as_list_mut(&mut self) -> Option<IndexedListMut<'_, IndexedList>> {
-        let BorrowedValueIndex::List(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::List must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::List(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListMut::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedListMut::new(self.root, self.core, index.index()) })
     }
 
     /// Get the compound of named entries.
@@ -623,18 +535,10 @@ impl<'data> BorrowedValueMut<'data> {
     /// Returns `None` if the value is not a compound.
     #[must_use]
     pub fn as_compound(&self) -> Option<IndexedCompoundRef<'_>> {
-        let BorrowedValueIndex::Compound(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::Compound must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::Compound(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.index()) })
     }
 
     /// Get the compound of named entries mutably.
@@ -642,18 +546,10 @@ impl<'data> BorrowedValueMut<'data> {
     /// Returns `None` if the value is not a compound.
     #[must_use]
     pub fn as_compound_mut(&mut self) -> Option<IndexedCompoundMut<'_>> {
-        let BorrowedValueIndex::Compound(_) = self.value else { return None };
-        let Some(index) = self.index else {
-            #[cfg(debug_assertions)]
-            unreachable!("IndexedValue::Compound must have an index!");
-            #[cfg(not(debug_assertions))]
-            unsafe {
-                core::hint::unreachable_unchecked()
-            }
-        };
+        let BorrowedValueIndex::Compound(index) = self.value else { return None };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedCompoundMut::new(self.root, self.core, index.get()) })
+        Some(unsafe { IndexedCompoundMut::new(self.root, self.core, index.index()) })
     }
 
     /// Get the value as a [`u32`] array.

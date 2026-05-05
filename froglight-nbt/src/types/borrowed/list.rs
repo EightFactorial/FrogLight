@@ -59,8 +59,9 @@ impl<T: BorrowedPOD> IndexedListRef<'_, T> {
         let normalized = Range { start: 0, end: range.end.saturating_sub(range.start) };
 
         if normalized.contains(&index) {
-            let data_index = range.start + (core::mem::size_of::<T>() * index);
-            Some(unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(data_index)).get_value() })
+            let index = range.start + (core::mem::size_of::<T>() * index);
+
+            Some(unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() })
         } else {
             None
         }
@@ -77,12 +78,9 @@ impl IndexedListRef<'_, IndexedList> {
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
         let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        if let Some(entry) = entries.get(index) {
-            let ref_index = unsafe { super::compound::get_index(self.index, index, entries) };
-            Some(unsafe { BorrowedValueRef::new(self.root, self.core, entry.value(), ref_index) })
-        } else {
-            None
-        }
+        entries
+            .get(index)
+            .map(|entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
     }
 
     /// Get an iterator over all entries in this list.
@@ -91,10 +89,9 @@ impl IndexedListRef<'_, IndexedList> {
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
         let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        entries.iter().enumerate().map(move |(index, entry)| {
-            let ref_index = unsafe { super::compound::get_index(self.index, index, entries) };
-            unsafe { BorrowedValueRef::new(self.root, self.core, entry.value(), ref_index) }
-        })
+        entries
+            .iter()
+            .map(move |entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
     }
 }
 
@@ -168,13 +165,12 @@ impl<T: BorrowedPOD> IndexedListMut<'_, T> {
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
         let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        if let Some(entry) = entries.get(index) {
+        entries.get(index).map(|entry| {
             // SAFETY: `index` is valid for `core` and is of type `T`
-            let index = unsafe { BorrowedIndex::new(entry.value().index()) };
-            Some(unsafe { BorrowedRef::new(self.root, index).get_value() })
-        } else {
-            None
-        }
+            unsafe {
+                BorrowedRef::new(self.root, BorrowedIndex::new(entry.value().index())).get_value()
+            }
+        })
     }
 
     /// Set the value at the provided index, if it exists.
@@ -188,8 +184,10 @@ impl<T: BorrowedPOD> IndexedListMut<'_, T> {
 
         if let Some(entry) = entries.get(index) {
             // SAFETY: `index` is valid for `core` and is of type `T`
-            let index = unsafe { BorrowedIndex::new(entry.value().index()) };
-            unsafe { BorrowedMut::new(self.root, index).set_value(value) }
+            unsafe {
+                BorrowedMut::new(self.root, BorrowedIndex::new(entry.value().index()))
+                    .set_value(value);
+            }
             true
         } else {
             false
@@ -207,12 +205,9 @@ impl IndexedListMut<'_, IndexedList> {
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
         let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        if let Some(entry) = entries.get(index) {
-            let ref_index = unsafe { super::compound::get_index(self.index, index, entries) };
-            Some(unsafe { BorrowedValueRef::new(self.root, self.core, entry.value(), ref_index) })
-        } else {
-            None
-        }
+        entries
+            .get(index)
+            .map(|entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
     }
 }
 

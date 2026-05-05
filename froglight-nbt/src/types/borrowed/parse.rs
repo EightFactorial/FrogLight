@@ -45,27 +45,41 @@ fn parse_nbt(
     let name = named.then(|| read_string(&mut cursor)).transpose()?;
 
     // Prepare a queue of items to read
-    let mut items = VecDeque::with_capacity(1);
+    let mut item_count = 1;
+    let mut item_queue = VecDeque::with_capacity(1);
     // Add the root compound to the queue
-    items.push_back((cursor, true));
+    item_queue.push_back((cursor, true));
 
     // Read all items until the queue is empty
-    while let Some((mut cursor, named)) = items.pop_front() {
+    while let Some((mut cursor, named)) = item_queue.pop_front() {
         if named {
-            read_compound(&mut cursor, &mut entries, &mut indexes, &mut items)?;
+            read_compound_item(
+                &mut cursor,
+                &mut entries,
+                &mut indexes,
+                &mut item_count,
+                &mut item_queue,
+            )?;
         } else {
-            read_list(&mut cursor, &mut entries, &mut indexes, &mut items)?;
+            read_list_item(
+                &mut cursor,
+                &mut entries,
+                &mut indexes,
+                &mut item_count,
+                &mut item_queue,
+            )?;
         }
     }
 
     Ok((name, entries, indexes))
 }
 
-fn read_compound<'data>(
+fn read_compound_item<'data>(
     cursor: &mut SliceCursor<'data>,
     entries: &mut Vec<IndexedEntry>,
     indexes: &mut Vec<Range<usize>>,
-    items: &mut VecDeque<(SliceCursor<'data>, bool)>,
+    item_count: &mut usize,
+    item_queue: &mut VecDeque<(SliceCursor<'data>, bool)>,
 ) -> Result<(), ()> {
     let start = entries.len();
 
@@ -119,17 +133,19 @@ fn read_compound<'data>(
             }
 
             NbtTagType::LIST => {
-                let index = unsafe { BorrowedIndex::new(cursor.position()) };
+                let index = unsafe { BorrowedIndex::new(*item_count) };
+                *item_count += 1;
 
-                items.push_back((cursor.clone(), false));
+                item_queue.push_back((cursor.clone(), false));
                 read_until_list_end(cursor, 0)?;
 
                 entries.push(IndexedEntry::new(name, BorrowedValueIndex::List(index)));
             }
             NbtTagType::COMPOUND => {
-                let index = unsafe { BorrowedIndex::new(cursor.position()) };
+                let index = unsafe { BorrowedIndex::new(*item_count) };
+                *item_count += 1;
 
-                items.push_back((cursor.clone(), true));
+                item_queue.push_back((cursor.clone(), true));
                 read_until_compound_end(cursor, 0)?;
 
                 entries.push(IndexedEntry::new(name, BorrowedValueIndex::Compound(index)));
@@ -144,11 +160,12 @@ fn read_compound<'data>(
     Ok(())
 }
 
-fn read_list<'data>(
+fn read_list_item<'data>(
     cursor: &mut SliceCursor<'data>,
     entries: &mut Vec<IndexedEntry>,
     indexes: &mut Vec<Range<usize>>,
-    items: &mut VecDeque<(SliceCursor<'data>, bool)>,
+    item_count: &mut usize,
+    item_queue: &mut VecDeque<(SliceCursor<'data>, bool)>,
 ) -> Result<(), ()> {
     let start = entries.len();
 
@@ -201,17 +218,19 @@ fn read_list<'data>(
             }
 
             NbtTagType::LIST => {
-                let index = unsafe { BorrowedIndex::new(cursor.position()) };
+                let index = unsafe { BorrowedIndex::new(*item_count) };
+                *item_count += 1;
 
-                items.push_back((cursor.clone(), false));
+                item_queue.push_back((cursor.clone(), false));
                 read_until_list_end(cursor, 0)?;
 
                 entries.push(IndexedEntry::new(name, BorrowedValueIndex::List(index)));
             }
             NbtTagType::COMPOUND => {
-                let index = unsafe { BorrowedIndex::new(cursor.position()) };
+                let index = unsafe { BorrowedIndex::new(*item_count) };
+                *item_count += 1;
 
-                items.push_back((cursor.clone(), true));
+                item_queue.push_back((cursor.clone(), true));
                 read_until_compound_end(cursor, 0)?;
 
                 entries.push(IndexedEntry::new(name, BorrowedValueIndex::Compound(index)));
