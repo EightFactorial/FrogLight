@@ -86,3 +86,25 @@ fn inttest1023() {
         assert_eq!(entry.as_int(), Some(index as u32), "Entry {entry:?} is not {index}?");
     }
 }
+
+// #[test]
+// fn bigtest() {
+//     static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
+//
+//     std::println!("Slice: {:?}", &SLICE[..64]);
+//     let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
+//     let compound = nbt.as_compound();
+//
+//     std::println!("Compound: {compound:?}");
+// }
+
+// #[test]
+// fn complex_player() {
+//     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
+//
+//     std::println!("Slice: {:?}", &SLICE[..64]);
+//     let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
+//     let compound = nbt.as_compound();
+//
+//     std::println!("Compound: {compound:?}");
+// }

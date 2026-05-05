@@ -457,11 +457,13 @@ pub(super) unsafe fn get_index(
         return 0;
     }
 
-    entries.iter().take(entry_index).fold(compound_index.max(1), |index, entry| {
-        index
-            + usize::from(matches!(
-                entry.value().ty(),
-                BorrowedValueType::Compound | BorrowedValueType::List
-            ))
-    })
+    // Increment the index for each previous `Compound` or `List` entry
+    let mut index = compound_index.max(1);
+    for entry in entries.iter().take(entry_index) {
+        index += usize::from(matches!(
+            entry.value().ty(),
+            BorrowedValueType::Compound | BorrowedValueType::List
+        ));
+    }
+    index
 }

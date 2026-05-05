@@ -75,6 +75,7 @@ fn read_compound<'data>(
         }
 
         let name = read_string(cursor)?;
+
         match tag {
             NbtTagType::BYTE => {
                 let value = read_byte(cursor)?;
@@ -152,8 +153,8 @@ fn read_list<'data>(
     let start = entries.len();
 
     let Ok(tag) = cursor.next() else { todo!() };
-
     let length = u32::from_be_bytes(cursor.take::<4>()?);
+
     let name = unsafe { BorrowedIndex::new(0) };
 
     for _ in 0..length {
@@ -428,6 +429,7 @@ fn read_double(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<f64>, ()> {
 fn read_string(cursor: &mut SliceCursor<'_>) -> Result<BorrowedIndex<MStr>, ()> {
     let position = cursor.position();
     let length = u16::from_be_bytes(cursor.take::<2>()?);
+
     let contents = cursor.take_slice(usize::from(length))?;
     froglight_mutf8::types::str::MStr::from_mutf8(contents)?;
 
