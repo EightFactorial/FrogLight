@@ -129,11 +129,7 @@ impl<'data> BorrowedEntryRef<'data> {
 
 impl fmt::Debug for IndexedCompoundRef<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut map = f.debug_map();
-        for entry in self.iter() {
-            map.entry(&entry.name().get_ref(), &entry.value());
-        }
-        map.finish()
+        f.debug_map().entries(self.iter().map(|e| (e.name(), e.value()))).finish()
     }
 }
 
@@ -339,15 +335,8 @@ impl BorrowedEntryMut<'_> {
 }
 
 impl fmt::Debug for IndexedCompoundMut<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut map = f.debug_map();
-        for index in 0..self.len() {
-            if let Some(entry) = self.get_index(index) {
-                map.entry(&entry.name().get_ref(), &entry.value());
-            }
-        }
-        map.finish()
-    }
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -77,6 +77,30 @@ impl<'data, T: BorrowedSlice + ?Sized> BorrowedRef<'data, T> {
     pub fn is_empty(&self) -> bool { self.len() == 0 }
 }
 
+impl<'a: 'b, 'b, T: ?Sized> From<&'a BorrowedMut<'_, T>> for BorrowedRef<'b, T> {
+    #[inline]
+    fn from(value: &'a BorrowedMut<'_, T>) -> Self { value.as_ref() }
+}
+impl<'a, T: ?Sized> From<BorrowedMut<'a, T>> for BorrowedRef<'a, T> {
+    #[inline]
+    fn from(value: BorrowedMut<'a, T>) -> Self { value.into_ref() }
+}
+
+impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for BorrowedRef<'_, T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.get_value(), f)
+    }
+}
+impl fmt::Debug for BorrowedRef<'_, [u8]> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.get_ref(), f) }
+}
+impl fmt::Debug for BorrowedRef<'_, MStr> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.get_ref(), f) }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A mutable reference to a type `T` in a byte slice.
@@ -172,6 +196,19 @@ impl<T: BorrowedSlice> BorrowedMut<'_, T> {
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
+}
+
+impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for BorrowedMut<'_, T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
+}
+impl fmt::Debug for BorrowedMut<'_, [u8]> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
+}
+impl fmt::Debug for BorrowedMut<'_, MStr> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
 }
 
 // -------------------------------------------------------------------------------------------------

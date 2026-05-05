@@ -1,11 +1,11 @@
 //! TODO
 
-use core::{fmt, marker::PhantomData, range::Range};
+use core::{fmt, marker::PhantomData};
 
 use crate::types::borrowed::{
     IndexedCore,
     reference::{BorrowedIndex, BorrowedMut, BorrowedPOD, BorrowedRef},
-    value::{BorrowedValueRef, IndexedList},
+    value::{BorrowedValueMut, BorrowedValueRef, IndexedList},
 };
 
 /// An NBT list tag with a reference to its data.
@@ -31,7 +31,48 @@ impl<'data, T> IndexedListRef<'data, T> {
     ) -> Self {
         Self { root, core, index, _phantom: PhantomData }
     }
+}
 
+impl<T: BorrowedPOD> IndexedListRef<'_, T> {
+    /// Get the number of entries in this [`IndexedListRef`].
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize {
+        unsafe { BorrowedRef::new(self.root, BorrowedIndex::<[u8]>::new(self.index)).len() }
+    }
+
+    /// Returns `true` if the list is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.len() == 0 }
+
+    /// Get the value at the provided index, if it exists.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get_value(&self, index: usize) -> Option<T> {
+        if index < self.len() {
+            let index = self.index + (core::mem::size_of::<T>() * index);
+
+            // SAFETY: `index` is valid for `core` and is of type `T`
+            Some(unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() })
+        } else {
+            None
+        }
+    }
+
+    /// Get an iterator over all entries in this list.
+    pub fn iter(&self) -> impl Iterator<Item = T> + '_ {
+        (0..self.len()).map(move |index| {
+            let index = self.index + (core::mem::size_of::<T>() * index);
+
+            // SAFETY: `index` is valid for `core` and is of type `T`
+            unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() }
+        })
+    }
+}
+
+impl IndexedListRef<'_, IndexedList> {
     /// Get the number of entries in this [`IndexedListRef`].
     #[inline]
     #[must_use]
@@ -46,29 +87,7 @@ impl<'data, T> IndexedListRef<'data, T> {
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
-}
 
-impl<T: BorrowedPOD> IndexedListRef<'_, T> {
-    /// Get the value at the provided index, if it exists.
-    ///
-    /// Returns `None` if the index is out of bounds.
-    #[must_use]
-    pub fn get_value(&self, index: usize) -> Option<T> {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let normalized = Range { start: 0, end: range.end.saturating_sub(range.start) };
-
-        if normalized.contains(&index) {
-            let index = range.start + (core::mem::size_of::<T>() * index);
-
-            Some(unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() })
-        } else {
-            None
-        }
-    }
-}
-
-impl IndexedListRef<'_, IndexedList> {
     /// Get the value at the provided index, if it exists.
     ///
     /// Returns `None` if the index is out of bounds.
@@ -97,13 +116,7 @@ impl IndexedListRef<'_, IndexedList> {
 
 impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for IndexedListRef<'_, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut list = f.debug_list();
-        for index in 0..self.len() {
-            if let Some(value) = self.get_value(index) {
-                list.entry(&value);
-            }
-        }
-        list.finish()
+        f.debug_list().entries(self.iter()).finish()
     }
 }
 
@@ -139,23 +152,36 @@ impl<'data, T> IndexedListMut<'data, T> {
         Self { root, core, index, _phantom: PhantomData }
     }
 
+    /// Get this [`IndexedListMut`] as an [`IndexedListRef`].
+    #[inline]
+    #[must_use]
+    pub fn as_ref(&self) -> IndexedListRef<'_, T> {
+        // SAFETY: `index` is always guaranteed to be within bounds
+        unsafe { IndexedListRef::new(self.root, self.core, self.index) }
+    }
+
+    /// Convert this [`IndexedListMut`] into an [`IndexedListRef`].
+    #[inline]
+    #[must_use]
+    pub fn into_ref(self) -> IndexedListRef<'data, T> {
+        // SAFETY: `index` is always guaranteed to be within bounds
+        unsafe { IndexedListRef::new(self.root, self.core, self.index) }
+    }
+}
+
+impl<T: BorrowedPOD> IndexedListMut<'_, T> {
     /// Get the number of entries in this [`IndexedListMut`].
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-
-        range.end.saturating_sub(range.start)
+        unsafe { BorrowedRef::new(self.root, BorrowedIndex::<[u8]>::new(self.index)).len() }
     }
 
     /// Returns `true` if the list is empty.
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
-}
 
-impl<T: BorrowedPOD> IndexedListMut<'_, T> {
     /// Get the value at the provided index, if it exists.
     ///
     /// Returns `None` if the index is out of bounds.
@@ -196,6 +222,21 @@ impl<T: BorrowedPOD> IndexedListMut<'_, T> {
 }
 
 impl IndexedListMut<'_, IndexedList> {
+    /// Get the number of entries in this [`IndexedListMut`].
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize {
+        // SAFETY: `index` is always guaranteed to be within bounds
+        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
+
+        range.end.saturating_sub(range.start)
+    }
+
+    /// Returns `true` if the list is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.len() == 0 }
+
     /// Get the value at the provided index, if it exists.
     ///
     /// Returns `None` if the index is out of bounds.
@@ -209,28 +250,28 @@ impl IndexedListMut<'_, IndexedList> {
             .get(index)
             .map(|entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
     }
+
+    /// Get the value at the provided index mutably, if it exists.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get_mut(&mut self, index: usize) -> Option<BorrowedValueMut<'_>> {
+        // SAFETY: `index` and `range` are always guaranteed to be within bounds
+        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
+        let entries = unsafe { self.core.entries().get_unchecked(*range) };
+
+        entries
+            .get(index)
+            .map(|entry| unsafe { BorrowedValueMut::new(self.root, self.core, entry.value()) })
+    }
 }
 
 impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for IndexedListMut<'_, T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut list = f.debug_list();
-        for index in 0..self.len() {
-            if let Some(value) = self.get_value(index) {
-                list.entry(&value);
-            }
-        }
-        list.finish()
-    }
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
 }
 
 impl fmt::Debug for IndexedListMut<'_, IndexedList> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut list = f.debug_list();
-        for index in 0..self.len() {
-            if let Some(value) = self.get(index) {
-                list.entry(&value);
-            }
-        }
-        list.finish()
-    }
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
 }

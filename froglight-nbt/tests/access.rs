@@ -176,5 +176,6 @@ fn complex_player() {
     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
 
     let nbt = IndexedNbtRef::new_named(SLICE).unwrap();
-    let _compound = nbt.as_compound();
+    let compound = nbt.as_compound();
+    std::println!("{compound:#?}");
 }
