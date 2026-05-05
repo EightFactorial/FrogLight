@@ -1,32 +1,30 @@
 #![allow(clippy::result_unit_err, reason = "WIP")]
 #![expect(dead_code, reason = "WIP")]
 
-use alloc::{borrow::Cow, collections::VecDeque, vec::Vec};
+use alloc::{collections::VecDeque, vec::Vec};
 use core::range::Range;
 
 use froglight_mutf8::prelude::MStr;
 
 use crate::{
     prelude::*,
-    types::borrowed::{reference::BorrowedIndex, value::IndexedValue},
+    types::borrowed::{reference::BorrowedIndex, value::BorrowedValueIndex},
 };
 
 #[allow(clippy::unnecessary_wraps, reason = "WIP")]
 pub(super) fn parse_nbt_ref(root: &[u8], named: bool) -> Result<IndexedNbtRef<'_>, ()> {
-    // SAFETY: `entries` and `indexes` were created for `root`.
     let (name, entries, indexes) = parse_nbt(root, named)?;
-    Ok(unsafe {
-        IndexedNbtRef::new_unchecked(root, name, Cow::Owned(entries), Cow::Owned(indexes))
-    })
+
+    // SAFETY: `entries` and `indexes` were created for `root`.
+    Ok(unsafe { IndexedNbtRef::new_unchecked(root, name, entries, indexes) })
 }
 
 #[allow(clippy::unnecessary_wraps, reason = "WIP")]
 pub(super) fn parse_nbt_mut(root: &mut [u8], named: bool) -> Result<IndexedNbtMut<'_>, ()> {
-    // SAFETY: `entries` and `indexes` were created for `root`.
     let (name, entries, indexes) = parse_nbt(root, named)?;
-    Ok(unsafe {
-        IndexedNbtMut::new_unchecked(root, name, Cow::Owned(entries), Cow::Owned(indexes))
-    })
+
+    // SAFETY: `entries` and `indexes` were created for `root`.
+    Ok(unsafe { IndexedNbtMut::new_unchecked(root, name, entries, indexes) })
 }
 
 #[expect(clippy::type_complexity, reason = "Returns multiple parsed components")]
@@ -80,43 +78,43 @@ fn read_compound<'data>(
         match tag {
             NbtTagType::BYTE => {
                 let value = read_byte(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Byte(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Byte(value)));
             }
             NbtTagType::SHORT => {
                 let value = read_short(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Short(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Short(value)));
             }
             NbtTagType::INT => {
                 let value = read_int(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Int(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Int(value)));
             }
             NbtTagType::LONG => {
                 let value = read_long(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Long(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Long(value)));
             }
             NbtTagType::FLOAT => {
                 let value = read_float(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Float(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Float(value)));
             }
             NbtTagType::DOUBLE => {
                 let value = read_double(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Double(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Double(value)));
             }
             NbtTagType::STRING => {
                 let value = read_string(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::String(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::String(value)));
             }
             NbtTagType::BYTE_ARRAY => {
                 let value = read_byte_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::ByteArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::ByteArray(value)));
             }
             NbtTagType::INT_ARRAY => {
                 let value = read_int_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::IntArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::IntArray(value)));
             }
             NbtTagType::LONG_ARRAY => {
                 let value = read_long_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::LongArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::LongArray(value)));
             }
 
             NbtTagType::LIST => {
@@ -125,7 +123,7 @@ fn read_compound<'data>(
                 items.push_back((cursor.clone(), false));
                 read_until_list_end(cursor, 0)?;
 
-                entries.push(IndexedEntry::new(name, IndexedValue::List(index)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::List(index)));
             }
             NbtTagType::COMPOUND => {
                 let index = unsafe { BorrowedIndex::new(cursor.position()) };
@@ -133,7 +131,7 @@ fn read_compound<'data>(
                 items.push_back((cursor.clone(), true));
                 read_until_compound_end(cursor, 0)?;
 
-                entries.push(IndexedEntry::new(name, IndexedValue::Compound(index)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Compound(index)));
             }
 
             _ => return Err(()),
@@ -162,43 +160,43 @@ fn read_list<'data>(
         match tag {
             NbtTagType::BYTE => {
                 let value = read_byte(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Byte(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Byte(value)));
             }
             NbtTagType::SHORT => {
                 let value = read_short(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Short(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Short(value)));
             }
             NbtTagType::INT => {
                 let value = read_int(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Int(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Int(value)));
             }
             NbtTagType::LONG => {
                 let value = read_long(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Long(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Long(value)));
             }
             NbtTagType::FLOAT => {
                 let value = read_float(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Float(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Float(value)));
             }
             NbtTagType::DOUBLE => {
                 let value = read_double(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::Double(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Double(value)));
             }
             NbtTagType::STRING => {
                 let value = read_string(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::String(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::String(value)));
             }
             NbtTagType::BYTE_ARRAY => {
                 let value = read_byte_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::ByteArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::ByteArray(value)));
             }
             NbtTagType::INT_ARRAY => {
                 let value = read_int_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::IntArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::IntArray(value)));
             }
             NbtTagType::LONG_ARRAY => {
                 let value = read_long_array(cursor)?;
-                entries.push(IndexedEntry::new(name, IndexedValue::LongArray(value)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::LongArray(value)));
             }
 
             NbtTagType::LIST => {
@@ -207,7 +205,7 @@ fn read_list<'data>(
                 items.push_back((cursor.clone(), false));
                 read_until_list_end(cursor, 0)?;
 
-                entries.push(IndexedEntry::new(name, IndexedValue::List(index)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::List(index)));
             }
             NbtTagType::COMPOUND => {
                 let index = unsafe { BorrowedIndex::new(cursor.position()) };
@@ -215,7 +213,7 @@ fn read_list<'data>(
                 items.push_back((cursor.clone(), true));
                 read_until_compound_end(cursor, 0)?;
 
-                entries.push(IndexedEntry::new(name, IndexedValue::Compound(index)));
+                entries.push(IndexedEntry::new(name, BorrowedValueIndex::Compound(index)));
             }
 
             _ => return Err(()),

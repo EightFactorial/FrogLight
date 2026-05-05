@@ -1,24 +1,25 @@
 //! TODO
 
-use core::num::NonZeroUsize;
+use core::{fmt, num::NonZeroUsize};
 
 use froglight_mutf8::prelude::MStr;
 
 use crate::{
-    prelude::IndexedCompoundRef,
+    prelude::{IndexedCompoundMut, IndexedCompoundRef},
     types::borrowed::{
-        IndexedCoreMut, IndexedCoreRef,
+        IndexedCore,
         list::{IndexedListMut, IndexedListRef},
         reference::{BorrowedIndex, BorrowedMut, BorrowedRef},
     },
 };
 
 /// A reference to an [`IndexedValue`].
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct BorrowedValueRef<'data> {
-    core: IndexedCoreRef<'data>,
-    value: IndexedValue,
+    root: &'data [u8],
+    core: &'data IndexedCore,
+    value: BorrowedValueIndex,
     index: Option<NonZeroUsize>,
 }
 
@@ -34,11 +35,12 @@ impl<'data> BorrowedValueRef<'data> {
     #[inline]
     #[must_use]
     pub(super) const unsafe fn new(
-        core: IndexedCoreRef<'data>,
-        value: IndexedValue,
+        root: &'data [u8],
+        core: &'data IndexedCore,
+        value: BorrowedValueIndex,
         index: usize,
     ) -> Self {
-        Self { core, value, index: NonZeroUsize::new(index) }
+        Self { root, core, value, index: NonZeroUsize::new(index) }
     }
 
     /// Create a new [`BorrowedValueRef`] using the given data and index.
@@ -52,17 +54,61 @@ impl<'data> BorrowedValueRef<'data> {
     #[inline]
     #[must_use]
     pub(super) const unsafe fn new_nonzero(
-        core: IndexedCoreRef<'data>,
-        value: IndexedValue,
+        root: &'data [u8],
+        core: &'data IndexedCore,
+        value: BorrowedValueIndex,
         index: Option<NonZeroUsize>,
     ) -> Self {
-        Self { core, value, index }
+        Self { root, core, value, index }
     }
 
     /// Get the [`IndexedValueType`] of this value.
     #[inline]
     #[must_use]
-    pub const fn ty(&self) -> IndexedValueType { self.value.ty() }
+    pub const fn ty(&self) -> BorrowedValueType { self.value.ty() }
+
+    /// Get the value as a [`BorrowedValue`].
+    #[must_use]
+    pub fn as_value(&self) -> BorrowedValue<'data> {
+        match self.value {
+            BorrowedValueIndex::Byte(..) => {
+                BorrowedValue::Byte(unsafe { self.as_byte().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Short(..) => {
+                BorrowedValue::Short(unsafe { self.as_short().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Int(..) => {
+                BorrowedValue::Int(unsafe { self.as_int().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Long(..) => {
+                BorrowedValue::Long(unsafe { self.as_long().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Float(..) => {
+                BorrowedValue::Float(unsafe { self.as_float().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Double(..) => {
+                BorrowedValue::Double(unsafe { self.as_double().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::ByteArray(..) => {
+                BorrowedValue::ByteArray(unsafe { self.as_byte_array().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::String(..) => {
+                BorrowedValue::String(unsafe { self.as_string().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::List(..) => {
+                BorrowedValue::List(unsafe { self.as_list().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Compound(..) => {
+                BorrowedValue::Compound(unsafe { self.as_compound().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::IntArray(..) => {
+                BorrowedValue::IntArray(unsafe { self.as_int_array().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::LongArray(..) => {
+                BorrowedValue::LongArray(unsafe { self.as_long_array().unwrap_unchecked() })
+            }
+        }
+    }
 
     /// Get the value as a [`u8`].
     ///
@@ -70,8 +116,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_byte(&self) -> Option<u8> {
         match self.value {
-            IndexedValue::Byte(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Byte(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -83,8 +129,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_short(&self) -> Option<u16> {
         match self.value {
-            IndexedValue::Short(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Short(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -96,8 +142,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_int(&self) -> Option<u32> {
         match self.value {
-            IndexedValue::Int(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Int(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -109,8 +155,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_long(&self) -> Option<u64> {
         match self.value {
-            IndexedValue::Long(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Long(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -122,8 +168,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_float(&self) -> Option<f32> {
         match self.value {
-            IndexedValue::Float(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Float(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -135,8 +181,8 @@ impl<'data> BorrowedValueRef<'data> {
     #[must_use]
     pub fn as_double(&self) -> Option<f64> {
         match self.value {
-            IndexedValue::Double(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Double(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -146,10 +192,10 @@ impl<'data> BorrowedValueRef<'data> {
     ///
     /// Returns `None` if the value is not a byte array.
     #[must_use]
-    pub fn as_byte_array(&self) -> Option<&[u8]> {
+    pub fn as_byte_array(&self) -> Option<&'data [u8]> {
         match self.value {
-            IndexedValue::ByteArray(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_ref())
+            BorrowedValueIndex::ByteArray(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_ref())
             }
             _ => None,
         }
@@ -159,10 +205,10 @@ impl<'data> BorrowedValueRef<'data> {
     ///
     /// Returns `None` if the value is not a string.
     #[must_use]
-    pub fn as_string(&self) -> Option<&MStr> {
+    pub fn as_string(&self) -> Option<&'data MStr> {
         match self.value {
-            IndexedValue::String(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_ref())
+            BorrowedValueIndex::String(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_ref())
             }
             _ => None,
         }
@@ -172,8 +218,8 @@ impl<'data> BorrowedValueRef<'data> {
     ///
     /// Returns `None` if the value is not a list.
     #[must_use]
-    pub fn as_list(&self) -> Option<IndexedListRef<'_, IndexedList>> {
-        let IndexedValue::List(_) = self.value else { return None };
+    pub fn as_list(&self) -> Option<IndexedListRef<'data, IndexedList>> {
+        let BorrowedValueIndex::List(_) = self.value else { return None };
         let Some(index) = self.index else {
             #[cfg(debug_assertions)]
             unreachable!("IndexedValue::List must have an index!");
@@ -184,15 +230,15 @@ impl<'data> BorrowedValueRef<'data> {
         };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.core.reborrow(), index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
     }
 
     /// Get the compound of named entries.
     ///
     /// Returns `None` if the value is not a compound.
     #[must_use]
-    pub fn as_compound(&self) -> Option<IndexedCompoundRef<'_>> {
-        let IndexedValue::Compound(_) = self.value else { return None };
+    pub fn as_compound(&self) -> Option<IndexedCompoundRef<'data>> {
+        let BorrowedValueIndex::Compound(_) = self.value else { return None };
         let Some(index) = self.index else {
             #[cfg(debug_assertions)]
             unreachable!("IndexedValue::Compound must have an index!");
@@ -203,15 +249,15 @@ impl<'data> BorrowedValueRef<'data> {
         };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedCompoundRef::new(self.core.reborrow(), index.get()) })
+        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.get()) })
     }
 
     /// Get the value as a [`u32`] array.
     ///
     /// Returns `None` if the value is not a [`u32`] array.
     #[must_use]
-    pub fn as_int_array(&self) -> Option<IndexedListRef<'_, u32>> {
-        let IndexedValue::IntArray(_) = self.value else { return None };
+    pub fn as_int_array(&self) -> Option<IndexedListRef<'data, u32>> {
+        let BorrowedValueIndex::IntArray(_) = self.value else { return None };
         let Some(index) = self.index else {
             #[cfg(debug_assertions)]
             unreachable!("IndexedValue::IntArray must have an index!");
@@ -222,15 +268,15 @@ impl<'data> BorrowedValueRef<'data> {
         };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.core.reborrow(), index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
     }
 
     /// Get the value as a [`u64`] array.
     ///
     /// Returns `None` if the value is not a [`u64`] array.
     #[must_use]
-    pub fn as_long_array(&self) -> Option<IndexedListRef<'_, u64>> {
-        let IndexedValue::LongArray(_) = self.value else { return None };
+    pub fn as_long_array(&self) -> Option<IndexedListRef<'data, u64>> {
+        let BorrowedValueIndex::LongArray(_) = self.value else { return None };
         let Some(index) = self.index else {
             #[cfg(debug_assertions)]
             unreachable!("IndexedValue::LongArray must have an index!");
@@ -241,18 +287,25 @@ impl<'data> BorrowedValueRef<'data> {
         };
 
         // SAFETY: The provided `index` is required to be valid for `core`
-        Some(unsafe { IndexedListRef::new(self.core.reborrow(), index.get()) })
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
+    }
+}
+
+impl fmt::Debug for BorrowedValueRef<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.as_value(), f)
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// A mutable reference to an [`IndexedValue`].
-#[derive(Debug, PartialEq, Eq)]
+#[derive(PartialEq, Eq)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct BorrowedValueMut<'data> {
-    core: IndexedCoreMut<'data>,
-    value: IndexedValue,
+    root: &'data mut [u8],
+    core: &'data IndexedCore,
+    value: BorrowedValueIndex,
     index: Option<NonZeroUsize>,
 }
 
@@ -266,11 +319,12 @@ impl<'data> BorrowedValueMut<'data> {
     #[inline]
     #[must_use]
     pub(super) const unsafe fn new(
-        core: IndexedCoreMut<'data>,
-        value: IndexedValue,
+        root: &'data mut [u8],
+        core: &'data IndexedCore,
+        value: BorrowedValueIndex,
         index: usize,
     ) -> Self {
-        Self { core, value, index: NonZeroUsize::new(index) }
+        Self { root, core, value, index: NonZeroUsize::new(index) }
     }
 
     /// Create a new [`BorrowedValueMut`] using the given data and index.
@@ -282,17 +336,61 @@ impl<'data> BorrowedValueMut<'data> {
     #[inline]
     #[must_use]
     pub(super) const unsafe fn new_nonzero(
-        core: IndexedCoreMut<'data>,
-        value: IndexedValue,
+        root: &'data mut [u8],
+        core: &'data IndexedCore,
+        value: BorrowedValueIndex,
         index: Option<NonZeroUsize>,
     ) -> Self {
-        Self { core, value, index }
+        Self { root, core, value, index }
     }
 
     /// Get the [`IndexedValueType`] of this value.
     #[inline]
     #[must_use]
-    pub const fn ty(&self) -> IndexedValueType { self.value.ty() }
+    pub const fn ty(&self) -> BorrowedValueType { self.value.ty() }
+
+    /// Get the value as a [`BorrowedValue`].
+    #[must_use]
+    pub fn as_value(&self) -> BorrowedValue<'_> {
+        match self.value {
+            BorrowedValueIndex::Byte(..) => {
+                BorrowedValue::Byte(unsafe { self.as_byte().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Short(..) => {
+                BorrowedValue::Short(unsafe { self.as_short().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Int(..) => {
+                BorrowedValue::Int(unsafe { self.as_int().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Long(..) => {
+                BorrowedValue::Long(unsafe { self.as_long().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Float(..) => {
+                BorrowedValue::Float(unsafe { self.as_float().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Double(..) => {
+                BorrowedValue::Double(unsafe { self.as_double().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::ByteArray(..) => {
+                BorrowedValue::ByteArray(unsafe { self.as_byte_array().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::String(..) => {
+                BorrowedValue::String(unsafe { self.as_string().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::List(..) => {
+                BorrowedValue::List(unsafe { self.as_list().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::Compound(..) => {
+                BorrowedValue::Compound(unsafe { self.as_compound().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::IntArray(..) => {
+                BorrowedValue::IntArray(unsafe { self.as_int_array().unwrap_unchecked() })
+            }
+            BorrowedValueIndex::LongArray(..) => {
+                BorrowedValue::LongArray(unsafe { self.as_long_array().unwrap_unchecked() })
+            }
+        }
+    }
 
     /// Get the value as a [`u8`].
     ///
@@ -300,8 +398,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_byte(&self) -> Option<u8> {
         match self.value {
-            IndexedValue::Byte(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Byte(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -313,8 +411,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`u8`].
     pub fn set_byte(&mut self, value: u8) -> bool {
         match self.value {
-            IndexedValue::Byte(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Byte(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -327,8 +425,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_short(&self) -> Option<u16> {
         match self.value {
-            IndexedValue::Short(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Short(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -340,8 +438,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`u16`].
     pub fn set_short(&mut self, value: u16) -> bool {
         match self.value {
-            IndexedValue::Short(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Short(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -354,8 +452,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_int(&self) -> Option<u32> {
         match self.value {
-            IndexedValue::Int(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Int(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -367,8 +465,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`u32`].
     pub fn set_int(&mut self, value: u32) -> bool {
         match self.value {
-            IndexedValue::Int(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Int(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -381,8 +479,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_long(&self) -> Option<u64> {
         match self.value {
-            IndexedValue::Long(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Long(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -394,8 +492,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`u64`].
     pub fn set_long(&mut self, value: u64) -> bool {
         match self.value {
-            IndexedValue::Long(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Long(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -408,8 +506,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_float(&self) -> Option<f32> {
         match self.value {
-            IndexedValue::Float(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Float(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -421,8 +519,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`f32`].
     pub fn set_float(&mut self, value: f32) -> bool {
         match self.value {
-            IndexedValue::Float(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Float(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -435,8 +533,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_double(&self) -> Option<f64> {
         match self.value {
-            IndexedValue::Double(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_value())
+            BorrowedValueIndex::Double(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_value())
             }
             _ => None,
         }
@@ -448,8 +546,8 @@ impl<'data> BorrowedValueMut<'data> {
     /// or `false` if the value is not a [`f64`].
     pub fn set_double(&mut self, value: f64) -> bool {
         match self.value {
-            IndexedValue::Double(index) => {
-                unsafe { BorrowedMut::new(self.core.root_mut(), index) }.set_value(value);
+            BorrowedValueIndex::Double(index) => {
+                unsafe { BorrowedMut::new(self.root, index) }.set_value(value);
                 true
             }
             _ => false,
@@ -462,8 +560,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_byte_array(&self) -> Option<&[u8]> {
         match self.value {
-            IndexedValue::ByteArray(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_ref())
+            BorrowedValueIndex::ByteArray(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_ref())
             }
             _ => None,
         }
@@ -475,8 +573,8 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_string(&self) -> Option<&MStr> {
         match self.value {
-            IndexedValue::String(index) => {
-                Some(unsafe { BorrowedRef::new(self.core.root(), index) }.get_ref())
+            BorrowedValueIndex::String(index) => {
+                Some(unsafe { BorrowedRef::new(self.root, index) }.get_ref())
             }
             _ => None,
         }
@@ -486,44 +584,76 @@ impl<'data> BorrowedValueMut<'data> {
     ///
     /// Returns `None` if the value is not a list.
     #[must_use]
-    pub fn as_list(&self) -> Option<IndexedListRef<'data, ()>> {
-        match self.value {
-            IndexedValue::List(_index) => todo!(),
-            _ => None,
-        }
+    pub fn as_list(&self) -> Option<IndexedListRef<'_, IndexedList>> {
+        let BorrowedValueIndex::List(_) = self.value else { return None };
+        let Some(index) = self.index else {
+            #[cfg(debug_assertions)]
+            unreachable!("IndexedValue::List must have an index!");
+            #[cfg(not(debug_assertions))]
+            unsafe {
+                core::hint::unreachable_unchecked()
+            }
+        };
+
+        // SAFETY: The provided `index` is required to be valid for `core`
+        Some(unsafe { IndexedListRef::new(self.root, self.core, index.get()) })
     }
 
     /// Get the list of values mutably.
     ///
     /// Returns `None` if the value is not a list.
     #[must_use]
-    pub fn as_list_mut(&mut self) -> Option<IndexedListMut<'data, ()>> {
-        match self.value {
-            IndexedValue::List(_index) => todo!(),
-            _ => None,
-        }
+    pub fn as_list_mut(&mut self) -> Option<IndexedListMut<'_, IndexedList>> {
+        let BorrowedValueIndex::List(_) = self.value else { return None };
+        let Some(index) = self.index else {
+            #[cfg(debug_assertions)]
+            unreachable!("IndexedValue::List must have an index!");
+            #[cfg(not(debug_assertions))]
+            unsafe {
+                core::hint::unreachable_unchecked()
+            }
+        };
+
+        // SAFETY: The provided `index` is required to be valid for `core`
+        Some(unsafe { IndexedListMut::new(self.root, self.core, index.get()) })
     }
 
     /// Get the compound of named entries.
     ///
     /// Returns `None` if the value is not a compound.
     #[must_use]
-    pub fn as_compound(&self) -> Option<IndexedCompoundRef<'data>> {
-        match self.value {
-            IndexedValue::Compound(_index) => todo!(),
-            _ => None,
-        }
+    pub fn as_compound(&self) -> Option<IndexedCompoundRef<'_>> {
+        let BorrowedValueIndex::Compound(_) = self.value else { return None };
+        let Some(index) = self.index else {
+            #[cfg(debug_assertions)]
+            unreachable!("IndexedValue::Compound must have an index!");
+            #[cfg(not(debug_assertions))]
+            unsafe {
+                core::hint::unreachable_unchecked()
+            }
+        };
+
+        // SAFETY: The provided `index` is required to be valid for `core`
+        Some(unsafe { IndexedCompoundRef::new(self.root, self.core, index.get()) })
     }
 
     /// Get the compound of named entries mutably.
     ///
     /// Returns `None` if the value is not a compound.
     #[must_use]
-    pub fn as_compound_mut(&mut self) -> Option<IndexedCompoundRef<'data>> {
-        match self.value {
-            IndexedValue::Compound(_index) => todo!(),
-            _ => None,
-        }
+    pub fn as_compound_mut(&mut self) -> Option<IndexedCompoundMut<'_>> {
+        let BorrowedValueIndex::Compound(_) = self.value else { return None };
+        let Some(index) = self.index else {
+            #[cfg(debug_assertions)]
+            unreachable!("IndexedValue::Compound must have an index!");
+            #[cfg(not(debug_assertions))]
+            unsafe {
+                core::hint::unreachable_unchecked()
+            }
+        };
+
+        // SAFETY: The provided `index` is required to be valid for `core`
+        Some(unsafe { IndexedCompoundMut::new(self.root, self.core, index.get()) })
     }
 
     /// Get the value as a [`u32`] array.
@@ -532,7 +662,7 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_int_array(&self) -> Option<IndexedListRef<'data, u32>> {
         match self.value {
-            IndexedValue::IntArray(_index) => todo!(),
+            BorrowedValueIndex::IntArray(_index) => todo!(),
             _ => None,
         }
     }
@@ -543,7 +673,7 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_int_array_mut(&mut self) -> Option<IndexedListMut<'data, u32>> {
         match self.value {
-            IndexedValue::IntArray(_index) => todo!(),
+            BorrowedValueIndex::IntArray(_index) => todo!(),
             _ => None,
         }
     }
@@ -554,7 +684,7 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_long_array(&self) -> Option<IndexedListRef<'data, u64>> {
         match self.value {
-            IndexedValue::LongArray(_index) => todo!(),
+            BorrowedValueIndex::LongArray(_index) => todo!(),
             _ => None,
         }
     }
@@ -565,9 +695,15 @@ impl<'data> BorrowedValueMut<'data> {
     #[must_use]
     pub fn as_long_array_mut(&mut self) -> Option<IndexedListMut<'data, u64>> {
         match self.value {
-            IndexedValue::LongArray(_index) => todo!(),
+            BorrowedValueIndex::LongArray(_index) => todo!(),
             _ => None,
         }
+    }
+}
+
+impl fmt::Debug for BorrowedValueMut<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.as_value(), f)
     }
 }
 
@@ -577,7 +713,7 @@ impl<'data> BorrowedValueMut<'data> {
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub enum IndexedValue {
+pub enum BorrowedValueIndex {
     /// A [`u8`] value.
     Byte(BorrowedIndex<u8>),
     /// A [`u16`] value.
@@ -604,11 +740,40 @@ pub enum IndexedValue {
     LongArray(BorrowedIndex<[u64]>),
 }
 
-/// The type of an [`IndexedValue`].
+/// A borrowed value of any type.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum BorrowedValue<'data> {
+    /// A [`u8`] value.
+    Byte(u8),
+    /// A [`u16`] value.
+    Short(u16),
+    /// A [`u32`] value.
+    Int(u32),
+    /// A [`u64`] value.
+    Long(u64),
+    /// A [`f32`] value.
+    Float(f32),
+    /// A [`f64`] value.
+    Double(f64),
+    /// A [`u8`] array.
+    ByteArray(&'data [u8]),
+    /// An [`MStr`] string.
+    String(&'data MStr),
+    /// A list of values.
+    List(IndexedListRef<'data, IndexedList>),
+    /// A compound of named entries.
+    Compound(IndexedCompoundRef<'data>),
+    /// A [`u32`] array.
+    IntArray(IndexedListRef<'data, u32>),
+    /// A [`u64`] array.
+    LongArray(IndexedListRef<'data, u64>),
+}
+
+/// The type of an [`BorrowedValueIndex`].
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub enum IndexedValueType {
+pub enum BorrowedValueType {
     /// A [`u8`] value.
     Byte,
     /// A [`u16`] value.
@@ -635,7 +800,7 @@ pub enum IndexedValueType {
     LongArray,
 }
 
-impl IndexedValue {
+impl BorrowedValueIndex {
     /// Get the inner index of this value.
     #[must_use]
     pub(super) const fn index(&self) -> usize {
@@ -657,20 +822,20 @@ impl IndexedValue {
 
     /// Get the type of this value.
     #[must_use]
-    pub const fn ty(&self) -> IndexedValueType {
+    pub const fn ty(&self) -> BorrowedValueType {
         match self {
-            Self::Byte(_) => IndexedValueType::Byte,
-            Self::Short(_) => IndexedValueType::Short,
-            Self::Int(_) => IndexedValueType::Int,
-            Self::Long(_) => IndexedValueType::Long,
-            Self::Float(_) => IndexedValueType::Float,
-            Self::Double(_) => IndexedValueType::Double,
-            Self::ByteArray(_) => IndexedValueType::ByteArray,
-            Self::String(_) => IndexedValueType::String,
-            Self::List(_) => IndexedValueType::List,
-            Self::Compound(_) => IndexedValueType::Compound,
-            Self::IntArray(_) => IndexedValueType::IntArray,
-            Self::LongArray(_) => IndexedValueType::LongArray,
+            Self::Byte(_) => BorrowedValueType::Byte,
+            Self::Short(_) => BorrowedValueType::Short,
+            Self::Int(_) => BorrowedValueType::Int,
+            Self::Long(_) => BorrowedValueType::Long,
+            Self::Float(_) => BorrowedValueType::Float,
+            Self::Double(_) => BorrowedValueType::Double,
+            Self::ByteArray(_) => BorrowedValueType::ByteArray,
+            Self::String(_) => BorrowedValueType::String,
+            Self::List(_) => BorrowedValueType::List,
+            Self::Compound(_) => BorrowedValueType::Compound,
+            Self::IntArray(_) => BorrowedValueType::IntArray,
+            Self::LongArray(_) => BorrowedValueType::LongArray,
         }
     }
 }

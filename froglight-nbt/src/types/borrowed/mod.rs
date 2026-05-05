@@ -1,14 +1,13 @@
 //! TODO
 
-use ::alloc::borrow::Cow;
+use core::fmt;
+
+use ::alloc::vec::Vec;
 use ::core::range::Range;
 use froglight_mutf8::prelude::MStr;
 
 pub mod compound;
 use compound::{IndexedCompoundMut, IndexedCompoundRef, IndexedEntry};
-
-pub mod core;
-use core::{IndexedCoreMut, IndexedCoreRef};
 
 pub mod reference;
 use reference::{BorrowedIndex, BorrowedRef};
@@ -19,10 +18,11 @@ pub mod value;
 mod parse;
 
 /// A borrowed NBT structure with an index of its contents.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct IndexedNbtRef<'data> {
+    root: &'data [u8],
     name: Option<BorrowedIndex<MStr>>,
-    core: IndexedCoreRef<'data>,
+    core: IndexedCore,
 }
 
 impl<'data> IndexedNbtRef<'data> {
@@ -49,7 +49,7 @@ impl<'data> IndexedNbtRef<'data> {
     pub const fn name(&self) -> Option<BorrowedRef<'data, MStr>> {
         if let Some(index) = self.name {
             // SAFETY: The entry uses the same `root` so the index is valid.
-            Some(unsafe { BorrowedRef::new(self.core.root(), index) })
+            Some(unsafe { BorrowedRef::new(self.root, index) })
         } else {
             None
         }
@@ -60,7 +60,7 @@ impl<'data> IndexedNbtRef<'data> {
     #[must_use]
     pub const fn as_compound(&self) -> IndexedCompoundRef<'_> {
         // SAFETY: `IndexedNbtRef` ensures this is valid.
-        unsafe { IndexedCompoundRef::new(self.core.reborrow(), 0) }
+        unsafe { IndexedCompoundRef::new(self.root, &self.core, 0) }
     }
 
     /// Create a new [`IndexedNbtRef`] from the given root and entries.
@@ -76,21 +76,30 @@ impl<'data> IndexedNbtRef<'data> {
     pub const unsafe fn new_unchecked(
         root: &'data [u8],
         name: Option<BorrowedIndex<MStr>>,
-        entries: Cow<'data, [IndexedEntry]>,
-        indexes: Cow<'data, [Range<usize>]>,
+        entries: Vec<IndexedEntry>,
+        indexes: Vec<Range<usize>>,
     ) -> Self {
         // SAFETY: The caller ensured this is safe.
-        Self { name, core: unsafe { IndexedCoreRef::new(root, entries, indexes) } }
+        Self { root, name, core: unsafe { IndexedCore::new(entries, indexes) } }
+    }
+}
+
+impl fmt::Debug for IndexedNbtRef<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let name = self.name().map(|n| n.get_ref());
+        let compound = self.as_compound();
+        f.debug_struct("IndexedNbtRef").field("name", &name).field("root", &compound).finish()
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// A mutable, borrowed NBT structure with an index of its contents.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(PartialEq, Eq)]
 pub struct IndexedNbtMut<'data> {
+    root: &'data mut [u8],
     name: Option<BorrowedIndex<MStr>>,
-    core: IndexedCoreMut<'data>,
+    core: IndexedCore,
 }
 
 impl<'data> IndexedNbtMut<'data> {
@@ -119,7 +128,7 @@ impl<'data> IndexedNbtMut<'data> {
     pub const fn name(&self) -> Option<BorrowedRef<'_, MStr>> {
         if let Some(index) = self.name {
             // SAFETY: The entry uses the same `root` so the index is valid.
-            Some(unsafe { BorrowedRef::new(self.core.root(), index) })
+            Some(unsafe { BorrowedRef::new(self.root, index) })
         } else {
             None
         }
@@ -130,7 +139,7 @@ impl<'data> IndexedNbtMut<'data> {
     #[must_use]
     pub const fn as_compound(&self) -> IndexedCompoundRef<'_> {
         // SAFETY: `IndexedNbtMut` ensures this is valid.
-        unsafe { IndexedCompoundRef::new(self.core.as_ref(), 0) }
+        unsafe { IndexedCompoundRef::new(self.root, &self.core, 0) }
     }
 
     /// Get the root compound of this NBT structure.
@@ -138,7 +147,7 @@ impl<'data> IndexedNbtMut<'data> {
     #[must_use]
     pub const fn as_compound_mut(&mut self) -> IndexedCompoundMut<'_> {
         // SAFETY: `IndexedNbtMut` ensures this is valid.
-        unsafe { IndexedCompoundMut::new(self.core.reborrow(), 0) }
+        unsafe { IndexedCompoundMut::new(self.root, &self.core, 0) }
     }
 
     /// Create a new [`IndexedNbtMut`] from the given root and entries.
@@ -154,10 +163,52 @@ impl<'data> IndexedNbtMut<'data> {
     pub const unsafe fn new_unchecked(
         root: &'data mut [u8],
         name: Option<BorrowedIndex<MStr>>,
-        entries: Cow<'data, [IndexedEntry]>,
-        indexes: Cow<'data, [Range<usize>]>,
+        entries: Vec<IndexedEntry>,
+        indexes: Vec<Range<usize>>,
     ) -> Self {
         // SAFETY: The caller ensured this is safe.
-        Self { name, core: unsafe { IndexedCoreMut::new(root, entries, indexes) } }
+        Self { root, name, core: unsafe { IndexedCore::new(entries, indexes) } }
     }
+}
+
+impl fmt::Debug for IndexedNbtMut<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let name = self.name().map(|n| n.get_ref());
+        let compound = self.as_compound();
+        f.debug_struct("IndexedNbtMut").field("name", &name).field("root", &compound).finish()
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// The core of an indexed NBT..
+#[derive(Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
+pub(super) struct IndexedCore {
+    entries: Vec<IndexedEntry>,
+    indexes: Vec<Range<usize>>,
+}
+
+impl IndexedCore {
+    /// Create a new [`IndexedCoreRef`] from the given root and entries.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the given list of entries and indexes
+    /// is valid for the given root slice.
+    #[inline]
+    #[must_use]
+    pub(super) const unsafe fn new(entries: Vec<IndexedEntry>, indexes: Vec<Range<usize>>) -> Self {
+        Self { entries, indexes }
+    }
+
+    /// Get the core list of [`IndexedEntry`]s.
+    #[inline]
+    #[must_use]
+    pub(super) const fn entries(&self) -> &[IndexedEntry] { self.entries.as_slice() }
+
+    /// Get the core list of index ranges.
+    #[inline]
+    #[must_use]
+    pub(super) const fn indexes(&self) -> &[Range<usize>] { self.indexes.as_slice() }
 }
