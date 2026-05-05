@@ -391,7 +391,11 @@ impl IndexedEntry {
 ///
 /// `entry_index` must be a valid index of `entries`.
 #[inline]
-unsafe fn get_index(compound_index: usize, entry_index: usize, entries: &[IndexedEntry]) -> usize {
+pub(super) unsafe fn get_index(
+    compound_index: usize,
+    entry_index: usize,
+    entries: &[IndexedEntry],
+) -> usize {
     // SAFETY: `entry_index` is a valid index of `entries`
     let entry = unsafe { entries.get_unchecked(entry_index) };
 
@@ -400,7 +404,7 @@ unsafe fn get_index(compound_index: usize, entry_index: usize, entries: &[Indexe
         return 0;
     }
 
-    entries.iter().take(entry_index).fold(compound_index, |index, entry| {
+    entries.iter().take(entry_index).fold(compound_index.max(1), |index, entry| {
         index
             + usize::from(matches!(
                 entry.value().ty(),

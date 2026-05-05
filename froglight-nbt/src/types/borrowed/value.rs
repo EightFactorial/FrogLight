@@ -172,7 +172,7 @@ impl<'data> BorrowedValueRef<'data> {
     ///
     /// Returns `None` if the value is not a list.
     #[must_use]
-    pub fn as_list(&self) -> Option<IndexedListRef<'_, ()>> {
+    pub fn as_list(&self) -> Option<IndexedListRef<'_, IndexedList>> {
         let IndexedValue::List(_) = self.value else { return None };
         let Some(index) = self.index else {
             #[cfg(debug_assertions)]
@@ -636,6 +636,25 @@ pub enum IndexedValueType {
 }
 
 impl IndexedValue {
+    /// Get the inner index of this value.
+    #[must_use]
+    pub(super) const fn index(&self) -> usize {
+        match self {
+            Self::Byte(index) => index.index(),
+            Self::Short(index) => index.index(),
+            Self::Int(index) => index.index(),
+            Self::Long(index) => index.index(),
+            Self::Float(index) => index.index(),
+            Self::Double(index) => index.index(),
+            Self::ByteArray(index) => index.index(),
+            Self::String(index) => index.index(),
+            Self::List(index) => index.index(),
+            Self::Compound(index) => index.index(),
+            Self::IntArray(index) => index.index(),
+            Self::LongArray(index) => index.index(),
+        }
+    }
+
     /// Get the type of this value.
     #[must_use]
     pub const fn ty(&self) -> IndexedValueType {

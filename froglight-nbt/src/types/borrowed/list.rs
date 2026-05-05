@@ -6,6 +6,7 @@ use core::{marker::PhantomData, range::Range};
 use crate::types::borrowed::{
     IndexedCoreMut, IndexedCoreRef,
     reference::{BorrowedIndex, BorrowedMut, BorrowedPOD, BorrowedRef},
+    value::{BorrowedValueRef, IndexedList},
 };
 
 /// An NBT list tag with a reference to its data.
@@ -63,6 +64,37 @@ impl<T: BorrowedPOD> IndexedListRef<'_, T> {
     }
 }
 
+impl IndexedListRef<'_, IndexedList> {
+    /// Get the value at the provided index, if it exists.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get(&self, index: usize) -> Option<BorrowedValueRef<'_>> {
+        // SAFETY: `index` and `range` are always guaranteed to be within bounds
+        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
+        let entries = unsafe { self.core.entries().get_unchecked(*range) };
+
+        if let Some(entry) = entries.get(index) {
+            let ref_index = unsafe { super::compound::get_index(self.index, index, entries) };
+            Some(unsafe { BorrowedValueRef::new(self.core.reborrow(), entry.value(), ref_index) })
+        } else {
+            None
+        }
+    }
+
+    /// Get an iterator over all entries in this list.
+    pub fn iter(&self) -> impl Iterator<Item = BorrowedValueRef<'_>> + '_ {
+        // SAFETY: `index` and `range` are always guaranteed to be within bounds
+        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
+        let entries = unsafe { self.core.entries().get_unchecked(*range) };
+
+        entries.iter().enumerate().map(move |(index, entry)| {
+            let ref_index = unsafe { super::compound::get_index(self.index, index, entries) };
+            unsafe { BorrowedValueRef::new(self.core.reborrow(), entry.value(), ref_index) }
+        })
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// An NBT list tag with a mutable reference to its data.
@@ -105,15 +137,14 @@ impl<T: BorrowedPOD> IndexedListMut<'_, T> {
     /// Returns `None` if the index is out of bounds.
     #[must_use]
     pub fn get_value(&self, index: usize) -> Option<T> {
-        // SAFETY: `index` is always guaranteed to be within bounds
+        // SAFETY: `index` and `range` are always guaranteed to be within bounds
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let normalized = Range { start: 0, end: range.end.saturating_sub(range.start) };
+        let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        if normalized.contains(&index) {
-            let data_index = range.start + (core::mem::size_of::<T>() * index);
-            Some(unsafe {
-                BorrowedRef::new(self.core.root(), BorrowedIndex::new(data_index)).get_value()
-            })
+        if let Some(entry) = entries.get(index) {
+            // SAFETY: `index` is valid for `core` and is of type `T`
+            let index = unsafe { BorrowedIndex::new(entry.value().index()) };
+            Some(unsafe { BorrowedRef::new(self.core.root(), index).get_value() })
         } else {
             None
         }
@@ -124,16 +155,14 @@ impl<T: BorrowedPOD> IndexedListMut<'_, T> {
     /// Returns `true` if the value was successfully set,
     /// or `false` if the index is out of bounds.
     pub fn set_value(&mut self, index: usize, value: T) -> bool {
-        // SAFETY: `index` is always guaranteed to be within bounds
+        // SAFETY: `index` and `range` are always guaranteed to be within bounds
         let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let normalized = Range { start: 0, end: range.end.saturating_sub(range.start) };
+        let entries = unsafe { self.core.entries().get_unchecked(*range) };
 
-        if normalized.contains(&index) {
-            let data_index = range.start + (core::mem::size_of::<T>() * index);
-            unsafe {
-                BorrowedMut::new(self.core.root_mut(), BorrowedIndex::new(data_index))
-                    .set_value(value);
-            }
+        if let Some(entry) = entries.get(index) {
+            // SAFETY: `index` is valid for `core` and is of type `T`
+            let index = unsafe { BorrowedIndex::new(entry.value().index()) };
+            unsafe { BorrowedMut::new(self.core.root_mut(), index).set_value(value) }
             true
         } else {
             false
