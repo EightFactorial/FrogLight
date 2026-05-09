@@ -1,277 +1,482 @@
 //! TODO
 
-use core::{fmt, marker::PhantomData};
+use froglight_mutf8::prelude::MStr;
 
 use crate::types::borrowed::{
-    IndexedCore,
-    reference::{BorrowedIndex, BorrowedMut, BorrowedPOD, BorrowedRef},
-    value::{BorrowedValueMut, BorrowedValueRef, IndexedList},
+    core::{IndexCore, Mut, NbtAccess, Ref},
+    index::{Index, IndexedListType, IndexedMapType},
+    reference::{IndexedReference, NbtSliceType, NbtValueType},
 };
 
-/// An NBT list tag with a reference to its data.
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub struct IndexedListRef<'data, T> {
-    root: &'data [u8],
-    core: &'data IndexedCore,
-    index: usize,
-    _phantom: PhantomData<T>,
+cfg_select! {
+    feature = "alloc" => {
+        /// A typed NBT List that is indexed by an [`IndexCore`].
+        pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data = super::core::BorrowedCore<'data, A>> {
+            core: A::CORE<'data, C>,
+            index: Index<T>,
+        }
+
+        /// An NBT List that is indexed by an [`IndexCore`].
+        pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::core::BorrowedCore<'data, A>> {
+            /// An empty list.
+            Empty,
+            /// A [`u8`] value.
+            Byte(IndexedList<'data, u8, A, C>),
+            /// A [`u16`] value.
+            Short(IndexedList<'data, u16, A, C>),
+            /// A [`u32`] value.
+            Int(IndexedList<'data, u32, A, C>),
+            /// A [`u64`] value.
+            Long(IndexedList<'data, u64, A, C>),
+            /// A [`f32`] value.
+            Float(IndexedList<'data, f32, A, C>),
+            /// A [`f64`] value.
+            Double(IndexedList<'data, f64, A, C>),
+            /// A [`u8`] array.
+            ByteArray(IndexedList<'data, [u8], A, C>),
+            /// An [`MStr`] string.
+            String(IndexedList<'data, MStr, A, C>),
+            /// A list of values.
+            List(IndexedList<'data, IndexedListType, A, C>),
+            /// A compound of named entries.
+            Compound(IndexedList<'data, IndexedMapType, A, C>),
+            /// A [`u32`] array.
+            IntArray(IndexedList<'data, [u32], A, C>),
+            /// A [`u64`] array.
+            LongArray(IndexedList<'data, [u64], A, C>),
+        }
+    }
+    _ => {
+        /// A typed NBT List that is indexed by an [`IndexCore`].
+        pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> {
+            core: A::CORE<'data, C>,
+            index: Index<T>,
+        }
+
+        /// An NBT List that is indexed by an [`IndexCore`].
+        pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+            /// An empty list.
+            Empty,
+            /// A [`u8`] value.
+            Byte(IndexedList<'data, u8, A, C>),
+            /// A [`u16`] value.
+            Short(IndexedList<'data, u16, A, C>),
+            /// A [`u32`] value.
+            Int(IndexedList<'data, u32, A, C>),
+            /// A [`u64`] value.
+            Long(IndexedList<'data, u64, A, C>),
+            /// A [`f32`] value.
+            Float(IndexedList<'data, f32, A, C>),
+            /// A [`f64`] value.
+            Double(IndexedList<'data, f64, A, C>),
+            /// A [`u8`] array.
+            ByteArray(IndexedList<'data, u8, A, C>),
+            /// An [`MStr`] string.
+            String(IndexedList<'data, MStr, A, C>),
+            /// A list of values.
+            List(IndexedList<'data, IndexedListType, A, C>),
+            /// A compound of named entries.
+            Compound(IndexedList<'data, IndexedMapType, A, C>),
+            /// A [`u32`] array.
+            IntArray(IndexedList<'data, [u32], A, C>),
+            /// A [`u64`] array.
+            LongArray(IndexedList<'data, [u64], A, C>),
+        }
+    }
 }
 
-impl<'data, T> IndexedListRef<'data, T> {
-    /// Create a new [`IndexedListRef`] with the given core and index.
+impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, T, A, C> {
+    /// Create a new [`IndexedList`] from the given core and [`Index`].
     ///
     /// # Safety
     ///
-    /// The caller must ensure that `index` is a valid index of `core`.
-    #[must_use]
-    pub(super) const unsafe fn new(
-        root: &'data [u8],
-        core: &'data IndexedCore,
-        index: usize,
-    ) -> Self {
-        Self { root, core, index, _phantom: PhantomData }
-    }
-}
-
-impl<T: BorrowedPOD> IndexedListRef<'_, T> {
-    /// Get the number of entries in this [`IndexedListRef`].
+    /// The caller must ensure that the index is valid for the given core.
     #[inline]
     #[must_use]
-    pub fn len(&self) -> usize {
-        unsafe { BorrowedRef::new(self.root, BorrowedIndex::<[u8]>::new(self.index)).len() }
-    }
-
-    /// Returns `true` if the list is empty.
-    #[inline]
-    #[must_use]
-    pub fn is_empty(&self) -> bool { self.len() == 0 }
-
-    /// Get the value at the provided index, if it exists.
-    ///
-    /// Returns `None` if the index is out of bounds.
-    #[must_use]
-    pub fn get_value(&self, index: usize) -> Option<T> {
-        if index < self.len() {
-            let index = self.index + (core::mem::size_of::<T>() * index);
-
-            // SAFETY: `index` is valid for `core` and is of type `T`
-            Some(unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() })
-        } else {
-            None
-        }
-    }
-
-    /// Get an iterator over all entries in this list.
-    pub fn iter(&self) -> impl Iterator<Item = T> + '_ {
-        (0..self.len()).map(move |index| {
-            let index = self.index + (core::mem::size_of::<T>() * index);
-
-            // SAFETY: `index` is valid for `core` and is of type `T`
-            unsafe { BorrowedRef::new(self.root, BorrowedIndex::new(index)).get_value() }
-        })
-    }
-}
-
-impl IndexedListRef<'_, IndexedList> {
-    /// Get the number of entries in this [`IndexedListRef`].
-    #[inline]
-    #[must_use]
-    pub fn len(&self) -> usize {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-
-        range.end.saturating_sub(range.start)
-    }
-
-    /// Returns `true` if the list is empty.
-    #[inline]
-    #[must_use]
-    pub fn is_empty(&self) -> bool { self.len() == 0 }
-
-    /// Get the value at the provided index, if it exists.
-    ///
-    /// Returns `None` if the index is out of bounds.
-    #[must_use]
-    pub fn get(&self, index: usize) -> Option<BorrowedValueRef<'_>> {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        entries
-            .get(index)
-            .map(|entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
-    }
-
-    /// Get an iterator over all entries in this list.
-    pub fn iter(&self) -> impl Iterator<Item = BorrowedValueRef<'_>> + '_ {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        entries
-            .iter()
-            .map(move |entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
-    }
-}
-
-impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for IndexedListRef<'_, T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
-    }
-}
-
-impl fmt::Debug for IndexedListRef<'_, IndexedList> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
+    pub const unsafe fn new(core: A::CORE<'data, C>, index: Index<T>) -> Self {
+        Self { core, index }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// An NBT list tag with a mutable reference to its data.
-#[derive(PartialEq, Eq)]
-pub struct IndexedListMut<'data, T> {
-    root: &'data mut [u8],
-    core: &'data IndexedCore,
-    index: usize,
-    _phantom: PhantomData<T>,
-}
-
-impl<'data, T> IndexedListMut<'data, T> {
-    /// Create a new [`IndexedListMut`] with the given core and index.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that `index` is a valid index of `core`.
-    #[must_use]
-    pub(super) const unsafe fn new(
-        root: &'data mut [u8],
-        core: &'data IndexedCore,
-        index: usize,
-    ) -> Self {
-        Self { root, core, index, _phantom: PhantomData }
-    }
-
-    /// Get this [`IndexedListMut`] as an [`IndexedListRef`].
-    #[inline]
-    #[must_use]
-    pub fn as_ref(&self) -> IndexedListRef<'_, T> {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        unsafe { IndexedListRef::new(self.root, self.core, self.index) }
-    }
-
-    /// Convert this [`IndexedListMut`] into an [`IndexedListRef`].
-    #[inline]
-    #[must_use]
-    pub fn into_ref(self) -> IndexedListRef<'data, T> {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        unsafe { IndexedListRef::new(self.root, self.core, self.index) }
-    }
-}
-
-impl<T: BorrowedPOD> IndexedListMut<'_, T> {
-    /// Get the number of entries in this [`IndexedListMut`].
-    #[inline]
+impl<'data, T: NbtValueType, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data>
+    IndexedList<'data, T, A, C>
+{
+    /// Get the length of the list.
     #[must_use]
     pub fn len(&self) -> usize {
-        unsafe { BorrowedRef::new(self.root, BorrowedIndex::<[u8]>::new(self.index)).len() }
+        // SAFETY: All `NbtValueType`-type lists start with a 4-byte `u32` length
+        // prefix, followed by the list elements.
+        unsafe {
+            IndexedReference::<u32, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                self.index.cast::<u32>(),
+            )
+            .get() as usize
+        }
     }
 
-    /// Returns `true` if the list is empty.
+    /// Return `true` if the length of the list is zero.
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
 
-    /// Get the value at the provided index, if it exists.
-    ///
-    /// Returns `None` if the index is out of bounds.
+    /// Get a reference to the element at the given index, if it is present,
+    /// else `None`.
     #[must_use]
-    pub fn get_value(&self, index: usize) -> Option<T> {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        entries.get(index).map(|entry| {
-            // SAFETY: `index` is valid for `core` and is of type `T`
-            unsafe {
-                BorrowedRef::new(self.root, BorrowedIndex::new(entry.value().index())).get_value()
-            }
-        })
+    pub fn get(&self, index: usize) -> Option<IndexedReference<'_, T, Ref>> {
+        if index < self.len() {
+            // SAFETY: A bounds check was just performed.
+            Some(unsafe { self.get_unchecked(index) })
+        } else {
+            None
+        }
     }
 
-    /// Set the value at the provided index, if it exists.
+    /// Get a reference to the element at the given index without performing
+    /// bounds checks.
     ///
-    /// Returns `true` if the value was successfully set,
-    /// or `false` if the index is out of bounds.
-    pub fn set_value(&mut self, index: usize, value: T) -> bool {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        if let Some(entry) = entries.get(index) {
-            // SAFETY: `index` is valid for `core` and is of type `T`
-            unsafe {
-                BorrowedMut::new(self.root, BorrowedIndex::new(entry.value().index()))
-                    .set_value(value);
-            }
-            true
-        } else {
-            false
+    /// # Safety
+    ///
+    /// The caller must ensure that `index` is within the bounds of the list.
+    #[must_use]
+    pub unsafe fn get_unchecked(&self, index: usize) -> IndexedReference<'_, T, Ref> {
+        // SAFETY: All `NbtValueType`-type lists start with a 4-byte `u32` length
+        // prefix, followed by the list elements.
+        unsafe {
+            let offset = core::mem::size_of::<u32>() + (index * core::mem::size_of::<T>());
+            let index = Index::<T>::new(self.index.value() + offset);
+            IndexedReference::<T, Ref>::new(<C as IndexCore<A>>::root(&self.core), index)
         }
     }
 }
 
-impl IndexedListMut<'_, IndexedList> {
-    /// Get the number of entries in this [`IndexedListMut`].
-    #[inline]
+impl<'data, T: NbtValueType, C: IndexCore<Mut> + 'data> IndexedList<'data, T, Mut, C> {
+    /// Get a mutable reference to the element at the given index, if it is
+    /// present, else `None`.
     #[must_use]
-    pub fn len(&self) -> usize {
-        // SAFETY: `index` is always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-
-        range.end.saturating_sub(range.start)
+    pub fn get_mut(&mut self, index: usize) -> Option<IndexedReference<'_, T, Mut>> {
+        if index < self.len() {
+            // SAFETY: A bounds check was just performed.
+            Some(unsafe { self.get_mut_unchecked(index) })
+        } else {
+            None
+        }
     }
 
-    /// Returns `true` if the list is empty.
+    /// Get a mutable reference to the element at the given index without
+    /// performing bounds checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `index` is within the bounds of the list.
+    #[must_use]
+    pub unsafe fn get_mut_unchecked(&mut self, index: usize) -> IndexedReference<'_, T, Mut> {
+        // SAFETY: All `NbtValueType` lists start with a 4-byte `u32` length prefix,
+        // followed by the list elements.
+        unsafe {
+            let offset = core::mem::size_of::<u32>() + (index * core::mem::size_of::<T>());
+            let index = Index::<T>::new(self.index.value() + offset);
+            IndexedReference::<T, Mut>::new(self.core.root_mut(), index)
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'data, T: NbtSliceType + ?Sized, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data>
+    IndexedList<'data, T, A, C>
+{
+    /// Get the number of slices in the list.
+    #[must_use]
+    pub fn slice_count(&self) -> usize {
+        unsafe { <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).len() }
+    }
+
+    /// Get a reference to the element at the given index, if it is present,
+    /// else `None`.
+    #[must_use]
+    pub fn get_slice(&self, index: usize) -> Option<IndexedReference<'_, T, Ref>> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `NbtSliceType` types.
+            let entry =
+                <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).get(index)?;
+
+            // SAFETY: `T` is guaranteed to be the type of value in the list.
+            Some(IndexedReference::<T, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            ))
+        }
+    }
+
+    /// Get a reference to the element at the given index without performing
+    /// bounds checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `index` is within the bounds of the list.
+    #[must_use]
+    pub unsafe fn get_slice_unchecked(&self, index: usize) -> IndexedReference<'_, T, Ref> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `NbtSliceType` types.
+            // SAFETY: The caller guarantees that `index` is within the bounds of the list.
+            let entry = <C as IndexCore<A>>::entry_range(&self.core, self.index.value())
+                .get_unchecked(index);
+
+            // SAFETY: `T` is guaranteed to be the type of value in the list.
+            IndexedReference::<T, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data>
+    IndexedList<'data, IndexedListType, A, C>
+{
+    /// Get the number of lists in the list.
+    #[must_use]
+    pub fn list_count(&self) -> usize {
+        unsafe { <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).len() }
+    }
+
+    /// Get a reference to the element at the given index, if it is present,
+    /// else `None`.
+    #[must_use]
+    pub fn get_list(&self, index: usize) -> Option<IndexedReference<'_, IndexedListType, Ref>> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `IndexedListType` lists.
+            let entry =
+                <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).get(index)?;
+
+            // SAFETY: `IndexedListType` is guaranteed to be the type of value in the list.
+            Some(IndexedReference::<IndexedListType, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            ))
+        }
+    }
+
+    /// Get a reference to the element at the given index without performing
+    /// bounds checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `index` is within the bounds of the list.
+    #[must_use]
+    pub unsafe fn get_list_unchecked(
+        &self,
+        index: usize,
+    ) -> IndexedReference<'_, IndexedListType, Ref> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `IndexedListType` lists.
+            // SAFETY: The caller guarantees that `index` is within the bounds of the list.
+            let entry = <C as IndexCore<A>>::entry_range(&self.core, self.index.value())
+                .get_unchecked(index);
+
+            // SAFETY: `IndexedListType` is guaranteed to be the type of value in the list.
+            IndexedReference::<IndexedListType, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data>
+    IndexedList<'data, IndexedMapType, A, C>
+{
+    /// Get the number of compounds in the list.
+    #[must_use]
+    pub fn map_count(&self) -> usize {
+        unsafe { <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).len() }
+    }
+
+    /// Get a reference to the element at the given index, if it is present,
+    /// else `None`.
+    #[must_use]
+    pub fn get_map(&self, index: usize) -> Option<IndexedReference<'_, IndexedMapType, Ref>> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `IndexedMapType` lists.
+            let entry =
+                <C as IndexCore<A>>::entry_range(&self.core, self.index.value()).get(index)?;
+
+            // SAFETY: `IndexedMapType` is guaranteed to be the type of value in the list.
+            Some(IndexedReference::<IndexedMapType, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            ))
+        }
+    }
+
+    /// Get a reference to the element at the given index without performing
+    /// bounds checks.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `index` is within the bounds of the list.
+    #[must_use]
+    pub unsafe fn get_map_unchecked(
+        &self,
+        index: usize,
+    ) -> IndexedReference<'_, IndexedMapType, Ref> {
+        unsafe {
+            // SAFETY: `self.index.value()` is the range index for `IndexedMapType` lists.
+            // SAFETY: The caller guarantees that `index` is within the bounds of the list.
+            let entry = <C as IndexCore<A>>::entry_range(&self.core, self.index.value())
+                .get_unchecked(index);
+
+            // SAFETY: `IndexedMapType` is guaranteed to be the type of value in the list.
+            IndexedReference::<IndexedMapType, Ref>::new(
+                <C as IndexCore<A>>::root(&self.core),
+                Index::new(entry.value().index()),
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValueList<'data, A, C> {
+    /// Get the length of the list.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        match self {
+            Self::Empty => 0,
+            Self::Byte(list) => list.len(),
+            Self::Short(list) => list.len(),
+            Self::Int(list) => list.len(),
+            Self::Long(list) => list.len(),
+            Self::Float(list) => list.len(),
+            Self::Double(list) => list.len(),
+            Self::ByteArray(list) => list.slice_count(),
+            Self::String(list) => list.slice_count(),
+            Self::List(list) => list.list_count(),
+            Self::Compound(list) => list.map_count(),
+            Self::IntArray(list) => list.slice_count(),
+            Self::LongArray(list) => list.slice_count(),
+        }
+    }
+
+    /// Return `true` if the length of the list is zero.
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
 
-    /// Get the value at the provided index, if it exists.
+    /// Get a reference to a [`u8`] list, if it is one.
     ///
-    /// Returns `None` if the index is out of bounds.
+    /// Returns `None` if the list is not a [`IndexedValueList::Byte`] list.
+    #[inline]
     #[must_use]
-    pub fn get(&self, index: usize) -> Option<BorrowedValueRef<'_>> {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        entries
-            .get(index)
-            .map(|entry| unsafe { BorrowedValueRef::new(self.root, self.core, entry.value()) })
+    pub const fn as_byte(&self) -> Option<&IndexedList<'data, u8, A, C>> {
+        if let Self::Byte(list) = self { Some(list) } else { None }
     }
 
-    /// Get the value at the provided index mutably, if it exists.
+    /// Get a reference to a [`u16`] list, if it is one.
     ///
-    /// Returns `None` if the index is out of bounds.
+    /// Returns `None` if the list is not a [`IndexedValueList::Short`] list.
+    #[inline]
     #[must_use]
-    pub fn get_mut(&mut self, index: usize) -> Option<BorrowedValueMut<'_>> {
-        // SAFETY: `index` and `range` are always guaranteed to be within bounds
-        let range = unsafe { self.core.indexes().get_unchecked(self.index) };
-        let entries = unsafe { self.core.entries().get_unchecked(*range) };
-
-        entries
-            .get(index)
-            .map(|entry| unsafe { BorrowedValueMut::new(self.root, self.core, entry.value()) })
+    pub const fn as_short(&self) -> Option<&IndexedList<'data, u16, A, C>> {
+        if let Self::Short(list) = self { Some(list) } else { None }
     }
-}
 
-impl<T: fmt::Debug + BorrowedPOD> fmt::Debug for IndexedListMut<'_, T> {
+    /// Get a reference to a [`u32`] list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::Int`] list.
     #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
-}
+    #[must_use]
+    pub const fn as_int(&self) -> Option<&IndexedList<'data, u32, A, C>> {
+        if let Self::Int(list) = self { Some(list) } else { None }
+    }
 
-impl fmt::Debug for IndexedListMut<'_, IndexedList> {
+    /// Get a reference to a [`u64`] list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::Long`] list.
     #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.as_ref(), f) }
+    #[must_use]
+    pub const fn as_long(&self) -> Option<&IndexedList<'data, u64, A, C>> {
+        if let Self::Long(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a [`f32`] list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::Float`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_float(&self) -> Option<&IndexedList<'data, f32, A, C>> {
+        if let Self::Float(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a [`f64`] list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::Double`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_double(&self) -> Option<&IndexedList<'data, f64, A, C>> {
+        if let Self::Double(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a [`u8`] array list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::ByteArray`]
+    /// list.
+    #[inline]
+    #[must_use]
+    pub const fn as_byte_array(&self) -> Option<&IndexedList<'data, [u8], A, C>> {
+        if let Self::ByteArray(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to an [`MStr`] list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::String`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_string(&self) -> Option<&IndexedList<'data, MStr, A, C>> {
+        if let Self::String(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a list of lists, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::List`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_list(&self) -> Option<&IndexedList<'data, IndexedListType, A, C>> {
+        if let Self::List(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a list of compounds, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::Compound`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_compound(&self) -> Option<&IndexedList<'data, IndexedMapType, A, C>> {
+        if let Self::Compound(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a [`u32`] array list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::IntArray`] list.
+    #[inline]
+    #[must_use]
+    pub const fn as_int_array(&self) -> Option<&IndexedList<'data, [u32], A, C>> {
+        if let Self::IntArray(list) = self { Some(list) } else { None }
+    }
+
+    /// Get a reference to a [`u64`] array list, if it is one.
+    ///
+    /// Returns `None` if the list is not a [`IndexedValueList::LongArray`]
+    /// list.
+    #[inline]
+    #[must_use]
+    pub const fn as_long_array(&self) -> Option<&IndexedList<'data, [u64], A, C>> {
+        if let Self::LongArray(list) = self { Some(list) } else { None }
+    }
 }
