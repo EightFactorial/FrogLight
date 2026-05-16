@@ -8,4 +8,5 @@ cfg_select! {
         pub mod string;
         pub use string::MString;
     }
+    _ => {}
 }

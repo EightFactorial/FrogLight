@@ -1,85 +1,8 @@
 //! TODO
 
-#[cfg(feature = "alloc")]
-use alloc::vec::Vec;
 use core::ops::Deref;
-#[cfg(feature = "alloc")]
-use core::range::Range;
 
-use crate::types::borrowed::index::EntryIndex;
-
-/// An [`IndexCore`] for borrowed NBT data.
-#[cfg(feature = "alloc")]
-pub struct BorrowedCore<'data, A: NbtAccess> {
-    root: A::SLICE<'data>,
-    entries: Vec<EntryIndex>,
-    ranges: Vec<Range<usize>>,
-}
-
-#[cfg(feature = "alloc")]
-impl<'data, A: NbtAccess> BorrowedCore<'data, A> {
-    /// Create a new [`BorrowedCore`] with the given NBT slice, entries, and
-    /// ranges.
-    ///
-    /// # Safety
-    ///
-    /// TODO
-    #[inline]
-    #[must_use]
-    pub const unsafe fn new(
-        root: A::SLICE<'data>,
-        entries: Vec<EntryIndex>,
-        ranges: Vec<Range<usize>>,
-    ) -> Self {
-        Self { root, entries, ranges }
-    }
-}
-
-#[cfg(feature = "alloc")]
-impl IndexCore<Mut> for BorrowedCore<'_, Mut> {
-    #[inline]
-    fn root(&self) -> &[u8] { self.root }
-
-    #[inline]
-    fn entries(&self) -> &[EntryIndex] { &self.entries }
-
-    #[inline]
-    unsafe fn entry_range(&self, index: usize) -> &[EntryIndex] {
-        unsafe {
-            let range = self.ranges.get_unchecked(index);
-            self.entries.as_slice().get_unchecked(*range)
-        }
-    }
-
-    fn root_mut(&mut self) -> <Mut as NbtAccess>::SLICE<'_>
-    where
-        Mut: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        &mut self.root
-    }
-
-    #[inline]
-    unsafe fn entries_mut(&mut self) -> &mut [EntryIndex]
-    where
-        Mut: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        &mut self.entries
-    }
-
-    #[inline]
-    unsafe fn entry_range_mut(&mut self, index: usize) -> &mut [EntryIndex]
-    where
-        Mut: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        // SAFETY: The caller ensures that this is safe.
-        unsafe {
-            let range = self.ranges.get_unchecked(index);
-            self.entries.as_mut_slice().get_unchecked_mut(*range)
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
+use crate::types::indexed::index::EntryIndex;
 
 /// A trait for an index of NBT entries.
 ///

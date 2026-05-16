@@ -28,15 +28,10 @@ impl fmt::Debug for MStr {
         fmt::Debug::fmt(&self.as_bytes(), f)
     }
 }
+#[cfg(feature = "alloc")]
 impl fmt::Display for MStr {
-    #[cfg(feature = "alloc")]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.to_mstring().into_utf8(), f)
-    }
-
-    #[cfg(not(feature = "alloc"))]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(&self.as_bytes(), f)
     }
 }
 

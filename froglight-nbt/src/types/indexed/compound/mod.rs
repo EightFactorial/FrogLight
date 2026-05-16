@@ -2,17 +2,20 @@
 
 use froglight_mutf8::prelude::MStr;
 
-use crate::types::borrowed::{
+use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
+    entry::{IndexedEntry, IndexedValue},
     index::EntryIndex,
     reference::IndexedReference,
-    value::{IndexedEntry, IndexedValue},
 };
+
+mod iter;
+pub use iter::CompoundIter;
 
 cfg_select! {
     feature = "alloc" => {
         /// An NBT Compound that is indexed by an [`IndexCore`].
-        pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::core::BorrowedCore<'data, A>> {
+        pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::alloc::SliceCore<'data, A>> {
             core: A::CORE<'data, C>,
             index: usize,
         }
@@ -68,7 +71,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedCompo
                 IndexedReference::<_, Ref>::new(<C as IndexCore<A>>::root(&self.core), entry.name())
             };
 
-            if key == entry_key.get_slice() {
+            if key == entry_key.get() {
                 // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
                 return Some(unsafe { IndexedValue::<Ref, C>::new(&self.core, entry.value()) });
             }
@@ -88,9 +91,9 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedCompo
     }
 
     /// Return an iterator over the entries in this compound.
-    pub fn iter(&self) -> CompoundIter<'_, 'data, A, C> {
-        CompoundIter { compound: self, index: 0 }
-    }
+    #[inline]
+    #[must_use]
+    pub fn iter(&self) -> CompoundIter<'_, 'data, A, C> { CompoundIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -112,7 +115,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedCompound<'data, Mut, C> {
                 )
             };
 
-            if key == entry_key.get_slice() {
+            if key == entry_key.get() {
                 // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
                 let value = entry.value();
                 return Some(unsafe { IndexedValue::<Mut, C>::new(&mut self.core, value) });
@@ -129,36 +132,4 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedCompound<'data, Mut, C> {
             unsafe { IndexedEntry::<Mut, C>::new(&mut self.core, entry) }
         })
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An iterator over the entries in an [`IndexedCompound`].
-pub struct CompoundIter<'iter, 'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> {
-    compound: &'iter IndexedCompound<'data, A, C>,
-    index: usize,
-}
-
-impl<'iter, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> Iterator
-    for CompoundIter<'iter, '_, A, C>
-{
-    type Item = IndexedEntry<'iter, Ref, C>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let entry = self.compound.entries().get(self.index).copied()?;
-        self.index += 1;
-
-        // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
-        Some(unsafe { IndexedEntry::<Ref, C>::new(&self.compound.core, entry) })
-    }
-}
-
-impl<'iter, 'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
-    for &'iter IndexedCompound<'data, A, C>
-{
-    type IntoIter = CompoundIter<'iter, 'data, A, C>;
-    type Item = IndexedEntry<'iter, Ref, C>;
-
-    #[inline]
-    fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
