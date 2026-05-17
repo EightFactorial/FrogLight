@@ -35,6 +35,10 @@ tracing = { workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---
 
+[[test]]
+name = "access"
+required-features = ["alloc"]
+
 # --- Features ---
 
 [features]

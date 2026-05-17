@@ -45,34 +45,63 @@ impl_indexable!(u8, u16, u32, u64, f32, f64);
 
 // -------------------------------------------------------------------------------------------------
 
-/// A reference to an NBT value that is indexed by an [`IndexCore`].
-pub enum IndexedValueReference<
-    'data,
-    A: NbtAccess,
-    C: IndexCore<A> + 'data = crate::types::indexed::alloc::SliceCore<'data, A>,
-> {
-    /// A [`u8`] value.
-    Byte(IndexedReference<'data, u8, A>),
-    /// A [`u16`] value.
-    Short(IndexedReference<'data, u16, A>),
-    /// A [`u32`] value.
-    Int(IndexedReference<'data, u32, A>),
-    /// A [`u64`] value.
-    Long(IndexedReference<'data, u64, A>),
-    /// A [`f32`] value.
-    Float(IndexedReference<'data, f32, A>),
-    /// A [`f64`] value.
-    Double(IndexedReference<'data, f64, A>),
-    /// A [`u8`] array.
-    ByteArray(IndexedList<'data, [u8], A, C>),
-    /// An [`MStr`] string.
-    String(IndexedReference<'data, MStr, A>),
-    /// A list of values.
-    List(IndexedValueList<'data, A, C>),
-    /// A compound of named entries.
-    Compound(IndexedCompound<'data, A, C>),
-    /// A [`u32`] array.
-    IntArray(IndexedList<'data, [u32], A, C>),
-    /// A [`u64`] array.
-    LongArray(IndexedList<'data, [u64], A, C>),
+cfg_select! {
+    feature = "alloc" => {
+        /// A reference to an NBT value that is indexed by an [`IndexCore`].
+        pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data = crate::types::indexed::alloc::SliceCore<'data, A>> {
+            /// A [`u8`] value.
+            Byte(IndexedReference<'data, u8, A>),
+            /// A [`u16`] value.
+            Short(IndexedReference<'data, u16, A>),
+            /// A [`u32`] value.
+            Int(IndexedReference<'data, u32, A>),
+            /// A [`u64`] value.
+            Long(IndexedReference<'data, u64, A>),
+            /// A [`f32`] value.
+            Float(IndexedReference<'data, f32, A>),
+            /// A [`f64`] value.
+            Double(IndexedReference<'data, f64, A>),
+            /// A [`u8`] array.
+            ByteArray(IndexedList<'data, [u8], A, C>),
+            /// An [`MStr`] string.
+            String(IndexedReference<'data, MStr, A>),
+            /// A list of values.
+            List(IndexedValueList<'data, A, C>),
+            /// A compound of named entries.
+            Compound(IndexedCompound<'data, A, C>),
+            /// A [`u32`] array.
+            IntArray(IndexedList<'data, [u32], A, C>),
+            /// A [`u64`] array.
+            LongArray(IndexedList<'data, [u64], A, C>),
+        }
+    }
+    _ => {
+        /// A reference to an NBT value that is indexed by an [`IndexCore`].
+        pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+            /// A [`u8`] value.
+            Byte(IndexedReference<'data, u8, A>),
+            /// A [`u16`] value.
+            Short(IndexedReference<'data, u16, A>),
+            /// A [`u32`] value.
+            Int(IndexedReference<'data, u32, A>),
+            /// A [`u64`] value.
+            Long(IndexedReference<'data, u64, A>),
+            /// A [`f32`] value.
+            Float(IndexedReference<'data, f32, A>),
+            /// A [`f64`] value.
+            Double(IndexedReference<'data, f64, A>),
+            /// A [`u8`] array.
+            ByteArray(IndexedList<'data, [u8], A, C>),
+            /// An [`MStr`] string.
+            String(IndexedReference<'data, MStr, A>),
+            /// A list of values.
+            List(IndexedValueList<'data, A, C>),
+            /// A compound of named entries.
+            Compound(IndexedCompound<'data, A, C>),
+            /// A [`u32`] array.
+            IntArray(IndexedList<'data, [u32], A, C>),
+            /// A [`u64`] array.
+            LongArray(IndexedList<'data, [u64], A, C>),
+        }
+    }
 }
