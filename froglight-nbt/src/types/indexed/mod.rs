@@ -58,10 +58,20 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
     #[must_use]
     pub const fn core(&self) -> &C { &self.core }
 
+    /// Get a mutable reference to the underlying [`IndexCore`] of this NBT
+    /// structure.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that core is still valid if it is modified.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn core_mut(&mut self) -> &mut C { &mut self.core }
+
     /// Get the raw NBT data as a byte slice.
     #[inline]
     #[must_use]
-    pub fn raw(&self) -> &[u8] { self.core.root() }
+    pub fn data(&self) -> &[u8] { self.core.root() }
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
@@ -81,6 +91,14 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedNbt<'
         // SAFETY: `0` is always a valid index.
         unsafe { IndexedCompound::new(&self.core, 0) }
     }
+
+    /// Convert this NBT structure into a read-only version.
+    #[inline]
+    #[must_use]
+    pub fn into_ref(self) -> IndexedNbt<'data, Ref, C> {
+        // SAFETY: `IndexedNbt` is still valid.
+        unsafe { IndexedNbt::new_core(self.core, self.name) }
+    }
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<Mut> + IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
@@ -90,6 +108,25 @@ impl<'data, A: NbtAccess, C: IndexCore<Mut> + IndexCore<A> + 'data> IndexedNbt<'
     pub fn as_compound_mut(&mut self) -> IndexedCompound<'_, Mut, C> {
         // SAFETY: `0` is always a valid index.
         unsafe { IndexedCompound::new(&mut self.core, 0) }
+    }
+
+    /// Get the raw NBT data as a mutable byte slice.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the slice is still valid for it's core.
+    #[inline]
+    #[must_use]
+    pub unsafe fn data_mut(&mut self) -> &mut [u8] {
+        <C as IndexCore<Mut>>::root_mut(&mut self.core)
+    }
+
+    /// Convert this NBT structure into a mutable version.
+    #[inline]
+    #[must_use]
+    pub fn into_mut(self) -> IndexedNbt<'data, Mut, C> {
+        // SAFETY: `IndexedNbt` is still valid.
+        unsafe { IndexedNbt::new_core(self.core, self.name) }
     }
 }
 
@@ -118,6 +155,17 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
     pub fn new_named_ref(data: &'data [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_ref(data, true)
     }
+
+    /// Take ownership of the underlying NBT data,
+    /// returning a new [`IndexedNbt`] with an owned core.
+    #[must_use]
+    pub fn into_owned_ref(self) -> IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
+        // SAFETY: `self.core` is valid for the lifetime of `self`.
+        unsafe {
+            let core = alloc::CowCore::from_slice_ref(self.core).into_owned();
+            IndexedNbt::<Ref, alloc::CowCore<'static, Ref>>::new_core(core, self.name)
+        }
+    }
 }
 
 #[cfg(feature = "alloc")]
@@ -142,5 +190,16 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn new_named_mut(data: &'data mut [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_mut(data, true)
+    }
+
+    /// Take ownership of the underlying NBT data,
+    /// returning a new [`IndexedNbt`] with an owned core.
+    #[must_use]
+    pub fn into_owned_mut(self) -> IndexedNbt<'static, Mut, alloc::CowCore<'static, Mut>> {
+        // SAFETY: `self.core` is valid for the lifetime of `self`.
+        unsafe {
+            let core = alloc::CowCore::from_slice_mut(self.core).into_owned();
+            IndexedNbt::<Mut, alloc::CowCore<'static, Mut>>::new_core(core, self.name)
+        }
     }
 }

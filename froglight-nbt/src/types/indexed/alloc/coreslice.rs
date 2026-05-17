@@ -9,10 +9,11 @@ use crate::types::indexed::{
 };
 
 /// An [`IndexCore`] for borrowed NBT data.
+#[derive(Debug)]
 pub struct SliceCore<'data, A: NbtAccess> {
-    root: A::SLICE<'data>,
-    entries: Vec<EntryIndex>,
-    ranges: Vec<Range<usize>>,
+    pub(super) root: A::SLICE<'data>,
+    pub(super) entries: Vec<EntryIndex>,
+    pub(super) ranges: Vec<Range<usize>>,
 }
 
 impl<'data, A: NbtAccess> SliceCore<'data, A> {

@@ -104,7 +104,7 @@ pub trait NbtAccess: sealed::Sealed + 'static {
 }
 
 /// A marker type for read-only access.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Ref;
 impl NbtAccess for Ref {
@@ -113,7 +113,7 @@ impl NbtAccess for Ref {
 }
 
 /// A marker type for mutable access.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Mut;
 impl NbtAccess for Mut {

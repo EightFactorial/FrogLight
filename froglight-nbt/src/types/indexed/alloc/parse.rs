@@ -1,5 +1,4 @@
-#![allow(clippy::result_unit_err, reason = "WIP")]
-#![expect(dead_code, reason = "WIP")]
+#![allow(clippy::result_unit_err, dead_code, reason = "WIP")]
 
 use alloc::{collections::VecDeque, vec::Vec};
 use core::range::Range;
@@ -10,33 +9,35 @@ use crate::types::indexed::{
     IndexedNbt,
     alloc::SliceCore,
     core::{Mut, Ref},
-    index::{EntryIndex, Index, ValueIndex},
+    index::{EntryIndex, Index},
 };
 
-#[allow(clippy::unnecessary_wraps, reason = "WIP")]
 pub(crate) fn parse_nbt_ref(
     root: &[u8],
     named: bool,
 ) -> Result<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>, ()> {
-    let (name, entries, ranges) = parse_nbt(root, named)?;
+    let (length, name, entries, ranges) = parse_nbt(root, named)?;
 
+    // SAFETY: `slice` is a subslice of `root`.
     // SAFETY: `entries` and `ranges` were created using `root`.
     unsafe {
-        let core = SliceCore::new(root, entries, ranges);
+        let slice = root.get_unchecked(..length);
+        let core = SliceCore::new(slice, entries, ranges);
         Ok(IndexedNbt::<Ref, SliceCore<'_, Ref>>::new_core(core, name))
     }
 }
 
-#[allow(clippy::unnecessary_wraps, reason = "WIP")]
 pub(crate) fn parse_nbt_mut(
     root: &mut [u8],
     named: bool,
 ) -> Result<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>, ()> {
-    let (name, entries, ranges) = parse_nbt(root, named)?;
+    let (length, name, entries, ranges) = parse_nbt(root, named)?;
 
+    // SAFETY: `slice` is a subslice of `root`.
     // SAFETY: `entries` and `ranges` were created using `root`.
     unsafe {
-        let core = SliceCore::new(root, entries, ranges);
+        let slice = root.get_unchecked_mut(..length);
+        let core = SliceCore::new(slice, entries, ranges);
         Ok(IndexedNbt::<Mut, SliceCore<'_, Mut>>::new_core(core, name))
     }
 }
@@ -45,13 +46,13 @@ pub(crate) fn parse_nbt_mut(
 fn parse_nbt(
     root: &[u8],
     named: bool,
-) -> Result<(Option<Index<MStr>>, Vec<EntryIndex>, Vec<Range<usize>>), ()> {
-    let mut cursor = SliceCursor::new(root);
+) -> Result<(usize, Option<Index<MStr>>, Vec<EntryIndex>, Vec<Range<usize>>), ()> {
+    let mut cursor = Cursor::new(root);
     let mut entries = Vec::new();
     let mut indexes = Vec::new();
 
     // All NBT starts with a compound tag
-    if !matches!(cursor.next()?, NbtTagType::COMPOUND) {
+    if !matches!(cursor.next()?, COMPOUND) {
         return Err(());
     }
 
@@ -59,589 +60,183 @@ fn parse_nbt(
     let name = named.then(|| read_string(&mut cursor)).transpose()?;
 
     // Prepare a queue of items to read
-    let mut item_count = 1;
-    let mut item_queue = VecDeque::with_capacity(1);
+    let mut counter = 1;
+    let mut queue = VecDeque::with_capacity(1);
+
     // Add the root compound to the queue
-    item_queue.push_back((cursor, true));
+    queue.push_back((cursor, true));
 
-    // Read all items until the queue is empty
-    while let Some((mut cursor, named)) = item_queue.pop_front() {
+    // Process the queue until it's empty
+    while let Some((cursor, named)) = queue.pop_front() {
         if named {
-            read_compound_item(
-                &mut cursor,
-                &mut entries,
-                &mut indexes,
-                &mut item_count,
-                &mut item_queue,
-            )?;
+            parse_item::<true>(cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
         } else {
-            read_list_item(
-                &mut cursor,
-                &mut entries,
-                &mut indexes,
-                &mut item_count,
-                &mut item_queue,
-            )?;
+            parse_item::<false>(cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
         }
     }
 
-    Ok((name, entries, indexes))
+    // TODO: Shrink to exact size.
+    let length = root.len();
+    Ok((length, name, entries, indexes))
 }
 
-fn read_compound_item<'data>(
-    cursor: &mut SliceCursor<'data>,
+#[inline]
+#[expect(clippy::ptr_arg, unused, reason = "WIP")]
+fn parse_item<const NAMED: bool>(
+    cursor: Cursor<'_>,
     entries: &mut Vec<EntryIndex>,
-    indexes: &mut Vec<Range<usize>>,
-    item_count: &mut usize,
-    item_queue: &mut VecDeque<(SliceCursor<'data>, bool)>,
+    ranges: &mut Vec<Range<usize>>,
+
+    counter: &mut usize,
+    queue: &mut VecDeque<(Cursor<'_>, bool)>,
 ) -> Result<(), ()> {
-    let start = entries.len();
-
-    while let Ok(tag) = cursor.next() {
-        if tag == NbtTagType::END {
-            break;
-        }
-
-        let name = read_string(cursor)?;
-
-        match tag {
-            NbtTagType::BYTE => {
-                let value = read_byte(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Byte(value)));
-            }
-            NbtTagType::SHORT => {
-                let value = read_short(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Short(value)));
-            }
-            NbtTagType::INT => {
-                let value = read_int(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Int(value)));
-            }
-            NbtTagType::LONG => {
-                let value = read_long(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Long(value)));
-            }
-            NbtTagType::FLOAT => {
-                let value = read_float(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Float(value)));
-            }
-            NbtTagType::DOUBLE => {
-                let value = read_double(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Double(value)));
-            }
-            NbtTagType::STRING => {
-                let value = read_string(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::String(value)));
-            }
-            NbtTagType::BYTE_ARRAY => {
-                let value = read_byte_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::ByteArray(value)));
-            }
-            NbtTagType::INT_ARRAY => {
-                let value = read_int_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::IntArray(value)));
-            }
-            NbtTagType::LONG_ARRAY => {
-                let value = read_long_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::LongArray(value)));
-            }
-
-            NbtTagType::LIST => {
-                let index = Index::new(*item_count);
-                *item_count += 1;
-
-                item_queue.push_back((cursor.clone(), false));
-                read_until_list_end(cursor, 0)?;
-
-                entries.push(EntryIndex::new(name, ValueIndex::List(index)));
-            }
-            NbtTagType::COMPOUND => {
-                let index = Index::new(*item_count);
-                *item_count += 1;
-
-                item_queue.push_back((cursor.clone(), true));
-                read_until_compound_end(cursor, 0)?;
-
-                entries.push(EntryIndex::new(name, ValueIndex::Compound(index)));
-            }
-
-            _ => return Err(()),
-        }
-    }
-
-    indexes.push(Range { start, end: entries.len() });
-
-    Ok(())
-}
-
-fn read_list_item<'data>(
-    cursor: &mut SliceCursor<'data>,
-    entries: &mut Vec<EntryIndex>,
-    indexes: &mut Vec<Range<usize>>,
-    item_count: &mut usize,
-    item_queue: &mut VecDeque<(SliceCursor<'data>, bool)>,
-) -> Result<(), ()> {
-    let start = entries.len();
-
-    let Ok(tag) = cursor.next() else { todo!() };
-    let length = u32::from_be_bytes(cursor.take::<4>()?);
-
-    let name = Index::new(0);
-
-    for _ in 0..length {
-        match tag {
-            NbtTagType::BYTE => {
-                let value = read_byte(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Byte(value)));
-            }
-            NbtTagType::SHORT => {
-                let value = read_short(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Short(value)));
-            }
-            NbtTagType::INT => {
-                let value = read_int(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Int(value)));
-            }
-            NbtTagType::LONG => {
-                let value = read_long(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Long(value)));
-            }
-            NbtTagType::FLOAT => {
-                let value = read_float(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Float(value)));
-            }
-            NbtTagType::DOUBLE => {
-                let value = read_double(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::Double(value)));
-            }
-            NbtTagType::STRING => {
-                let value = read_string(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::String(value)));
-            }
-            NbtTagType::BYTE_ARRAY => {
-                let value = read_byte_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::ByteArray(value)));
-            }
-            NbtTagType::INT_ARRAY => {
-                let value = read_int_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::IntArray(value)));
-            }
-            NbtTagType::LONG_ARRAY => {
-                let value = read_long_array(cursor)?;
-                entries.push(EntryIndex::new(name, ValueIndex::LongArray(value)));
-            }
-
-            NbtTagType::LIST => {
-                let index = Index::new(*item_count);
-                *item_count += 1;
-
-                item_queue.push_back((cursor.clone(), false));
-                read_until_list_end(cursor, 0)?;
-
-                entries.push(EntryIndex::new(name, ValueIndex::List(index)));
-            }
-            NbtTagType::COMPOUND => {
-                let index = Index::new(*item_count);
-                *item_count += 1;
-
-                item_queue.push_back((cursor.clone(), true));
-                read_until_compound_end(cursor, 0)?;
-
-                entries.push(EntryIndex::new(name, ValueIndex::Compound(index)));
-            }
-
-            _ => return Err(()),
-        }
-    }
-
-    indexes.push(Range { start, end: entries.len() });
-
-    Ok(())
+    todo!()
 }
 
 // -------------------------------------------------------------------------------------------------
 
-fn read_until_compound_end(cursor: &mut SliceCursor<'_>, depth: usize) -> Result<(), ()> {
-    if depth >= 512 {
-        return Err(());
-    }
-
-    loop {
-        let next = cursor.next()?;
-
-        if next == NbtTagType::END {
-            return Ok(());
-        }
-
-        read_string(cursor)?;
-
-        match next {
-            NbtTagType::BYTE => {
-                read_byte(cursor)?;
-            }
-            NbtTagType::SHORT => {
-                read_short(cursor)?;
-            }
-            NbtTagType::INT => {
-                read_int(cursor)?;
-            }
-            NbtTagType::LONG => {
-                read_long(cursor)?;
-            }
-            NbtTagType::FLOAT => {
-                read_float(cursor)?;
-            }
-            NbtTagType::DOUBLE => {
-                read_double(cursor)?;
-            }
-            NbtTagType::BYTE_ARRAY => {
-                read_byte_array(cursor)?;
-            }
-            NbtTagType::STRING => {
-                read_string(cursor)?;
-            }
-            NbtTagType::INT_ARRAY => {
-                read_int_array(cursor)?;
-            }
-            NbtTagType::LONG_ARRAY => {
-                read_long_array(cursor)?;
-            }
-
-            NbtTagType::LIST => read_until_list_end(cursor, depth + 1)?,
-            NbtTagType::COMPOUND => read_until_compound_end(cursor, depth + 1)?,
-
-            _ => return Err(()),
-        }
-    }
-}
-
-fn read_until_list_end(cursor: &mut SliceCursor<'_>, depth: usize) -> Result<(), ()> {
-    if depth >= 512 {
-        return Err(());
-    }
-
-    let tag = cursor.next()?;
-    let length = u32::from_be_bytes(cursor.take::<4>()?);
-
-    for _ in 0..length {
-        match tag {
-            NbtTagType::BYTE => {
-                read_byte(cursor)?;
-            }
-            NbtTagType::SHORT => {
-                read_short(cursor)?;
-            }
-            NbtTagType::INT => {
-                read_int(cursor)?;
-            }
-            NbtTagType::LONG => {
-                read_long(cursor)?;
-            }
-            NbtTagType::FLOAT => {
-                read_float(cursor)?;
-            }
-            NbtTagType::DOUBLE => {
-                read_double(cursor)?;
-            }
-            NbtTagType::BYTE_ARRAY => {
-                read_byte_array(cursor)?;
-            }
-            NbtTagType::STRING => {
-                read_string(cursor)?;
-            }
-            NbtTagType::INT_ARRAY => {
-                read_int_array(cursor)?;
-            }
-            NbtTagType::LONG_ARRAY => {
-                read_long_array(cursor)?;
-            }
-
-            NbtTagType::LIST => read_until_list_end(cursor, depth + 1)?,
-            NbtTagType::COMPOUND => read_until_compound_end(cursor, depth + 1)?,
-
-            _ => return Err(()),
-        }
-    }
-
-    Ok(())
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// Parse a [`u8`] from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the cursor does not hold a byte.
 #[inline]
-fn read_byte(cursor: &mut SliceCursor<'_>) -> Result<Index<u8>, ()> {
-    let position = cursor.position();
-    let _ = cursor.next()?;
-
-    // SAFETY: We just validated the cursor held a byte
+fn read_byte(cursor: &mut Cursor<'_>) -> Result<Index<u8>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<1>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a [`u16`] from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the cursor does not hold a short.
 #[inline]
-fn read_short(cursor: &mut SliceCursor<'_>) -> Result<Index<u16>, ()> {
-    let position = cursor.position();
-    let _ = cursor.take::<2>()?;
-
-    // SAFETY: We just validated the cursor held a short
+fn read_short(cursor: &mut Cursor<'_>) -> Result<Index<u16>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<2>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a [`u32`] from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the cursor does not hold an int.
 #[inline]
-fn read_int(cursor: &mut SliceCursor<'_>) -> Result<Index<u32>, ()> {
-    let position = cursor.position();
-    let _ = cursor.take::<4>()?;
-
-    // SAFETY: We just validated the cursor held an int
+fn read_int(cursor: &mut Cursor<'_>) -> Result<Index<u32>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<4>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a [`u64`] from the cursor.
-///
-/// # Errors
-///
-///
-/// Returns an error if the cursor does not hold a long.
 #[inline]
-fn read_long(cursor: &mut SliceCursor<'_>) -> Result<Index<u64>, ()> {
-    let position = cursor.position();
-    let _ = cursor.take::<8>()?;
-
-    // SAFETY: We just validated the cursor held a long
+fn read_long(cursor: &mut Cursor<'_>) -> Result<Index<u64>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<8>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a [`f32`] from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the cursor does not hold a float.
 #[inline]
-fn read_float(cursor: &mut SliceCursor<'_>) -> Result<Index<f32>, ()> {
-    let position = cursor.position();
-    let _ = cursor.take::<4>()?;
-
-    // SAFETY: We just validated the cursor held a float
+fn read_float(cursor: &mut Cursor<'_>) -> Result<Index<f32>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<4>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a [`f64`] from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the cursor does not hold a double.
 #[inline]
-fn read_double(cursor: &mut SliceCursor<'_>) -> Result<Index<f64>, ()> {
-    let position = cursor.position();
-    let _ = cursor.take::<8>()?;
-
-    // SAFETY: We just validated the cursor held a double
+fn read_double(cursor: &mut Cursor<'_>) -> Result<Index<f64>, ()> {
+    let position = cursor.pos();
+    let _ = cursor.next_arr::<8>()?;
     Ok(Index::new(position))
 }
 
-/// Parse a string from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the string is invalid.
 #[inline]
-fn read_string(cursor: &mut SliceCursor<'_>) -> Result<Index<MStr>, ()> {
-    let position = cursor.position();
-    let length = u16::from_be_bytes(cursor.take::<2>()?);
+fn read_byte_array(cursor: &mut Cursor<'_>) -> Result<Index<[u8]>, ()> {
+    let position = cursor.pos();
 
-    let contents = cursor.take_slice(usize::from(length))?;
-    froglight_mutf8::types::str::MStr::from_mutf8(contents)?;
+    let length_bytes = cursor.next_arr::<4>()?;
+    let length = usize::try_from(u32::from_be_bytes(length_bytes)).map_err(|_| ())?;
+    let _ = cursor.next_slice(length)?;
 
-    // SAFETY: We just validated that cursor held a string
     Ok(Index::new(position))
 }
 
-/// Parse a byte array from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the byte array is invalid.
 #[inline]
-fn read_byte_array(cursor: &mut SliceCursor<'_>) -> Result<Index<[u8]>, ()> {
-    let position = cursor.position();
-    let length = u32::from_be_bytes(cursor.take::<4>()?);
-    let length = usize::try_from(length).map_err(|_| ())?;
-    let _ = cursor.take_slice(length * core::mem::size_of::<u8>())?;
+fn read_int_array(cursor: &mut Cursor<'_>) -> Result<Index<[u32]>, ()> {
+    let position = cursor.pos();
 
-    // SAFETY: We just validated that cursor held a byte array
+    let length_bytes = cursor.next_arr::<4>()?;
+    let length = usize::try_from(u32::from_be_bytes(length_bytes)).map_err(|_| ())?;
+    let _ = cursor.next_slice(length * 4)?;
+
     Ok(Index::new(position))
 }
 
-/// Parse an int array from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the int array is invalid.
 #[inline]
-fn read_int_array(cursor: &mut SliceCursor<'_>) -> Result<Index<[u32]>, ()> {
-    let position = cursor.position();
-    let length = u32::from_be_bytes(cursor.take::<4>()?);
-    let length = usize::try_from(length).map_err(|_| ())?;
-    let _ = cursor.take_slice(length * core::mem::size_of::<u32>())?;
+fn read_long_array(cursor: &mut Cursor<'_>) -> Result<Index<[u64]>, ()> {
+    let position = cursor.pos();
 
-    // SAFETY: We just validated that cursor held an int array
+    let length_bytes = cursor.next_arr::<4>()?;
+    let length = usize::try_from(u32::from_be_bytes(length_bytes)).map_err(|_| ())?;
+    let _ = cursor.next_slice(length * 8)?;
+
     Ok(Index::new(position))
 }
 
-/// Parse a long array from the cursor.
-///
-/// # Errors
-///
-/// Returns an error if the long array is invalid.
 #[inline]
-fn read_long_array(cursor: &mut SliceCursor<'_>) -> Result<Index<[u64]>, ()> {
-    let position = cursor.position();
-    let length = u32::from_be_bytes(cursor.take::<4>()?);
-    let length = usize::try_from(length).map_err(|_| ())?;
-    let _ = cursor.take_slice(length * core::mem::size_of::<u64>())?;
+fn read_string(cursor: &mut Cursor<'_>) -> Result<Index<MStr>, ()> {
+    let position = cursor.pos();
 
-    // SAFETY: We just validated that cursor held a long array
+    let length_bytes = cursor.next_arr::<2>()?;
+    let length = usize::from(u16::from_be_bytes(length_bytes));
+
+    let content = cursor.next_slice(length)?;
+    MStr::from_mutf8(content)?;
+
     Ok(Index::new(position))
 }
 
 // -------------------------------------------------------------------------------------------------
 
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-enum NbtTagType {
-    End,
-    Byte,
-    Short,
-    Int,
-    Long,
-    Float,
-    Double,
-    ByteArray,
-    String,
-    List,
-    Compound,
-    IntArray,
-    LongArray,
-}
-
-#[rustfmt::skip]
-#[allow(dead_code, reason = "Constants")]
-impl NbtTagType {
-    const END: u8 = 0;
-    const BYTE: u8 = 1;
-    const SHORT: u8 = 2;
-    const INT: u8 = 3;
-    const LONG: u8 = 4;
-    const FLOAT: u8 = 5;
-    const DOUBLE: u8 = 6;
-    const BYTE_ARRAY: u8 = 7;
-    const STRING: u8 = 8;
-    const LIST: u8 = 9;
-    const COMPOUND: u8 = 10;
-    const INT_ARRAY: u8 = 11;
-    const LONG_ARRAY: u8 = 12;
-
-    /// Convert a byte to an [`NbtTagType`].
-    const fn from_byte(byte: u8) -> Result<Self, ()> {
-        match byte {
-            0 => Ok(Self::End),
-            1 => Ok(Self::Byte),
-            2 => Ok(Self::Short),
-            3 => Ok(Self::Int),
-            4 => Ok(Self::Long),
-            5 => Ok(Self::Float),
-            6 => Ok(Self::Double),
-            7 => Ok(Self::ByteArray),
-            8 => Ok(Self::String),
-            9 => Ok(Self::List),
-            10 => Ok(Self::Compound),
-            11 => Ok(Self::IntArray),
-            12 => Ok(Self::LongArray),
-            _ => Err(()),
-        }
-    }
-}
+const BYTE: u8 = 1;
+const SHORT: u8 = 2;
+const INT: u8 = 3;
+const LONG: u8 = 4;
+const FLOAT: u8 = 5;
+const DOUBLE: u8 = 6;
+const BYTE_ARRAY: u8 = 7;
+const STRING: u8 = 8;
+const LIST: u8 = 9;
+const COMPOUND: u8 = 10;
+const INT_ARRAY: u8 = 11;
+const LONG_ARRAY: u8 = 12;
 
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Clone)]
-struct SliceCursor<'data> {
-    input: &'data [u8],
+struct Cursor<'a> {
+    data: &'a [u8],
     position: usize,
 }
 
-impl<'data> SliceCursor<'data> {
-    /// Create a new [`SliceCursor`].
+impl<'a> Cursor<'a> {
+    /// Create a new [`Cursor`] over the given byte slice.
     #[inline]
     #[must_use]
-    const fn new(input: &'data [u8]) -> Self { Self { input, position: 0 } }
+    const fn new(data: &'a [u8]) -> Self { Self { data, position: 0 } }
 
-    /// Get the next byte from the input, advancing the cursor.
+    /// Get the current position of the cursor.
+    #[inline]
+    #[must_use]
+    const fn pos(&self) -> usize { self.position }
+
+    /// Read the next byte from the cursor.
     #[inline]
     fn next(&mut self) -> Result<u8, ()> {
-        self.input.get(self.position).copied().map_or_else(
-            || Err(()),
-            |byte| {
-                self.position += 1;
-                Ok(byte)
-            },
-        )
+        let byte = self.data.get(self.position).ok_or(())?;
+        self.position += 1;
+        Ok(*byte)
     }
 
-    /// Get the next slice of bytes from the input, advancing the cursor.
+    /// Read the next N bytes from the cursor.
     #[inline]
-    fn take_slice(&mut self, length: usize) -> Result<&'data [u8], ()> {
-        self.input.get(self.position..self.position + length).map_or_else(
-            || Err(()),
-            |slice| {
-                self.position += length;
-                Ok(slice)
-            },
-        )
+    fn next_arr<const N: usize>(&mut self) -> Result<[u8; N], ()> {
+        // SAFETY: `next_slice` always returns the correct length slice.
+        self.next_slice(N).map(|s| unsafe { s.try_into().unwrap_unchecked() })
     }
 
-    /// Get the next N bytes from the input, advancing the cursor.
+    /// Read the next N bytes from the cursor.
     #[inline]
-    fn take<const N: usize>(&mut self) -> Result<[u8; N], ()> {
-        // SAFETY: `slice` is guaranteed to have length `N`.
-        self.take_slice(N).map(|slice| unsafe { slice.try_into().unwrap_unchecked() })
-    }
-
-    /// Get the next byte from the input without advancing the cursor.
-    #[inline]
-    #[must_use]
-    fn peek(&self) -> Option<u8> { self.input.get(self.position).copied() }
-
-    /// Get the number of bytes consumed by the cursor.
-    #[inline]
-    #[must_use]
-    fn position(&self) -> usize { self.position }
-
-    /// Set the cursor's position.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the position is out of bounds.
-    fn set_position(&mut self, position: usize) -> Result<(), ()> {
-        if position <= self.input.len() {
-            self.position = position;
-            Ok(())
-        } else {
-            Err(())
-        }
+    fn next_slice(&mut self, n: usize) -> Result<&'a [u8], ()> {
+        let slice = self.data.get(self.position..self.position + n).ok_or(())?;
+        self.position += n;
+        Ok(slice)
     }
 }

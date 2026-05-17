@@ -9,6 +9,7 @@ use crate::types::indexed::{
 };
 
 /// An [`IndexCore`] for Copy-On-Write NBT data.
+#[derive(Debug, Clone)]
 pub struct CowCore<'data, A: NbtAccess> {
     root: Cow<'data, [u8]>,
     entries: Vec<EntryIndex>,
@@ -30,6 +31,36 @@ impl<'data, A: NbtAccess> CowCore<'data, A> {
         ranges: Vec<Range<usize>>,
     ) -> Self {
         Self { root, entries, ranges, _phantom: PhantomData }
+    }
+
+    /// Convert this [`CowCore`] into an owned version with a `'static`
+    /// lifetime.
+    #[inline]
+    #[must_use]
+    pub fn into_owned(self) -> CowCore<'static, A> {
+        CowCore {
+            root: Cow::Owned(self.root.into_owned()),
+            entries: self.entries,
+            ranges: self.ranges,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<'data> CowCore<'data, Ref> {
+    /// Create a new [`CowCore`] from the given [`SliceCore`].
+    #[inline]
+    #[must_use]
+    pub fn from_slice_ref(core: super::SliceCore<'data, Ref>) -> Self {
+        unsafe { Self::new(Cow::Borrowed(core.root), core.entries, core.ranges) }
+    }
+}
+impl<'data> CowCore<'data, Mut> {
+    /// Create a new [`CowCore`] from the given [`SliceCore`].
+    #[inline]
+    #[must_use]
+    pub fn from_slice_mut(core: super::SliceCore<'data, Mut>) -> Self {
+        unsafe { Self::new(Cow::Borrowed(core.root), core.entries, core.ranges) }
     }
 }
 
