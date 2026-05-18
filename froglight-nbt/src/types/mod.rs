@@ -1,4 +1,5 @@
 //! TODO
 
 pub mod indexed;
-pub mod owned;
+#[cfg(feature = "alloc")]
+pub mod structured;

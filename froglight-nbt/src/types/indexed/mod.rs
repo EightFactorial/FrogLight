@@ -71,8 +71,15 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
     /// Get the raw NBT data as a byte slice.
     #[inline]
     #[must_use]
-    pub fn data(&self) -> &[u8] { self.core.root() }
+    pub fn as_slice(&self) -> &[u8] { self.core.root() }
 }
+
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> AsRef<[u8]> for IndexedNbt<'data, A, C> {
+    #[inline]
+    fn as_ref(&self) -> &[u8] { self.as_slice() }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
     /// Get the name of this NBT structure, if it has one.
@@ -117,7 +124,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Mut> + IndexCore<A> + 'data> IndexedNbt<'
     /// The caller must ensure that the slice is still valid for it's core.
     #[inline]
     #[must_use]
-    pub unsafe fn data_mut(&mut self) -> &mut [u8] {
+    pub unsafe fn as_slice_mut(&mut self) -> &mut [u8] {
         <C as IndexCore<Mut>>::root_mut(&mut self.core)
     }
 
