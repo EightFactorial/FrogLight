@@ -4,7 +4,7 @@ use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, NbtAccess},
     index::Index,
-    list::{IndexedList, IndexedValueList},
+    list::IndexedValueList,
     reference::{IndexableValue, IndexableValueMut, IndexedReference},
 };
 
@@ -13,7 +13,8 @@ macro_rules! impl_indexable {
         $(
             unsafe impl IndexableValue for $ty {
                 type Value<'a> = Self;
-                const INDEX_IS_ENTRY_RANGE: bool = false;
+
+                const LIST_INDEX_IS_ENTRY_RANGE: bool = false;
 
                 unsafe fn size(_: &[u8], _: Index<Self>) -> usize {
                     core::mem::size_of::<Self>()
@@ -62,7 +63,7 @@ cfg_select! {
             /// A [`f64`] value.
             Double(IndexedReference<'data, f64, A>),
             /// A [`u8`] array.
-            ByteArray(IndexedList<'data, [u8], A, C>),
+            ByteArray(IndexedReference<'data, [u8], A>),
             /// An [`MStr`] string.
             String(IndexedReference<'data, MStr, A>),
             /// A list of values.
@@ -70,9 +71,9 @@ cfg_select! {
             /// A compound of named entries.
             Compound(IndexedCompound<'data, A, C>),
             /// A [`u32`] array.
-            IntArray(IndexedList<'data, [u32], A, C>),
+            IntArray(IndexedReference<'data, [u32], A>),
             /// A [`u64`] array.
-            LongArray(IndexedList<'data, [u64], A, C>),
+            LongArray(IndexedReference<'data, [u64], A>),
         }
     }
     _ => {
@@ -91,7 +92,7 @@ cfg_select! {
             /// A [`f64`] value.
             Double(IndexedReference<'data, f64, A>),
             /// A [`u8`] array.
-            ByteArray(IndexedList<'data, [u8], A, C>),
+            ByteArray(IndexedReference<'data, [u8], A>),
             /// An [`MStr`] string.
             String(IndexedReference<'data, MStr, A>),
             /// A list of values.
@@ -99,9 +100,9 @@ cfg_select! {
             /// A compound of named entries.
             Compound(IndexedCompound<'data, A, C>),
             /// A [`u32`] array.
-            IntArray(IndexedList<'data, [u32], A, C>),
+            IntArray(IndexedReference<'data, [u32], A>),
             /// A [`u64`] array.
-            LongArray(IndexedList<'data, [u64], A, C>),
+            LongArray(IndexedReference<'data, [u64], A>),
         }
     }
 }

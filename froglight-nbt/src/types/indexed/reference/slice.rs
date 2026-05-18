@@ -10,7 +10,8 @@ macro_rules! impl_indexable {
         $(
             unsafe impl IndexableValue for [$ty] {
                 type Value<'slice> = &'slice Self;
-                const INDEX_IS_ENTRY_RANGE: bool = true;
+
+                const LIST_INDEX_IS_ENTRY_RANGE: bool = true;
 
                 unsafe fn size(slice: &[u8], index: Index<Self>) -> usize {
                     unsafe { Self::slice_len(slice, index) + Self::SIZE_BYTES }
@@ -70,7 +71,7 @@ impl_indexable!([u8]: 4, [u32]: 4, [u64]: 4);
 unsafe impl IndexableValue for MStr {
     type Value<'slice> = &'slice Self;
 
-    const INDEX_IS_ENTRY_RANGE: bool = true;
+    const LIST_INDEX_IS_ENTRY_RANGE: bool = true;
 
     unsafe fn size(slice: &[u8], index: Index<Self>) -> usize {
         unsafe { Self::slice_len(slice, index) + Self::SIZE_BYTES }
@@ -91,7 +92,9 @@ impl IndexableSlice for MStr {
     const SIZE_BYTES: usize = 2;
 
     unsafe fn slice_len(slice: &[u8], index: Index<Self>) -> usize {
+        debug_assert_ne!(index.value(), 0, "Got the name of something unnamed!");
         debug_assert!(index.value() + Self::SIZE_BYTES <= slice.len());
+
         unsafe {
             let ptr = slice.as_ptr().add(index.value());
             let val = ptr.cast::<u16>().read_unaligned();

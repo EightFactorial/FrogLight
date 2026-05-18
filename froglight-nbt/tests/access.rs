@@ -15,9 +15,6 @@ fn hello_world() {
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
     let compound = nbt.as_compound();
 
-    #[cfg(all(feature = "std", debug_assertions))]
-    std::println!("{compound:#?}");
-
     // Test getting entries by name
     if let Some(value) = compound.get("name") {
         assert_eq!(value.as_string().unwrap().get(), mutf8!("Bananrama"));
@@ -37,15 +34,12 @@ fn short() {
     static SLICE: &[u8] = &[
         0x0A, 0x08, 0x00, 0x0A, b'e', b'n', b't', b'r', b'y', b'_', b'n', b'a', b'm', b'e', 0x00,
         0x0B, b'e', b'n', b't', b'r', b'y', b'_', b'v', b'a', b'l', b'u', b'e', 0x02, 0x00, 0x05,
-        b'S', b'h', b'o', b'r', b't', 0x12, 0x34,
+        b'S', b'h', b'o', b'r', b't', 0x12, 0x34, 0x00,
     ];
 
     // Parse `SLICE`
     let nbt = IndexedNbt::new_unnamed_ref(SLICE).unwrap();
     let compound = nbt.as_compound();
-
-    #[cfg(all(feature = "std", debug_assertions))]
-    std::println!("{compound:#?}");
 
     // Test getting entries by name
     if let Some(value) = compound.get("entry_name") {
@@ -83,9 +77,6 @@ fn inttest1023() {
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
     let compound = nbt.as_compound();
 
-    #[cfg(all(feature = "std", debug_assertions))]
-    std::println!("{compound:#?}");
-
     let value = compound.get("").unwrap();
     let list = value.as_list().unwrap();
     assert_eq!(list.len(), 1023);
@@ -103,7 +94,6 @@ fn bigtest() {
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
     let compound = nbt.as_compound();
 
-    #[cfg(all(feature = "std", debug_assertions))]
     std::println!("{compound:#?}");
 
     // Test getting entries by name
@@ -183,6 +173,21 @@ fn bigtest() {
     } else {
         panic!("`nested compound test` not found!");
     }
+
+    if let Some(array) = compound.get("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))") {
+        let array = array.as_byte_array().unwrap();
+        let array = array.get();
+
+        assert_eq!(array.len(), 1000);
+        for (index, entry) in array.iter().enumerate() {
+            #[expect(clippy::cast_possible_truncation, reason = "Intended behavior")]
+            let expected = ((index * index * 255 + index * 7) % 100) as u8;
+
+            assert_eq!(*entry, expected, "N={index} got {entry}, but expected {expected}?");
+        }
+    } else {
+        panic!("`byteArrayTest` not found!");
+    }
 }
 
 #[test]
@@ -190,8 +195,5 @@ fn complex_player() {
     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
 
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
-    let compound = nbt.as_compound();
-
-    #[cfg(all(feature = "std", debug_assertions))]
-    std::println!("{compound:#?}");
+    let _compound = nbt.as_compound();
 }

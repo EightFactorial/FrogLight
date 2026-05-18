@@ -54,11 +54,11 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<Ref> + IndexC
     #[expect(clippy::missing_panics_doc, reason = "Should never panic")]
     pub fn len(&self) -> usize {
         let value_index = self.index.value();
-        if T::INDEX_IS_ENTRY_RANGE {
+        if T::LIST_INDEX_IS_ENTRY_RANGE {
             unsafe { <C as IndexCore<Ref>>::entry_range(&self.core, value_index).len() }
         } else {
             let root = <C as IndexCore<Ref>>::root(&self.core);
-            let index = Index::new(value_index);
+            let index = Index::new(1 + value_index);
             let length = unsafe { <u32 as IndexableValue>::get(root, index) };
             usize::try_from(length).expect("Length is too large!")
         }
@@ -80,7 +80,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<Ref> + IndexC
         let root = <C as IndexCore<Ref>>::root(&self.core);
         let value_index = self.index.value();
 
-        if T::INDEX_IS_ENTRY_RANGE {
+        if T::LIST_INDEX_IS_ENTRY_RANGE {
             // SAFETY: The index is valid for this core.
             let entries = unsafe { <C as IndexCore<Ref>>::entry_range(&self.core, value_index) };
 
@@ -91,11 +91,11 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<Ref> + IndexC
             // SAFETY: The index is valid for this core.
             Some(unsafe { T::get(root, index) })
         } else {
-            let size = unsafe { T::size(root, Index::new(index + 4)) };
-            let index = Index::new(4 + (size * index));
+            let first = Index::new(1 + 4 + value_index);
+            let size = unsafe { T::size(root, first) };
 
             // SAFETY: The index is valid for this core.
-            Some(unsafe { T::get(root, index) })
+            Some(unsafe { T::get(root, Index::new(first.value() + (size * index))) })
         }
     }
 
@@ -117,7 +117,7 @@ impl<'data, T: IndexableValueMut + ?Sized, C: IndexCore<Mut> + 'data>
 
         let value_index = self.index.value();
 
-        if T::INDEX_IS_ENTRY_RANGE {
+        if T::LIST_INDEX_IS_ENTRY_RANGE {
             // SAFETY: The index is valid for this core.
             let entries = unsafe { <C as IndexCore<Ref>>::entry_range(self.core, value_index) };
 

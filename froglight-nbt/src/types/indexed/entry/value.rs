@@ -3,7 +3,7 @@ use froglight_mutf8::prelude::MStr;
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, Mut, NbtAccess, Ref},
-    entry::{IndexedListType, IndexedMapType, IndexedValue},
+    entry::{IndexedListType, IndexedValue},
     index::{Index, ValueIndex},
     list::{IndexedList, IndexedValueList},
     reference::{IndexedReference, IndexedValueReference},
@@ -34,16 +34,16 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
                 IndexedReference::<f64, Ref>::new(root, index)
             }),
             ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
-                IndexedList::<[u8], Ref, C>::new(&self.core, index)
+                IndexedReference::<[u8], Ref>::new(root, index)
             }),
             ValueIndex::String(index) => IndexedValueReference::String(unsafe {
                 IndexedReference::<MStr, Ref>::new(root, index)
             }),
             ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
-                IndexedList::<[u32], Ref, C>::new(&self.core, index)
+                IndexedReference::<[u32], Ref>::new(root, index)
             }),
             ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
-                IndexedList::<[u64], Ref, C>::new(&self.core, index)
+                IndexedReference::<[u64], Ref>::new(root, index)
             }),
 
             ValueIndex::List(index) => IndexedValueReference::List(create_list(&self.core, index)),
@@ -84,17 +84,20 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
                 IndexedReference::<f64, Mut>::new(root, index)
             }),
             ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
-                IndexedList::<[u8], Mut, C>::new(self.core, index)
+                let root = <C as IndexCore<Mut>>::root_mut(self.core);
+                IndexedReference::<[u8], Mut>::new(root, index)
             }),
             ValueIndex::String(index) => IndexedValueReference::String(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<MStr, Mut>::new(root, index)
             }),
             ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
-                IndexedList::<[u32], Mut, C>::new(self.core, index)
+                let root = <C as IndexCore<Mut>>::root_mut(self.core);
+                IndexedReference::<[u32], Mut>::new(root, index)
             }),
             ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
-                IndexedList::<[u64], Mut, C>::new(self.core, index)
+                let root = <C as IndexCore<Mut>>::root_mut(self.core);
+                IndexedReference::<[u64], Mut>::new(root, index)
             }),
 
             ValueIndex::List(index) => {
@@ -223,53 +226,29 @@ pub(in crate::types::indexed) fn create_list<C: IndexCore<Ref>>(
     core: &C,
     index: Index<IndexedListType>,
 ) -> IndexedValueList<'_, Ref, C> {
-    // SAFETY: The `index` for lists is an `entry_range` index.
-    let entries = unsafe { <C as IndexCore<Ref>>::entry_range(core, index.value()) };
-    let Some(first) = entries.first() else { return IndexedValueList::Empty };
+    const RESERVED_BITS: usize = usize::BITS as usize - 4;
+    const INDEX_MASK: usize = (1 << RESERVED_BITS) - 1;
 
-    // SAFETY: Every value in a list is guaranteed to be the same type.
+    // Extract the tag from the two highest bits
+    let tag = index.value() >> RESERVED_BITS;
+    let index = Index::<IndexedListType>::new(index.value() & INDEX_MASK);
+
     unsafe {
-        match first.value() {
-            ValueIndex::Byte(..) => {
-                IndexedValueList::Byte(IndexedList::<u8, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::Short(..) => {
-                IndexedValueList::Short(IndexedList::<u16, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::Int(..) => {
-                IndexedValueList::Int(IndexedList::<u32, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::Long(..) => {
-                IndexedValueList::Long(IndexedList::<u64, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::Float(..) => {
-                IndexedValueList::Float(IndexedList::<f32, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::Double(..) => {
-                IndexedValueList::Double(IndexedList::<f64, Ref, C>::new(core, index.cast()))
-            }
-
-            ValueIndex::ByteArray(..) => {
-                IndexedValueList::ByteArray(IndexedList::<[u8], Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::String(..) => {
-                IndexedValueList::String(IndexedList::<MStr, Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::List(..) => IndexedValueList::List(
-                IndexedList::<IndexedListType, Ref, C>::new(core, index.cast()),
-            ),
-            ValueIndex::Compound(..) => {
-                IndexedValueList::Compound(IndexedList::<IndexedMapType, Ref, C>::new(
-                    core,
-                    index.cast(),
-                ))
-            }
-            ValueIndex::IntArray(..) => {
-                IndexedValueList::IntArray(IndexedList::<[u32], Ref, C>::new(core, index.cast()))
-            }
-            ValueIndex::LongArray(..) => {
-                IndexedValueList::LongArray(IndexedList::<[u64], Ref, C>::new(core, index.cast()))
-            }
+        match tag {
+            0 => IndexedValueList::Empty,
+            1 => IndexedValueList::Byte(IndexedList::<u8, Ref, C>::new(core, index.cast())),
+            2 => IndexedValueList::Short(IndexedList::<u16, Ref, C>::new(core, index.cast())),
+            3 => IndexedValueList::Int(IndexedList::<u32, Ref, C>::new(core, index.cast())),
+            4 => IndexedValueList::Long(IndexedList::<u64, Ref, C>::new(core, index.cast())),
+            5 => IndexedValueList::Float(IndexedList::<f32, Ref, C>::new(core, index.cast())),
+            6 => IndexedValueList::Double(IndexedList::<f64, Ref, C>::new(core, index.cast())),
+            7 => IndexedValueList::ByteArray(IndexedList::<[u8], Ref, C>::new(core, index.cast())),
+            8 => IndexedValueList::String(IndexedList::<_, Ref, C>::new(core, index.cast())),
+            9 => IndexedValueList::List(IndexedList::<_, Ref, C>::new(core, index.cast())),
+            10 => IndexedValueList::Compound(IndexedList::<_, Ref, C>::new(core, index.cast())),
+            11 => IndexedValueList::IntArray(IndexedList::<_, Ref, C>::new(core, index.cast())),
+            12 => IndexedValueList::LongArray(IndexedList::<_, Ref, C>::new(core, index.cast())),
+            _ => unreachable!("Invalid list tag \"{tag}\"!"),
         }
     }
 }
@@ -278,52 +257,29 @@ pub(in crate::types::indexed) fn create_list_mut<C: IndexCore<Mut>>(
     core: &mut C,
     index: Index<IndexedListType>,
 ) -> IndexedValueList<'_, Mut, C> {
-    // SAFETY: The `index` for lists is an `entry_range` index.
-    let entries = unsafe { <C as IndexCore<Mut>>::entry_range(core, index.value()) };
-    let Some(first) = entries.first() else { return IndexedValueList::Empty };
+    const RESERVED_BITS: usize = usize::BITS as usize - 4;
+    const INDEX_MASK: usize = (1 << RESERVED_BITS) - 1;
 
-    // SAFETY: Every value in a list is guaranteed to be the same type.
+    // Extract the tag from the four highest bits
+    let tag = index.value() >> RESERVED_BITS;
+    let index = Index::<IndexedListType>::new(index.value() & INDEX_MASK);
+
     unsafe {
-        match first.value() {
-            ValueIndex::Byte(..) => {
-                IndexedValueList::Byte(IndexedList::<u8, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::Short(..) => {
-                IndexedValueList::Short(IndexedList::<u16, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::Int(..) => {
-                IndexedValueList::Int(IndexedList::<u32, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::Long(..) => {
-                IndexedValueList::Long(IndexedList::<u64, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::Float(..) => {
-                IndexedValueList::Float(IndexedList::<f32, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::Double(..) => {
-                IndexedValueList::Double(IndexedList::<f64, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::ByteArray(..) => {
-                IndexedValueList::ByteArray(IndexedList::<[u8], Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::String(..) => {
-                IndexedValueList::String(IndexedList::<MStr, Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::List(..) => IndexedValueList::List(
-                IndexedList::<IndexedListType, Mut, C>::new(core, index.cast()),
-            ),
-            ValueIndex::Compound(..) => {
-                IndexedValueList::Compound(IndexedList::<IndexedMapType, Mut, C>::new(
-                    core,
-                    index.cast(),
-                ))
-            }
-            ValueIndex::IntArray(..) => {
-                IndexedValueList::IntArray(IndexedList::<[u32], Mut, C>::new(core, index.cast()))
-            }
-            ValueIndex::LongArray(..) => {
-                IndexedValueList::LongArray(IndexedList::<[u64], Mut, C>::new(core, index.cast()))
-            }
+        match tag {
+            0 => IndexedValueList::Empty,
+            1 => IndexedValueList::Byte(IndexedList::<u8, Mut, C>::new(core, index.cast())),
+            2 => IndexedValueList::Short(IndexedList::<u16, Mut, C>::new(core, index.cast())),
+            3 => IndexedValueList::Int(IndexedList::<u32, Mut, C>::new(core, index.cast())),
+            4 => IndexedValueList::Long(IndexedList::<u64, Mut, C>::new(core, index.cast())),
+            5 => IndexedValueList::Float(IndexedList::<f32, Mut, C>::new(core, index.cast())),
+            6 => IndexedValueList::Double(IndexedList::<f64, Mut, C>::new(core, index.cast())),
+            7 => IndexedValueList::ByteArray(IndexedList::<[u8], Mut, C>::new(core, index.cast())),
+            8 => IndexedValueList::String(IndexedList::<_, Mut, C>::new(core, index.cast())),
+            9 => IndexedValueList::List(IndexedList::<_, Mut, C>::new(core, index.cast())),
+            10 => IndexedValueList::Compound(IndexedList::<_, Mut, C>::new(core, index.cast())),
+            11 => IndexedValueList::IntArray(IndexedList::<_, Mut, C>::new(core, index.cast())),
+            12 => IndexedValueList::LongArray(IndexedList::<_, Mut, C>::new(core, index.cast())),
+            _ => unreachable!("Invalid list tag \"{tag}\"!"),
         }
     }
 }

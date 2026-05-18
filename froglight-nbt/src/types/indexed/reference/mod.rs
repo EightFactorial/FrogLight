@@ -55,8 +55,10 @@ impl<T: IndexableValueMut + ?Sized> IndexedReference<'_, T, Mut> {
 pub unsafe trait IndexableValue: sealed::Sealed {
     /// The type of value that is accessed via an [`Index`].
     type Value<'data>: Sized;
-    /// Whether the index points to a value, or into the entry range list.
-    const INDEX_IS_ENTRY_RANGE: bool;
+
+    /// Whether a list's index is an index into the data slice,
+    /// or an index into the list of entry ranges.
+    const LIST_INDEX_IS_ENTRY_RANGE: bool;
 
     /// Get the size of the whole value using the given slice and index.
     ///
