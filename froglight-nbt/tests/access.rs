@@ -2,6 +2,7 @@
 #![no_std]
 
 extern crate alloc;
+#[cfg(feature = "std")]
 extern crate std;
 
 use froglight_mutf8::mutf8;
@@ -13,6 +14,9 @@ fn hello_world() {
 
     // Parse `SLICE`
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    #[cfg(feature = "std")]
+    std::println!("NBT: {nbt:#?}");
+
     let compound = nbt.as_compound();
 
     // Test getting entries by name
@@ -39,6 +43,9 @@ fn short() {
 
     // Parse `SLICE`
     let nbt = IndexedNbt::new_unnamed_ref(SLICE).unwrap();
+    #[cfg(feature = "std")]
+    std::println!("NBT: {nbt:#?}");
+
     let compound = nbt.as_compound();
 
     // Test getting entries by name
@@ -75,6 +82,9 @@ fn inttest1023() {
     static SLICE: &[u8] = include_bytes!("nbt/inttest1023.nbt");
 
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    #[cfg(feature = "std")]
+    std::println!("NBT: {nbt:#?}");
+
     let compound = nbt.as_compound();
 
     let value = compound.get("").unwrap();
@@ -92,9 +102,10 @@ fn bigtest() {
     static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
 
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
-    let compound = nbt.as_compound();
+    #[cfg(feature = "std")]
+    std::println!("NBT: {nbt:#?}");
 
-    std::println!("{compound:#?}");
+    let compound = nbt.as_compound();
 
     // Test getting entries by name
     if let Some(long_test) = compound.get("longTest") {
@@ -195,5 +206,8 @@ fn complex_player() {
     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
 
     let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    #[cfg(feature = "std")]
+    std::println!("NBT: {nbt:#?}");
+
     let _compound = nbt.as_compound();
 }

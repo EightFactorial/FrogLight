@@ -226,29 +226,62 @@ pub(in crate::types::indexed) fn create_list<C: IndexCore<Ref>>(
     core: &C,
     index: Index<IndexedListType>,
 ) -> IndexedValueList<'_, Ref, C> {
-    const RESERVED_BITS: usize = usize::BITS as usize - 4;
-    const INDEX_MASK: usize = (1 << RESERVED_BITS) - 1;
+    const UNRESERVED_BITS: usize = usize::BITS as usize - 1;
+    const BITMASK: usize = (1 << UNRESERVED_BITS) - 1;
 
-    // Extract the tag from the two highest bits
-    let tag = index.value() >> RESERVED_BITS;
-    let index = Index::<IndexedListType>::new(index.value() & INDEX_MASK);
+    // Extract the flag from the highest bit
+    let range_or_byte_index = index.value() >> UNRESERVED_BITS;
+    let index = Index::<IndexedListType>::new(index.value() & BITMASK);
 
-    unsafe {
-        match tag {
-            0 => IndexedValueList::Empty,
-            1 => IndexedValueList::Byte(IndexedList::<u8, Ref, C>::new(core, index.cast())),
-            2 => IndexedValueList::Short(IndexedList::<u16, Ref, C>::new(core, index.cast())),
-            3 => IndexedValueList::Int(IndexedList::<u32, Ref, C>::new(core, index.cast())),
-            4 => IndexedValueList::Long(IndexedList::<u64, Ref, C>::new(core, index.cast())),
-            5 => IndexedValueList::Float(IndexedList::<f32, Ref, C>::new(core, index.cast())),
-            6 => IndexedValueList::Double(IndexedList::<f64, Ref, C>::new(core, index.cast())),
-            7 => IndexedValueList::ByteArray(IndexedList::<[u8], Ref, C>::new(core, index.cast())),
-            8 => IndexedValueList::String(IndexedList::<_, Ref, C>::new(core, index.cast())),
-            9 => IndexedValueList::List(IndexedList::<_, Ref, C>::new(core, index.cast())),
-            10 => IndexedValueList::Compound(IndexedList::<_, Ref, C>::new(core, index.cast())),
-            11 => IndexedValueList::IntArray(IndexedList::<_, Ref, C>::new(core, index.cast())),
-            12 => IndexedValueList::LongArray(IndexedList::<_, Ref, C>::new(core, index.cast())),
-            _ => unreachable!("Invalid list tag \"{tag}\"!"),
+    if range_or_byte_index == 0 {
+        // No flag, determine from byte index
+        let tag = unsafe { *core.root().get_unchecked(index.value()) };
+
+        unsafe {
+            match tag {
+                0 => IndexedValueList::Empty,
+                1 => IndexedValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
+                2 => IndexedValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
+                3 => IndexedValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
+                4 => IndexedValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
+                5 => IndexedValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
+                6 => IndexedValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
+                #[cfg(debug_assertions)]
+                _ => unreachable!("Invalid byte-index tag \"{tag}\"!"),
+                #[cfg(not(debug_assertions))]
+                _ => core::hint::unreachable_unchecked(),
+            }
+        }
+    } else {
+        // Flag, determine from entries in range
+        let entries = unsafe { core.entry_range(index.value()) };
+        let Some(first) = entries.first() else { return IndexedValueList::Empty };
+
+        unsafe {
+            match first.value() {
+                ValueIndex::ByteArray(..) => {
+                    IndexedValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::String(..) => {
+                    IndexedValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::List(..) => {
+                    IndexedValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::Compound(..) => {
+                    IndexedValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::IntArray(..) => {
+                    IndexedValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::LongArray(..) => {
+                    IndexedValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                #[cfg(debug_assertions)]
+                _ => unreachable!("Invalid range-entry tag \"{:?}\"!", first.value()),
+                #[cfg(not(debug_assertions))]
+                _ => core::hint::unreachable_unchecked(),
+            }
         }
     }
 }
@@ -257,29 +290,62 @@ pub(in crate::types::indexed) fn create_list_mut<C: IndexCore<Mut>>(
     core: &mut C,
     index: Index<IndexedListType>,
 ) -> IndexedValueList<'_, Mut, C> {
-    const RESERVED_BITS: usize = usize::BITS as usize - 4;
-    const INDEX_MASK: usize = (1 << RESERVED_BITS) - 1;
+    const UNRESERVED_BITS: usize = usize::BITS as usize - 1;
+    const BITMASK: usize = (1 << UNRESERVED_BITS) - 1;
 
-    // Extract the tag from the four highest bits
-    let tag = index.value() >> RESERVED_BITS;
-    let index = Index::<IndexedListType>::new(index.value() & INDEX_MASK);
+    // Extract the flag from the highest bit
+    let range_or_byte_index = index.value() >> UNRESERVED_BITS;
+    let index = Index::<IndexedListType>::new(index.value() & BITMASK);
 
-    unsafe {
-        match tag {
-            0 => IndexedValueList::Empty,
-            1 => IndexedValueList::Byte(IndexedList::<u8, Mut, C>::new(core, index.cast())),
-            2 => IndexedValueList::Short(IndexedList::<u16, Mut, C>::new(core, index.cast())),
-            3 => IndexedValueList::Int(IndexedList::<u32, Mut, C>::new(core, index.cast())),
-            4 => IndexedValueList::Long(IndexedList::<u64, Mut, C>::new(core, index.cast())),
-            5 => IndexedValueList::Float(IndexedList::<f32, Mut, C>::new(core, index.cast())),
-            6 => IndexedValueList::Double(IndexedList::<f64, Mut, C>::new(core, index.cast())),
-            7 => IndexedValueList::ByteArray(IndexedList::<[u8], Mut, C>::new(core, index.cast())),
-            8 => IndexedValueList::String(IndexedList::<_, Mut, C>::new(core, index.cast())),
-            9 => IndexedValueList::List(IndexedList::<_, Mut, C>::new(core, index.cast())),
-            10 => IndexedValueList::Compound(IndexedList::<_, Mut, C>::new(core, index.cast())),
-            11 => IndexedValueList::IntArray(IndexedList::<_, Mut, C>::new(core, index.cast())),
-            12 => IndexedValueList::LongArray(IndexedList::<_, Mut, C>::new(core, index.cast())),
-            _ => unreachable!("Invalid list tag \"{tag}\"!"),
+    if range_or_byte_index == 0 {
+        // No flag, determine from byte index
+        let tag = unsafe { *core.root().get_unchecked(index.value()) };
+
+        unsafe {
+            match tag {
+                0 => IndexedValueList::Empty,
+                1 => IndexedValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
+                2 => IndexedValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
+                3 => IndexedValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
+                4 => IndexedValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
+                5 => IndexedValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
+                6 => IndexedValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
+                #[cfg(debug_assertions)]
+                _ => unreachable!("Invalid byte-index tag \"{tag}\"!"),
+                #[cfg(not(debug_assertions))]
+                _ => core::hint::unreachable_unchecked(),
+            }
+        }
+    } else {
+        // Flag, determine from entries in range
+        let entries = unsafe { core.entry_range(index.value()) };
+        let Some(first) = entries.first() else { return IndexedValueList::Empty };
+
+        unsafe {
+            match first.value() {
+                ValueIndex::ByteArray(..) => {
+                    IndexedValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::String(..) => {
+                    IndexedValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::List(..) => {
+                    IndexedValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::Compound(..) => {
+                    IndexedValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::IntArray(..) => {
+                    IndexedValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                ValueIndex::LongArray(..) => {
+                    IndexedValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                }
+                #[cfg(debug_assertions)]
+                _ => unreachable!("Invalid range-entry tag \"{:?}\"!", first.value()),
+                #[cfg(not(debug_assertions))]
+                _ => core::hint::unreachable_unchecked(),
+            }
         }
     }
 }

@@ -328,9 +328,10 @@ fn read_list<'data>(
     counter: &mut usize,
     queue: &mut VecDeque<(Cursor<'data>, bool)>,
 ) -> Result<Index<IndexedListType>, ()> {
-    // Reserve the highest four bits for list types
-    const RESERVED_BITS: usize = usize::BITS as usize - 4;
-    const HIGHEST_INDEX: usize = (1 << RESERVED_BITS) - 1;
+    // Reserve the highest bit for list types
+    const UNRESERVED_BITS: usize = usize::BITS as usize - 1;
+    const RESERVED_BITS: usize = 1 << UNRESERVED_BITS;
+    const HIGHEST_INDEX: usize = RESERVED_BITS - 1;
 
     let tag = cursor.peek()?;
     let index = match tag {
@@ -351,7 +352,7 @@ fn read_list<'data>(
             }
 
             // Index + set the highest bit
-            let index = Index::<IndexedListType>::new(*counter);
+            let index = Index::<IndexedListType>::new(*counter | RESERVED_BITS);
             *counter += 1;
 
             queue.push_back((cursor.clone(), false));
@@ -362,7 +363,7 @@ fn read_list<'data>(
     skip_item::<false>(cursor, 0)?;
 
     // Store the tag in the highest bits of the index for later retrieval
-    Ok(Index::new(index.value() | (usize::from(tag) << RESERVED_BITS)))
+    Ok(index)
 }
 
 #[inline]
