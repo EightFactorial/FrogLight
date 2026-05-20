@@ -23,6 +23,7 @@ froglight-physics = { default-features = false, path = "froglight-physics", vers
 froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
 froglight-snbt = { default-features = false, path = "froglight-snbt", version = "0.0.1" }
+froglight-text = { default-features = false, path = "froglight-text", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
@@ -81,6 +82,7 @@ hickory-resolver = { default-features = false, version = "0.26" }
 indexmap = { default-features = false, version = "2.14" }
 lexical = { default-features = false, version = "7.0" }
 libm = { default-features = false, version = "0.2" }
+memchr = { default-features = false, version = "2.8" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
 petgraph = { default-features = false, version = "0.8" }
@@ -99,7 +101,6 @@ ureq = { default-features = false, version = "3.3" }
 uuid = { default-features = false, version = "1.23" }
 variadics_please = { default-features = false, version = "2.0" }
 zerocopy = { default-features = false, version = "0.8" }
-memchr = { default-features = false, version = "2.8" }
 
 # Debug Dependencies
 criterion = { default-features = false, version = "0.8" }
@@ -147,6 +148,7 @@ members = [
   "froglight-player",
   "froglight-registry",
   "froglight-snbt",
+  "froglight-text",
   "froglight-world",
 ]
 resolver = "2"
