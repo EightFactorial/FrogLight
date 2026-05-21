@@ -45,7 +45,7 @@ facet-toml = { default-features = false, version = "0.44" }
 facet-value = { default-features = false, version = "0.44" }
 
 # Cranelift Dependencies
-cranelift = { default-features = false, version = "0.131" }
+cranelift = { default-features = false, version = "0.132" }
 cranelift-jit = { default-features = false, version = "0.131" }
 cranelift-module = { default-features = false, version = "0.131" }
 
