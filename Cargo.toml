@@ -46,7 +46,7 @@ facet-value = { default-features = false, version = "0.44" }
 
 # Cranelift Dependencies
 cranelift = { default-features = false, version = "0.131" }
-cranelift-jit = { default-features = false, version = "0.131" }
+cranelift-jit = { default-features = false, version = "0.132" }
 cranelift-module = { default-features = false, version = "0.131" }
 
 # Hashing & Cryptography Dependencies
