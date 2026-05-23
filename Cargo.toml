@@ -45,9 +45,9 @@ facet-toml = { default-features = false, version = "0.44" }
 facet-value = { default-features = false, version = "0.44" }
 
 # Cranelift Dependencies
-cranelift = { default-features = false, version = "0.131" }
-cranelift-jit = { default-features = false, version = "0.131" }
-cranelift-module = { default-features = false, version = "0.131" }
+cranelift = { default-features = false, version = "0.132" }
+cranelift-jit = { default-features = false, version = "0.132" }
+cranelift-module = { default-features = false, version = "0.132" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.0" }
@@ -88,6 +88,7 @@ parking_lot = { default-features = false, version = "0.12" }
 petgraph = { default-features = false, version = "0.8" }
 quick_cache = { default-features = false, version = "0.6" }
 rand = { default-features = false, version = "0.10" }
+regex-lite = { default-features = false, version = "0.1.9" }
 replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }

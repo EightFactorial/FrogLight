@@ -1,10 +1,14 @@
 use alloc::vec::Vec;
 use core::range::Range;
 
-use memchr::Memchr2;
+use memchr::{Memchr, Memchr2};
 use smallvec::SmallVec;
 
-use crate::types::indexed::{IndexedSnbt, core::StrCore, index::EntryIndex};
+use crate::types::indexed::{
+    IndexedSnbt,
+    core::StrCore,
+    index::{EntryIndex, Index, ValueIndex},
+};
 
 pub(crate) fn parse_snbt(root: &str) -> Result<IndexedSnbt<'_, StrCore<'_>>, ()> {
     let compounds = get_item_bounds(root.as_bytes(), b'{', b'}')?;
@@ -13,115 +17,20 @@ pub(crate) fn parse_snbt(root: &str) -> Result<IndexedSnbt<'_, StrCore<'_>>, ()>
     let mut entries = Vec::with_capacity(compounds.len() + lists.len());
     let mut ranges = Vec::with_capacity(compounds.len() + lists.len());
 
-    let mut counter = 0;
-    for index in 0..compounds.len() {
-        unsafe {
-            parse_item::<true>(
-                root,
-                index,
-                &compounds,
-                &lists,
-                &mut entries,
-                &mut ranges,
-                &mut counter,
-            )?;
+    unsafe {
+        for index in 0..compounds.len() {
+            parse_item::<true>(root, index, &compounds, &lists, &mut entries, &mut ranges)?;
         }
-    }
-    for index in 0..lists.len() {
-        unsafe {
-            parse_item::<false>(
-                root,
-                index,
-                &compounds,
-                &lists,
-                &mut entries,
-                &mut ranges,
-                &mut counter,
-            )?;
+        for index in 0..lists.len() {
+            parse_item::<false>(root, index, &compounds, &lists, &mut entries, &mut ranges)?;
         }
     }
 
     // SAFETY: `entries` and `ranges` were created from `root`.
-    Ok(IndexedSnbt::new(unsafe { StrCore::new(root, entries, ranges) }))
+    Ok(IndexedSnbt::new(unsafe {
+        StrCore::new(root, entries.into_boxed_slice(), ranges.into_boxed_slice())
+    }))
 }
-
-/// # SAFETY
-///
-/// The caller must ensure:
-///   - If `NAMED` is `true`, `index` must be a valid index into `compounds`.
-///   - If `NAMED` is `false`, `index` must be a valid index into `lists`.
-///   - All pairs of `{` and `}` must have indices in `compounds`.
-///   - All pairs of `[` and `]` must have indices in `lists`.
-#[inline]
-#[allow(clippy::unnecessary_wraps, reason = "WIP")]
-unsafe fn parse_item<const NAMED: bool>(
-    root: &str,
-    index: usize,
-    compounds: &[Range<usize>],
-    lists: &[Range<usize>],
-
-    _entries: &mut Vec<EntryIndex>,
-    _ranges: &mut Vec<Range<usize>>,
-    _counter: &mut usize,
-) -> Result<(), ()> {
-    // SAFETY: The caller ensures this is safe.
-    let (range, slice) = unsafe {
-        let range =
-            if NAMED { *compounds.get_unchecked(index) } else { *lists.get_unchecked(index) };
-        let slice = root.get_unchecked(range);
-        (range, slice)
-    };
-
-    // TODO: Custom iterator that returns string slices *and* their byte ranges.
-    let entry_iter = slice.split({
-        let mut skip = 0;
-        let mut index = range.start;
-
-        let mut escaped = false;
-        move |char| {
-            index += 1;
-            if skip >= index {
-                return false;
-            }
-
-            match char {
-                // Return `true` for non-escaped commas
-                ',' if !escaped => true,
-                // Set `escaped` for non-escaped backslashes
-                '\\' if !escaped => {
-                    escaped = true;
-                    false
-                }
-                // Skip over nested compounds
-                '{' if !escaped => {
-                    // SAFETY: There is guaranteed to be a compound starting at `index`.
-                    let compound =
-                        unsafe { compounds.iter().find(|r| r.start == index).unwrap_unchecked() };
-                    skip = compound.end;
-                    false
-                }
-                // Skip over nested lists
-                '[' if !escaped => {
-                    // SAFETY: There is guaranteed to be a list starting at `index`.
-                    let list =
-                        unsafe { lists.iter().find(|r| r.start == index).unwrap_unchecked() };
-                    skip = list.end;
-                    false
-                }
-                _ => {
-                    escaped = false;
-                    false
-                }
-            }
-        }
-    });
-
-    for _entry in entry_iter {}
-
-    Ok(())
-}
-
-// -------------------------------------------------------------------------------------------------
 
 fn get_item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>, ()> {
     let mut bounds = Vec::with_capacity(2);
@@ -164,4 +73,235 @@ fn get_item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>,
 
     // Ensure all `start` characters have been matched with an `end` character.
     if history.is_empty() { Ok(bounds) } else { Err(()) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// # SAFETY
+///
+/// The caller must ensure:
+///   - If `NAMED` is `true`, `index` must be a valid index into `compounds`.
+///   - If `NAMED` is `false`, `index` must be a valid index into `lists`.
+///   - All pairs of `{` and `}` must have indices in `compounds`.
+///   - All pairs of `[` and `]` must have indices in `lists`.
+#[inline]
+#[allow(clippy::unnecessary_wraps, reason = "WIP")]
+unsafe fn parse_item<const NAMED: bool>(
+    root: &str,
+    index: usize,
+
+    compounds: &[Range<usize>],
+    lists: &[Range<usize>],
+
+    entries: &mut Vec<EntryIndex>,
+    item_ranges: &mut Vec<Range<usize>>,
+) -> Result<(), ()> {
+    // SAFETY: The caller ensures this is safe.
+    let (range, mut slice) = if NAMED {
+        let range = unsafe { *compounds.get_unchecked(index) };
+        let slice = unsafe { root.get_unchecked(range) };
+        (range, slice)
+    } else {
+        let range = unsafe { *lists.get_unchecked(index) };
+        let slice = unsafe { root.get_unchecked(range) };
+        (range, slice)
+    };
+
+    // Track the starting `entries` index
+    let range_start = entries.len();
+
+    // Parse each entry in the item.
+    loop {
+        if slice.is_empty() {
+            break;
+        }
+
+        // Read the entry's name.
+        slice = slice.trim_start();
+        let name = read_string_key(slice)?;
+        let name_start = range.start + name.len();
+        unsafe {
+            slice = slice.get_unchecked(name.len()..);
+        }
+
+        // Skip the `:`, which is required.
+        slice = slice.trim_start();
+        if let Some(stripped) = slice.strip_prefix(':') {
+            slice = stripped;
+        } else {
+            return Err(());
+        }
+
+        // Read the entry's value.
+        slice = slice.trim_start();
+        let entry = read_unknown_value(slice, range.end - slice.len(), compounds, lists)?;
+        let entry_start = range.start + entry.len();
+        unsafe {
+            slice = slice.get_unchecked(entry.len()..);
+        }
+
+        // Skip the ',' if there is one.
+        slice = slice.trim_start();
+        if let Some(stripped) = slice.strip_prefix(',') {
+            slice = stripped;
+        }
+
+        entries.push(parse_entry(name, name_start, entry, entry_start, compounds, lists)?);
+    }
+
+    // Add the item's `entries` range
+    item_ranges.push(Range { start: range_start, end: entries.len() });
+
+    Ok(())
+}
+
+// -------------------------------------------------------------------------------------------------
+
+fn parse_entry(
+    name: &str,
+    name_start: usize,
+    entry: &str,
+    entry_start: usize,
+
+    compounds: &[Range<usize>],
+    lists: &[Range<usize>],
+) -> Result<EntryIndex, ()> {
+    let (name, _name_settings) = parse_string(name, name_start)?;
+
+    match entry.chars().next().ok_or(())? {
+        // A number, as un-quoted strings cannot start with these.
+        '0'..='9' | '+' | '-' | '.' => {
+            let (value, _entry_settings) = parse_number(entry, entry_start)?;
+            Ok(EntryIndex::new(name, value))
+        }
+        // A string, either quoted or un-quoted.
+        'a'..='z' | 'A'..='Z' | '_' | '\"' | '\'' => {
+            let (value, _entry_settings) = parse_string(entry, entry_start)?;
+            Ok(EntryIndex::new(name, ValueIndex::String(value)))
+        }
+
+        // A compound.
+        '{' => {
+            let compound =
+                compounds.iter().position(|range| range.start == entry_start).ok_or(())?;
+            Ok(EntryIndex::new(name, ValueIndex::Compound(Index::new(compound))))
+        }
+        // A list.
+        '[' => {
+            let list = lists.iter().position(|range| range.start == entry_start).ok_or(())?;
+            Ok(EntryIndex::new(name, ValueIndex::List(Index::new(list + compounds.len()))))
+        }
+
+        _ => Err(()),
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[expect(clippy::unnecessary_wraps, reason = "TODO: String Settings")]
+fn parse_string(_content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
+    Ok((Index::new(start), ()))
+}
+
+// -------------------------------------------------------------------------------------------------
+
+fn parse_number(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
+    // Check for a hex or binary prefix
+    if let Some(src) = content.strip_prefix("0x") {
+        return if u32::from_str_radix(src, 16).is_ok() {
+            Ok((ValueIndex::Int(Index::new(start)), ()))
+        } else {
+            Err(())
+        };
+    } else if let Some(src) = content.strip_prefix("0b") {
+        return if u32::from_str_radix(src, 2).is_ok() {
+            Ok((ValueIndex::Int(Index::new(start)), ()))
+        } else {
+            Err(())
+        };
+    }
+
+    todo!()
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// TODO: Check string validity
+fn read_string_key(content: &str) -> Result<&str, ()> {
+    // Get the first char, or return an empty string.
+    let Some(first) = content.chars().next() else { return Ok(content) };
+
+    match first {
+        // An un-quoted string, which ends at the next `:`.
+        'a'..='z' | 'A'..='Z' | '_' => {
+            let end = content.as_bytes().iter().position(|&c| c == b':').ok_or(())?;
+            Ok(unsafe { content.get_unchecked(..end) })
+        }
+        // A quoted string, which ends at the next un-escaped `"` or `'`.
+        c @ ('\"' | '\'') => {
+            let mut quote_end = Option::<usize>::None;
+            for index in Memchr::new(c as u8, content.as_bytes()) {
+                if let Some(previous) = index.checked_sub(1).and_then(|i| content.as_bytes().get(i))
+                    && *previous == b'\\'
+                {
+                } else {
+                    quote_end = Some(index);
+                    break;
+                }
+            }
+
+            let end = quote_end.ok_or(())?;
+            Ok(unsafe { content.get_unchecked(..end) })
+        }
+        _ => Err(()),
+    }
+}
+
+fn read_unknown_value<'a>(
+    content: &'a str,
+    position: usize,
+    compounds: &[Range<usize>],
+    lists: &[Range<usize>],
+) -> Result<&'a str, ()> {
+    match content.chars().next().ok_or(())? {
+        // An un-quoted number or string, which ends at the next `,` or the end of the item.
+        'a'..='z' | 'A'..='Z' | '0'..='9' | '+' | '-' | '.' | '_' => {
+            if let Some(end) = Memchr::new(b',', content.as_bytes()).next() {
+                Ok(unsafe { content.get_unchecked(..end) })
+            } else {
+                Ok(content)
+            }
+        }
+
+        // TODO: Check string validity
+        // An quoted string, which ends at the next un-escaped `"` or `'`.
+        c @ ('\"' | '\'') => {
+            let mut quote_end = Option::<usize>::None;
+            for index in Memchr::new(c as u8, content.as_bytes()) {
+                if let Some(previous) = index.checked_sub(1).and_then(|i| content.as_bytes().get(i))
+                    && *previous == b'\\'
+                {
+                } else {
+                    quote_end = Some(index);
+                    break;
+                }
+            }
+
+            let end = quote_end.ok_or(())?;
+            Ok(unsafe { content.get_unchecked(..end) })
+        }
+
+        // A compound.
+        '{' => {
+            let compound = compounds.iter().find(|range| range.start == position).ok_or(())?;
+            Ok(unsafe { content.get_unchecked(..compound.end - position) })
+        }
+        // A list.
+        '[' => {
+            let list = lists.iter().find(|range| range.start == position).ok_or(())?;
+            Ok(unsafe { content.get_unchecked(..list.end - position) })
+        }
+
+        _ => Err(()),
+    }
 }

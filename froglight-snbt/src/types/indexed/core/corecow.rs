@@ -1,4 +1,4 @@
-use alloc::{borrow::Cow, vec::Vec};
+use alloc::{borrow::Cow, boxed::Box};
 use core::range::Range;
 
 use crate::types::indexed::{
@@ -8,8 +8,8 @@ use crate::types::indexed::{
 
 pub struct CowCore<'data> {
     data: Cow<'data, str>,
-    entries: Vec<EntryIndex>,
-    ranges: Vec<Range<usize>>,
+    entries: Box<[EntryIndex]>,
+    ranges: Box<[Range<usize>]>,
 }
 
 impl<'data> CowCore<'data> {
@@ -25,13 +25,13 @@ impl<'data> CowCore<'data> {
 impl IndexCore for CowCore<'_> {
     fn root(&self) -> &str { self.data.as_ref() }
 
-    fn entries(&self) -> &[EntryIndex] { self.entries.as_slice() }
+    fn entries(&self) -> &[EntryIndex] { &self.entries }
 
     unsafe fn entry_range(&self, index: usize) -> &[EntryIndex] {
         // SAFETY: The caller ensures that this is safe.
         unsafe {
             let range = self.ranges.get_unchecked(index);
-            self.entries.as_slice().get_unchecked(*range)
+            self.entries.get_unchecked(*range)
         }
     }
 }
