@@ -3,7 +3,6 @@ use core::range::Range;
 
 use memchr::{Memchr, Memchr2};
 use smallvec::SmallVec;
-use uuid::Uuid;
 
 use crate::types::indexed::{
     IndexedSnbt,
@@ -12,8 +11,8 @@ use crate::types::indexed::{
 };
 
 pub(crate) fn parse_snbt(root: &str) -> Result<IndexedSnbt<'_, StrCore<'_>>, ()> {
-    let compounds = get_item_bounds(root.as_bytes(), b'{', b'}')?;
-    let lists = get_item_bounds(root.as_bytes(), b'[', b']')?;
+    let compounds = item_bounds(root.as_bytes(), b'{', b'}')?;
+    let lists = item_bounds(root.as_bytes(), b'[', b']')?;
 
     let mut entries = Vec::with_capacity(compounds.len() + lists.len());
     let mut ranges = Vec::with_capacity(compounds.len() + lists.len());
@@ -33,7 +32,8 @@ pub(crate) fn parse_snbt(root: &str) -> Result<IndexedSnbt<'_, StrCore<'_>>, ()>
     }))
 }
 
-fn get_item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>, ()> {
+/// Calculate the bounds of items based on the provided `start` and `end` chars.
+fn item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>, ()> {
     let mut bounds = Vec::with_capacity(2);
 
     // Track the indices of `start` characters
@@ -98,7 +98,7 @@ unsafe fn parse_item<const NAMED: bool>(
     item_ranges: &mut Vec<Range<usize>>,
 ) -> Result<(), ()> {
     // SAFETY: The caller ensures this is safe.
-    let (range, mut slice) = if NAMED {
+    let (range, slice) = if NAMED {
         let range = unsafe { *compounds.get_unchecked(index) };
         let slice = unsafe { root.get_unchecked(range) };
         (range, slice)
@@ -112,42 +112,9 @@ unsafe fn parse_item<const NAMED: bool>(
     let range_start = entries.len();
 
     // Parse each entry in the item.
-    loop {
-        if slice.is_empty() {
-            break;
-        }
-
-        // Read the entry's name.
-        slice = slice.trim_start();
-        let name = read_string_key(slice)?;
-        let name_start = range.start + name.len();
-        unsafe {
-            slice = slice.get_unchecked(name.len()..);
-        }
-
-        // Skip the `:`, which is required.
-        slice = slice.trim_start();
-        if let Some(stripped) = slice.strip_prefix(':') {
-            slice = stripped;
-        } else {
-            return Err(());
-        }
-
-        // Read the entry's value.
-        slice = slice.trim_start();
-        let entry = read_unknown_value(slice, range.end - slice.len(), compounds, lists)?;
-        let entry_start = range.start + entry.len();
-        unsafe {
-            slice = slice.get_unchecked(entry.len()..);
-        }
-
-        // Skip the ',' if there is one.
-        slice = slice.trim_start();
-        if let Some(stripped) = slice.strip_prefix(',') {
-            slice = stripped;
-        }
-
-        entries.push(parse_entry(name, name_start, entry, entry_start, compounds, lists)?);
+    let mut cursor = Cursor::new(slice, range.start);
+    while !slice.is_empty() {
+        entries.push(parse_entry::<NAMED>(&mut cursor, compounds, lists)?);
     }
 
     // Add the item's `entries` range
@@ -156,224 +123,144 @@ unsafe fn parse_item<const NAMED: bool>(
     Ok(())
 }
 
-// -------------------------------------------------------------------------------------------------
-
-fn parse_entry(
-    name: &str,
-    name_start: usize,
-    entry: &str,
-    entry_start: usize,
-
+#[inline]
+fn parse_entry<const NAMED: bool>(
+    cursor: &mut Cursor<'_>,
     compounds: &[Range<usize>],
     lists: &[Range<usize>],
 ) -> Result<EntryIndex, ()> {
-    let (name, _name_settings) = parse_string(name, name_start)?;
+    cursor.trim_start();
 
-    // Support `bool(...)` and `uuid(...)` operations.
-    if let Some(bool) = entry.strip_prefix("bool(")
-        && let Some(bool) = bool.strip_suffix(')')
-    {
-        let (value, _entry_settings) = parse_bool(bool, entry_start)?;
-        return Ok(EntryIndex::new(name, value));
-    } else if let Some(uuid) = entry.strip_prefix("uuid(")
-        && let Some(uuid) = uuid.strip_suffix(')')
-    {
-        let (value, _entry_settings) = parse_uuid(uuid, entry_start)?;
-        return Ok(EntryIndex::new(name, value));
-    }
+    std::println!("Parsing Name: {:?}", cursor.remaining());
 
-    match entry.chars().next().ok_or(())? {
-        // A number, as un-quoted strings cannot start with these.
-        '0'..='9' | '+' | '-' | '.' => {
-            let (value, _entry_settings) = parse_number(entry, entry_start)?;
-            Ok(EntryIndex::new(name, value))
-        }
-        // A string, either quoted or un-quoted.
-        'a'..='z' | 'A'..='Z' | '_' | '\"' | '\'' => {
-            let (value, _entry_settings) = parse_string(entry, entry_start)?;
-            Ok(EntryIndex::new(name, ValueIndex::String(value)))
+    // Read the name if `NAMED`
+    let name = if NAMED {
+        let position = cursor.root_position();
+
+        if cursor.peek_char() == Some('\"') {
+            // Read past the name, until the next unescaped `"` character.
+            cursor.until_char('\"', true).ok_or(())?;
+        } else if cursor.peek_char() == Some('\'') {
+            // Read past the name, until the next unescaped `'` character.
+            cursor.until_char('\'', true).ok_or(())?;
         }
 
-        // A compound.
-        '{' => {
-            let compound =
-                compounds.iter().position(|range| range.start == entry_start).ok_or(())?;
-            Ok(EntryIndex::new(name, ValueIndex::Compound(Index::new(compound))))
-        }
-        // A list.
-        '[' => {
-            let list = lists.iter().position(|range| range.start == entry_start).ok_or(())?;
-            Ok(EntryIndex::new(name, ValueIndex::List(Index::new(list + compounds.len()))))
-        }
+        // Read until the next `:` character.
+        cursor.until_char(':', false).ok_or(())?;
 
-        _ => Err(()),
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-#[cfg(feature = "std")]
-fn parse_string(content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
-    /// [`Regex`] for un-quoted strings: 0-9, A-Z, a-z, _, -, ., and +
-    static REGEX: std::sync::LazyLock<regex_lite::Regex> =
-        std::sync::LazyLock::new(|| regex_lite::Regex::new(r"^[0-9A-Za-z_.+-]+$").unwrap());
-
-    if content.starts_with(['\"', '\'']) || REGEX.is_match(content) {
-        Ok((Index::new(start), ()))
+        Index::<str>::new(position)
     } else {
-        Err(())
-    }
+        Index::<str>::new(0)
+    };
+
+    let value = parse_value(cursor, compounds, lists)?;
+
+    Ok(EntryIndex::new(name, value))
 }
 
-#[cfg(not(feature = "std"))]
-fn parse_string(content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
-    if content.starts_with(['\"', '\''])
-        || content
-            .chars()
-            .all(|c| matches!(c, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '-' | '.' | '+'))
-    {
-        Ok((Index::new(start), ()))
-    } else {
-        Err(())
-    }
-}
-
-fn parse_number(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
-    // Check for a hex or binary prefix
-    if let Some(src) = content.strip_prefix("0x") {
-        return if u32::from_str_radix(src, 16).is_ok() {
-            Ok((ValueIndex::Int(Index::new(start)), ()))
-        } else {
-            Err(())
-        };
-    } else if let Some(src) = content.strip_prefix("0b") {
-        return if u32::from_str_radix(src, 2).is_ok() {
-            Ok((ValueIndex::Int(Index::new(start)), ()))
-        } else {
-            Err(())
-        };
-    }
-
-    todo!()
-}
-
-/// Returns a `ValueIndex::Byte` if the content is a valid boolean.
-///
-/// Expects content to be in one of the following formats:
-///     - `true` (true)
-///     - `false` (false)
-///     - `0` (false)
-///     - `5` (true)
-///     - `10` (true)
-fn parse_bool(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
-    if matches!(content, "true" | "false") || content.chars().all(|c| c.is_ascii_digit()) {
-        Ok((ValueIndex::Int(Index::new(start)), ()))
-    } else {
-        Err(())
-    }
-}
-
-/// Returns a `ValueIndex::IntArray` if the content is a valid UUID.
-///
-/// Expects content to be in the format:
-/// `"f81d4fae-7dec-11d0-a765-00a0c91e6bf6"`
-fn parse_uuid(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
-    let Some(trimmed) = content.strip_prefix("\"") else { return Err(()) };
-    let Some(trimmed) = trimmed.strip_suffix("\"") else { return Err(()) };
-
-    match Uuid::try_parse(trimmed) {
-        Ok(..) => Ok((ValueIndex::IntArray(Index::new(start)), ())),
-        Err(_) => Err(()),
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-fn read_string_key(content: &str) -> Result<&str, ()> {
-    // Get the first char, or return an empty string.
-    let Some(first) = content.chars().next() else { return Ok(content) };
-
-    match first {
-        // An un-quoted string, which ends at the next `:`.
-        'a'..='z' | 'A'..='Z' | '_' => {
-            let end = content.as_bytes().iter().position(|&c| c == b':').ok_or(())?;
-            Ok(unsafe { content.get_unchecked(..end) })
-        }
-        // A quoted string, which ends at the next un-escaped `"` or `'`.
-        c @ ('\"' | '\'') => {
-            let mut quote_end = Option::<usize>::None;
-            for index in Memchr::new(c as u8, content.as_bytes()) {
-                if let Some(previous) = index.checked_sub(1).and_then(|i| content.as_bytes().get(i))
-                    && *previous == b'\\'
-                {
-                } else {
-                    quote_end = Some(index);
-                    break;
-                }
-            }
-
-            let end = quote_end.ok_or(())?;
-            Ok(unsafe { content.get_unchecked(..end) })
-        }
-        _ => Err(()),
-    }
-}
-
-fn read_unknown_value<'a>(
-    content: &'a str,
-    position: usize,
+#[inline]
+fn parse_value(
+    cursor: &mut Cursor<'_>,
     compounds: &[Range<usize>],
     lists: &[Range<usize>],
-) -> Result<&'a str, ()> {
-    // Support `bool(...)` and `uuid(...)` operations.
-    if content.starts_with("bool(")
-        && let Some((bool, _)) = content.split_once(')')
-    {
-        return Ok(bool);
-    } else if content.starts_with("uuid(")
-        && let Some((uuid, _)) = content.split_once(')')
-    {
-        return Ok(uuid);
-    }
+) -> Result<ValueIndex, ()> {
+    cursor.trim_start();
 
-    match content.chars().next().ok_or(())? {
-        // An un-quoted number or string, which ends at the next `,` or the end of the item.
-        'a'..='z' | 'A'..='Z' | '0'..='9' | '+' | '-' | '.' | '_' => {
-            if let Some(end) = Memchr::new(b',', content.as_bytes()).next() {
-                Ok(unsafe { content.get_unchecked(..end) })
-            } else {
-                Ok(content)
-            }
-        }
+    std::println!("Parsing Value: {:?}", cursor.remaining());
 
-        // An quoted string, which ends at the next un-escaped `"` or `'`.
-        c @ ('\"' | '\'') => {
-            let mut quote_end = Option::<usize>::None;
-            for index in Memchr::new(c as u8, content.as_bytes()) {
-                if let Some(previous) = index.checked_sub(1).and_then(|i| content.as_bytes().get(i))
-                    && *previous == b'\\'
-                {
-                } else {
-                    quote_end = Some(index);
-                    break;
-                }
-            }
+    match cursor.peek_char().ok_or(())? {
+        // Numeric values can start with a digit, a sign, or a decimal point.
+        '0'..='9' | '-' | '.' | '+' => todo!(),
 
-            let end = quote_end.ok_or(())?;
-            Ok(unsafe { content.get_unchecked(..end) })
-        }
+        // Un-quoted strings can start with a letter or an underscore.
+        'a'..='z' | 'A'..='Z' | '_' => todo!(),
+        // Quoted strings start with either a single or double quote.
+        _char @ ('\"' | '\'') => todo!(),
 
-        // A compound.
+        // Compound objects start with `{`.
         '{' => {
-            let compound = compounds.iter().find(|range| range.start == position).ok_or(())?;
-            Ok(unsafe { content.get_unchecked(..compound.end - position) })
+            // Find the compound object that starts at our position.
+            let (index, range) = compounds
+                .iter()
+                .enumerate()
+                .find(|(_, range)| range.start == cursor.root_position())
+                .unwrap();
+
+            // Advance the cursor past the compound object.
+            cursor.position += range.end - range.start;
+            Ok(ValueIndex::Compound(Index::new(index)))
         }
-        // A list.
+        // List objects start with `[`.
         '[' => {
-            let list = lists.iter().find(|range| range.start == position).ok_or(())?;
-            Ok(unsafe { content.get_unchecked(..list.end - position) })
+            // Find the list object that starts at our position.
+            let (index, range) = lists
+                .iter()
+                .enumerate()
+                .find(|(_, range)| range.start == cursor.root_position())
+                .unwrap();
+
+            // Advance the cursor past the list object.
+            cursor.position += range.end - range.start;
+            Ok(ValueIndex::List(Index::new(index + compounds.len())))
         }
 
         _ => Err(()),
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------
+
+struct Cursor<'a> {
+    slice: &'a str,
+    position: usize,
+    start: usize,
+}
+
+impl<'a> Cursor<'a> {
+    /// Create a new [`Cursor`], where the slice starts at index `start`.
+    const fn new(slice: &'a str, start: usize) -> Self { Self { slice, position: 0, start } }
+
+    /// Get the local position of the cursor within the slice.
+    const fn position(&self) -> usize { self.position }
+
+    /// Get the global position of the cursor within the slice.
+    const fn root_position(&self) -> usize { self.start + self.position }
+
+    /// Get the remaining slice from the current position.
+    fn remaining(&self) -> &'a str {
+        // SAFETY: `position` is always within bounds.
+        unsafe { self.slice.get_unchecked(self.position..) }
+    }
+
+    /// Advance the cursor past any leading whitespace.
+    fn trim_start(&mut self) {
+        let slice = self.remaining();
+        let trimmed = slice.trim_start();
+        self.position += slice.len() - trimmed.len();
+    }
+
+    /// Peek the next character without advancing the cursor.
+    fn peek_char(&self) -> Option<char> { self.remaining().chars().next() }
+
+    /// Advance the cursor until the target character is found.
+    fn until_char(&mut self, target: char, escaped: bool) -> Option<&'a str> {
+        let mut slice = self.remaining();
+
+        let mut found = false;
+        for index in Memchr::new(target as u8, slice.as_bytes()) {
+            if escaped && index.checked_sub(1).and_then(|i| slice.as_bytes().get(i)) == Some(&b'\\')
+            {
+                continue;
+            }
+
+            found = true;
+            slice = unsafe { slice.get_unchecked(..index) };
+            self.position += index + target.len_utf8();
+            break;
+        }
+
+        found.then_some(slice)
     }
 }
