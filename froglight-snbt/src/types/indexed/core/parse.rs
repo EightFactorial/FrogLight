@@ -1,7 +1,7 @@
 use alloc::vec::Vec;
 use core::range::Range;
 
-use memchr::{Memchr, Memchr2};
+use memchr::{Memchr, Memchr2, Memchr3};
 use smallvec::SmallVec;
 
 use crate::types::indexed::{
@@ -73,7 +73,12 @@ fn item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>, ()>
     }
 
     // Ensure all `start` characters have been matched with an `end` character.
-    if history.is_empty() { Ok(bounds) } else { Err(()) }
+    if history.is_empty() {
+        bounds.sort_unstable_by_key(|r| r.start);
+        Ok(bounds)
+    } else {
+        Err(())
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -86,7 +91,6 @@ fn item_bounds(root: &[u8], start: u8, end: u8) -> Result<Vec<Range<usize>>, ()>
 ///   - All pairs of `{` and `}` must have indices in `compounds`.
 ///   - All pairs of `[` and `]` must have indices in `lists`.
 #[inline]
-#[allow(clippy::unnecessary_wraps, reason = "WIP")]
 unsafe fn parse_item<const NAMED: bool>(
     root: &str,
     index: usize,
@@ -113,8 +117,22 @@ unsafe fn parse_item<const NAMED: bool>(
 
     // Parse each entry in the item.
     let mut cursor = Cursor::new(slice, range.start);
-    while !slice.is_empty() {
+    cursor.trim_start();
+
+    while !cursor.remaining().is_empty() {
         entries.push(parse_entry::<NAMED>(&mut cursor, compounds, lists)?);
+        cursor.trim_start();
+
+        // If there are more entries, they must be separated by a comma.
+        if NAMED && !cursor.remaining().is_empty() {
+            if cursor.peek_char() == Some(',') {
+                cursor.position += 1;
+                debug_assert!(cursor.position <= cursor.slice.len());
+                cursor.trim_start();
+            } else {
+                return Err(());
+            }
+        }
     }
 
     // Add the item's `entries` range
@@ -129,30 +147,27 @@ fn parse_entry<const NAMED: bool>(
     compounds: &[Range<usize>],
     lists: &[Range<usize>],
 ) -> Result<EntryIndex, ()> {
-    cursor.trim_start();
-
-    std::println!("Parsing Name: {:?}", cursor.remaining());
-
     // Read the name if `NAMED`
     let name = if NAMED {
         let position = cursor.root_position();
 
         if cursor.peek_char() == Some('\"') {
             // Read past the name, until the next unescaped `"` character.
-            cursor.until_char('\"', true).ok_or(())?;
+            cursor.until_char(b'\"', true, true).ok_or(())?;
         } else if cursor.peek_char() == Some('\'') {
             // Read past the name, until the next unescaped `'` character.
-            cursor.until_char('\'', true).ok_or(())?;
+            cursor.until_char(b'\'', true, true).ok_or(())?;
         }
 
         // Read until the next `:` character.
-        cursor.until_char(':', false).ok_or(())?;
+        cursor.until_char(b':', false, true).ok_or(())?;
 
         Index::<str>::new(position)
     } else {
         Index::<str>::new(0)
     };
 
+    // Read the value
     let value = parse_value(cursor, compounds, lists)?;
 
     Ok(EntryIndex::new(name, value))
@@ -166,41 +181,59 @@ fn parse_value(
 ) -> Result<ValueIndex, ()> {
     cursor.trim_start();
 
-    std::println!("Parsing Value: {:?}", cursor.remaining());
-
     match cursor.peek_char().ok_or(())? {
-        // Numeric values can start with a digit, a sign, or a decimal point.
-        '0'..='9' | '-' | '.' | '+' => todo!(),
+        // Numeric values start with a digit, a sign, or a decimal point.
+        '0'..='9' | '-' | '+' | '.' => todo!(),
 
         // Un-quoted strings can start with a letter or an underscore.
-        'a'..='z' | 'A'..='Z' | '_' => todo!(),
+        'a'..='z' | 'A'..='Z' | '_' => {
+            let position = cursor.root_position();
+            if cursor
+                .until(
+                    false,
+                    |c| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' | '+' | '.'| '_'),
+                )
+                .is_none()
+            {
+                // If we reached the end of the slice, move the cursor to the end.
+                cursor.position = cursor.slice.len();
+                debug_assert!(cursor.position <= cursor.slice.len());
+            }
+
+            Ok(ValueIndex::String(Index::new(position)))
+        }
         // Quoted strings start with either a single or double quote.
-        _char @ ('\"' | '\'') => todo!(),
+        c @ ('\"' | '\'') => {
+            let position = cursor.root_position();
+            cursor.until_char(c as u8, true, true).ok_or(())?;
+
+            Ok(ValueIndex::String(Index::new(position)))
+        }
 
         // Compound objects start with `{`.
         '{' => {
             // Find the compound object that starts at our position.
-            let (index, range) = compounds
-                .iter()
-                .enumerate()
-                .find(|(_, range)| range.start == cursor.root_position())
-                .unwrap();
+            let position = cursor.root_position() + 1;
+            let (index, range) =
+                compounds.iter().enumerate().find(|(_, range)| range.start == position).unwrap();
 
             // Advance the cursor past the compound object.
-            cursor.position += range.end - range.start;
+            cursor.position += range.end + 2 - range.start;
+            debug_assert!(cursor.position <= cursor.slice.len());
+
             Ok(ValueIndex::Compound(Index::new(index)))
         }
         // List objects start with `[`.
         '[' => {
             // Find the list object that starts at our position.
-            let (index, range) = lists
-                .iter()
-                .enumerate()
-                .find(|(_, range)| range.start == cursor.root_position())
-                .unwrap();
+            let position = cursor.root_position() + 1;
+            let (index, range) =
+                lists.iter().enumerate().find(|(_, range)| range.start == position).unwrap();
 
             // Advance the cursor past the list object.
-            cursor.position += range.end - range.start;
+            cursor.position += range.end + 2 - range.start;
+            debug_assert!(cursor.position <= cursor.slice.len());
+
             Ok(ValueIndex::List(Index::new(index + compounds.len())))
         }
 
@@ -235,21 +268,57 @@ impl<'a> Cursor<'a> {
     }
 
     /// Advance the cursor past any leading whitespace.
+    #[inline]
     fn trim_start(&mut self) {
         let slice = self.remaining();
         let trimmed = slice.trim_start();
+
         self.position += slice.len() - trimmed.len();
+        debug_assert!(self.position <= self.slice.len());
     }
 
     /// Peek the next character without advancing the cursor.
+    #[inline]
     fn peek_char(&self) -> Option<char> { self.remaining().chars().next() }
 
-    /// Advance the cursor until the target character is found.
-    fn until_char(&mut self, target: char, escaped: bool) -> Option<&'a str> {
+    /// Advance the cursor until some condition is met.
+    ///
+    /// - `including` determines whether the character should be included in the
+    ///   returned slice.
+    fn until(&mut self, including: bool, mut f: impl FnMut(char) -> bool) -> Option<&'a str> {
         let mut slice = self.remaining();
 
         let mut found = false;
-        for index in Memchr::new(target as u8, slice.as_bytes()) {
+        for (index, char) in slice.char_indices() {
+            if f(char) {
+                found = true;
+                slice = unsafe { slice.get_unchecked(..index) };
+
+                self.position += index;
+                if including {
+                    self.position += char.len_utf8();
+                }
+                debug_assert!(self.position <= self.slice.len());
+
+                break;
+            }
+        }
+
+        found.then_some(slice)
+    }
+
+    /// Advance the cursor until the target character is found.
+    ///
+    /// - `escaped` determines whether the target characters can be escaped with
+    ///   a backslash.
+    ///
+    /// - `including` determines whether the target character should be included
+    ///   in the returned slice.
+    fn until_char(&mut self, target: u8, escaped: bool, including: bool) -> Option<&'a str> {
+        let mut slice = self.remaining();
+
+        let mut found = false;
+        for index in Memchr::new(target, slice.as_bytes()) {
             if escaped && index.checked_sub(1).and_then(|i| slice.as_bytes().get(i)) == Some(&b'\\')
             {
                 continue;
@@ -257,7 +326,90 @@ impl<'a> Cursor<'a> {
 
             found = true;
             slice = unsafe { slice.get_unchecked(..index) };
-            self.position += index + target.len_utf8();
+
+            self.position += index;
+            if including {
+                self.position += 1;
+            }
+            debug_assert!(self.position <= self.slice.len());
+
+            break;
+        }
+
+        found.then_some(slice)
+    }
+
+    /// Advance the cursor until any of the target characters is found.
+    ///
+    /// - `escaped` determines whether the target characters can be escaped with
+    ///   a backslash.
+    ///
+    /// - `including` determines whether the target character should be included
+    ///   in the returned slice.
+    fn until_char2(
+        &mut self,
+        target_a: u8,
+        target_b: u8,
+        escaped: bool,
+        including: bool,
+    ) -> Option<&'a str> {
+        let mut slice = self.remaining();
+
+        let mut found = false;
+        for index in Memchr2::new(target_a, target_b, slice.as_bytes()) {
+            if escaped && index.checked_sub(1).and_then(|i| slice.as_bytes().get(i)) == Some(&b'\\')
+            {
+                continue;
+            }
+
+            found = true;
+            slice = unsafe { slice.get_unchecked(..index) };
+
+            self.position += index;
+            if including {
+                self.position += 1;
+            }
+            debug_assert!(self.position <= self.slice.len());
+
+            break;
+        }
+
+        found.then_some(slice)
+    }
+
+    /// Advance the cursor until any of the target characters is found.
+    ///
+    /// - `escaped` determines whether the target characters can be escaped with
+    ///   a backslash.
+    ///
+    /// - `including` determines whether the target character should be included
+    ///   in the returned slice.
+    fn until_char3(
+        &mut self,
+        target_a: u8,
+        target_b: u8,
+        target_c: u8,
+        escaped: bool,
+        including: bool,
+    ) -> Option<&'a str> {
+        let mut slice = self.remaining();
+
+        let mut found = false;
+        for index in Memchr3::new(target_a, target_b, target_c, slice.as_bytes()) {
+            if escaped && index.checked_sub(1).and_then(|i| slice.as_bytes().get(i)) == Some(&b'\\')
+            {
+                continue;
+            }
+
+            found = true;
+            slice = unsafe { slice.get_unchecked(..index) };
+
+            self.position += index;
+            if including {
+                self.position += 1;
+            }
+            debug_assert!(self.position <= self.slice.len());
+
             break;
         }
 
