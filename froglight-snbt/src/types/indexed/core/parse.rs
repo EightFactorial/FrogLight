@@ -3,6 +3,7 @@ use core::range::Range;
 
 use memchr::{Memchr, Memchr2};
 use smallvec::SmallVec;
+use uuid::Uuid;
 
 use crate::types::indexed::{
     IndexedSnbt,
@@ -168,6 +169,19 @@ fn parse_entry(
 ) -> Result<EntryIndex, ()> {
     let (name, _name_settings) = parse_string(name, name_start)?;
 
+    // Support `bool(...)` and `uuid(...)` operations.
+    if let Some(bool) = entry.strip_prefix("bool(")
+        && let Some(bool) = bool.strip_suffix(')')
+    {
+        let (value, _entry_settings) = parse_bool(bool, entry_start)?;
+        return Ok(EntryIndex::new(name, value));
+    } else if let Some(uuid) = entry.strip_prefix("uuid(")
+        && let Some(uuid) = uuid.strip_suffix(')')
+    {
+        let (value, _entry_settings) = parse_uuid(uuid, entry_start)?;
+        return Ok(EntryIndex::new(name, value));
+    }
+
     match entry.chars().next().ok_or(())? {
         // A number, as un-quoted strings cannot start with these.
         '0'..='9' | '+' | '-' | '.' => {
@@ -198,12 +212,31 @@ fn parse_entry(
 
 // -------------------------------------------------------------------------------------------------
 
-#[expect(clippy::unnecessary_wraps, reason = "TODO: String Settings")]
-fn parse_string(_content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
-    Ok((Index::new(start), ()))
+#[cfg(feature = "std")]
+fn parse_string(content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
+    /// [`Regex`] for un-quoted strings: 0-9, A-Z, a-z, _, -, ., and +
+    static REGEX: std::sync::LazyLock<regex_lite::Regex> =
+        std::sync::LazyLock::new(|| regex_lite::Regex::new(r"^[0-9A-Za-z_.+-]+$").unwrap());
+
+    if content.starts_with(['\"', '\'']) || REGEX.is_match(content) {
+        Ok((Index::new(start), ()))
+    } else {
+        Err(())
+    }
 }
 
-// -------------------------------------------------------------------------------------------------
+#[cfg(not(feature = "std"))]
+fn parse_string(content: &str, start: usize) -> Result<(Index<str>, ()), ()> {
+    if content.starts_with(['\"', '\''])
+        || content
+            .chars()
+            .all(|c| matches!(c, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '-' | '.' | '+'))
+    {
+        Ok((Index::new(start), ()))
+    } else {
+        Err(())
+    }
+}
 
 fn parse_number(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
     // Check for a hex or binary prefix
@@ -224,9 +257,38 @@ fn parse_number(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
     todo!()
 }
 
+/// Returns a `ValueIndex::Byte` if the content is a valid boolean.
+///
+/// Expects content to be in one of the following formats:
+///     - `true` (true)
+///     - `false` (false)
+///     - `0` (false)
+///     - `5` (true)
+///     - `10` (true)
+fn parse_bool(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
+    if matches!(content, "true" | "false") || content.chars().all(|c| c.is_ascii_digit()) {
+        Ok((ValueIndex::Int(Index::new(start)), ()))
+    } else {
+        Err(())
+    }
+}
+
+/// Returns a `ValueIndex::IntArray` if the content is a valid UUID.
+///
+/// Expects content to be in the format:
+/// `"f81d4fae-7dec-11d0-a765-00a0c91e6bf6"`
+fn parse_uuid(content: &str, start: usize) -> Result<(ValueIndex, ()), ()> {
+    let Some(trimmed) = content.strip_prefix("\"") else { return Err(()) };
+    let Some(trimmed) = trimmed.strip_suffix("\"") else { return Err(()) };
+
+    match Uuid::try_parse(trimmed) {
+        Ok(..) => Ok((ValueIndex::IntArray(Index::new(start)), ())),
+        Err(_) => Err(()),
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
-// TODO: Check string validity
 fn read_string_key(content: &str) -> Result<&str, ()> {
     // Get the first char, or return an empty string.
     let Some(first) = content.chars().next() else { return Ok(content) };
@@ -263,6 +325,17 @@ fn read_unknown_value<'a>(
     compounds: &[Range<usize>],
     lists: &[Range<usize>],
 ) -> Result<&'a str, ()> {
+    // Support `bool(...)` and `uuid(...)` operations.
+    if content.starts_with("bool(")
+        && let Some((bool, _)) = content.split_once(')')
+    {
+        return Ok(bool);
+    } else if content.starts_with("uuid(")
+        && let Some((uuid, _)) = content.split_once(')')
+    {
+        return Ok(uuid);
+    }
+
     match content.chars().next().ok_or(())? {
         // An un-quoted number or string, which ends at the next `,` or the end of the item.
         'a'..='z' | 'A'..='Z' | '0'..='9' | '+' | '-' | '.' | '_' => {
@@ -273,7 +346,6 @@ fn read_unknown_value<'a>(
             }
         }
 
-        // TODO: Check string validity
         // An quoted string, which ends at the next un-escaped `"` or `'`.
         c @ ('\"' | '\'') => {
             let mut quote_end = Option::<usize>::None;

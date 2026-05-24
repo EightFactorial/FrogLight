@@ -26,7 +26,6 @@ rand = { workspace = true }
 bitflags = { workspace = true }
 lexical = { features = ["floats", "format", "integers"], workspace = true }
 memchr = { features = ["alloc"], workspace = true }
-regex-lite = { features = [], workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 uuid = { workspace = true }
 
@@ -34,6 +33,7 @@ uuid = { workspace = true }
 facet = { features = ["alloc", "reflect", "smallvec"], workspace = true, optional = true }
 froglight-mutf8 = { features = ["alloc"], workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true }
+regex-lite = { features = ["std", "string"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---
@@ -52,6 +52,6 @@ nbt = ["dep:froglight-mutf8", "dep:froglight-nbt"]
 tracing = ["dep:tracing", "froglight-mutf8?/tracing", "froglight-nbt?/tracing"]
 
 # Enable support for the standard library
-std = ["bitflags/std", "facet?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]
+std = ["bitflags/std", "dep:regex-lite", "facet?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-mutf8?/simd", "froglight-nbt?/nightly", "smallvec/specialization"]

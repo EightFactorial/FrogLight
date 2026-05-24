@@ -14,4 +14,6 @@ fn short() {
     // Parse `STRING`
 
     let snbt = IndexedSnbt::new_str(STRING).unwrap();
+    #[cfg(feature = "std")]
+    std::println!("Parsed SNBT: {:?}", snbt.core());
 }

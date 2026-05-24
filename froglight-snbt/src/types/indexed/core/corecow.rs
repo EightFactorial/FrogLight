@@ -6,6 +6,7 @@ use crate::types::indexed::{
     index::EntryIndex,
 };
 
+#[derive(Debug)]
 pub struct CowCore<'data> {
     data: Cow<'data, str>,
     entries: Box<[EntryIndex]>,

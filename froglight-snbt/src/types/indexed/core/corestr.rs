@@ -3,6 +3,7 @@ use core::range::Range;
 
 use crate::types::indexed::{core::IndexCore, index::EntryIndex};
 
+#[derive(Debug)]
 pub struct StrCore<'data> {
     pub(super) data: &'data str,
     pub(super) entries: Box<[EntryIndex]>,
