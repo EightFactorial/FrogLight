@@ -6,7 +6,7 @@ use ::core::marker::PhantomData;
 pub mod core;
 use core::{IndexCore, StrCore};
 
-pub mod index;
+pub mod location;
 
 pub mod reference;
 

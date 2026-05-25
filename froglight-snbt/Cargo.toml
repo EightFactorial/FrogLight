@@ -24,7 +24,7 @@ rand = { workspace = true }
 
 [dependencies]
 bitflags = { workspace = true }
-lexical = { features = ["floats", "format", "integers"], workspace = true }
+lexical = { features = ["floats", "format", "integers", "radix"], workspace = true }
 memchr = { features = ["alloc"], workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 uuid = { workspace = true }

@@ -4,32 +4,25 @@ use core::range::Range;
 use memchr::{Memchr, Memchr2, Memchr3};
 use smallvec::SmallVec;
 
-use crate::types::indexed::{
-    IndexedSnbt,
-    core::StrCore,
-    index::{EntryIndex, Index, ValueIndex},
-};
+use crate::types::indexed::{IndexedSnbt, core::StrCore};
 
 pub(crate) fn parse_snbt(root: &str) -> Result<IndexedSnbt<'_, StrCore<'_>>, ()> {
     let compounds = item_bounds(root.as_bytes(), b'{', b'}')?;
     let lists = item_bounds(root.as_bytes(), b'[', b']')?;
 
     let mut entries = Vec::with_capacity(compounds.len() + lists.len());
-    let mut ranges = Vec::with_capacity(compounds.len() + lists.len());
 
     unsafe {
         for index in 0..compounds.len() {
-            parse_item::<true>(root, index, &compounds, &lists, &mut entries, &mut ranges)?;
+            parse_item::<true>(root, index, &compounds, &lists, &mut entries)?;
         }
         for index in 0..lists.len() {
-            parse_item::<false>(root, index, &compounds, &lists, &mut entries, &mut ranges)?;
+            parse_item::<false>(root, index, &compounds, &lists, &mut entries)?;
         }
     }
 
     // SAFETY: `entries` and `ranges` were created from `root`.
-    Ok(IndexedSnbt::new(unsafe {
-        StrCore::new(root, entries.into_boxed_slice(), ranges.into_boxed_slice())
-    }))
+    Ok(IndexedSnbt::new(unsafe { StrCore::new(root, entries.into_boxed_slice()) }))
 }
 
 /// Calculate the bounds of items based on the provided `start` and `end` chars.
@@ -98,11 +91,10 @@ unsafe fn parse_item<const NAMED: bool>(
     compounds: &[Range<usize>],
     lists: &[Range<usize>],
 
-    entries: &mut Vec<EntryIndex>,
-    item_ranges: &mut Vec<Range<usize>>,
+    _entries: &mut Vec<()>,
 ) -> Result<(), ()> {
     // SAFETY: The caller ensures this is safe.
-    let (range, slice) = if NAMED {
+    let (_range, _slice) = if NAMED {
         let range = unsafe { *compounds.get_unchecked(index) };
         let slice = unsafe { root.get_unchecked(range) };
         (range, slice)
@@ -112,136 +104,8 @@ unsafe fn parse_item<const NAMED: bool>(
         (range, slice)
     };
 
-    // Track the starting `entries` index
-    let range_start = entries.len();
-
-    // Parse each entry in the item.
-    let mut cursor = Cursor::new(slice, range.start);
-    cursor.trim_start();
-
-    while !cursor.remaining().is_empty() {
-        entries.push(parse_entry::<NAMED>(&mut cursor, compounds, lists)?);
-        cursor.trim_start();
-
-        // If there are more entries, they must be separated by a comma.
-        if NAMED && !cursor.remaining().is_empty() {
-            if cursor.peek_char() == Some(',') {
-                cursor.position += 1;
-                debug_assert!(cursor.position <= cursor.slice.len());
-                cursor.trim_start();
-            } else {
-                return Err(());
-            }
-        }
-    }
-
-    // Add the item's `entries` range
-    item_ranges.push(Range { start: range_start, end: entries.len() });
-
-    Ok(())
+    todo!()
 }
-
-#[inline]
-fn parse_entry<const NAMED: bool>(
-    cursor: &mut Cursor<'_>,
-    compounds: &[Range<usize>],
-    lists: &[Range<usize>],
-) -> Result<EntryIndex, ()> {
-    // Read the name if `NAMED`
-    let name = if NAMED {
-        let position = cursor.root_position();
-
-        if cursor.peek_char() == Some('\"') {
-            // Read past the name, until the next unescaped `"` character.
-            cursor.until_char(b'\"', true, true).ok_or(())?;
-        } else if cursor.peek_char() == Some('\'') {
-            // Read past the name, until the next unescaped `'` character.
-            cursor.until_char(b'\'', true, true).ok_or(())?;
-        }
-
-        // Read until the next `:` character.
-        cursor.until_char(b':', false, true).ok_or(())?;
-
-        Index::<str>::new(position)
-    } else {
-        Index::<str>::new(0)
-    };
-
-    // Read the value
-    let value = parse_value(cursor, compounds, lists)?;
-
-    Ok(EntryIndex::new(name, value))
-}
-
-#[inline]
-fn parse_value(
-    cursor: &mut Cursor<'_>,
-    compounds: &[Range<usize>],
-    lists: &[Range<usize>],
-) -> Result<ValueIndex, ()> {
-    cursor.trim_start();
-
-    match cursor.peek_char().ok_or(())? {
-        // Numeric values start with a digit, a sign, or a decimal point.
-        '0'..='9' | '-' | '+' | '.' => todo!(),
-
-        // Un-quoted strings can start with a letter or an underscore.
-        'a'..='z' | 'A'..='Z' | '_' => {
-            let position = cursor.root_position();
-            if cursor
-                .until(
-                    false,
-                    |c| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' | '+' | '.'| '_'),
-                )
-                .is_none()
-            {
-                // If we reached the end of the slice, move the cursor to the end.
-                cursor.position = cursor.slice.len();
-                debug_assert!(cursor.position <= cursor.slice.len());
-            }
-
-            Ok(ValueIndex::String(Index::new(position)))
-        }
-        // Quoted strings start with either a single or double quote.
-        c @ ('\"' | '\'') => {
-            let position = cursor.root_position();
-            cursor.until_char(c as u8, true, true).ok_or(())?;
-
-            Ok(ValueIndex::String(Index::new(position)))
-        }
-
-        // Compound objects start with `{`.
-        '{' => {
-            // Find the compound object that starts at our position.
-            let position = cursor.root_position() + 1;
-            let (index, range) =
-                compounds.iter().enumerate().find(|(_, range)| range.start == position).unwrap();
-
-            // Advance the cursor past the compound object.
-            cursor.position += range.end + 2 - range.start;
-            debug_assert!(cursor.position <= cursor.slice.len());
-
-            Ok(ValueIndex::Compound(Index::new(index)))
-        }
-        // List objects start with `[`.
-        '[' => {
-            // Find the list object that starts at our position.
-            let position = cursor.root_position() + 1;
-            let (index, range) =
-                lists.iter().enumerate().find(|(_, range)| range.start == position).unwrap();
-
-            // Advance the cursor past the list object.
-            cursor.position += range.end + 2 - range.start;
-            debug_assert!(cursor.position <= cursor.slice.len());
-
-            Ok(ValueIndex::List(Index::new(index + compounds.len())))
-        }
-
-        _ => Err(()),
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
 
