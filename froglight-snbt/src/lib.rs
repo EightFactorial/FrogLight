@@ -6,6 +6,7 @@ extern crate alloc;
 extern crate std;
 
 pub mod types;
+pub mod unicode;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
