@@ -1,11 +1,11 @@
 //! TODO
 
-use alloc::string::String;
+use alloc::{borrow::Cow, string::String};
 use core::fmt;
 
 use bitflags::bitflags;
 
-use crate::types::indexed::index::Indexable;
+use crate::types::indexed::index::{Index, Indexable, IndexableValue};
 
 impl Indexable for String {
     type Description = StringDescription;
@@ -66,5 +66,27 @@ impl StringDescription {
 impl fmt::Debug for StringDescription {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("StringDescription").field("quotes", &self.quotes()).finish()
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl IndexableValue for String {
+    type Value<'a> = Cow<'a, str>;
+
+    unsafe fn read_from(index: Index<Self>, root: &str) -> Self::Value<'_> {
+        // SAFETY: The caller ensures that this is safe.
+        let mut slice = unsafe { root.get_unchecked(index.start..index.start + index.length) };
+
+        match index.description().quotes() {
+            StringQuotes::None => Cow::Borrowed(slice),
+            StringQuotes::Single | StringQuotes::Double => {
+                // SAFETY: `Index` guarantees that this is valid.
+                slice = unsafe { slice.get_unchecked(1..slice.len() - 1) };
+
+                // TODO: Un-escape the string.
+                Cow::Borrowed(slice)
+            }
+        }
     }
 }

@@ -1,10 +1,13 @@
 //! TODO
 
-use core::fmt;
+use core::{fmt, num::NonZeroU8};
 
 use bitflags::bitflags;
+use lexical::{
+    FromLexicalWithOptions, NumberFormatBuilder, ParseFloatOptions, ParseIntegerOptions,
+};
 
-use crate::types::indexed::index::Indexable;
+use crate::types::indexed::index::{Index, Indexable, IndexableValue};
 
 /// An integer value.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -154,6 +157,195 @@ impl fmt::Debug for IntegerDescription {
 
 // -------------------------------------------------------------------------------------------------
 
+/// An integer value.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum IntegerValue {
+    /// A [`u8`] value.
+    Byte(u8),
+    /// A [`u16`] value.
+    Short(u16),
+    /// A [`u32`] value.
+    Int(u32),
+    /// A [`u64`] value.
+    Long(u64),
+}
+
+pub(crate) static INTEGER_DECIMAL_FORMAT: u128 = NumberFormatBuilder::new()
+    .digit_separator(NonZeroU8::new(b'_'))
+    .no_exponent_notation(true)
+    .consecutive_digit_separator(true)
+    .internal_digit_separator(true)
+    .leading_digit_separator(false)
+    .trailing_digit_separator(false)
+    .build_strict();
+
+pub(crate) static INTEGER_BINARY_FORMAT: u128 = NumberFormatBuilder::new()
+    .radix(2)
+    .exponent_base(NonZeroU8::new(2))
+    .exponent_radix(NonZeroU8::new(2))
+    .base_prefix(NonZeroU8::new(b'b'))
+    .case_sensitive_base_prefix(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .no_exponent_notation(true)
+    .consecutive_digit_separator(true)
+    .internal_digit_separator(true)
+    .leading_digit_separator(false)
+    .trailing_digit_separator(false)
+    .build_strict();
+
+pub(crate) static INTEGER_HEXADECIMAL_FORMAT: u128 = NumberFormatBuilder::new()
+    .radix(16)
+    .exponent_base(NonZeroU8::new(16))
+    .exponent_radix(NonZeroU8::new(16))
+    .base_prefix(NonZeroU8::new(b'x'))
+    .case_sensitive_base_prefix(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .no_exponent_notation(true)
+    .consecutive_digit_separator(true)
+    .internal_digit_separator(true)
+    .leading_digit_separator(false)
+    .trailing_digit_separator(false)
+    .build_strict();
+
+pub(crate) static INTEGER_OPTIONS: ParseIntegerOptions =
+    ParseIntegerOptions::builder().no_multi_digit(true).build_strict();
+
+pub(crate) static INTEGER_MULTIDIGIT_OPTIONS: ParseIntegerOptions =
+    ParseIntegerOptions::builder().no_multi_digit(false).build_strict();
+
+impl IndexableValue for Integer {
+    type Value<'a> = IntegerValue;
+
+    unsafe fn read_from(index: Index<Self>, root: &str) -> Self::Value<'_> {
+        // SAFETY: The caller ensures that this is safe.
+        let mut slice = unsafe { root.get_unchecked(index.start..index.start + index.length) };
+
+        let desc = index.description();
+
+        // Trim any suffix chars from the end of the slice.
+        match (desc.signness(), desc.ty()) {
+            (IntegerSignness::None, IntegerType::None) => {
+                debug_assert!(!slice.is_empty());
+            }
+            (IntegerSignness::None, _) | (_, IntegerType::None) => {
+                // SAFETY: `Index` guarantees the description is valid.
+                debug_assert!(slice.len() >= 2);
+                slice = unsafe { slice.get_unchecked(..slice.len() - 1) };
+            }
+            _ => {
+                // SAFETY: `Index` guarantees the description is valid.
+                debug_assert!(slice.len() >= 3);
+                slice = unsafe { slice.get_unchecked(..slice.len() - 2) };
+            }
+        }
+
+        // If the string is long, enable multi-digit optimizations.
+        let options =
+            if index.length >= 12 { &INTEGER_MULTIDIGIT_OPTIONS } else { &INTEGER_OPTIONS };
+
+        // SAFETY: `Index` guarantees that this is valid.
+        unsafe {
+            match desc.ty() {
+                IntegerType::Byte => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<u8>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<u8>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<u8>(slice, options),
+                },
+                IntegerType::Short => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<u16>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<u16>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<u16>(slice, options),
+                },
+                IntegerType::None | IntegerType::Int => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<u32>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<u32>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<u32>(slice, options),
+                },
+                IntegerType::Long => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<u64>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<u64>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<u64>(slice, options),
+                },
+            }
+        }
+    }
+}
+
+cfg_select! {
+    debug_assertions => {
+        #[inline]
+        unsafe fn read_binary<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options).unwrap().into()
+        }
+
+        #[inline]
+        unsafe fn read_decimal<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options).unwrap().into()
+        }
+
+        #[inline]
+        unsafe fn read_hexadecimal<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options).unwrap().into()
+        }
+    }
+    _ => {
+        #[inline]
+        unsafe fn read_binary<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            // SAFETY: `Index` guarantees that this is valid.
+            unsafe { lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options).unwrap_unchecked().into() }
+        }
+
+        #[inline]
+        unsafe fn read_decimal<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            // SAFETY: `Index` guarantees that this is valid.
+            unsafe { lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options).unwrap_unchecked().into() }
+        }
+
+        #[inline]
+        unsafe fn read_hexadecimal<T: Into<IntegerValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> IntegerValue {
+            // SAFETY: `Index` guarantees that this is valid.
+            unsafe { lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options).unwrap_unchecked().into() }
+        }
+    }
+}
+
+impl From<u8> for IntegerValue {
+    #[inline]
+    fn from(value: u8) -> Self { Self::Byte(value) }
+}
+impl From<u16> for IntegerValue {
+    #[inline]
+    fn from(value: u16) -> Self { Self::Short(value) }
+}
+impl From<u32> for IntegerValue {
+    #[inline]
+    fn from(value: u32) -> Self { Self::Int(value) }
+}
+impl From<u64> for IntegerValue {
+    #[inline]
+    fn from(value: u64) -> Self { Self::Long(value) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /// A floating-point value.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Float;
@@ -247,4 +439,78 @@ impl fmt::Debug for FloatDescription {
             .field("ty", &self.ty())
             .finish()
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A floating-point value.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FloatValue {
+    /// A [`f32`] value.
+    Float(f32),
+    /// A [`f64`] value.
+    Double(f64),
+}
+
+pub(crate) static FLOAT_FORMAT: u128 = NumberFormatBuilder::new()
+    .digit_separator(NonZeroU8::new(b'_'))
+    .no_exponent_notation(false)
+    .consecutive_digit_separator(true)
+    .internal_digit_separator(true)
+    .leading_digit_separator(false)
+    .trailing_digit_separator(false)
+    .build_strict();
+
+pub(crate) static FLOAT_OPTIONS: ParseFloatOptions = ParseFloatOptions::builder().build_strict();
+
+impl IndexableValue for Float {
+    type Value<'a> = FloatValue;
+
+    unsafe fn read_from(index: Index<Self>, root: &str) -> Self::Value<'_> {
+        // SAFETY: The caller ensures that this is safe.
+        let slice = unsafe { root.get_unchecked(index.start..index.start + index.length) };
+
+        // Trim the suffix char from the end of the slice.
+        debug_assert!(slice.len() >= 2);
+        let slice = unsafe { slice.get_unchecked(..slice.len() - 1) };
+
+        // SAFETY: `Index` guarantees that this is valid.
+        unsafe {
+            match index.description().ty() {
+                FloatType::Float => parse_float::<f32>(slice, &FLOAT_OPTIONS),
+                FloatType::Double => parse_float::<f64>(slice, &FLOAT_OPTIONS),
+            }
+        }
+    }
+}
+
+cfg_select! {
+    debug_assertions => {
+        #[inline]
+        unsafe fn parse_float<T: Into<FloatValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> FloatValue {
+            lexical::parse_with_options::<T, &str, FLOAT_FORMAT>(slice, options).unwrap().into()
+        }
+    }
+    _ => {
+        #[inline]
+        unsafe fn parse_float<T: Into<FloatValue> + FromLexicalWithOptions>(
+            slice: &str,
+            options: &T::Options,
+        ) -> FloatValue {
+            // SAFETY: `Index` guarantees that this is valid.
+            unsafe { lexical::parse_with_options::<T, &str, FLOAT_FORMAT>(slice, &options).unwrap_unchecked().into() }
+        }
+    }
+}
+
+impl From<f32> for FloatValue {
+    #[inline]
+    fn from(value: f32) -> Self { Self::Float(value) }
+}
+impl From<f64> for FloatValue {
+    #[inline]
+    fn from(value: f64) -> Self { Self::Double(value) }
 }

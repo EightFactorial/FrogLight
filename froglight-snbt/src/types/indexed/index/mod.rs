@@ -18,6 +18,20 @@ pub trait Indexable {
     type Description: fmt::Debug + Copy + Sized;
 }
 
+/// A trait for types that can be read from an [`Index`].
+pub trait IndexableValue: Indexable {
+    /// The type of the return value.
+    type Value<'a>: Sized;
+
+    /// Read an [`Index`]ed value from the given root string.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the [`Index`] is valid for the given root string.
+    #[must_use]
+    unsafe fn read_from(index: Index<Self>, root: &str) -> Self::Value<'_>;
+}
+
 impl<T: Indexable + ?Sized> Index<T> {
     /// Create a new [`Index`] with the given starting index, length, and
     /// description.
@@ -44,6 +58,26 @@ impl<T: Indexable + ?Sized> Index<T> {
     pub const unsafe fn new_from(slice: &str, start: usize, settings: T::Description) -> Self {
         // SAFETY: The caller ensures that this is safe.
         unsafe { Self::new(start, slice.len(), settings) }
+    }
+
+    /// Get a description of the indexed value.
+    #[inline]
+    #[must_use]
+    pub const fn description(&self) -> T::Description { self.description }
+}
+
+impl<T: IndexableValue + ?Sized> Index<T> {
+    /// Read the value from the given root string.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the [`Index`] is valid for the given root
+    /// string.
+    #[inline]
+    #[must_use]
+    pub unsafe fn read_from<'a>(&self, root: &'a str) -> T::Value<'a> {
+        // SAFETY: The caller ensures that this is safe.
+        unsafe { T::read_from(*self, root) }
     }
 }
 
