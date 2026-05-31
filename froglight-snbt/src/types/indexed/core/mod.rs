@@ -8,6 +8,8 @@ pub use corecow::CowCore;
 mod coreslice;
 pub use coreslice::SliceCore;
 
+use crate::types::indexed::entry::EntryIndex;
+
 /// A trait for an index of SNBT entries.
 pub trait IndexCore {
     /// Get the root string.
@@ -20,5 +22,5 @@ pub trait IndexCore {
     ///
     /// The caller must ensure that the range is valid.
     #[must_use]
-    unsafe fn get_entries(&self, range: Range<usize>) -> &[()];
+    unsafe fn get_entries(&self, range: Range<usize>) -> &[EntryIndex];
 }

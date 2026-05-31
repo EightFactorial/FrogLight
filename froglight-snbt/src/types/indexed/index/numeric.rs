@@ -170,7 +170,41 @@ pub enum IntegerValue {
     Long(u64),
 }
 
+#[expect(clippy::cast_possible_truncation, reason = "Expected Behavior")]
 impl IntegerValue {
+    /// Get this [`IntegerValue`] as a [`u8`].
+    #[must_use]
+    pub const fn as_u8(self) -> u8 {
+        match self {
+            Self::Byte(v) => v,
+            Self::Short(v) => v as u8,
+            Self::Int(v) => v as u8,
+            Self::Long(v) => v as u8,
+        }
+    }
+
+    /// Get this [`IntegerValue`] as a [`u16`].
+    #[must_use]
+    pub const fn as_u16(self) -> u16 {
+        match self {
+            Self::Byte(v) => v as u16,
+            Self::Short(v) => v,
+            Self::Int(v) => v as u16,
+            Self::Long(v) => v as u16,
+        }
+    }
+
+    /// Get this [`IntegerValue`] as a [`u32`].
+    #[must_use]
+    pub const fn as_u32(self) -> u32 {
+        match self {
+            Self::Byte(v) => v as u32,
+            Self::Short(v) => v as u32,
+            Self::Int(v) => v,
+            Self::Long(v) => v as u32,
+        }
+    }
+
     /// Get this [`IntegerValue`] as a [`u64`].
     #[must_use]
     pub const fn as_u64(self) -> u64 {
@@ -357,6 +391,23 @@ impl From<u64> for IntegerValue {
     fn from(value: u64) -> Self { Self::Long(value) }
 }
 
+impl From<IntegerValue> for u8 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_u8() }
+}
+impl From<IntegerValue> for u16 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_u16() }
+}
+impl From<IntegerValue> for u32 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_u32() }
+}
+impl From<IntegerValue> for u64 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_u64() }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A floating-point value.
@@ -465,7 +516,17 @@ pub enum FloatValue {
     Double(f64),
 }
 
+#[expect(clippy::cast_possible_truncation, reason = "Expected Behavior")]
 impl FloatValue {
+    /// Get this [`FloatValue`] as a [`f32`].
+    #[must_use]
+    pub const fn as_f32(self) -> f32 {
+        match self {
+            Self::Float(v) => v,
+            Self::Double(v) => v as f32,
+        }
+    }
+
     /// Get this [`FloatValue`] as a [`f64`].
     #[must_use]
     pub const fn as_f64(self) -> f64 {
@@ -537,4 +598,13 @@ impl From<f32> for FloatValue {
 impl From<f64> for FloatValue {
     #[inline]
     fn from(value: f64) -> Self { Self::Double(value) }
+}
+
+impl From<FloatValue> for f32 {
+    #[inline]
+    fn from(value: FloatValue) -> Self { value.as_f32() }
+}
+impl From<FloatValue> for f64 {
+    #[inline]
+    fn from(value: FloatValue) -> Self { value.as_f64() }
 }

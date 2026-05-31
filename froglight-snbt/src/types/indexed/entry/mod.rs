@@ -1,62 +1,121 @@
 //! TODO
 
 use alloc::string::String;
+use core::fmt;
 
-use froglight_nbt::types::indexed::types::{IndexedListType, IndexedMapType};
+mod index;
+pub use index::{EntryIndex, ValueIndex};
 
-use crate::types::indexed::index::{
-    Index,
-    numeric::{Float, Integer},
+use crate::types::indexed::{
+    core::IndexCore,
+    reference::{IndexedReference, ValueReference},
 };
 
-/// A pair of name and value [`Index`]es.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct EntryIndex {
-    name: Index<String>,
-    value: ValueIndex,
+/// An SNBT entry that is indexed by an [`IndexCore`].
+pub struct IndexedEntry<'data, C: IndexCore> {
+    core: &'data C,
+    index: EntryIndex,
 }
 
-impl EntryIndex {
-    /// Get the [`Index`] of the name of this entry.
+impl<'data, C: IndexCore> IndexedEntry<'data, C> {
+    /// Create a new [`IndexedEntry`] from the given core and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the index is valid for the given core.
     #[inline]
     #[must_use]
-    pub const fn name(&self) -> Index<String> { self.name }
+    pub const unsafe fn new(core: &'data C, index: EntryIndex) -> Self { Self { core, index } }
 
-    /// Get the [`ValueIndex`] of this entry.
-    #[inline]
+    /// Get the name of this entry.
     #[must_use]
-    pub const fn value(&self) -> ValueIndex { self.value }
+    pub fn name(&self) -> IndexedReference<'data, String> {
+        // SAFETY: `IndexedEntry` guarantees that this is safe.
+        unsafe { IndexedReference::new(self.core.root(), self.index.name()) }
+    }
+
+    /// Get the value of this entry.
+    #[must_use]
+    pub fn value(&self) -> ValueReference<'data, C> {
+        // SAFETY: `IndexedEntry` guarantees that this is safe.
+        unsafe { ValueReference::new(self.core, self.index.value()) }
+    }
 }
+
+impl<C: IndexCore> fmt::Debug for IndexedEntry<'_, C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("IndexedEntry")
+            .field("name", &self.name())
+            .field("value", &self.value())
+            .finish()
+    }
+}
+
+impl<C: IndexCore> Clone for IndexedEntry<'_, C> {
+    #[inline]
+    fn clone(&self) -> Self { *self }
+}
+impl<C: IndexCore> Copy for IndexedEntry<'_, C> {}
+
+impl<C: IndexCore> PartialEq for IndexedEntry<'_, C> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.name() == other.name() && self.value() == other.value()
+    }
+}
+impl<C: IndexCore> Eq for IndexedEntry<'_, C> {}
 
 // -------------------------------------------------------------------------------------------------
 
-/// The [`Index`] of an SNBT value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ValueIndex {
-    /// A [`bool`] value.
-    Bool(Index<bool>),
-    /// A [`u8`] value.
-    Byte(Index<Integer>),
-    /// A [`u16`] value.
-    Short(Index<Integer>),
-    /// A [`u32`] value.
-    Int(Index<Integer>),
-    /// A [`u64`] value.
-    Long(Index<Integer>),
-    /// A [`f32`] value.
-    Float(Index<Float>),
-    /// A [`f64`] value.
-    Double(Index<Float>),
-    /// A slice of [`u8`] values.
-    ByteArray(Index<[Integer]>),
-    /// A [`String`] value.
-    String(Index<String>),
-    /// A list of values.
-    List(Index<IndexedListType>),
-    /// A compound of named entries.
-    Compound(Index<IndexedMapType>),
-    /// A slice of [`u32`] values.
-    IntArray(Index<[Integer]>),
-    /// A slice of [`u64`] values.
-    LongArray(Index<[Integer]>),
+/// An SNBT value that is indexed by an [`IndexCore`].
+pub struct IndexedValue<'data, C: IndexCore> {
+    core: &'data C,
+    index: ValueIndex,
+}
+
+impl<'data, C: IndexCore> IndexedValue<'data, C> {
+    /// Create a new [`IndexedValue`] from the given core and index.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the index is valid for the given core.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn new(core: &'data C, index: ValueIndex) -> Self { Self { core, index } }
+
+    /// Get the value of this entry.
+    #[must_use]
+    pub fn get(&self) -> ValueReference<'data, C> {
+        // SAFETY: `IndexedValue` guarantees that this is safe.
+        unsafe { ValueReference::new(self.core, self.index) }
+    }
+}
+
+macro_rules! create_fns {
+    ($($ident:ident: $ty:ty => $variant:ident),*) => {
+        impl<'data, C: IndexCore + 'data> IndexedValue<'data, C> {
+            $(
+                #[must_use]
+                #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
+                pub fn $ident(&self) -> Option<IndexedReference<'data, $ty>> {
+                    if let ValueIndex::$variant(value) = self.index {
+                        Some(unsafe { IndexedReference::<$ty>::new(self.core.root(), value) })
+                    } else {
+                        None
+                    }
+                }
+            )*
+        }
+    };
+}
+
+create_fns! {
+    as_byte: u8 => Byte,
+    as_short: u16 => Short,
+    as_int: u32 => Int,
+    as_long: u64 => Long,
+    as_float: f32 => Float,
+    as_double: f64 => Double,
+    as_string: String => String
 }

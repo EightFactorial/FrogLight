@@ -2,7 +2,7 @@
 
 use core::{fmt, range::Range};
 
-use crate::types::indexed::core::IndexCore;
+use crate::types::indexed::{core::IndexCore, entry::EntryIndex};
 
 pub mod bool;
 pub mod numeric;
@@ -44,7 +44,7 @@ pub trait IndexableSlice: Indexable {
     ///
     /// The caller must ensure the [`Index`] is valid for the given core.
     #[must_use]
-    unsafe fn read_entries<C: IndexCore>(index: Index<Self>, core: &C) -> &[()];
+    unsafe fn read_entries<C: IndexCore>(index: Index<Self>, core: &C) -> &[EntryIndex];
 }
 
 impl<T: Indexable + ?Sized> Index<T> {
@@ -77,7 +77,7 @@ impl<T: Indexable + ?Sized> Index<T> {
     /// Get a description of the indexed value.
     #[inline]
     #[must_use]
-    pub const fn description(&self) -> T::Description { self.description }
+    pub const fn description(self) -> T::Description { self.description }
 }
 
 impl<T: IndexableValue + ?Sized> Index<T> {
@@ -89,9 +89,9 @@ impl<T: IndexableValue + ?Sized> Index<T> {
     /// string.
     #[inline]
     #[must_use]
-    pub unsafe fn read_value<'a>(&self, root: &'a str) -> T::Value<'a> {
+    pub unsafe fn read_value(self, root: &str) -> T::Value<'_> {
         // SAFETY: The caller ensures that this is safe.
-        unsafe { T::read_value(*self, root) }
+        unsafe { T::read_value(self, root) }
     }
 }
 
@@ -103,9 +103,9 @@ impl<T: IndexableSlice + ?Sized> Index<T> {
     /// The caller must ensure that the [`Index`] is valid for the given core.
     #[inline]
     #[must_use]
-    pub unsafe fn read_entries<'core, C: IndexCore>(&self, core: &'core C) -> &'core [()] {
+    pub unsafe fn read_entries<C: IndexCore>(self, core: &C) -> &[EntryIndex] {
         // SAFETY: The caller ensures that this is safe.
-        unsafe { T::read_entries(*self, core) }
+        unsafe { T::read_entries(self, core) }
     }
 }
 

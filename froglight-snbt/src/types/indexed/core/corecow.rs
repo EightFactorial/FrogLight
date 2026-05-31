@@ -1,12 +1,15 @@
 use alloc::{borrow::Cow, vec::Vec};
 use core::range::Range;
 
-use crate::types::indexed::core::{IndexCore, SliceCore};
+use crate::types::indexed::{
+    core::{IndexCore, SliceCore},
+    entry::EntryIndex,
+};
 
 /// TODO
 pub struct CowCore<'data> {
     root: Cow<'data, str>,
-    entries: Vec<()>,
+    entries: Vec<EntryIndex>,
 }
 
 impl IndexCore for CowCore<'_> {
@@ -14,7 +17,7 @@ impl IndexCore for CowCore<'_> {
     fn root(&self) -> &str { self.root.as_ref() }
 
     #[inline]
-    unsafe fn get_entries(&self, range: Range<usize>) -> &[()] {
+    unsafe fn get_entries(&self, range: Range<usize>) -> &[EntryIndex] {
         // SAFETY: The caller ensures that this is safe.
         unsafe { self.entries.get_unchecked(range) }
     }
@@ -28,7 +31,7 @@ impl<'data> CowCore<'data> {
     /// The caller must ensure that the entry list is valid for the root string.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(root: &'data str, entries: Vec<()>) -> Self {
+    pub const unsafe fn new(root: &'data str, entries: Vec<EntryIndex>) -> Self {
         Self { root: Cow::Borrowed(root), entries }
     }
 
@@ -54,7 +57,7 @@ impl<'data> CowCore<'data> {
     /// Get a slice of the entries in this [`CowCore`].
     #[inline]
     #[must_use]
-    pub const fn entries(&self) -> &[()] { self.entries.as_slice() }
+    pub const fn entries(&self) -> &[EntryIndex] { self.entries.as_slice() }
 
     /// Create an owned [`CowCore`] by cloning it's data.
     #[inline]

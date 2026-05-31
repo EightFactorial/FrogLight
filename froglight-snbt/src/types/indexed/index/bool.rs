@@ -1,24 +1,46 @@
 //! TODO
 
-use bitflags::bitflags;
+use core::range::Range;
 
-use crate::types::indexed::index::{Index, Indexable, IndexableValue, numeric::IntegerValue};
+use crate::types::indexed::index::{
+    Index, Indexable, IndexableValue,
+    numeric::{Integer, IntegerDescription, IntegerValue},
+};
+
+/// Whether a `bool(...)` operation was used.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BooleanOperation {
+    /// False
+    False,
+    /// True
+    True,
+}
 
 impl Indexable for bool {
-    type Description = ();
+    type Description = BoolDescription;
 }
 
 /// A description of a boolean value.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct BoolDescription(BooleanFlags);
-
-bitflags! {
-    #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-    struct BooleanFlags: u8 {
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BoolDescription {
+    /// A simple `bool` value.
+    Boolean,
+    /// A `bool(...)` operation on an integer value.
+    Integer(IntegerDescription),
 }
 
-impl BoolDescription {}
+impl BoolDescription {
+    /// Create a new [`BoolDescription::Boolean`].
+    #[inline]
+    #[must_use]
+    #[expect(clippy::new_without_default, reason = "No default")]
+    pub const fn new() -> Self { Self::Boolean }
+
+    /// Create a new [`BoolDescription::Integer`].
+    #[inline]
+    #[must_use]
+    pub const fn new_integer(desc: IntegerDescription) -> Self { Self::Integer(desc) }
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -48,5 +70,37 @@ impl BooleanValue {
 impl IndexableValue for bool {
     type Value<'a> = BooleanValue;
 
-    unsafe fn read_value(_: Index<Self>, _: &str) -> Self::Value<'_> { todo!() }
+    unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
+        match index.description() {
+            BoolDescription::Boolean => {
+                // SAFETY: The caller ensures that this is safe.
+                let slice = unsafe { root.get_unchecked(index.range) };
+
+                // `true` => true, `false` => false
+                BooleanValue::Bool(slice == "true")
+            }
+            BoolDescription::Integer(desc) => {
+                // Shrink the range to exclude the `bool(` and `)` parts.
+                debug_assert!(index.range.end - index.range.start >= 6);
+                let range = Range { start: index.range.start + 5, end: index.range.end - 1 };
+
+                // SAFETY: `Index` ensures that this is safe.
+                unsafe { BooleanValue::Integer(Integer::read_value(Index::new(range, desc), root)) }
+            }
+        }
+    }
+}
+
+impl From<bool> for BooleanValue {
+    #[inline]
+    fn from(value: bool) -> Self { Self::Bool(value) }
+}
+impl From<IntegerValue> for BooleanValue {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { Self::Integer(value) }
+}
+
+impl From<BooleanValue> for bool {
+    #[inline]
+    fn from(value: BooleanValue) -> Self { value.as_bool() }
 }
