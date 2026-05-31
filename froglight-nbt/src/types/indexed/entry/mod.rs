@@ -8,9 +8,6 @@ use crate::types::indexed::{
     reference::IndexedReference,
 };
 
-mod types;
-pub use types::{IndexedListType, IndexedMapType};
-
 pub(super) mod value;
 
 cfg_select! {

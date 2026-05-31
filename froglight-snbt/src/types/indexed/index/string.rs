@@ -74,9 +74,9 @@ impl fmt::Debug for StringDescription {
 impl IndexableValue for String {
     type Value<'a> = Cow<'a, str>;
 
-    unsafe fn read_from(index: Index<Self>, root: &str) -> Self::Value<'_> {
+    unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
         // SAFETY: The caller ensures that this is safe.
-        let mut slice = unsafe { root.get_unchecked(index.start..index.start + index.length) };
+        let mut slice = unsafe { root.get_unchecked(index.range) };
 
         match index.description().quotes() {
             StringQuotes::None => Cow::Borrowed(slice),

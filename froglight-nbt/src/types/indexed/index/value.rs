@@ -5,8 +5,8 @@ use core::cmp::Ordering;
 use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
-    entry::{IndexedListType, IndexedMapType},
     index::Index,
+    types::{IndexedListType, IndexedMapType},
 };
 
 /// The [`Index`] of an NBT value.

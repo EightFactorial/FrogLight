@@ -3,10 +3,11 @@ use froglight_mutf8::prelude::MStr;
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, Mut, NbtAccess, Ref},
-    entry::{IndexedListType, IndexedValue},
+    entry::IndexedValue,
     index::{Index, ValueIndex},
     list::{IndexedList, IndexedValueList},
     reference::{IndexedReference, IndexedValueReference},
+    types::IndexedListType,
 };
 
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {

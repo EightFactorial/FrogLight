@@ -22,6 +22,8 @@ pub mod list;
 pub mod reference;
 use reference::IndexedReference;
 
+pub mod types;
+
 cfg_select! {
     feature = "alloc" => {
         /// An indexed NBT structure for borrowed NBT data.

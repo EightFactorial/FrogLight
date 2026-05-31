@@ -4,8 +4,8 @@ use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
-    entry::{IndexedListType, IndexedMapType},
     list::IndexedList,
+    types::{IndexedListType, IndexedMapType},
 };
 
 cfg_select! {

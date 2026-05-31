@@ -9,8 +9,8 @@ use crate::types::indexed::{
     IndexedNbt,
     alloc::SliceCore,
     core::{Mut, Ref},
-    entry::{IndexedListType, IndexedMapType},
     index::{EntryIndex, Index, ValueIndex},
+    types::{IndexedListType, IndexedMapType},
 };
 
 pub(crate) fn parse_nbt_ref(

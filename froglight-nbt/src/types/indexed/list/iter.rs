@@ -1,9 +1,9 @@
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, NbtAccess, Ref},
-    entry::{IndexedListType, IndexedMapType},
     list::{IndexedList, IndexedValueList},
     reference::IndexableValue,
+    types::{IndexedListType, IndexedMapType},
 };
 
 /// An iterator over the entries in an [`IndexedList`].

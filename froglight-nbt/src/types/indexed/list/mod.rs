@@ -3,9 +3,9 @@
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, Mut, NbtAccess, Ref},
-    entry::{IndexedListType, IndexedMapType},
     index::Index,
     reference::{IndexableValue, IndexableValueMut},
+    types::{IndexedListType, IndexedMapType},
 };
 
 mod iter;
