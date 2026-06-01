@@ -9,6 +9,9 @@ use crate::types::indexed::index::{
     numeric::{Float, Integer},
 };
 
+mod entry;
+pub use entry::EntryReference;
+
 mod value;
 pub use value::ValueReference;
 

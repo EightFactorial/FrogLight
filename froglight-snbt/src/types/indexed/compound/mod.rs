@@ -2,7 +2,7 @@
 
 use core::{fmt, range::Range};
 
-use crate::types::indexed::{core::IndexCore, entry::EntryIndex};
+use crate::types::indexed::{core::IndexCore, entry::EntryIndex, reference::EntryReference};
 
 mod iter;
 
@@ -44,18 +44,20 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// Return a reference to the stored value for `key`, if it is present, else
     /// `None`.
     #[must_use]
-    pub fn get<K: PartialEq<str> + ?Sized>(&self, key: &K) -> Option<()> {
+    pub fn get<K: PartialEq<str> + ?Sized>(&self, key: &K) -> Option<EntryReference<'data, C>> {
         self.entries()
             .iter()
             .find(|e| key == unsafe { e.name().read_value(self.core.root()) }.as_ref())
-            .map(|_| ())
+            .map(|e| unsafe { EntryReference::new(*e, self.core) })
     }
 
     /// Get a key-value pair by index.
     ///
     /// Returns `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_index(&self, index: usize) -> Option<()> { self.entries().get(index).map(|_| ()) }
+    pub fn get_index(&self, index: usize) -> Option<EntryReference<'data, C>> {
+        self.entries().get(index).map(|e| unsafe { EntryReference::new(*e, self.core) })
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
