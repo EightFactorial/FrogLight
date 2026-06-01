@@ -147,7 +147,7 @@ impl<T: Referenceable + ?Sized> Copy for IndexedReference<'_, T> {}
 
 impl<T: Referenceable + ?Sized> PartialEq for IndexedReference<'_, T> {
     #[inline]
-    fn eq(&self, other: &Self) -> bool { self.index == other.index }
+    fn eq(&self, other: &Self) -> bool { self.index == other.index && self.root == other.root }
 }
 impl<T: Referenceable + ?Sized> Eq for IndexedReference<'_, T> {}
 
@@ -157,5 +157,7 @@ impl<T: Referenceable + ?Sized> PartialOrd for IndexedReference<'_, T> {
 }
 impl<T: Referenceable + ?Sized> Ord for IndexedReference<'_, T> {
     #[inline]
-    fn cmp(&self, other: &Self) -> core::cmp::Ordering { self.index.cmp(&other.index) }
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.index.cmp(&other.index).then_with(|| self.root.cmp(other.root))
+    }
 }

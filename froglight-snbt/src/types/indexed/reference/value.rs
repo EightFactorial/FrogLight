@@ -2,7 +2,9 @@ use alloc::string::String;
 use core::{fmt, marker::PhantomData};
 
 // use froglight_nbt::types::indexed::types::{IndexedListType, IndexedMapType};
-use crate::types::indexed::{core::IndexCore, entry::ValueIndex, reference::IndexedReference};
+use crate::types::indexed::{
+    compound::IndexedCompound, core::IndexCore, entry::ValueIndex, reference::IndexedReference,
+};
 
 /// A reference to an SNBT value.
 pub enum ValueReference<'data, C: IndexCore> {
@@ -27,7 +29,7 @@ pub enum ValueReference<'data, C: IndexCore> {
     /// A list of values.
     List(PhantomData<C>),
     /// A compound of named entries.
-    Compound(PhantomData<C>),
+    Compound(IndexedCompound<'data, C>),
     /// A slice of [`u32`] values.
     IntArray(PhantomData<C>),
     /// A slice of [`u64`] values.
@@ -79,12 +81,14 @@ impl<'data, C: IndexCore> ValueReference<'data, C> {
 }
 
 macro_rules! create_fns {
-    ($($ident:ident: $ty:ty => $variant:ident),*) => {
+    (
+        $($ident:ident: $ty:ty => $variant:ident),*
+    ) => {
         impl<'data, C: IndexCore> ValueReference<'data, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $ident(self) -> Option<IndexedReference<'data, $ty>> {
+                pub const fn $ident(self) -> Option<IndexedReference<'data, $ty>> {
                     if let Self::$variant(value) = self {
                         Some(value)
                     } else {
@@ -97,6 +101,7 @@ macro_rules! create_fns {
 }
 
 create_fns! {
+    as_bool: bool => Bool,
     as_byte: u8 => Byte,
     as_short: u16 => Short,
     as_int: u32 => Int,
@@ -106,45 +111,35 @@ create_fns! {
     as_string: String => String
 }
 
+impl<'data, C: IndexCore> ValueReference<'data, C> {
+    #[must_use]
+    /// Return a reference to the stored value if it is of type
+    /// [`IndexedCompound`], else `None`.
+    pub const fn as_compound(self) -> Option<IndexedCompound<'data, C>> {
+        if let Self::Compound(value) = self { Some(value) } else { None }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 impl<C: IndexCore> fmt::Debug for ValueReference<'_, C> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Bool(value) => fmt::Debug::fmt(value, f),
-            Self::Byte(value) => fmt::Debug::fmt(value, f),
-            Self::Short(value) => fmt::Debug::fmt(value, f),
-            Self::Int(value) => fmt::Debug::fmt(value, f),
-            Self::Long(value) => fmt::Debug::fmt(value, f),
-            Self::Float(value) => fmt::Debug::fmt(value, f),
-            Self::Double(value) => fmt::Debug::fmt(value, f),
-            Self::String(value) => fmt::Debug::fmt(value, f),
+            Self::Bool(value) => f.debug_tuple("Bool").field(value).finish(),
+            Self::Byte(value) => f.debug_tuple("Byte").field(value).finish(),
+            Self::Short(value) => f.debug_tuple("Short").field(value).finish(),
+            Self::Int(value) => f.debug_tuple("Int").field(value).finish(),
+            Self::Long(value) => f.debug_tuple("Long").field(value).finish(),
+            Self::Float(value) => f.debug_tuple("Float").field(value).finish(),
+            Self::Double(value) => f.debug_tuple("Double").field(value).finish(),
+            Self::String(value) => f.debug_tuple("String").field(value).finish(),
 
-            Self::ByteArray(_) => write!(f, "ByteArray(...)"),
-            Self::List(_) => write!(f, "List(...)"),
-            Self::Compound(_) => write!(f, "Compound(...)"),
-            Self::IntArray(_) => write!(f, "IntArray(...)"),
-            Self::LongArray(_) => write!(f, "LongArray(...)"),
-        }
-    }
-}
-impl<C: IndexCore> fmt::Display for ValueReference<'_, C> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Bool(value) => fmt::Display::fmt(value, f),
-            Self::Byte(value) => fmt::Display::fmt(value, f),
-            Self::Short(value) => fmt::Display::fmt(value, f),
-            Self::Int(value) => fmt::Display::fmt(value, f),
-            Self::Long(value) => fmt::Display::fmt(value, f),
-            Self::Float(value) => fmt::Display::fmt(value, f),
-            Self::Double(value) => fmt::Display::fmt(value, f),
-            Self::String(value) => fmt::Display::fmt(value, f),
+            Self::List(_) => f.debug_tuple("List").finish_non_exhaustive(),
+            Self::Compound(value) => f.debug_tuple("Compound").field(value).finish(),
 
-            Self::ByteArray(_) => write!(f, "ByteArray(...)"),
-            Self::List(_) => write!(f, "List(...)"),
-            Self::Compound(_) => write!(f, "Compound(...)"),
-            Self::IntArray(_) => write!(f, "IntArray(...)"),
-            Self::LongArray(_) => write!(f, "LongArray(...)"),
+            Self::ByteArray(_) => f.debug_tuple("ByteArray").finish_non_exhaustive(),
+            Self::IntArray(_) => f.debug_tuple("IntArray").finish_non_exhaustive(),
+            Self::LongArray(_) => f.debug_tuple("LongArray").finish_non_exhaustive(),
         }
     }
 }
@@ -167,6 +162,13 @@ impl<C: IndexCore> PartialEq for ValueReference<'_, C> {
             (Self::Float(a), Self::Float(b)) => a == b,
             (Self::Double(a), Self::Double(b)) => a == b,
             (Self::String(a), Self::String(b)) => a == b,
+
+            (Self::List(_), Self::List(_)) => todo!(),
+            (Self::Compound(a), Self::Compound(b)) => a == b,
+
+            (Self::ByteArray(_), Self::ByteArray(_)) => todo!(),
+            (Self::IntArray(_), Self::IntArray(_)) => todo!(),
+            (Self::LongArray(_), Self::LongArray(_)) => todo!(),
 
             _ => false,
         }

@@ -24,7 +24,7 @@ impl Indexable for bool {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BoolDescription {
     /// A simple `bool` value.
-    Boolean,
+    Boolean(BooleanOperation),
     /// A `bool(...)` operation on an integer value.
     Integer(IntegerDescription),
 }
@@ -33,8 +33,7 @@ impl BoolDescription {
     /// Create a new [`BoolDescription::Boolean`].
     #[inline]
     #[must_use]
-    #[expect(clippy::new_without_default, reason = "No default")]
-    pub const fn new() -> Self { Self::Boolean }
+    pub const fn new(operation: BooleanOperation) -> Self { Self::Boolean(operation) }
 
     /// Create a new [`BoolDescription::Integer`].
     #[inline]
@@ -72,19 +71,31 @@ impl IndexableValue for bool {
 
     unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
         match index.description() {
-            BoolDescription::Boolean => {
+            BoolDescription::Boolean(operation) => {
                 // SAFETY: The caller ensures that this is safe.
-                let slice = unsafe { root.get_unchecked(index.range) };
+                let mut slice = unsafe { root.get_unchecked(index.range) };
 
-                // `true` => true, `false` => false
-                BooleanValue::Bool(slice == "true")
+                // Shrink the slice to exclude the `bool(` and `)` parts.
+                if operation == BooleanOperation::True {
+                    debug_assert!(index.range.end - index.range.start >= 6);
+                    slice = unsafe { slice.get_unchecked(5..slice.len() - 1) };
+                }
+
+                match slice {
+                    "true" => BooleanValue::Bool(true),
+                    "false" => BooleanValue::Bool(false),
+                    #[cfg(debug_assertions)]
+                    _ => panic!("Invalid boolean value: \"{slice}\""),
+                    #[cfg(not(debug_assertions))]
+                    _ => unsafe { core::hint::unreachable_unchecked() },
+                }
             }
             BoolDescription::Integer(desc) => {
                 // Shrink the range to exclude the `bool(` and `)` parts.
                 debug_assert!(index.range.end - index.range.start >= 6);
                 let range = Range { start: index.range.start + 5, end: index.range.end - 1 };
 
-                // SAFETY: `Index` ensures that this is safe.
+                // SAFETY: The caller and `Index` ensure that this is safe.
                 unsafe { BooleanValue::Integer(Integer::read_value(Index::new(range, desc), root)) }
             }
         }
