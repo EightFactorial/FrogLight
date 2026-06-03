@@ -74,6 +74,11 @@ impl<T: Indexable + ?Sized> Index<T> {
         unsafe { Self::new(Range { start, end: start + slice.len() }, settings) }
     }
 
+    /// Get the range of the indexed value.
+    #[inline]
+    #[must_use]
+    pub const fn range(self) -> Range<usize> { self.range }
+
     /// Get a description of the indexed value.
     #[inline]
     #[must_use]

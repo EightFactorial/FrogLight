@@ -3,7 +3,12 @@ use core::{fmt, marker::PhantomData};
 
 // use froglight_nbt::types::indexed::types::{IndexedListType, IndexedMapType};
 use crate::types::indexed::{
-    compound::IndexedCompound, core::IndexCore, entry::ValueIndex, reference::IndexedReference,
+    compound::IndexedCompound,
+    core::IndexCore,
+    entry::ValueIndex,
+    index::numeric::{FloatValue, IntegerValue},
+    list::IndexedList,
+    reference::IndexedReference,
 };
 
 /// A reference to an SNBT value.
@@ -27,7 +32,7 @@ pub enum ValueReference<'data, C: IndexCore> {
     /// A [`String`] value.
     String(IndexedReference<'data, String>),
     /// A list of values.
-    List(PhantomData<C>),
+    List(IndexedList<'data, C>),
     /// A compound of named entries.
     Compound(IndexedCompound<'data, C>),
     /// A slice of [`u32`] values.
@@ -70,8 +75,14 @@ impl<'data, C: IndexCore> ValueReference<'data, C> {
                 Self::String(unsafe { IndexedReference::new(core.root(), index) })
             }
 
-            ValueIndex::List(_index) => todo!(),
-            ValueIndex::Compound(_index) => todo!(),
+            ValueIndex::List(index) => {
+                // SAFETY: `Index<IndexedListType>` has a valid `IndexedList` range.
+                Self::List(unsafe { IndexedList::new(core, index.range()) })
+            }
+            ValueIndex::Compound(index) => {
+                // SAFETY: `Index<IndexedMapType>` has a valid `IndexedCompound` range.
+                Self::Compound(unsafe { IndexedCompound::new(core, index.range()) })
+            }
 
             ValueIndex::ByteArray(_index) => todo!(),
             ValueIndex::IntArray(_index) => todo!(),
@@ -112,9 +123,55 @@ create_fns! {
 }
 
 impl<'data, C: IndexCore> ValueReference<'data, C> {
+    /// Return the stored value as a [`bool`] if it is of an integer or boolean
+    /// type, else `None`.
     #[must_use]
+    pub fn as_value_boolean(self) -> Option<bool> {
+        match self {
+            Self::Bool(value) => Some(value.get()),
+            Self::Byte(value) => Some(value.get() != 0),
+            Self::Short(value) => Some(value.get() != 0),
+            Self::Int(value) => Some(value.get() != 0),
+            Self::Long(value) => Some(value.get() != 0),
+            _ => None,
+        }
+    }
+
+    /// Return the stored value as an [`IntegerValue`] if it is of an integer or
+    /// boolean type, else `None`.
+    #[must_use]
+    pub fn as_value_integer(self) -> Option<IntegerValue> {
+        match self {
+            Self::Bool(value) => Some(IntegerValue::Byte(u8::from(value.get()))),
+            Self::Byte(value) => Some(IntegerValue::Byte(value.get())),
+            Self::Short(value) => Some(IntegerValue::Short(value.get())),
+            Self::Int(value) => Some(IntegerValue::Int(value.get())),
+            Self::Long(value) => Some(IntegerValue::Long(value.get())),
+            _ => None,
+        }
+    }
+
+    /// Return the stored value as a [`FloatValue`] if it is of a float type,
+    /// else `None`.
+    #[must_use]
+    pub fn as_value_float(self) -> Option<FloatValue> {
+        match self {
+            Self::Float(value) => Some(FloatValue::Float(value.get())),
+            Self::Double(value) => Some(FloatValue::Double(value.get())),
+            _ => None,
+        }
+    }
+
+    /// Return a reference to the stored value if it is of type [`IndexedList`],
+    /// else `None`.
+    #[must_use]
+    pub const fn as_list(self) -> Option<IndexedList<'data, C>> {
+        if let Self::List(value) = self { Some(value) } else { None }
+    }
+
     /// Return a reference to the stored value if it is of type
     /// [`IndexedCompound`], else `None`.
+    #[must_use]
     pub const fn as_compound(self) -> Option<IndexedCompound<'data, C>> {
         if let Self::Compound(value) = self { Some(value) } else { None }
     }
@@ -134,7 +191,7 @@ impl<C: IndexCore> fmt::Debug for ValueReference<'_, C> {
             Self::Double(value) => f.debug_tuple("Double").field(value).finish(),
             Self::String(value) => f.debug_tuple("String").field(value).finish(),
 
-            Self::List(_) => f.debug_tuple("List").finish_non_exhaustive(),
+            Self::List(value) => f.debug_tuple("List").field(value).finish(),
             Self::Compound(value) => f.debug_tuple("Compound").field(value).finish(),
 
             Self::ByteArray(_) => f.debug_tuple("ByteArray").finish_non_exhaustive(),
@@ -163,7 +220,7 @@ impl<C: IndexCore> PartialEq for ValueReference<'_, C> {
             (Self::Double(a), Self::Double(b)) => a == b,
             (Self::String(a), Self::String(b)) => a == b,
 
-            (Self::List(_), Self::List(_)) => todo!(),
+            (Self::List(a), Self::List(b)) => a == b,
             (Self::Compound(a), Self::Compound(b)) => a == b,
 
             (Self::ByteArray(_), Self::ByteArray(_)) => todo!(),

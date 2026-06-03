@@ -2,14 +2,19 @@
 
 use core::{fmt, range::Range};
 
-use crate::types::indexed::{core::IndexCore, entry::EntryIndex, reference::EntryReference};
+use crate::types::indexed::{
+    core::IndexCore,
+    entry::EntryIndex,
+    reference::{EntryReference, ValueReference},
+};
 
 mod iter;
+use iter::CompoundIter;
 
 /// An SNBT Compound that is indexed by an [`IndexCore`].
 pub struct IndexedCompound<'data, C: IndexCore> {
-    range: Range<usize>,
     core: &'data C,
+    range: Range<usize>,
 }
 
 impl<'data, C: IndexCore> IndexedCompound<'data, C> {
@@ -21,7 +26,7 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(range: Range<usize>, core: &'data C) -> Self { Self { range, core } }
+    pub const unsafe fn new(core: &'data C, range: Range<usize>) -> Self { Self { core, range } }
 
     /// Get the [`EntryIndexes`](EntryIndex) of this compound.
     #[inline]
@@ -41,14 +46,14 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     #[must_use]
     pub fn is_empty(&self) -> bool { self.entries().is_empty() }
 
-    /// Return a reference to the stored value for `key`, if it is present, else
-    /// `None`.
+    /// Return a reference to the value matching the `key`, if it is present,
+    /// else `None`.
     #[must_use]
-    pub fn get<K: PartialEq<str> + ?Sized>(&self, key: &K) -> Option<EntryReference<'data, C>> {
+    pub fn get<K: PartialEq<str> + ?Sized>(&self, key: &K) -> Option<ValueReference<'data, C>> {
         self.entries()
             .iter()
             .find(|e| key == unsafe { e.name().read_value(self.core.root()) }.as_ref())
-            .map(|e| unsafe { EntryReference::new(*e, self.core) })
+            .map(|e| unsafe { ValueReference::new(self.core, e.value()) })
     }
 
     /// Get a key-value pair by index.
@@ -56,16 +61,20 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// Returns `None` if the index is out of bounds.
     #[must_use]
     pub fn get_index(&self, index: usize) -> Option<EntryReference<'data, C>> {
-        self.entries().get(index).map(|e| unsafe { EntryReference::new(*e, self.core) })
+        self.entries().get(index).map(|e| unsafe { EntryReference::new(self.core, *e) })
     }
+
+    /// Create an iterator over this compound.
+    #[inline]
+    #[must_use]
+    pub const fn iter(&self) -> CompoundIter<'_, 'data, C> { CompoundIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 impl<C: IndexCore> fmt::Debug for IndexedCompound<'_, C> {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // f.debug_map().entries(self.iter()).finish()
-        todo!();
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_map().entries(self.iter().map(|e| (e.name(), e.value()))).finish()
     }
 }
 

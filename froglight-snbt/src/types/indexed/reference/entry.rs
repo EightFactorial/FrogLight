@@ -21,7 +21,7 @@ impl<'data, C: IndexCore> EntryReference<'data, C> {
     /// The caller must ensure the [`EntryIndex`] is valid for the given core.
     #[inline]
     #[must_use]
-    pub unsafe fn new(entry: EntryIndex, core: &'data C) -> Self {
+    pub unsafe fn new(core: &'data C, entry: EntryIndex) -> Self {
         // SAFETY: The caller ensures that this is safe.
         unsafe {
             Self {
