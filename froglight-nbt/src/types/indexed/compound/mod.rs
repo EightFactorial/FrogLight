@@ -12,21 +12,10 @@ use crate::types::indexed::{
 mod iter;
 pub use iter::CompoundIter;
 
-cfg_select! {
-    feature = "alloc" => {
-        /// An NBT Compound that is indexed by an [`IndexCore`].
-        pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::alloc::SliceCore<'data, A>> {
-            core: A::CORE<'data, C>,
-            index: usize,
-        }
-    }
-    _ => {
-        /// An NBT Compound that is indexed by an [`IndexCore`].
-        pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-            core: A::CORE<'data, C>,
-            index: usize,
-        }
-    }
+/// An NBT Compound that is indexed by an [`IndexCore`].
+pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+    core: A::CORE<'data, C>,
+    index: usize,
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedCompound<'data, A, C> {

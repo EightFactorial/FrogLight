@@ -67,18 +67,21 @@ fn serialize<'mem, 'facet>(
         };
 
         // Handle field attributes.
-        if let Some(field) = item.field() {
-            // Run the custom serializer.
-            if let Some(attr) = field.get_attr(Some("mc"), "with")
-                && let Some(crate::facet::Attr::With(Some(with))) =
-                    attr.get_as::<crate::facet::Attr>()
-            {
-                return with.serialize(item, &mut writer);
+        if let Some(attrs) = item.field_attr() {
+            for attr in attrs {
+                // Run the custom serializer.
+                if attr.ns.is_some_and(|ns| ns == "mc")
+                    && attr.key == "with"
+                    && let Some(crate::facet::Attr::With(Some(with))) =
+                        attr.get_as::<crate::facet::Attr>()
+                {
+                    return with.serialize(item, &mut writer);
+                }
             }
         }
 
         // Handle type attributes.
-        for attr in item.shape().attributes {
+        for attr in item.shape_attr() {
             // Run the custom serializer.
             if attr.ns.is_some_and(|ns| ns == "mc")
                 && attr.key == "with"
@@ -163,7 +166,7 @@ fn serialize_core(
 
     // Handle strings
     if let Some(string) = peek.as_str() {
-        let (bytes, len) = varint::encode_u32(string.len().try_into()?);
+        let (bytes, len) = varint::encode_u32(string.len().try_into().map_err(WriterError::other)?);
         writer.write_bytes(&bytes[..len as usize])?;
         return writer.write_bytes(string.as_bytes());
     }

@@ -10,33 +10,16 @@ use crate::types::indexed::{
 
 pub(super) mod value;
 
-cfg_select! {
-    feature = "alloc" => {
-        /// An NBT entry that is indexed by an [`IndexCore`].
-        pub struct IndexedEntry<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::alloc::SliceCore<'data, A>> {
-            core: A::CORE<'data, C>,
-            index: EntryIndex,
-        }
+/// An NBT entry that is indexed by an [`IndexCore`].
+pub struct IndexedEntry<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+    core: A::CORE<'data, C>,
+    index: EntryIndex,
+}
 
-        /// An NBT value that is indexed by an [`IndexCore`].
-        pub struct IndexedValue<'data, A: NbtAccess, C: IndexCore<A> + 'data = super::alloc::SliceCore<'data, A>> {
-            core: A::CORE<'data, C>,
-            index: ValueIndex,
-        }
-    }
-    _ => {
-        /// An NBT entry that is indexed by an [`IndexCore`].
-        pub struct IndexedEntry<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-            core: A::CORE<'data, C>,
-            index: EntryIndex,
-        }
-
-        /// An NBT value that is indexed by an [`IndexCore`].
-        pub struct IndexedValue<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-            core: A::CORE<'data, C>,
-            index: ValueIndex,
-        }
-    }
+/// An NBT value that is indexed by an [`IndexCore`].
+pub struct IndexedValue<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+    core: A::CORE<'data, C>,
+    index: ValueIndex,
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {

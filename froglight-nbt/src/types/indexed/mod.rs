@@ -1,4 +1,5 @@
 //! TODO
+#![expect(clippy::result_unit_err, reason = "WIP")]
 
 use ::core::marker::PhantomData;
 use froglight_mutf8::prelude::MStr;
@@ -24,23 +25,11 @@ use reference::IndexedReference;
 
 pub mod types;
 
-cfg_select! {
-    feature = "alloc" => {
-        /// An indexed NBT structure for borrowed NBT data.
-        pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data = alloc::SliceCore<'data, A>> {
-            core: C,
-            name: Option<Index<MStr>>,
-            _phantom: PhantomData<(&'data (), A)>,
-        }
-    }
-    _ => {
-        /// An indexed NBT structure for borrowed NBT data.
-        pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-            core: C,
-            name: Option<Index<MStr>>,
-            _phantom: PhantomData<(&'data (), A)>,
-        }
-    }
+/// An indexed NBT structure for borrowed NBT data.
+pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+    core: C,
+    name: Option<Index<MStr>>,
+    _phantom: PhantomData<(&'data (), A)>,
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
@@ -149,7 +138,6 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
     ///
     /// Returns an error if the byte slice is not valid NBT data.
     #[inline]
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn new_unnamed_ref(data: &'data [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_ref(data, false)
     }
@@ -160,7 +148,6 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
     ///
     /// Returns an error if the byte slice is not valid NBT data.
     #[inline]
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn new_named_ref(data: &'data [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_ref(data, true)
     }
@@ -185,7 +172,6 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     ///
     /// Returns an error if the byte slice is not valid NBT data.
     #[inline]
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn new_unnamed_mut(data: &'data mut [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_mut(data, false)
     }
@@ -196,7 +182,6 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     ///
     /// Returns an error if the byte slice is not valid NBT data.
     #[inline]
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn new_named_mut(data: &'data mut [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_mut(data, true)
     }

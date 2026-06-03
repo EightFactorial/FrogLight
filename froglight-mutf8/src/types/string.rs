@@ -73,7 +73,6 @@ impl MString {
     /// # Errors
     ///
     /// TODO
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn from_mutf8(vec: Vec<u8>) -> Result<Self, ()> {
         match MStr::from_mutf8(&vec) {
             Ok(..) => Ok(Self(vec)),

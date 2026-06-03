@@ -1,5 +1,3 @@
-#![allow(clippy::result_unit_err, dead_code, reason = "WIP")]
-
 use alloc::{collections::VecDeque, vec::Vec};
 use core::range::Range;
 

@@ -70,7 +70,6 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn from_utf8(str: &str) -> Result<&Self, ()> {
         if contains_null_or_4_byte_header(str.as_bytes()) {
             Err(())
@@ -85,7 +84,6 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn from_mutf8(bytes: &[u8]) -> Result<&Self, ()> {
         from_utf8_simd(bytes).map_or_else(|_| Err(()), Self::from_utf8)
     }
@@ -95,7 +93,6 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid UTF-8.
-    #[expect(clippy::result_unit_err, reason = "WIP")]
     pub fn to_utf8(&self) -> Result<&str, ()> {
         if from_utf8_simd(self.as_bytes()).is_ok() {
             Ok(unsafe { str::from_utf8_unchecked(self.as_bytes()) })

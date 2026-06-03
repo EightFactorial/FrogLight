@@ -16,7 +16,6 @@ pub struct Serializer<'mem, 'facet, C> {
 }
 
 /// A serializer item.
-#[expect(clippy::large_enum_variant, reason = "Yes")]
 pub enum Item<'mem, 'facet> {
     /// A size to be serialized.
     Size(u32),
@@ -109,11 +108,13 @@ fn handle_other<'mem, 'facet>(
         let mut var = item.is_variable();
         let mut with = false;
 
-        if let Some(field) = item.field() {
-            // #[facet(mc::variable)]
-            var |= field.has_attr(Some("mc"), "variable");
-            // #[facet(mc::with = ...)]
-            with |= field.has_attr(Some("mc"), "with");
+        if let Some(attrs) = item.field_attr() {
+            for attr in attrs.iter().filter(|attr| attr.ns.is_some_and(|ns| ns == "mc")) {
+                // #[facet(mc::variable)]
+                var |= attr.key == "variable";
+                // #[facet(mc::with = ...)]
+                with |= attr.key == "with";
+            }
         }
         for attr in item.shape().attributes {
             if attr.ns.is_some_and(|ns| ns == "mc") {
@@ -213,7 +214,7 @@ fn handle_def<'mem, 'facet>(
         Def::Map(_) => {
             let map = item.peek().into_map()?;
             // Serialize the length of the map.
-            core(Item::Size(map.len().try_into().map_err(WriterError::TryFromInt)?))?;
+            core(Item::Size(map.len().try_into().map_err(WriterError::other)?))?;
 
             // Push the items in reverse order.
             let iter = map.iter();
@@ -227,7 +228,7 @@ fn handle_def<'mem, 'facet>(
         Def::Set(_) => {
             let set = item.peek().into_set()?;
             // Serialize the length of the set.
-            core(Item::Size(set.len().try_into().map_err(WriterError::TryFromInt)?))?;
+            core(Item::Size(set.len().try_into().map_err(WriterError::other)?))?;
 
             // Push the items in reverse order.
             let iter = set.iter();
@@ -241,7 +242,7 @@ fn handle_def<'mem, 'facet>(
         Def::List(_) | Def::Slice(_) => {
             let list = item.peek().into_list()?;
             // Serialize the length of the list.
-            core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
+            core(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
 
             // Push the items in reverse order.
             let iter = list.iter();
@@ -330,7 +331,7 @@ fn handle_type<'mem, 'facet>(
         Type::Sequence(_) => {
             let list = item.peek().into_list_like()?;
             // Serialize the length of the list.
-            core(Item::Size(list.len().try_into().map_err(WriterError::TryFromInt)?))?;
+            core(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
 
             // Push the items in reverse order.
             let iter = list.iter();
@@ -392,7 +393,7 @@ fn handle_type<'mem, 'facet>(
             // Serialize the discriminant of the enum.
             #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
             core(Item::Size(
-                (enum_.discriminant() as u64).try_into().map_err(WriterError::TryFromInt)?,
+                (enum_.discriminant() as u64).try_into().map_err(WriterError::other)?,
             ))?;
 
             // Push the fields in reverse order.

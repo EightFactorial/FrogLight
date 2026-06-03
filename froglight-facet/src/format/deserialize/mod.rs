@@ -36,6 +36,7 @@ pub trait Deserialize<'facet>: Sized {
 }
 
 impl<'facet, T: Sized> Deserialize<'facet> for T {
+    #[inline]
     fn from_slice_remainder(slice: &[u8]) -> Result<(Self, &[u8]), DeserializeError>
     where
         Self: Facet<'static>,
@@ -45,6 +46,7 @@ impl<'facet, T: Sized> Deserialize<'facet> for T {
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 
+    #[inline]
     fn from_slice_borrowed(slice: &'facet [u8]) -> Result<(Self, &'facet [u8]), DeserializeError>
     where
         Self: Facet<'facet>,

@@ -1,4 +1,5 @@
 //! TODO
+#![expect(clippy::result_unit_err, reason = "WIP")]
 
 pub mod str;
 pub use str::MStr;

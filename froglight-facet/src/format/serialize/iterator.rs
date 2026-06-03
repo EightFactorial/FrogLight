@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use facet::{Field, Peek, Shape};
+use facet::{Attr, Field, Peek, Shape};
 use smallvec::SmallVec;
 
 /// TODO
@@ -12,7 +12,7 @@ pub struct SerializeIterator<'mem, 'facet> {
 }
 
 /// A stack of serialization frames.
-pub type IteratorStack<'mem, 'facet> = SmallVec<[SerializeItem<'mem, 'facet>; 12]>;
+pub type IteratorStack<'mem, 'facet> = SmallVec<[SerializeItem<'mem, 'facet>; 10]>;
 
 /// An item to be serialized.
 #[derive(Debug)]
@@ -20,7 +20,7 @@ pub struct SerializeItem<'mem, 'facet> {
     peek: Peek<'mem, 'facet>,
     ty: ItemType,
     variable: bool,
-    field: Option<Field>,
+    field_attr: Option<&'static [Attr]>,
 }
 
 /// An item on the serializer stack
@@ -37,7 +37,7 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     #[inline]
     #[must_use]
     pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
-        Self { peek, ty, variable: var, field: None }
+        Self { peek, ty, variable: var, field_attr: None }
     }
 
     /// Get the [`Peek`] for this [`StackItem`].
@@ -72,16 +72,23 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     #[inline]
     pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
 
-    /// Get the [`Field`] this [`StackItem`] came from, if any.
+    /// Get the [`Attr`]s of the field this [`StackItem`] came from, if any.
     #[inline]
     #[must_use]
-    pub const fn field(&self) -> Option<Field> { self.field }
+    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
 
-    /// Set the [`Field`] this [`StackItem`] came from.
+    /// Get the [`Attr`]s of the [`StackItem`]'s type.
+    #[inline]
+    #[must_use]
+    pub const fn shape_attr(&self) -> &'static [Attr] { self.peek.shape().attributes }
+
+    /// Set the [`Field`] [`Attr`]s of this [`StackItem`].
     #[inline]
     #[must_use]
     pub const fn with_field(mut self, field: Option<Field>) -> Self {
-        self.field = field;
+        if let Some(field) = field {
+            self.field_attr = Some(field.attributes);
+        }
         self
     }
 }

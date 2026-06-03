@@ -1,6 +1,7 @@
 //! TODO
 
-use core::num::TryFromIntError;
+use alloc::boxed::Box;
+use core::error::Error;
 
 /// A `no_std`-compatible writer.
 pub struct Writer<'a> {
@@ -18,21 +19,6 @@ impl<'a> Writer<'a> {
     #[inline]
     #[must_use]
     pub const fn total_written(&self) -> usize { self.written }
-
-    /// Add to the total number of bytes written.
-    ///
-    /// Should be used when the caller has written bytes through the inner
-    /// writer.
-    #[inline]
-    pub const fn add_written(&mut self, count: usize) { self.written += count; }
-
-    /// Get a mutable reference to the inner writer trait object.
-    ///
-    /// The caller must use [`Writer::add_written`] to update the total number
-    /// of bytes written when using this method.
-    #[inline]
-    #[must_use]
-    pub const fn as_mut_dyn(&mut self) -> &mut dyn WriterType { self.inner }
 
     /// Write a single byte to the writer.
     ///
@@ -132,18 +118,21 @@ impl<T: std::io::Write> WriterType for T {
 pub enum WriterError {
     /// The writer is full and cannot accept more bytes.
     WriterFull,
-    /// An integer conversion error occurred.
-    TryFromInt(TryFromIntError),
 
     /// An I/O error occurred while writing.
     #[cfg(feature = "std")]
     IO(std::io::Error),
+    /// Some other type of error occurred.
+    Other(Box<dyn Error + Send + Sync>),
 }
 
-impl From<TryFromIntError> for WriterError {
+impl WriterError {
+    /// Create a [`WriterError::Other`].
     #[inline]
-    fn from(err: TryFromIntError) -> Self { Self::TryFromInt(err) }
+    #[must_use]
+    pub fn other<T: Error + Send + Sync + 'static>(err: T) -> Self { Self::Other(Box::new(err)) }
 }
+
 #[cfg(feature = "std")]
 impl From<std::io::Error> for WriterError {
     #[inline]

@@ -8,69 +8,34 @@ use crate::types::indexed::{
     types::{IndexedListType, IndexedMapType},
 };
 
-cfg_select! {
-    feature = "alloc" => {
-        /// An NBT List that is indexed by an [`IndexCore`].
-        pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data = crate::types::indexed::alloc::SliceCore<'data, A>> {
-            /// An empty list.
-            Empty,
-            /// A [`u8`] value.
-            Byte(IndexedList<'data, u8, A, C>),
-            /// A [`u16`] value.
-            Short(IndexedList<'data, u16, A, C>),
-            /// A [`u32`] value.
-            Int(IndexedList<'data, u32, A, C>),
-            /// A [`u64`] value.
-            Long(IndexedList<'data, u64, A, C>),
-            /// A [`f32`] value.
-            Float(IndexedList<'data, f32, A, C>),
-            /// A [`f64`] value.
-            Double(IndexedList<'data, f64, A, C>),
-            /// A [`u8`] array.
-            ByteArray(IndexedList<'data, [u8], A, C>),
-            /// An [`MStr`] string.
-            String(IndexedList<'data, MStr, A, C>),
-            /// A list of values.
-            List(IndexedList<'data, IndexedListType, A, C>),
-            /// A compound of named entries.
-            Compound(IndexedList<'data, IndexedMapType, A, C>),
-            /// A [`u32`] array.
-            IntArray(IndexedList<'data, [u32], A, C>),
-            /// A [`u64`] array.
-            LongArray(IndexedList<'data, [u64], A, C>),
-        }
-    }
-    _ => {
-        /// An NBT List that is indexed by an [`IndexCore`].
-        pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-            /// An empty list.
-            Empty,
-            /// A [`u8`] value.
-            Byte(IndexedList<'data, u8, A, C>),
-            /// A [`u16`] value.
-            Short(IndexedList<'data, u16, A, C>),
-            /// A [`u32`] value.
-            Int(IndexedList<'data, u32, A, C>),
-            /// A [`u64`] value.
-            Long(IndexedList<'data, u64, A, C>),
-            /// A [`f32`] value.
-            Float(IndexedList<'data, f32, A, C>),
-            /// A [`f64`] value.
-            Double(IndexedList<'data, f64, A, C>),
-            /// A [`u8`] array.
-            ByteArray(IndexedList<'data, [u8], A, C>),
-            /// An [`MStr`] string.
-            String(IndexedList<'data, MStr, A, C>),
-            /// A list of values.
-            List(IndexedList<'data, IndexedListType, A, C>),
-            /// A compound of named entries.
-            Compound(IndexedList<'data, IndexedMapType, A, C>),
-            /// A [`u32`] array.
-            IntArray(IndexedList<'data, [u32], A, C>),
-            /// A [`u64`] array.
-            LongArray(IndexedList<'data, [u64], A, C>),
-        }
-    }
+/// An NBT List that is indexed by an [`IndexCore`].
+pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+    /// An empty list.
+    Empty,
+    /// A [`u8`] value.
+    Byte(IndexedList<'data, u8, A, C>),
+    /// A [`u16`] value.
+    Short(IndexedList<'data, u16, A, C>),
+    /// A [`u32`] value.
+    Int(IndexedList<'data, u32, A, C>),
+    /// A [`u64`] value.
+    Long(IndexedList<'data, u64, A, C>),
+    /// A [`f32`] value.
+    Float(IndexedList<'data, f32, A, C>),
+    /// A [`f64`] value.
+    Double(IndexedList<'data, f64, A, C>),
+    /// A [`u8`] array.
+    ByteArray(IndexedList<'data, [u8], A, C>),
+    /// An [`MStr`] string.
+    String(IndexedList<'data, MStr, A, C>),
+    /// A list of values.
+    List(IndexedList<'data, IndexedListType, A, C>),
+    /// A compound of named entries.
+    Compound(IndexedList<'data, IndexedMapType, A, C>),
+    /// A [`u32`] array.
+    IntArray(IndexedList<'data, [u32], A, C>),
+    /// A [`u64`] array.
+    LongArray(IndexedList<'data, [u64], A, C>),
 }
 
 impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IndexedValueList<'_, A, C> {
