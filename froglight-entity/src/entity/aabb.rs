@@ -1,19 +1,20 @@
 use core::ops::{Deref, DerefMut};
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_math::bounding::Aabb3d;
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use froglight_common::aabb::CommonAabb;
-use glam::{Vec3, Vec3A};
+use glam::Vec3;
+#[cfg(feature = "bevy")]
+use glam::Vec3A;
 
 /// An axis-aligned bounding box (AABB) for an entity.
 ///
 /// Centered around the entity's eye position.
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub struct EntityAabb {
     common: CommonAabb,
     eye_height: f32,
@@ -67,6 +68,7 @@ impl EntityAabb {
 
     /// Create an [`Aabb3d`] from this [`EntityAabb`].
     #[must_use]
+    #[cfg(feature = "bevy")]
     pub const fn into_aabb(self) -> Aabb3d {
         let (min, max) = self.common.min_max();
         Aabb3d { min: Vec3A::new(min.x, min.y, min.z), max: Vec3A::new(max.x, max.y, max.z) }
@@ -88,6 +90,7 @@ impl From<EntityAabb> for CommonAabb {
     #[inline]
     fn from(value: EntityAabb) -> Self { value.common }
 }
+#[cfg(feature = "bevy")]
 impl From<EntityAabb> for Aabb3d {
     #[inline]
     fn from(value: EntityAabb) -> Self { value.into_aabb() }

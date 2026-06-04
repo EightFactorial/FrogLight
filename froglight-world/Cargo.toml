@@ -23,7 +23,7 @@ divan = { workspace = true }
 
 [dependencies]
 bitvec = { workspace = true }
-froglight-common = { workspace = true }
+froglight-common = { features = ["uuid"], workspace = true }
 glam = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
@@ -33,9 +33,9 @@ bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "hashbrown", "smallvec"], workspace = true, optional = true }
 facet = { features = ["reflect"], workspace = true, optional = true }
-facet-minecraft = { workspace = true, optional = true }
 froglight-biome = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
+froglight-facet = { workspace = true, optional = true }
 hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
@@ -56,7 +56,7 @@ default = ["alloc", "std"]
 # Enable `bevy` support.
 bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:hashbrown", "froglight-common/bevy", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
+facet = ["dep:facet", "dep:froglight-facet", "froglight-common/facet"]
 # Enable `froglight-biome` support.
 froglight-biome = ["dep:froglight-biome"]
 # Enable `froglight-block` support.
@@ -74,4 +74,4 @@ alloc = ["bitvec/alloc", "froglight-biome?/alloc", "froglight-block?/alloc", "fr
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "dep:arc-swap", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "hashbrown?/nightly", "parking_lot?/nightly", "smallvec/specialization"]
+nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "hashbrown?/nightly", "parking_lot?/nightly", "smallvec/specialization"]

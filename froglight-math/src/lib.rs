@@ -8,8 +8,8 @@ extern crate alloc;
 extern crate std;
 
 #[cfg(feature = "bevy")]
-pub use bevy_math;
-pub use glam;
+pub use ::bevy_math;
+pub use ::glam;
 
 pub mod functions;
 #[cfg(any(all(feature = "libm", feature = "once_cell"), feature = "std"))]

@@ -46,9 +46,27 @@ impl WorldInstance {
     /// There are only two supported data types:
     ///   - [`EntityId`]
     ///   - [`EntityUuid`]
+    #[inline]
     #[must_use]
     #[expect(private_bounds, reason = "Only two possible data types")]
     pub fn get<T: InstanceData>(&self, data: &T) -> Option<Entity> { data.query(self) }
+
+    /// Get an iterator over all entities in the [`WorldInstance`].
+    #[inline]
+    pub fn iter_entity(&self) -> impl Iterator<Item = &Entity> { self.entity_id.values() }
+
+    /// Get an iterator over all data-entity pairs in the [`WorldInstance`].
+    ///
+    /// ## Note
+    ///
+    /// There are only two supported data types:
+    ///   - [`EntityId`]
+    ///   - [`EntityUuid`]
+    #[inline]
+    #[expect(private_bounds, reason = "Only two possible data types")]
+    pub fn iter_data<T: InstanceData>(&self) -> impl Iterator<Item = (&T, &Entity)> {
+        T::iter(self)
+    }
 
     /// Hook for when a [`WorldInstance`] is removed from an entity.
     #[allow(unused_variables, reason = "Used by tracing macros")]
@@ -90,6 +108,10 @@ impl WorldInstance {
 pub(super) trait InstanceData: Clone + Component + TypePath {
     /// The relationship component that points to the [`WorldInstance`].
     type Relationship: Component + TypePath + Deref<Target = Entity>;
+
+    /// Get an iterator over all data-entity pairs in the [`WorldInstance`].
+    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)>;
+
     /// Query the [`WorldInstance`] for the associated [`Entity`].
     fn query(&self, instance: &WorldInstance) -> Option<Entity>;
     /// Insert the associated [`Entity`] into the [`WorldInstance`].
@@ -104,6 +126,11 @@ pub(super) trait InstanceData: Clone + Component + TypePath {
 
 impl InstanceData for EntityId {
     type Relationship = EntityOfInstance;
+
+    #[inline]
+    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)> {
+        instance.entity_id.iter()
+    }
 
     #[inline]
     fn query(&self, instance: &WorldInstance) -> Option<Entity> {
@@ -123,6 +150,11 @@ impl InstanceData for EntityId {
 
 impl InstanceData for EntityUuid {
     type Relationship = EntityOfInstance;
+
+    #[inline]
+    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)> {
+        instance.entity_uuid.iter()
+    }
 
     #[inline]
     fn query(&self, instance: &WorldInstance) -> Option<Entity> {

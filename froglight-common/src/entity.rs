@@ -11,6 +11,7 @@ use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use facet::Facet;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 /// An identifier for an entity.

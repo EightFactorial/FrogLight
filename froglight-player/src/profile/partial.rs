@@ -1,8 +1,8 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

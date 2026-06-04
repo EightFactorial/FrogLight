@@ -4,9 +4,11 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+#[cfg(feature = "aabb")]
 pub mod aabb;
 #[cfg(feature = "bevy")]
 pub mod bevy;
+#[cfg(feature = "uuid")]
 pub mod entity;
 pub mod identifier;
 pub mod impossible;
@@ -17,9 +19,7 @@ pub mod prelude {
 
     #[cfg(feature = "bevy")]
     pub use crate::bevy::{relationship::EntityOfInstance, world::WorldInstance};
-    pub use crate::{
-        entity::{EntityId, EntityUuid},
-        identifier::Identifier,
-        version::*,
-    };
+    #[cfg(feature = "uuid")]
+    pub use crate::entity::{EntityId, EntityUuid};
+    pub use crate::{identifier::Identifier, version::*};
 }

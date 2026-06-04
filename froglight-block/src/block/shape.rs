@@ -137,14 +137,16 @@ impl BlockShape<'_> {
             (BlockShape::Single(aabb_a), BlockShape::Single(aabb_b)) => {
                 BlockShape::Collection(Cow::Owned(vec![aabb_a, aabb_b]))
             }
-            (BlockShape::Single(aabb), BlockShape::Collection(mut cow))
-            | (BlockShape::Collection(mut cow), BlockShape::Single(aabb)) => {
-                cow.to_mut().push(aabb);
-                BlockShape::Collection(cow).into_owned()
+            (BlockShape::Single(aabb), BlockShape::Collection(cow))
+            | (BlockShape::Collection(cow), BlockShape::Single(aabb)) => {
+                let mut cow = cow.into_owned();
+                cow.push(aabb);
+                BlockShape::Collection(Cow::Owned(cow))
             }
-            (BlockShape::Collection(mut cow_a), BlockShape::Collection(cow_b)) => {
-                cow_a.to_mut().extend(cow_b.into_owned());
-                BlockShape::Collection(cow_a).into_owned()
+            (BlockShape::Collection(cow_a), BlockShape::Collection(cow_b)) => {
+                let mut cow_a = cow_a.into_owned();
+                cow_a.extend(cow_b.into_owned());
+                BlockShape::Collection(Cow::Owned(cow_a))
             }
         }
     }
@@ -156,10 +158,10 @@ impl BlockShape<'_> {
         match self {
             BlockShape::None => BlockShape::None,
             BlockShape::Single(aabb) => BlockShape::Single(aabb),
+            BlockShape::Collection(Cow::Owned(vec)) => BlockShape::Collection(Cow::Owned(vec)),
             BlockShape::Collection(Cow::Borrowed(slice)) => {
                 BlockShape::Collection(Cow::Owned(slice.to_vec()))
             }
-            BlockShape::Collection(Cow::Owned(vec)) => BlockShape::Collection(Cow::Owned(vec)),
         }
     }
 }

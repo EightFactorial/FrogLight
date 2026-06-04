@@ -12,77 +12,77 @@ use glam::{Vec3, Vec3A};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "bevy")]
-use crate::components::Acceleration;
+use crate::components::Rotation;
 
-/// A velocity vector.
+/// A position.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Reflect, Component))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", require(Acceleration, PrevVelocity))]
-pub struct Velocity(Vec3A);
+#[cfg_attr(feature = "bevy", require(Rotation, PrevPosition))]
+pub struct Position(Vec3A);
 
-impl Velocity {
+impl Position {
     /// All zeros.
     pub const ZERO: Self = Self(Vec3A::ZERO);
 
-    /// Create a new [`Velocity`] from a [`Vec3A`].
+    /// Create a new [`Position`] from a [`Vec3A`].
     #[inline]
     #[must_use]
     pub const fn new(vec: Vec3A) -> Self { Self(vec) }
 
-    /// Create a new [`Velocity`] from its components.
+    /// Create a new [`Position`] from its components.
     #[inline]
     #[must_use]
     pub const fn new_xyz(x: f32, y: f32, z: f32) -> Self { Self::new(Vec3A::new(x, y, z)) }
 
-    /// Convert this [`Velocity`] into a [`Vec3`].
+    /// Convert this [`Position`] into a [`Vec3`].
     #[inline]
     #[must_use]
     pub fn to_vec3(self) -> Vec3 { self.0.to_vec3() }
 
-    /// Convert this [`Velocity`] into a [`Vec3A`].
+    /// Convert this [`Position`] into a [`Vec3A`].
     #[inline]
     #[must_use]
     pub const fn to_vec3a(self) -> Vec3A { self.0 }
 }
 
-impl AsRef<Vec3A> for Velocity {
+impl AsRef<Vec3A> for Position {
     #[inline]
     fn as_ref(&self) -> &Vec3A { &self.0 }
 }
-impl AsMut<Vec3A> for Velocity {
+impl AsMut<Vec3A> for Position {
     #[inline]
     fn as_mut(&mut self) -> &mut Vec3A { &mut self.0 }
 }
 
-impl Deref for Velocity {
+impl Deref for Position {
     type Target = Vec3A;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for Velocity {
+impl DerefMut for Position {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl Add for Velocity {
+impl Add for Position {
     type Output = Self;
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output { Self::new(self.0 + rhs.0) }
 }
-impl AddAssign for Velocity {
+impl AddAssign for Position {
     #[inline]
     fn add_assign(&mut self, rhs: Self) { self.0 += rhs.0; }
 }
 
-impl<T> Add<T> for Velocity
+impl<T> Add<T> for Position
 where
     Vec3A: Add<T, Output = Vec3A>,
 {
@@ -91,7 +91,7 @@ where
     #[inline]
     fn add(self, rhs: T) -> Self::Output { Self::new(self.0 + rhs) }
 }
-impl<T> AddAssign<T> for Velocity
+impl<T> AddAssign<T> for Position
 where
     Vec3A: AddAssign<T>,
 {
@@ -99,18 +99,18 @@ where
     fn add_assign(&mut self, rhs: T) { self.0 += rhs; }
 }
 
-impl Sub for Velocity {
+impl Sub for Position {
     type Output = Self;
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output { Self::new(self.0 - rhs.0) }
 }
-impl SubAssign for Velocity {
+impl SubAssign for Position {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) { self.0 -= rhs.0; }
 }
 
-impl<T> Sub<T> for Velocity
+impl<T> Sub<T> for Position
 where
     Vec3A: Sub<T, Output = Vec3A>,
 {
@@ -119,7 +119,7 @@ where
     #[inline]
     fn sub(self, rhs: T) -> Self::Output { Self::new(self.0 - rhs) }
 }
-impl<T> SubAssign<T> for Velocity
+impl<T> SubAssign<T> for Position
 where
     Vec3A: SubAssign<T>,
 {
@@ -129,90 +129,90 @@ where
 
 // -------------------------------------------------------------------------------------------------
 
-/// The previous tick's [`Velocity`].
+/// The previous tick's [`Position`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Reflect, Component))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
-pub struct PrevVelocity(Velocity);
+pub struct PrevPosition(Position);
 
-impl PrevVelocity {
-    /// Create a new [`PrevVelocity`] from a [`Vec3A`].
+impl PrevPosition {
+    /// Create a new [`PrevPosition`] from a [`Vec3A`].
     #[inline]
     #[must_use]
-    pub const fn new(vec: Vec3A) -> Self { Self(Velocity::new(vec)) }
+    pub const fn new(vec: Vec3A) -> Self { Self(Position::new(vec)) }
 
-    /// Create a new [`PrevVelocity`] from an [`Velocity`].
+    /// Create a new [`PrevPosition`] from an [`Position`].
     #[inline]
     #[must_use]
-    pub const fn new_vel(accel: Velocity) -> Self { Self(accel) }
+    pub const fn new_pos(accel: Position) -> Self { Self(accel) }
 
-    /// Convert this [`PrevVelocity`] into an [`Velocity`].
+    /// Convert this [`PrevPosition`] into an [`Position`].
     #[inline]
     #[must_use]
-    pub const fn to_accel(self) -> Velocity { self.0 }
+    pub const fn to_accel(self) -> Position { self.0 }
 
-    /// Convert this [`PrevVelocity`] into a [`Vec3`].
+    /// Convert this [`PrevPosition`] into a [`Vec3`].
     #[inline]
     #[must_use]
     pub fn to_vec3(self) -> Vec3 { self.0.to_vec3() }
 
-    /// Convert this [`PrevVelocity`] into a [`Vec3A`].
+    /// Convert this [`PrevPosition`] into a [`Vec3A`].
     #[inline]
     #[must_use]
     pub const fn to_vec3a(self) -> Vec3A { self.0.to_vec3a() }
 }
 
-impl From<Velocity> for PrevVelocity {
+impl From<Position> for PrevPosition {
     #[inline]
-    fn from(velocity: Velocity) -> Self { Self(velocity) }
+    fn from(accel: Position) -> Self { Self(accel) }
 }
 
-impl AsRef<Velocity> for PrevVelocity {
+impl AsRef<Position> for PrevPosition {
     #[inline]
-    fn as_ref(&self) -> &Velocity { &self.0 }
+    fn as_ref(&self) -> &Position { &self.0 }
 }
-impl AsMut<Velocity> for PrevVelocity {
+impl AsMut<Position> for PrevPosition {
     #[inline]
-    fn as_mut(&mut self) -> &mut Velocity { &mut self.0 }
+    fn as_mut(&mut self) -> &mut Position { &mut self.0 }
 }
 
-impl AsRef<Vec3A> for PrevVelocity {
+impl AsRef<Vec3A> for PrevPosition {
     #[inline]
     fn as_ref(&self) -> &Vec3A { self.0.as_ref() }
 }
-impl AsMut<Vec3A> for PrevVelocity {
+impl AsMut<Vec3A> for PrevPosition {
     #[inline]
     fn as_mut(&mut self) -> &mut Vec3A { self.0.as_mut() }
 }
 
-impl Deref for PrevVelocity {
-    type Target = Velocity;
+impl Deref for PrevPosition {
+    type Target = Position;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for PrevVelocity {
+impl DerefMut for PrevPosition {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl Add for PrevVelocity {
+impl Add for PrevPosition {
     type Output = Self;
 
     #[inline]
-    fn add(self, rhs: Self) -> Self::Output { Self::new_vel(self.0 + rhs.0) }
+    fn add(self, rhs: Self) -> Self::Output { Self::new_pos(self.0 + rhs.0) }
 }
-impl AddAssign for PrevVelocity {
+impl AddAssign for PrevPosition {
     #[inline]
     fn add_assign(&mut self, rhs: Self) { self.0 += rhs.0; }
 }
 
-impl<T> Add<T> for PrevVelocity
+impl<T> Add<T> for PrevPosition
 where
     Vec3A: Add<T, Output = Vec3A>,
 {
@@ -221,7 +221,7 @@ where
     #[inline]
     fn add(self, rhs: T) -> Self::Output { Self::new(self.0.0 + rhs) }
 }
-impl<T> AddAssign<T> for PrevVelocity
+impl<T> AddAssign<T> for PrevPosition
 where
     Vec3A: AddAssign<T>,
 {
@@ -229,18 +229,18 @@ where
     fn add_assign(&mut self, rhs: T) { self.0 += rhs; }
 }
 
-impl Sub for PrevVelocity {
+impl Sub for PrevPosition {
     type Output = Self;
 
     #[inline]
-    fn sub(self, rhs: Self) -> Self::Output { Self::new_vel(self.0 - rhs.0) }
+    fn sub(self, rhs: Self) -> Self::Output { Self::new_pos(self.0 - rhs.0) }
 }
-impl SubAssign for PrevVelocity {
+impl SubAssign for PrevPosition {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) { self.0 -= rhs.0; }
 }
 
-impl<T> Sub<T> for PrevVelocity
+impl<T> Sub<T> for PrevPosition
 where
     Vec3A: Sub<T, Output = Vec3A>,
 {
@@ -249,7 +249,7 @@ where
     #[inline]
     fn sub(self, rhs: T) -> Self::Output { Self::new(self.0.0 - rhs) }
 }
-impl<T> SubAssign<T> for PrevVelocity
+impl<T> SubAssign<T> for PrevPosition
 where
     Vec3A: SubAssign<T>,
 {

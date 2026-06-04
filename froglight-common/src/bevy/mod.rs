@@ -27,10 +27,10 @@ impl Plugin for CommonPlugin {
         world
             .register_component_hooks::<EntityId>()
             .on_insert(instance_insert_hook::<EntityId>)
-            .on_replace(instance_replace_hook::<EntityId>);
+            .on_discard(instance_replace_hook::<EntityId>);
         world
             .register_component_hooks::<EntityUuid>()
             .on_insert(instance_insert_hook::<EntityUuid>)
-            .on_replace(instance_replace_hook::<EntityUuid>);
+            .on_discard(instance_replace_hook::<EntityUuid>);
     }
 }

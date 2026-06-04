@@ -7,8 +7,6 @@ use alloc::vec::Vec;
 use core::ops::Range;
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-#[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
 use crate::{component::ChunkBlockPos, prelude::*};
@@ -26,8 +24,8 @@ use storage::BorrowedChunkStorage;
 
 /// A borrowed region of blocks in a world.
 #[derive(Default, Clone)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Clone, Default))]
 pub struct BorrowedChunk<'a> {
     storage: BorrowedChunkStorage<'a>,
 }

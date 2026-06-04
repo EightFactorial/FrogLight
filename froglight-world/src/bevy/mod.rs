@@ -27,6 +27,6 @@ impl Plugin for WorldPlugin {
         app.world_mut()
             .register_component_hooks::<ChunkPos>()
             .on_insert(instance_insert_hook)
-            .on_replace(instance_replace_hook);
+            .on_discard(instance_replace_hook);
     }
 }

@@ -62,3 +62,4 @@ pub trait EventVersion: PacketVersion {
 mod v26_1;
 #[cfg(feature = "v26_2")]
 mod v26_2;
+

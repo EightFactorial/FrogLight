@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-common = { workspace = true }
+froglight-common = { features = ["aabb"], workspace = true }
 glam = { workspace = true }
 variadics_please = { workspace = true }
 

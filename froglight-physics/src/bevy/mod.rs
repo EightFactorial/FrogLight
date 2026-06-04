@@ -1,154 +1,178 @@
 //! TODO
 
-use alloc::sync::Arc;
-
-use arc_swap::Guard;
 use bevy_app::{App, Plugin};
-use bevy_ecs::prelude::*;
-use froglight_common::prelude::*;
-use froglight_entity::{bevy::EntityBundleEvent, entity::EntityAabb, prelude::*};
-use froglight_world::prelude::*;
+#[cfg(feature = "tracing")]
+use bevy_ecs::entity::EntityNotSpawnedError;
+use bevy_ecs::{prelude::*, world::DeferredWorld};
+use bevy_tasks::ComputeTaskPool;
+use froglight_entity::{bevy::EntityBundleEvent, prelude::EntityBundle};
 
-use crate::{
-    prelude::*,
-    step::{ChunkGuard, ChunkQuery, CollidingQuery, EntityQuery, PhysicsInput},
-};
+use crate::prelude::*;
 
-/// A [`Plugin`] that...
+mod cache;
+pub use cache::{CollidingWith, EntityCollisions};
+
+/// A [`Plugin`] that adds physics components and systems.
+///
+/// # Warning
+///
+/// This [`Plugin`] includes several [`System`]s that are not scheduled by
+/// default!
+///
+/// This is to allow maximum flexibility when
+/// integrating with custom simulation and tick-rates.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<PhysicsState>().register_type::<PhysicsController>();
-        app.register_type::<WorldCollision>().register_type::<PreviousWorldCollision>();
-        app.register_type::<Transform>().register_type::<PreviousTransform>();
-        app.register_type::<Velocity>().register_type::<PreviousVelocity>();
-        app.register_type::<Acceleration>().register_type::<PreviousAcceleration>();
-        app.register_type::<OnGround>().register_type::<PreviousOnGround>();
-        app.register_type::<InFluid>().register_type::<PreviousInFluid>();
+        app.register_type::<Acceleration>().register_type::<PrevAcceleration>();
+        app.register_into_type_conversion::<Acceleration, PrevAcceleration>();
 
-        app.init_resource::<EntityCollisions>().register_type::<EntityCollisions>();
+        app.register_type::<Position>().register_type::<PrevPosition>();
+        app.register_into_type_conversion::<Position, PrevPosition>();
 
-        app.add_observer(Self::entity_physics_observer);
+        app.register_type::<Rotation>().register_type::<PrevRotation>();
+        app.register_into_type_conversion::<Rotation, PrevRotation>();
+
+        app.register_type::<Velocity>().register_type::<PrevVelocity>();
+        app.register_into_type_conversion::<Velocity, PrevVelocity>();
+
+        app.register_type::<Collider>().register_type::<PrevCollider>();
+        app.register_into_type_conversion::<Collider, PrevCollider>();
+
+        app.register_type::<EntityCollisions>().init_resource::<EntityCollisions>();
+        app.register_type::<CollidingWith>();
+
+        app.add_observer(PhysicsPlugin::on_entity_bundle);
     }
 }
 
 impl PhysicsPlugin {
-    /// An [`Observer`] that listens for [`EntityBundleEvent`]s and inserts
-    /// [`PhysicsState`]s.
-    #[expect(clippy::type_complexity, reason = "Complex query")]
-    pub fn entity_physics_observer(
-        event: On<EntityBundleEvent>,
-        query: Query<(), (With<EntityBundle>, With<EntityAabb>, Without<PhysicsState>)>,
-        mut commands: Commands,
+    /// An [`Observer`] that inserts physics components when an entity with an
+    /// [`EntityBundle`] is spawned.
+    pub fn on_entity_bundle(trigger: On<EntityBundleEvent>, mut world: DeferredWorld) {
+        let (entities, mut commands) = world.entities_and_commands();
+        let entity_id = trigger.entity();
+
+        match entities.get(entity_id) {
+            Ok(entity) => {
+                if let Some(bundle) = entity.get::<EntityBundle>() {
+                    let mut commands = commands.entity(entity_id);
+
+                    // Insert `Collider`, `Position`, and `Rotation`
+                    // (preserves `Position` and `Rotation` if they already exist)
+                    let collider = Collider::new_entity(*bundle.metadata().aabb());
+                    commands.insert(collider);
+
+                    // Insert `Velocity` and `Acceleration`
+                    // (overwrites `Velocity` and `Acceleration` to zero)
+                    commands.insert((Velocity::default(), Acceleration::default()));
+                } else {
+                    #[cfg(feature = "tracing")]
+                    tracing::error!(target: "froglight_physics", "Failed to add Collider to Entity {entity_id}, missing EntityBundle component?");
+                }
+            }
+            #[cfg(feature = "tracing")]
+            Err(EntityNotSpawnedError::Invalid(..)) => {
+                tracing::error!(target: "froglight_physics", "Failed to add Collider, Entity {entity_id} is invalid?");
+            }
+            #[cfg(feature = "tracing")]
+            Err(EntityNotSpawnedError::ValidButNotSpawned(..)) => {
+                tracing::error!(target: "froglight_physics", "Failed to add Collider, Entity {entity_id} has not been spawned");
+            }
+            #[cfg(not(feature = "tracing"))]
+            Err(_) => {}
+        }
+    }
+
+    /// A [`System`] that updates [`EntityCollisions`] and [`CollidingWith`]
+    /// based on entity [`Collider`]s.
+    ///
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
+    pub fn update_entity_collisions(
+        mut query: Query<(Entity, &Collider, &mut CollidingWith)>,
+        mut collisions: ResMut<EntityCollisions>,
     ) {
-        if query.contains(event.entity()) {
-            commands.entity(event.entity()).insert(PhysicsState::default());
+        let mut iter = query.iter_combinations_mut();
+
+        while let Some(
+            [
+                (entity_a, collider_a, mut colliding_with_a),
+                (entity_b, collider_b, mut colliding_with_b),
+            ],
+        ) = iter.fetch_next()
+        {
+            if collider_a.intersects(collider_b) {
+                if collisions.push_pair(entity_a, entity_b) {
+                    colliding_with_a.insert(entity_b);
+                    colliding_with_b.insert(entity_a);
+                }
+            } else if collisions.remove_pair(entity_a, entity_b) {
+                colliding_with_a.remove(&entity_b);
+                colliding_with_b.remove(&entity_a);
+            }
         }
     }
-}
 
-// -------------------------------------------------------------------------------------------------
-
-/// Create a [`PhysicsInput`] for the given entity and call the provided
-/// function with it.
-///
-/// # Panics
-///
-/// TODO
-#[inline]
-pub fn entity_as_input(
-    entity: Entity,
-    world: &mut World,
-    f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>, Entity>),
-) {
-    many_as_input::<1>([entity], world, f);
-}
-
-/// Create a [`PhysicsInput`] for the given entities and call the provided
-/// function with them.
-///
-/// # Panics
-///
-/// TODO: Don't panic
-pub fn many_as_input<const N: usize>(
-    entities: [Entity; N],
-    world: &mut World,
-    mut f: impl FnMut(PhysicsInput<PhysQuery<'_>, ColliderQuery<'_>, WorldQuery<'_>, Entity>),
-) {
-    let mut physics = world.query::<PhysicsMut<'static>>();
-    let mut colliders = world.query::<&CollidingWith>();
-    let mut chunks = world.query::<&SharedChunk>();
-    let cell = world.as_unsafe_world_cell();
-
-    // SAFETY: None of the queries can access any other's components.
-    // SAFETY: No archetype changes can occur through `PhysicsInput`.
-    unsafe {
-        let mut physics = physics.query_unchecked(cell);
-        let mut colliders = colliders.query_unchecked(cell);
-        let mut chunks = chunks.query_unchecked(cell);
-
-        for target_id in entities {
-            let instance_id =
-                cell.get_entity(target_id).unwrap().get::<EntityOfInstance>().unwrap().entity();
-            let instance =
-                cell.get_entity(instance_id).unwrap().get::<WorldInstanceChunks>().unwrap();
-
-            f(PhysicsInput::new(
-                target_id,
-                PhysQuery { query: physics.reborrow() },
-                ColliderQuery { query: colliders.reborrow() },
-                WorldQuery { instance, query: chunks.reborrow() },
-            ));
-        }
+    /// A [`System`] that updates last-tick physics [`Component`]s.
+    ///
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
+    ///
+    /// Updates:
+    /// - [`Acceleration`] -> [`PrevAcceleration`]
+    /// - [`Position`] -> [`PrevPosition`]
+    /// - [`Rotation`] -> [`PrevRotation`]
+    /// - [`Velocity`] -> [`PrevVelocity`]
+    /// - [`Collider`] -> [`PrevCollider`]
+    #[expect(clippy::missing_panics_doc, reason = "Components are dense, so `unwrap` is ok.")]
+    pub fn update_prev_components(
+        mut accel: Query<(&Acceleration, &mut PrevAcceleration)>,
+        mut pos: Query<(&Position, &mut PrevPosition)>,
+        mut rot: Query<(&Rotation, &mut PrevRotation)>,
+        mut vel: Query<(&Velocity, &mut PrevVelocity)>,
+        mut col: Query<(&Collider, &mut PrevCollider)>,
+    ) {
+        ComputeTaskPool::get().scope::<_, ()>(|scope| {
+            scope.spawn(async {
+                for (accel, prev) in accel.contiguous_iter_mut().unwrap() {
+                    for (accel, prev) in accel.iter().zip(prev) {
+                        *prev = PrevAcceleration::new_accel(*accel);
+                    }
+                }
+            });
+            scope.spawn(async {
+                for (pos, prev) in pos.contiguous_iter_mut().unwrap() {
+                    for (pos, prev) in pos.iter().zip(prev) {
+                        *prev = PrevPosition::new_pos(*pos);
+                    }
+                }
+            });
+            scope.spawn(async {
+                for (rot, prev) in rot.contiguous_iter_mut().unwrap() {
+                    for (rot, prev) in rot.iter().zip(prev) {
+                        *prev = PrevRotation::new_rot(*rot);
+                    }
+                }
+            });
+            scope.spawn(async {
+                for (vel, prev) in vel.contiguous_iter_mut().unwrap() {
+                    for (vel, prev) in vel.iter().zip(prev) {
+                        *prev = PrevVelocity::new_vel(*vel);
+                    }
+                }
+            });
+            scope.spawn(async {
+                for (col, prev) in col.contiguous_iter_mut().unwrap() {
+                    for (col, prev) in col.iter().zip(prev) {
+                        *prev = PrevCollider::new_col(*col);
+                    }
+                }
+            });
+        });
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An [`EntityQuery`] implementation for Bevy.
-pub struct PhysQuery<'a> {
-    query: Query<'a, 'a, PhysicsMut<'static>, ()>,
-}
-
-impl EntityQuery<Entity> for PhysQuery<'_> {
-    #[inline]
-    fn get_entity(&self, entity: Entity) -> Option<PhysicsRef<'_>> {
-        self.query.get(entity).ok().map(Into::into)
-    }
-
-    #[inline]
-    fn get_entity_mut(&mut self, entity: Entity) -> Option<PhysicsMut<'_>> {
-        self.query.get_mut(entity).ok().map(Into::into)
-    }
-}
-
-/// A [`ColliderQuery`] implementation for Bevy.
-pub struct ColliderQuery<'a> {
-    query: Query<'a, 'a, &'static CollidingWith, ()>,
-}
-
-impl CollidingQuery<Entity> for ColliderQuery<'_> {
-    fn get_colliding(&self, entity: Entity) -> Option<impl Iterator<Item = Entity> + '_> {
-        self.query.get(entity).ok().map(|c| c.iter().copied())
-    }
-}
-
-/// A [`ChunkQuery`] implementation for Bevy.
-pub struct WorldQuery<'a> {
-    instance: &'a WorldInstanceChunks,
-    query: Query<'a, 'a, &'static SharedChunk, ()>,
-}
-
-impl ChunkQuery for WorldQuery<'_> {
-    type Guard = Guard<Arc<Chunk>>;
-
-    fn get_chunk(&self, chunk: &ChunkPos) -> Option<Self::Guard> {
-        self.instance.get(chunk).and_then(|entity| self.query.get(entity).ok().map(|c| c.load()))
-    }
-}
-impl ChunkGuard for Guard<Arc<Chunk>> {
-    #[inline]
-    fn naive(&self) -> &NaiveChunk { self.as_naive() }
 }

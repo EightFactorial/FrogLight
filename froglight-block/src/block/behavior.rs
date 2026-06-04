@@ -6,21 +6,19 @@ use crate::{
     version::BlockVersion,
 };
 
-type BoolFn = fn(StateId) -> bool;
-type U8Fn = fn(StateId) -> u8;
-type ShapeFn = fn(StateId) -> &'static BlockShape<'static>;
+type StateFn<T> = fn(StateId) -> T;
 
 /// A collection of functions that define a block's behavior.
 #[derive(Clone, Copy)]
 pub struct BlockBehavior {
-    pub is_air: BoolFn,
-    pub is_solid: BoolFn,
-    pub is_liquid: BoolFn,
-    pub has_collision: BoolFn,
-    pub is_transparent: BoolFn,
-    pub has_occlusion: BoolFn,
-    pub light_emission: U8Fn,
-    pub shape_of: ShapeFn,
+    pub is_air: StateFn<bool>,
+    pub is_solid: StateFn<bool>,
+    pub is_liquid: StateFn<bool>,
+    pub has_collision: StateFn<bool>,
+    pub is_transparent: StateFn<bool>,
+    pub has_occlusion: StateFn<bool>,
+    pub light_emission: StateFn<u8>,
+    pub shape_of: StateFn<&'static BlockShape<'static>>,
 }
 
 impl BlockBehavior {
@@ -42,14 +40,14 @@ impl BlockBehavior {
     /// Create a new [`BlockBehavior`] from manually provided functions.
     #[must_use]
     pub const fn new_manual(
-        is_air: BoolFn,
-        is_solid: BoolFn,
-        is_liquid: BoolFn,
-        has_collision: BoolFn,
-        is_transparent: BoolFn,
-        has_occlusion: BoolFn,
-        light_emission: U8Fn,
-        shape_of: ShapeFn,
+        is_air: StateFn<bool>,
+        is_solid: StateFn<bool>,
+        is_liquid: StateFn<bool>,
+        has_collision: StateFn<bool>,
+        is_transparent: StateFn<bool>,
+        has_occlusion: StateFn<bool>,
+        light_emission: StateFn<u8>,
+        shape_of: StateFn<&'static BlockShape<'static>>,
     ) -> Self {
         Self {
             is_air,

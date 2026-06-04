@@ -19,10 +19,10 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-common = { features = ["alloc"], workspace = true }
+froglight-common = { features = ["alloc", "aabb"], workspace = true }
 foldhash = { workspace = true }
 indexmap = { workspace = true }
-md-5 = { features = [], workspace = true }
+md-5 = { features = ["alloc"], workspace = true }
 uuid = { features = ["md5", "v4"], workspace = true }
 base64 = { features = ["alloc"], workspace = true }
 
@@ -33,7 +33,7 @@ bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["indexmap", "uuid"], workspace = true, optional = true }
 facet-format = { workspace = true, optional = true }
 facet-json = { workspace = true, optional = true }
-facet-minecraft = { workspace = true, optional = true }
+froglight-facet = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
@@ -45,7 +45,7 @@ default = ["std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet", "dep:facet-format", "dep:facet-json", "dep:facet-minecraft", "froglight-common/facet"]
+facet = ["dep:facet", "dep:facet-format", "dep:facet-json", "froglight-common/facet", "dep:froglight-facet", ]
 # Enable `serde` support.
 serde = ["dep:serde", "indexmap/serde", "uuid/serde", "froglight-common/serde"]
 
@@ -53,6 +53,6 @@ serde = ["dep:serde", "indexmap/serde", "uuid/serde", "froglight-common/serde"]
 tracing = ["dep:tracing"]
 
 # Enable support for the standard library
-std = ["base64/std", "facet?/std", "facet-minecraft?/std", "facet-json?/std", "foldhash/std", "froglight-common/std", "indexmap/std", "uuid/std"]
+std = ["base64/std", "facet?/std", "facet-json?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "foldhash/nightly", "std"]
+nightly = ["froglight-common/nightly", "froglight-facet?/nightly", "foldhash/nightly", "std"]

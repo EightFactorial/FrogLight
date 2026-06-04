@@ -27,22 +27,21 @@ froglight-text = { default-features = false, path = "froglight-text", version = 
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
-bevy = { default-features = false, version = "0.18" }
-bevy_app = { default-features = false, version = "0.18" }
-bevy_ecs = { default-features = false, version = "0.18" }
-bevy_math = { default-features = false, version = "0.18" }
-bevy_reflect = { default-features = false, version = "0.18" }
-bevy_tasks = { default-features = false, version = "0.18" }
-bevy_transform = { default-features = false, version = "0.18" }
+bevy = { default-features = false, version = "0.19.0-rc.2" }
+bevy_app = { default-features = false, version = "0.19.0-rc.2" }
+bevy_ecs = { default-features = false, version = "0.19.0-rc.2" }
+bevy_math = { default-features = false, version = "0.19.0-rc.2" }
+bevy_reflect = { default-features = false, version = "0.19.0-rc.2" }
+bevy_tasks = { default-features = false, version = "0.19.0-rc.2" }
+bevy_transform = { default-features = false, version = "0.19.0-rc.2" }
 
 # Facet Dependencies
-facet = { default-features = false, version = "0.44" }
-facet-format = { default-features = false, version = "0.44" }
-facet-json = { default-features = false, version = "0.44" }
-facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
-facet-path = { default-features = false, version = "0.44" }
-facet-toml = { default-features = false, version = "0.44" }
-facet-value = { default-features = false, version = "0.44" }
+facet = { default-features = false, version = "=0.46" }
+facet-format = { default-features = false, version = "=0.47" }
+facet-json = { default-features = false, version = "=0.46" }
+facet-path = { default-features = false, version = "=0.46" }
+facet-toml = { default-features = false, version = "=0.46" }
+facet-value = { default-features = false, version = "=0.46" }
 
 # Cranelift Dependencies
 cranelift = { default-features = false, version = "0.132" }
@@ -50,10 +49,10 @@ cranelift-jit = { default-features = false, version = "0.132" }
 cranelift-module = { default-features = false, version = "0.132" }
 
 # Hashing & Cryptography Dependencies
-aes = { default-features = false, version = "0.9.0" }
+aes = { default-features = false, version = "0.9.1" }
 base64 = { default-features = false, version = "0.22.1" }
-cfb8 = { default-features = false, version = "0.9.0" }
-cipher = { default-features = false, version = "0.5.1" }
+cfb8 = { default-features = false, version = "0.9.1" }
+cipher = { default-features = false, version = "0.5.2" }
 crc32c = { default-features = false, version = "0.6.8" }
 foldhash = { default-features = false, version = "0.2.0" }
 md-5 = { default-features = false, version = "0.11.0" }
@@ -71,13 +70,13 @@ async-io = { default-features = false, version = "2.6" }
 async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 async-trait = { default-features = false, version = "0.1" }
-bitflags = { default-features = false, version = "2.11" }
+bitflags = { default-features = false, version = "2.12" }
 bitvec = { default-features = false, version = "1.0" }
 blocking = { default-features = false, version = "1.6" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
-glam = { default-features = false, version = "=0.30" }
-hashbrown = { default-features = false, version = "0.17" }
+glam = { default-features = false, version = "=0.32" }
+hashbrown = { default-features = false, version = "=0.16" }
 hickory-resolver = { default-features = false, version = "0.26" }
 indexmap = { default-features = false, version = "2.14" }
 lexical = { default-features = false, version = "7.0" }
@@ -88,7 +87,7 @@ parking_lot = { default-features = false, version = "0.12" }
 petgraph = { default-features = false, version = "0.8" }
 quick_cache = { default-features = false, version = "0.6" }
 rand = { default-features = false, version = "0.10" }
-regex-lite = { default-features = false, version = "0.1.9" }
+regex-lite = { default-features = false, version = "0.1" }
 replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
@@ -100,7 +99,7 @@ tokio = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.3" }
 uuid = { default-features = false, version = "1.23" }
-variadics_please = { default-features = false, version = "2.0" }
+variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
 
 # Debug Dependencies
@@ -108,7 +107,7 @@ criterion = { default-features = false, version = "0.8" }
 divan = { version = "0.1" }
 flate2 = { version = "1.1" }
 pretty_assertions = { version = "1.4" }
-proptest = { version = "1.9" }
+proptest = { version = "1.11" }
 tracing-subscriber = { features = ["tracing-log"], version = "0.3" }
 
 # --- Workspace Settings ---

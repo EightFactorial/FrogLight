@@ -14,7 +14,7 @@ use facet::Peek;
 use froglight_common::prelude::*;
 
 #[cfg(feature = "bevy")]
-use crate::{bevy::EntityBundleEvent, entity::EntityAabb};
+use crate::bevy::EntityBundleEvent;
 use crate::{
     entity::{EntityDataSet, GlobalId, metadata::EntityMetadata},
     generated::datatype::EntityDataType,
@@ -24,7 +24,7 @@ use crate::{
 /// A bundle of data and metadata for an entity.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_replace = Self::replace_hook))]
+#[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_discard = Self::replace_hook))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq, Component))]
 pub struct EntityBundle {
     dataset: EntityDataSet<'static>,
@@ -169,7 +169,6 @@ impl EntityBundle {
             commands.insert_reflect(c);
         });
 
-        commands.insert(*bundle.metadata().aabb());
         commands.trigger(EntityBundleEvent::new);
     }
 
@@ -186,8 +185,6 @@ impl EntityBundle {
         bundle.inspect_reflect(|c| {
             commands.remove_reflect(Cow::Owned(String::from(c.reflect_type_path())));
         });
-
-        commands.remove::<EntityAabb>();
     }
 }
 

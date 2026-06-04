@@ -6,24 +6,18 @@ use bevy_ecs::{
     prelude::*,
     world::DeferredWorld,
 };
-use bevy_reflect::prelude::*;
-use bevy_transform::components::GlobalTransform;
-use froglight_entity::prelude::EntityAabb;
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
-use crate::prelude::*;
+use crate::components::Position;
 
-#[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, Resource, Reflect)]
+/// A [`Resource`] containing all colliding entities.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource)]
 #[reflect(Debug, Default, Clone, PartialEq, Resource)]
 pub struct EntityCollisions(EntityHashMap<EntityHashSet>);
 
-impl Default for EntityCollisions {
-    #[inline]
-    fn default() -> Self { Self::new() }
-}
-
 impl EntityCollisions {
-    /// Create a new, empty [`EntityCollisions`].
+    /// Create a new, empty [`EntityCollisions`] resource.
+    #[inline]
     #[must_use]
     pub const fn new() -> Self { Self(EntityHashMap::new()) }
 
@@ -86,86 +80,40 @@ impl EntityCollisions {
         self.0.get(&entity_a).is_some_and(|set| set.contains(&entity_b))
             || self.0.get(&entity_b).is_some_and(|set| set.contains(&entity_a))
     }
-
-    /// A [`System`] that updates the [`EntityCollisions`] [`Resource`] and the
-    /// [`CollidingWith`] [`Components`](Component) of all [`Entities`](Entity).
-    pub fn update_collisions(
-        mut query: Query<(Entity, &EntityAabb, &GlobalTransform, &mut CollidingWith)>,
-        mut collisions: ResMut<EntityCollisions>,
-    ) {
-        let mut iter = query.iter_combinations_mut();
-        while let Some(
-            [
-                (entity_a, aabb_a, transform_a, mut colliding_a),
-                (entity_b, aabb_b, transform_b, mut colliding_b),
-            ],
-        ) = iter.fetch_next()
-        {
-            let translated_a =
-                aabb_a.with_translation(transform_a.translation()).with_scale(transform_a.scale());
-            let translated_b =
-                aabb_b.with_translation(transform_b.translation()).with_scale(transform_b.scale());
-
-            if translated_a.intersects(&translated_b) {
-                if collisions.push_pair(entity_a, entity_b) {
-                    colliding_a.insert(entity_b);
-                    colliding_b.insert(entity_a);
-                }
-            } else if collisions.remove_pair(entity_a, entity_b) {
-                colliding_a.remove(&entity_b);
-                colliding_b.remove(&entity_a);
-            }
-        }
-    }
 }
 
 // -------------------------------------------------------------------------------------------------
 
+/// A [`Component`] containing colliding entities.
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
-#[require(Transform)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Component)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]
-#[component(on_replace = Self::replace_hook)]
+#[require(Position)]
+#[component(on_discard = Self::discard_hook)]
 pub struct CollidingWith(EntityHashSet);
 
-impl Default for CollidingWith {
-    #[inline]
-    fn default() -> Self { Self::new() }
-}
-
 impl CollidingWith {
-    /// Create a new, empty [`CollidingWith`].
-    #[must_use]
-    pub const fn new() -> Self { Self::from_set(EntityHashSet::new()) }
-
-    /// Create a new [`CollidingWith`] from an existing [`EntityHashSet`].
+    /// Create a new, empty [`CollidingWith`] component.
     #[inline]
     #[must_use]
-    pub const fn from_set(set: EntityHashSet) -> Self { Self(set) }
+    pub const fn new() -> Self { Self(EntityHashSet::new()) }
 
-    /// Get a reference to the inner [`EntityHashSet`].
-    #[inline]
-    #[must_use]
-    pub const fn as_inner(&self) -> &EntityHashSet { &self.0 }
-
-    /// Get a mutable reference to the inner [`EntityHashSet`].
-    #[inline]
-    #[must_use]
-    pub const fn as_inner_mut(&mut self) -> &mut EntityHashSet { &mut self.0 }
-
-    /// Return the inner [`EntityHashSet`].
-    #[inline]
-    #[must_use]
-    pub fn into_inner(self) -> EntityHashSet { self.0 }
-
-    /// A `on_replace` [`ComponentHook`](bevy_ecs::lifecycle::ComponentHooks)
-    /// that removes an entity from [`EntityCollisions`] when the
-    /// [`CollidingWith`] [`Component`] is replaced or removed.
-    pub fn replace_hook(mut world: DeferredWorld, ctx: HookContext) {
+    /// A hook that removes the entity from the collision map when it is
+    /// discarded.
+    fn discard_hook(mut world: DeferredWorld, ctx: HookContext) {
         if let Some(mut collisions) = world.get_resource_mut::<EntityCollisions>() {
             collisions.remove_entity(ctx.entity);
         }
     }
+}
+
+impl AsRef<EntityHashSet> for CollidingWith {
+    #[inline]
+    fn as_ref(&self) -> &EntityHashSet { &self.0 }
+}
+impl AsMut<EntityHashSet> for CollidingWith {
+    #[inline]
+    fn as_mut(&mut self) -> &mut EntityHashSet { &mut self.0 }
 }
 
 impl Deref for CollidingWith {
