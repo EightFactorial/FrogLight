@@ -214,8 +214,9 @@ impl NetworkResolver for hickory::Resolver {
             Ok(lookup) => Ok(Box::new(
                 lookup
                     .as_lookup()
-                    .answers()
-                    .to_vec()
+                    .message()
+                    .answers
+                    .clone()
                     .into_iter()
                     .filter_map(|record| record.data.ip_addr()),
             )),
@@ -231,7 +232,7 @@ impl NetworkResolver for hickory::Resolver {
 
         match self.as_resolver().ipv4_lookup(name).await {
             Ok(lookup) => {
-                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                Ok(Box::new(lookup.message().answers.clone().into_iter().filter_map(|record| {
                     if let RData::A(a) = record.data { Some(a.0) } else { None }
                 })))
             }
@@ -247,7 +248,7 @@ impl NetworkResolver for hickory::Resolver {
 
         match self.as_resolver().ipv6_lookup(name).await {
             Ok(lookup) => {
-                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                Ok(Box::new(lookup.message().answers.clone().into_iter().filter_map(|record| {
                     if let RData::AAAA(aaaa) = record.data { Some(aaaa.0) } else { None }
                 })))
             }
@@ -263,7 +264,7 @@ impl NetworkResolver for hickory::Resolver {
 
         match self.as_resolver().ns_lookup(name).await {
             Ok(lookup) => {
-                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                Ok(Box::new(lookup.message().answers.clone().into_iter().filter_map(|record| {
                     if let RData::NS(ns) = &record.data { Some(ns.to_utf8()) } else { None }
                 })))
             }
@@ -279,7 +280,7 @@ impl NetworkResolver for hickory::Resolver {
 
         match self.as_resolver().srv_lookup(name).await {
             Ok(lookup) => {
-                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                Ok(Box::new(lookup.message().answers.clone().into_iter().filter_map(|record| {
                     if let RData::SRV(srv) = &record.data {
                         Some((srv.target.to_utf8(), srv.port))
                     } else {

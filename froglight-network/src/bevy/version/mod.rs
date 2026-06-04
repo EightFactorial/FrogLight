@@ -1,5 +1,5 @@
 //! Generated [`NetworkVersion`] implementations.
-//! 
+//!
 //! Feel free to edit anything *except* the modules at the end of this file!
 
 use core::{
@@ -512,4 +512,3 @@ impl Display for LengthError {
 mod v26_1;
 #[cfg(feature = "v26_2")]
 mod v26_2;
-

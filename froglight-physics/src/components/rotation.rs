@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", require(PrevRotation))]
@@ -94,7 +94,7 @@ where
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 pub struct PrevRotation(Rotation);

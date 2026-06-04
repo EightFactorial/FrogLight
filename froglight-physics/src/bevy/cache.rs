@@ -11,7 +11,7 @@ use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use crate::components::Position;
 
 /// A [`Resource`] containing all colliding entities.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Resource)]
 pub struct EntityCollisions(EntityHashMap<EntityHashSet>);
 
@@ -86,7 +86,7 @@ impl EntityCollisions {
 
 /// A [`Component`] containing colliding entities.
 #[repr(transparent)]
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Component)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Component, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]
 #[require(Position)]
 #[component(on_discard = Self::discard_hook)]

@@ -20,6 +20,7 @@ workspace = true
 
 [dev-dependencies]
 async-compat = { workspace = true }
+bevy_tasks = { features = ["async-io", "async_executor", "futures-lite", "multi_threaded"], workspace = true }
 tracing-subscriber = { workspace = true }
 
 [dependencies]

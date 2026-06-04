@@ -33,7 +33,7 @@ impl Resolve for crate::resolver::hickory::Resolver {
             resolver.as_resolver().lookup_ip(name.as_str().to_string()).await.map_or_else(
                 |err| -> Result<_, Box<dyn Error + Send + Sync>> { Err(Box::new(err)) },
                 |val| -> Result<Box<dyn Iterator<Item = SocketAddr> + Send>, _> {
-                    let answers = val.as_lookup().answers().to_vec();
+                    let answers = val.as_lookup().message().answers.clone();
 
                     #[cfg(feature = "tracing")]
                     tracing::trace!(target: "froglight_api::resolver::reqwest", "Resolved \"{}\" to IPs {:?}", name.as_str(), answers.iter().map(|ans| &ans.data));
