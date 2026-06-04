@@ -68,6 +68,7 @@ impl Resolver for crate::resolver::hickory::Resolver {
         use std::net::SocketAddr;
 
         use async_io::block_on;
+        use hickory_resolver::proto::rr::RData;
         use ureq::config::IpFamily;
 
         let host = uri.host().ok_or_else(|| {
@@ -94,25 +95,24 @@ impl Resolver for crate::resolver::hickory::Resolver {
         match config.ip_family() {
             IpFamily::Any => match block_on(self.as_resolver().lookup_ip(host)) {
                 Ok(lookup) => {
-                    lookup
-                        .into_iter()
-                        .take(16)
-                        .for_each(|ip| results.push(SocketAddr::new(ip, port)));
+                    lookup.iter().take(16).for_each(|ip| results.push(SocketAddr::new(ip, port)));
                 }
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv4Only => match block_on(self.as_resolver().ipv4_lookup(uri.to_string())) {
-                Ok(lookup) => lookup
-                    .into_iter()
-                    .take(16)
-                    .for_each(|a| results.push(SocketAddr::new(IpAddr::V4(a.0), port))),
+                Ok(lookup) => lookup.answers().iter().take(16).for_each(|record| {
+                    if let RData::A(a) = record.data {
+                        results.push(SocketAddr::new(IpAddr::V4(a.0), port));
+                    }
+                }),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv6Only => match block_on(self.as_resolver().ipv6_lookup(uri.to_string())) {
-                Ok(lookup) => lookup
-                    .into_iter()
-                    .take(16)
-                    .for_each(|aaaa| results.push(SocketAddr::new(IpAddr::V6(aaaa.0), port))),
+                Ok(lookup) => lookup.answers().iter().take(16).for_each(|record| {
+                    if let RData::AAAA(aaaa) = record.data {
+                        results.push(SocketAddr::new(IpAddr::V6(aaaa.0), port));
+                    }
+                }),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
         }

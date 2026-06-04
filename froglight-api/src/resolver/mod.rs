@@ -211,7 +211,14 @@ impl NetworkResolver for hickory::Resolver {
         name: &str,
     ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn Error + Send + Sync>> {
         match self.as_resolver().lookup_ip(name).await {
-            Ok(lookup) => Ok(Box::new(lookup.into_iter())),
+            Ok(lookup) => Ok(Box::new(
+                lookup
+                    .as_lookup()
+                    .answers()
+                    .to_vec()
+                    .into_iter()
+                    .filter_map(|record| record.data.ip_addr()),
+            )),
             Err(err) => Err(Box::new(err)),
         }
     }
@@ -220,8 +227,14 @@ impl NetworkResolver for hickory::Resolver {
         &self,
         name: &str,
     ) -> Result<Box<dyn Iterator<Item = Ipv4Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        use hickory_resolver::proto::rr::RData;
+
         match self.as_resolver().ipv4_lookup(name).await {
-            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|a| a.0))),
+            Ok(lookup) => {
+                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                    if let RData::A(a) = record.data { Some(a.0) } else { None }
+                })))
+            }
             Err(err) => Err(Box::new(err)),
         }
     }
@@ -230,8 +243,14 @@ impl NetworkResolver for hickory::Resolver {
         &self,
         name: &str,
     ) -> Result<Box<dyn Iterator<Item = Ipv6Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        use hickory_resolver::proto::rr::RData;
+
         match self.as_resolver().ipv6_lookup(name).await {
-            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|aaaa| aaaa.0))),
+            Ok(lookup) => {
+                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                    if let RData::AAAA(aaaa) = record.data { Some(aaaa.0) } else { None }
+                })))
+            }
             Err(err) => Err(Box::new(err)),
         }
     }
@@ -240,8 +259,14 @@ impl NetworkResolver for hickory::Resolver {
         &self,
         name: &str,
     ) -> Result<Box<dyn Iterator<Item = String> + Send>, Box<dyn Error + Send + Sync>> {
+        use hickory_resolver::proto::rr::RData;
+
         match self.as_resolver().ns_lookup(name).await {
-            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|ns| ns.to_utf8()))),
+            Ok(lookup) => {
+                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                    if let RData::NS(ns) = &record.data { Some(ns.to_utf8()) } else { None }
+                })))
+            }
             Err(err) => Err(Box::new(err)),
         }
     }
@@ -250,9 +275,17 @@ impl NetworkResolver for hickory::Resolver {
         &self,
         name: &str,
     ) -> Result<Box<dyn Iterator<Item = (String, u16)> + Send>, Box<dyn Error + Send + Sync>> {
+        use hickory_resolver::proto::rr::RData;
+
         match self.as_resolver().srv_lookup(name).await {
             Ok(lookup) => {
-                Ok(Box::new(lookup.into_iter().map(|srv| (srv.target().to_utf8(), srv.port()))))
+                Ok(Box::new(lookup.answers().to_vec().into_iter().filter_map(|record| {
+                    if let RData::SRV(srv) = &record.data {
+                        Some((srv.target.to_utf8(), srv.port))
+                    } else {
+                        None
+                    }
+                })))
             }
             Err(err) => Err(Box::new(err)),
         }

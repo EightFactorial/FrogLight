@@ -55,12 +55,12 @@ impl PlayerProfile {
         Self::new(uuid, username)
     }
 
-    /// Get a reference to the player's [`Username`].
+    /// Get a reference to the player's real [`Username`].
     #[inline]
     #[must_use]
     pub const fn username(&self) -> &Username { &self.username }
 
-    /// Get a reference to the player's [`Uuid`].
+    /// Get a reference to the player's real [`Uuid`].
     #[inline]
     #[must_use]
     pub const fn uuid(&self) -> &Uuid { &self.uuid }

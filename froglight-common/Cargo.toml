@@ -55,7 +55,7 @@ libm = ["dep:libm", "glam?/nostd-libm"]
 # Enable support for a global allocator
 alloc = []
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "uuid?/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "glam?/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = []
 

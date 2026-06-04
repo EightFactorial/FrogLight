@@ -18,12 +18,10 @@ pub use hickory_resolver::{
     config::{ResolverConfig as HickoryConfig, ResolverOpts as HickoryOpts},
 };
 use hickory_resolver::{
-    name_server::GenericConnector,
-    proto::{
-        ProtoError,
-        runtime::{Executor, RuntimeProvider, Spawn, Time},
-        tcp::DnsTcpStream,
-        udp::DnsUdpSocket,
+    config::{CLOUDFLARE, GOOGLE, QUAD9},
+    net::{
+        NetError,
+        runtime::{DnsTcpStream, DnsUdpSocket, RuntimeProvider, Spawn, Time},
     },
 };
 use socket2::{Domain, Protocol, SockAddr, Socket, Type};
@@ -31,7 +29,7 @@ use socket2::{Domain, Protocol, SockAddr, Socket, Type};
 /// A [`NetworkResolver`](crate::resolver::NetworkResolver) implementation using
 /// [`hickory_resolver`].
 #[derive(Clone)]
-pub struct Resolver(HickoryResolver<GenericConnector<DnsExecutor>>);
+pub struct Resolver(HickoryResolver<DnsExecutor>);
 
 impl Default for Resolver {
     fn default() -> Self { Self::new_cloudflare() }
@@ -46,7 +44,11 @@ impl Resolver {
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
-    pub fn new_cloudflare() -> Self { Self::new_with_config(HickoryConfig::cloudflare(), None) }
+    #[expect(clippy::missing_panics_doc, reason = "The defaults should never panic")]
+    pub fn new_cloudflare() -> Self {
+        Self::new_with_config(HickoryConfig::udp_and_tcp(&CLOUDFLARE), None)
+            .expect("Failed to build Resolver with Cloudflare configuration?!")
+    }
 
     /// Creates a new [`Resolver`].
     ///
@@ -56,7 +58,11 @@ impl Resolver {
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
-    pub fn new_google() -> Self { Self::new_with_config(HickoryConfig::google(), None) }
+    #[expect(clippy::missing_panics_doc, reason = "The defaults should never panic")]
+    pub fn new_google() -> Self {
+        Self::new_with_config(HickoryConfig::udp_and_tcp(&GOOGLE), None)
+            .expect("Failed to build Resolver with Google configuration?!")
+    }
 
     /// Creates a new [`Resolver`].
     ///
@@ -66,40 +72,45 @@ impl Resolver {
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
-    pub fn new_quad9() -> Self { Self::new_with_config(HickoryConfig::quad9(), None) }
+    #[expect(clippy::missing_panics_doc, reason = "The defaults should never panic")]
+    pub fn new_quad9() -> Self {
+        Self::new_with_config(HickoryConfig::udp_and_tcp(&QUAD9), None)
+            .expect("Failed to build Resolver with Quad9 configuration?!")
+    }
 
     /// Creates a new [`Resolver`] from a [`HickoryConfig`] and optional
     /// [`HickoryOpts`].
-    #[must_use]
-    pub fn new_with_config(config: HickoryConfig, opts: Option<HickoryOpts>) -> Self {
-        let mut builder =
-            HickoryResolver::builder_with_config(config, GenericConnector::new(DnsExecutor));
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the resolver fails to build.
+    pub fn new_with_config(
+        config: HickoryConfig,
+        opts: Option<HickoryOpts>,
+    ) -> Result<Self, NetError> {
+        let mut builder = HickoryResolver::builder_with_config(config, DnsExecutor);
         if let Some(opts) = opts {
             builder = builder.with_options(opts);
         }
-        Self::new_from_resolver(builder.build())
+        builder.build().map(Self::new_from_resolver)
     }
 
     /// Creates a new [`Resolver`] from a [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn new_from_resolver(
-        resolver: HickoryResolver<GenericConnector<DnsExecutor>>,
-    ) -> Self {
+    pub const fn new_from_resolver(resolver: HickoryResolver<DnsExecutor>) -> Self {
         Self(resolver)
     }
 
     /// Returns a reference to the inner [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn as_resolver(&self) -> &HickoryResolver<GenericConnector<DnsExecutor>> { &self.0 }
+    pub const fn as_resolver(&self) -> &HickoryResolver<DnsExecutor> { &self.0 }
 
     /// Returns a mutable reference to the inner [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn as_resolver_mut(&mut self) -> &mut HickoryResolver<GenericConnector<DnsExecutor>> {
-        &mut self.0
-    }
+    pub const fn as_resolver_mut(&mut self) -> &mut HickoryResolver<DnsExecutor> { &mut self.0 }
 }
 
 impl Debug for Resolver {
@@ -109,7 +120,7 @@ impl Debug for Resolver {
 }
 
 impl Deref for Resolver {
-    type Target = HickoryResolver<GenericConnector<DnsExecutor>>;
+    type Target = HickoryResolver<DnsExecutor>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
@@ -125,19 +136,8 @@ impl DerefMut for Resolver {
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DnsExecutor;
 
-impl Executor for DnsExecutor {
-    #[inline]
-    fn new() -> Self { Self }
-
-    #[inline]
-    fn block_on<F: Future>(&mut self, future: F) -> F::Output { async_io::block_on(future) }
-}
-
 impl Spawn for DnsExecutor {
-    fn spawn_bg<F>(&mut self, future: F)
-    where
-        F: Future<Output = Result<(), ProtoError>> + Send + 'static,
-    {
+    fn spawn_bg(&mut self, future: impl Future<Output = ()> + Send + 'static) {
         #[cfg(feature = "bevy")]
         bevy_tasks::IoTaskPool::get().spawn(future).detach();
         #[cfg(not(feature = "bevy"))]

@@ -6,6 +6,7 @@ use froglight_api::{
     player::PlayerTextureProperty,
     prelude::*,
 };
+use froglight_player::prelude::Username;
 use ureq::{Agent, config::Config, unversioned::transport::DefaultConnector};
 use uuid::Uuid;
 
@@ -38,7 +39,7 @@ fn trace() -> tracing::subscriber::DefaultGuard {
 #[test]
 fn player_uuid() {
     const INPUT: &str = "Mr_Sus_";
-    const EXPECTED: Uuid = Uuid::from_u128_le(259778710492803530310996621428516138805);
+    const EXPECTED: Uuid = Uuid::from_u128_le(0xC36F_8F4B_76C8_DCAE_DF4B_6ACB_AB97_2F35);
 
     #[cfg(feature = "tracing")]
     let _guard = trace();
@@ -49,7 +50,7 @@ fn player_uuid() {
 
 #[test]
 fn player_username() {
-    const INPUT: Uuid = Uuid::from_u128_le(259778710492803530310996621428516138805);
+    const INPUT: Uuid = Uuid::from_u128_le(0xC36F_8F4B_76C8_DCAE_DF4B_6ACB_AB97_2F35);
     const EXPECTED: &str = "Mr_Sus_";
 
     #[cfg(feature = "tracing")]
@@ -57,7 +58,7 @@ fn player_username() {
     let (api, client) = api();
     let username = block_on(api.query_username(INPUT, &client)).unwrap();
     assert_eq!(
-        username.as_ref().map(|u| u.as_str()),
+        username.as_ref().map(Username::as_str),
         Some(EXPECTED),
         "Got \"{username:?}\", expected \"Some({EXPECTED})\""
     );
@@ -65,7 +66,7 @@ fn player_username() {
 
 #[test]
 fn player_profile() {
-    const INPUT: Uuid = Uuid::from_u128_le(259778710492803530310996621428516138805);
+    const INPUT: Uuid = Uuid::from_u128_le(0xC36F_8F4B_76C8_DCAE_DF4B_6ACB_AB97_2F35);
     const EXPECTED: &str = "Mr_Sus_";
 
     #[cfg(feature = "tracing")]
@@ -84,5 +85,5 @@ fn player_profile() {
         property.as_ref().map(|p| p.profile_name.as_str()),
         Some(EXPECTED),
         "Texture doesn't belong to the expected user?!"
-    )
+    );
 }
