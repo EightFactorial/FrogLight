@@ -12,10 +12,13 @@ pub mod plugins {
         modules::{
             brigadier::bevy::BrigadierPlugin, common::bevy::CommonPlugin,
             entity::bevy::EntityPlugin, inventory::bevy::InventoryPlugin,
-            physics::bevy::PhysicsPlugin, player::bevy::PlayerPlugin, world::bevy::WorldPlugin,
+            physics::bevy::PhysicsPlugin, player::bevy::PlayerPlugin, text::bevy::TextPlugin,
+            world::bevy::WorldPlugin,
         },
     };
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A [`PluginGroup`] that includes all of froglight's bevy
 /// [`Plugin`](bevy_app::Plugin)s.
@@ -38,6 +41,7 @@ impl PluginGroup for FroglightPlugins {
             .add(plugins::InventoryPlugin)
             .add(plugins::PhysicsPlugin)
             .add(plugins::PlayerPlugin)
+            .add(plugins::TextPlugin)
             .add(plugins::WorldPlugin)
     }
 }

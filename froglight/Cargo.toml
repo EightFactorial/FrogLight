@@ -25,7 +25,7 @@ froglight-internal = { workspace = true }
 
 [dev-dependencies]
 async-net = { workspace = true }
-bevy = { features = ["bevy_log", "multi_threaded", "std", "sysinfo_plugin"], workspace = true }
+bevy = { features = ["async_executor", "bevy_log", "multi_threaded", "std", "sysinfo_plugin"], workspace = true }
 
 [[example]]
 name = "frogbot"
@@ -35,12 +35,10 @@ required-features = ["bevy", "default", "v26_1"]
 # --- Features ---
 
 [features]
-default = ["network", "multi_threaded", "std"]
+default = ["network", "std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
-# Enable multi-threading.
-multi_threaded = ["froglight-internal/multi_threaded"]
 # Enable networking support.
 network = ["froglight-internal/network", "std"]
 # Enable `tracing` support.

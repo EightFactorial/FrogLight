@@ -12,14 +12,19 @@ pub mod modules {
     pub use froglight_brigadier as brigadier;
     pub use froglight_common as common;
     pub use froglight_entity as entity;
+    pub use froglight_facet as facet;
     pub use froglight_inventory as inventory;
     pub use froglight_math as math;
+    pub use froglight_mutf8 as mutf8;
+    pub use froglight_nbt as nbt;
     #[cfg(feature = "network")]
     pub use froglight_network as network;
     pub use froglight_packet as packet;
     pub use froglight_physics as physics;
     pub use froglight_player as player;
     pub use froglight_registry as registry;
+    pub use froglight_snbt as snbt;
+    pub use froglight_text as text;
     pub use froglight_world as world;
 }
 
@@ -33,8 +38,9 @@ pub mod prelude {
     pub use crate::modules::{api::prelude::*, network::prelude::*};
     pub use crate::modules::{
         biome::prelude::*, block::prelude::*, common::prelude::*, entity::prelude::*,
-        inventory::prelude::*, math::prelude::*, packet::prelude::*, physics::prelude::*,
-        player::prelude::*, registry::prelude::*, world::prelude::*,
+        facet::prelude::*, inventory::prelude::*, math::prelude::*, mutf8::prelude::*,
+        nbt::prelude::*, packet::prelude::*, physics::prelude::*, player::prelude::*,
+        registry::prelude::*, snbt::prelude::*, text::prelude::*, world::prelude::*,
     };
     #[cfg(feature = "bevy")]
     pub use crate::{bevy::plugins::FroglightPlugins, modules::brigadier::prelude::*};

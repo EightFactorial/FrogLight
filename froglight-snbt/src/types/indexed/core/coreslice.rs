@@ -1,12 +1,12 @@
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::range::Range;
 
 use crate::types::indexed::{core::IndexCore, entry::EntryIndex};
 
 /// TODO
 pub struct SliceCore<'data> {
-    pub(super) root: &'data str,
-    pub(super) entries: Vec<EntryIndex>,
+    pub(crate) root: &'data str,
+    pub(crate) entries: Box<[EntryIndex]>,
 }
 
 impl IndexCore for SliceCore<'_> {
@@ -28,7 +28,7 @@ impl<'data> SliceCore<'data> {
     /// The caller must ensure that the entry list is valid for the root string.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(root: &'data str, entries: Vec<EntryIndex>) -> Self {
+    pub const unsafe fn new(root: &'data str, entries: Box<[EntryIndex]>) -> Self {
         Self { root, entries }
     }
 
@@ -40,5 +40,5 @@ impl<'data> SliceCore<'data> {
     /// Get a slice of the entries in this [`SliceCore`].
     #[inline]
     #[must_use]
-    pub const fn entries(&self) -> &[EntryIndex] { self.entries.as_slice() }
+    pub const fn entries(&self) -> &[EntryIndex] { &self.entries }
 }

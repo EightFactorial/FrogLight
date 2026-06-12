@@ -69,9 +69,9 @@ impl<T: Indexable + ?Sized> Index<T> {
     /// and matches the description.
     #[inline]
     #[must_use]
-    pub const unsafe fn new_from(slice: &str, start: usize, settings: T::Description) -> Self {
+    pub const unsafe fn new_from(slice: &str, start: usize, description: T::Description) -> Self {
         // SAFETY: The caller ensures that this is safe.
-        unsafe { Self::new(Range { start, end: start + slice.len() }, settings) }
+        unsafe { Self::new(Range { start, end: start + slice.len() }, description) }
     }
 
     /// Get the range of the indexed value.

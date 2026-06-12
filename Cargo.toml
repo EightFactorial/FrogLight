@@ -27,13 +27,15 @@ froglight-text = { default-features = false, path = "froglight-text", version = 
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
-bevy = { default-features = false, version = "0.19.0-rc.2" }
-bevy_app = { default-features = false, version = "0.19.0-rc.2" }
-bevy_ecs = { default-features = false, version = "0.19.0-rc.2" }
-bevy_math = { default-features = false, version = "0.19.0-rc.2" }
-bevy_reflect = { default-features = false, version = "0.19.0-rc.2" }
-bevy_tasks = { default-features = false, version = "0.19.0-rc.2" }
-bevy_transform = { default-features = false, version = "0.19.0-rc.2" }
+bevy = { default-features = false, version = "0.19.0-rc.3" }
+bevy_app = { default-features = false, version = "0.19.0-rc.3" }
+bevy_ecs = { default-features = false, version = "0.19.0-rc.3" }
+bevy_math = { default-features = false, version = "0.19.0-rc.3" }
+bevy_reflect = { default-features = false, version = "0.19.0-rc.3" }
+bevy_sprite = { default-features = false, version = "0.19.0-rc.3" }
+bevy_tasks = { default-features = false, version = "0.19.0-rc.3" }
+bevy_transform = { default-features = false, version = "0.19.0-rc.3" }
+bevy_ui = { default-features = false, version = "0.19.0-rc.3" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "=0.46" }
@@ -70,13 +72,13 @@ async-io = { default-features = false, version = "2.6" }
 async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 async-trait = { default-features = false, version = "0.1" }
-bitflags = { default-features = false, version = "2.12" }
+bitflags = { default-features = false, version = "2.13" }
 bitvec = { default-features = false, version = "1.0" }
 blocking = { default-features = false, version = "1.6" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "=0.32" }
-hashbrown = { default-features = false, version = "=0.16" }
+hashbrown = { default-features = false, version = "0.17" }
 hickory-resolver = { default-features = false, version = "0.26" }
 indexmap = { default-features = false, version = "2.14" }
 lexical = { default-features = false, version = "7.0" }
@@ -91,6 +93,7 @@ regex-lite = { default-features = false, version = "0.1" }
 replace_with = { default-features = false, version = "0.1" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
+serde_core = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, version = "1.0" }
 simdutf8 = { default-features = false, version = "0.1" }
 smallvec = { default-features = false, version = "1.15" }
@@ -99,7 +102,7 @@ tokio = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.3" }
 uuid = { default-features = false, version = "1.23" }
-variadics_please = { default-features = false, version = "1.1" }
+variadics_please = { default-features = false, version = "2.0" }
 zerocopy = { default-features = false, version = "0.8" }
 
 # Debug Dependencies

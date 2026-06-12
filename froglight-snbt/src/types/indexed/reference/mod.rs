@@ -3,7 +3,6 @@
 use alloc::{borrow::Cow, string::String};
 use core::fmt;
 
-// use froglight_nbt::types::indexed::types::{IndexedListType, IndexedMapType};
 use crate::types::indexed::index::{
     Index, Indexable,
     numeric::{Float, Integer},
@@ -51,6 +50,13 @@ impl<'data, T: Referenceable + ?Sized> IndexedReference<'data, T> {
     #[inline]
     #[must_use]
     pub fn get(self) -> T::Value<'data> { T::get_value(self) }
+
+    /// Get a description of this value.
+    #[inline]
+    #[must_use]
+    pub const fn description(&self) -> <T::Indexable as Indexable>::Description {
+        self.index.description()
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

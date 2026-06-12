@@ -1,6 +1,6 @@
 //! TODO
 
-use core::range::Range;
+use core::{fmt, range::Range};
 
 use crate::types::indexed::index::{
     Index, Indexable, IndexableValue,
@@ -21,10 +21,10 @@ impl Indexable for bool {
 }
 
 /// A description of a boolean value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BoolDescription {
-    /// A simple `bool` value.
-    Boolean(BooleanOperation),
+    /// A simple `true` or `false` value.
+    Boolean,
     /// A `bool(...)` operation on an integer value.
     Integer(IntegerDescription),
 }
@@ -33,12 +33,22 @@ impl BoolDescription {
     /// Create a new [`BoolDescription::Boolean`].
     #[inline]
     #[must_use]
-    pub const fn new(operation: BooleanOperation) -> Self { Self::Boolean(operation) }
+    #[expect(clippy::new_without_default, reason = "No default value")]
+    pub const fn new() -> Self { Self::Boolean }
 
     /// Create a new [`BoolDescription::Integer`].
     #[inline]
     #[must_use]
     pub const fn new_integer(desc: IntegerDescription) -> Self { Self::Integer(desc) }
+}
+
+impl fmt::Debug for BoolDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Boolean => write!(f, "Boolean"),
+            Self::Integer(desc) => write!(f, "Integer({desc:?})"),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -71,15 +81,9 @@ impl IndexableValue for bool {
 
     unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
         match index.description() {
-            BoolDescription::Boolean(operation) => {
+            BoolDescription::Boolean => {
                 // SAFETY: The caller ensures that this is safe.
-                let mut slice = unsafe { root.get_unchecked(index.range) };
-
-                // Shrink the slice to exclude the `bool(` and `)` parts.
-                if operation == BooleanOperation::True {
-                    debug_assert!(index.range.end - index.range.start >= 6);
-                    slice = unsafe { slice.get_unchecked(5..slice.len() - 1) };
-                }
+                let slice = unsafe { root.get_unchecked(index.range) };
 
                 match slice {
                     "true" => BooleanValue::Bool(true),

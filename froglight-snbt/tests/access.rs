@@ -1,19 +1,18 @@
 //! TODO
-#![no_std]
 
 use froglight_snbt::types::indexed::IndexedSnbt;
 
 extern crate alloc;
-#[cfg(feature = "std")]
-extern crate std;
 
 #[test]
 fn short() {
-    static STRING: &str = "{entry_name: entry_value, Short: 0x1234}";
+    static STRING: &str =
+        "{ entry_name: entry_value, Short: [I; 0b, 10b, false, bool(1), bool(222uL)] }";
 
-    // Parse `STRING`
+    let snbt = IndexedSnbt::new_ref(STRING).unwrap();
 
-    let snbt = IndexedSnbt::new_str(STRING).unwrap();
-    #[cfg(feature = "std")]
-    std::println!("Parsed SNBT: {:?}", snbt.core());
+    std::println!("Raw SNBT: {STRING}");
+    std::println!("Parsed SNBT: {:?}", snbt.root());
+
+    std::println!("\nShort: {:?}", snbt.root().get("Short").unwrap());
 }

@@ -31,8 +31,9 @@ glam = { workspace = true }
 arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
-bevy_tasks = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+bevy_tasks = { workspace = true, optional = true }
+bevy_transform = { features = ["alloc", "bevy-support", "bevy_reflect"], workspace = true, optional = true }
 libm = { workspace = true, optional = true }
 quick_cache = { features = ["ahash", "parking_lot"], workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
@@ -49,13 +50,13 @@ bevy = ["alloc", "dep:arc-swap", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_tasks
 serde = ["dep:serde", "froglight-common/serde", "glam/serde"]
 
 # Enable `libm` for `no_std` support.
-libm = ["dep:libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
+libm = ["bevy_transform?/libm", "dep:libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing"]
 
 # Enable support for a global allocator
 alloc = ["froglight-common/alloc", "serde?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitflags/std", "dep:quick_cache", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std", "serde?/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bevy_transform?/std", "bitflags/std", "dep:quick_cache", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std", "serde?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-math/nightly", "froglight-world/std", "std"]

@@ -7,7 +7,10 @@ use lexical::{
     FromLexicalWithOptions, NumberFormatBuilder, ParseFloatOptions, ParseIntegerOptions,
 };
 
-use crate::types::indexed::index::{Index, Indexable, IndexableValue};
+use crate::types::indexed::index::{
+    Index, Indexable, IndexableValue,
+    bool::{BoolDescription, BooleanOperation},
+};
 
 /// An integer value.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,6 +38,8 @@ pub enum IntegerType {
     ///
     /// Equivalent to [`IntegerType::Int`].
     None,
+    /// A [`bool`] value.
+    Bool,
     /// A [`u8`] value.
     Byte,
     /// A [`u16`] value.
@@ -68,13 +73,19 @@ bitflags! {
         const RADIX_MASK = 0b0000_0011;
         const TYPE_MASK = 0b0001_1100;
         const SIGNNESS_MASK = 0b0110_0000;
+        const BOOLEAN_MASK = 0b1000_0000;
     }
 }
 
 impl IntegerDescription {
     /// Create a new [`IntegerDescription`].
     #[must_use]
-    pub const fn new(radix: IntegerRadix, ty: IntegerType, sign: IntegerSignness) -> Self {
+    pub const fn new(
+        radix: IntegerRadix,
+        ty: IntegerType,
+        sign: IntegerSignness,
+        operation: BooleanOperation,
+    ) -> Self {
         let mut flags = IntegerFlags::empty();
 
         flags = match radix {
@@ -85,16 +96,22 @@ impl IntegerDescription {
 
         flags = match ty {
             IntegerType::None => flags.union(IntegerFlags::from_bits_retain(0b0000_0000)),
-            IntegerType::Byte => flags.union(IntegerFlags::from_bits_retain(0b0000_0100)),
-            IntegerType::Short => flags.union(IntegerFlags::from_bits_retain(0b0000_1000)),
-            IntegerType::Int => flags.union(IntegerFlags::from_bits_retain(0b0000_1100)),
-            IntegerType::Long => flags.union(IntegerFlags::from_bits_retain(0b0001_0000)),
+            IntegerType::Bool => flags.union(IntegerFlags::from_bits_retain(0b0000_0100)),
+            IntegerType::Byte => flags.union(IntegerFlags::from_bits_retain(0b0000_1000)),
+            IntegerType::Short => flags.union(IntegerFlags::from_bits_retain(0b0000_1100)),
+            IntegerType::Int => flags.union(IntegerFlags::from_bits_retain(0b0001_0000)),
+            IntegerType::Long => flags.union(IntegerFlags::from_bits_retain(0b0001_0100)),
         };
 
         flags = match sign {
             IntegerSignness::None => flags.union(IntegerFlags::from_bits_retain(0b0000_0000)),
             IntegerSignness::Signed => flags.union(IntegerFlags::from_bits_retain(0b0010_0000)),
             IntegerSignness::Unsigned => flags.union(IntegerFlags::from_bits_retain(0b0100_0000)),
+        };
+
+        flags = match operation {
+            BooleanOperation::False => flags.union(IntegerFlags::from_bits_retain(0b0000_0000)),
+            BooleanOperation::True => flags.union(IntegerFlags::from_bits_retain(0b1000_0000)),
         };
 
         Self(flags)
@@ -114,20 +131,33 @@ impl IntegerDescription {
         }
     }
 
+    /// Set the [`IntegerRadix`] of this value.
+    #[must_use]
+    pub const fn with_radix(self, radix: IntegerRadix) -> Self {
+        Self::new(radix, self.ty(), self.signness(), self.boolean_operation())
+    }
+
     /// Get the [`IntegerType`] of this value.
     #[must_use]
     pub const fn ty(&self) -> IntegerType {
         match self.0.intersection(IntegerFlags::TYPE_MASK).bits() {
             0b0000_0000 => IntegerType::None,
-            0b0000_0100 => IntegerType::Byte,
-            0b0000_1000 => IntegerType::Short,
-            0b0000_1100 => IntegerType::Int,
-            0b0001_0000 => IntegerType::Long,
+            0b0000_0100 => IntegerType::Bool,
+            0b0000_1000 => IntegerType::Byte,
+            0b0000_1100 => IntegerType::Short,
+            0b0001_0000 => IntegerType::Int,
+            0b0001_0100 => IntegerType::Long,
             #[cfg(debug_assertions)]
             _ => unreachable!(),
             #[cfg(not(debug_assertions))]
             _ => unsafe { core::hint::unreachable_unchecked() },
         }
+    }
+
+    /// Set the [`IntegerType`] of this value.
+    #[must_use]
+    pub const fn with_ty(self, ty: IntegerType) -> Self {
+        Self::new(self.radix(), ty, self.signness(), self.boolean_operation())
     }
 
     /// Get the [`IntegerSignness`] of this value.
@@ -143,6 +173,31 @@ impl IntegerDescription {
             _ => unsafe { core::hint::unreachable_unchecked() },
         }
     }
+
+    /// Set the [`IntegerSignness`] of this value.
+    #[must_use]
+    pub const fn with_signness(self, signness: IntegerSignness) -> Self {
+        Self::new(self.radix(), self.ty(), signness, self.boolean_operation())
+    }
+
+    /// Get the [`BooleanOperation`] of this value.
+    #[must_use]
+    pub const fn boolean_operation(&self) -> BooleanOperation {
+        match self.0.intersection(IntegerFlags::BOOLEAN_MASK).bits() {
+            0b0000_0000 => BooleanOperation::False,
+            0b1000_0000 => BooleanOperation::True,
+            #[cfg(debug_assertions)]
+            _ => unreachable!(),
+            #[cfg(not(debug_assertions))]
+            _ => unsafe { core::hint::unreachable_unchecked() },
+        }
+    }
+
+    /// Set the [`BooleanOperation`] of this value.
+    #[must_use]
+    pub const fn with_boolean_operation(self, operation: BooleanOperation) -> Self {
+        Self::new(self.radix(), self.ty(), self.signness(), operation)
+    }
 }
 
 impl fmt::Debug for IntegerDescription {
@@ -151,6 +206,7 @@ impl fmt::Debug for IntegerDescription {
             .field("radix", &self.radix())
             .field("ty", &self.ty())
             .field("signness", &self.signness())
+            .field("boolean_operation", &self.boolean_operation())
             .finish()
     }
 }
@@ -172,6 +228,17 @@ pub enum IntegerValue {
 
 #[expect(clippy::cast_possible_truncation, reason = "Expected Behavior")]
 impl IntegerValue {
+    /// Get this [`IntegerValue`] as a [`bool`].
+    #[must_use]
+    pub const fn as_bool(self) -> bool {
+        match self {
+            Self::Byte(v) => v != 0,
+            Self::Short(v) => v != 0,
+            Self::Int(v) => v != 0,
+            Self::Long(v) => v != 0,
+        }
+    }
+
     /// Get this [`IntegerValue`] as a [`u8`].
     #[must_use]
     pub const fn as_u8(self) -> u8 {
@@ -218,12 +285,13 @@ impl IntegerValue {
 }
 
 pub(crate) static INTEGER_DECIMAL_FORMAT: u128 = NumberFormatBuilder::new()
-    .digit_separator(NonZeroU8::new(b'_'))
     .no_exponent_notation(true)
-    .consecutive_digit_separator(true)
-    .internal_digit_separator(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .integer_digit_separator_flags(true)
     .leading_digit_separator(false)
     .trailing_digit_separator(false)
+    .internal_digit_separator(true)
+    .consecutive_digit_separator(true)
     .build_strict();
 
 pub(crate) static INTEGER_BINARY_FORMAT: u128 = NumberFormatBuilder::new()
@@ -232,12 +300,13 @@ pub(crate) static INTEGER_BINARY_FORMAT: u128 = NumberFormatBuilder::new()
     .exponent_radix(NonZeroU8::new(2))
     .base_prefix(NonZeroU8::new(b'b'))
     .case_sensitive_base_prefix(true)
-    .digit_separator(NonZeroU8::new(b'_'))
     .no_exponent_notation(true)
-    .consecutive_digit_separator(true)
-    .internal_digit_separator(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .integer_digit_separator_flags(true)
     .leading_digit_separator(false)
     .trailing_digit_separator(false)
+    .internal_digit_separator(true)
+    .consecutive_digit_separator(true)
     .build_strict();
 
 pub(crate) static INTEGER_HEXADECIMAL_FORMAT: u128 = NumberFormatBuilder::new()
@@ -246,12 +315,13 @@ pub(crate) static INTEGER_HEXADECIMAL_FORMAT: u128 = NumberFormatBuilder::new()
     .exponent_radix(NonZeroU8::new(16))
     .base_prefix(NonZeroU8::new(b'x'))
     .case_sensitive_base_prefix(true)
-    .digit_separator(NonZeroU8::new(b'_'))
     .no_exponent_notation(true)
-    .consecutive_digit_separator(true)
-    .internal_digit_separator(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .integer_digit_separator_flags(true)
     .leading_digit_separator(false)
     .trailing_digit_separator(false)
+    .internal_digit_separator(true)
+    .consecutive_digit_separator(true)
     .build_strict();
 
 pub(crate) static INTEGER_OPTIONS: ParseIntegerOptions =
@@ -269,20 +339,27 @@ impl IndexableValue for Integer {
 
         let desc = index.description();
 
-        // Trim any suffix chars from the end of the slice.
-        match (desc.signness(), desc.ty()) {
-            (IntegerSignness::None, IntegerType::None) => {
-                debug_assert!(!slice.is_empty());
-            }
-            (IntegerSignness::None, _) | (_, IntegerType::None) => {
-                // SAFETY: `Index` guarantees the description is valid.
-                debug_assert!(slice.len() >= 2);
-                slice = unsafe { slice.get_unchecked(..slice.len() - 1) };
-            }
-            _ => {
-                // SAFETY: `Index` guarantees the description is valid.
-                debug_assert!(slice.len() >= 3);
-                slice = unsafe { slice.get_unchecked(..slice.len() - 2) };
+        // Handle `IntegerType::Bool` seperately.
+        if matches!(desc.ty(), IntegerType::Bool) {
+            let desc = BoolDescription::Boolean;
+            return unsafe {
+                let index = Index::<bool>::new(index.range, desc);
+                IntegerValue::Byte(u8::from(index.read_value(root).as_bool()))
+            };
+        }
+
+        if !matches!(desc.ty(), IntegerType::None)
+            && slice
+                .chars()
+                .last()
+                .is_some_and(|c| matches!(c, 'b' | 'B' | 's' | 'S' | 'i' | 'I' | 'l' | 'L'))
+        {
+            slice = &slice[..slice.len() - 1];
+
+            if !matches!(desc.signness(), IntegerSignness::None)
+                && slice.chars().last().is_some_and(|c| matches!(c, 'u' | 's'))
+            {
+                slice = &slice[..slice.len() - 1];
             }
         }
 
@@ -293,6 +370,8 @@ impl IndexableValue for Integer {
         // SAFETY: `Index` guarantees that this is valid.
         unsafe {
             match desc.ty() {
+                // `IntegerType::Bool` is handled above.
+                IntegerType::Bool => core::hint::unreachable_unchecked(),
                 IntegerType::Byte => match desc.radix() {
                     IntegerRadix::Binary => read_binary::<u8>(slice, options),
                     IntegerRadix::Decimal => read_decimal::<u8>(slice, options),
@@ -482,6 +561,10 @@ impl FloatDescription {
         }
     }
 
+    /// Set the [`FloatRepresentation`] of this value.
+    #[must_use]
+    pub const fn with_repr(self, repr: FloatRepresentation) -> Self { Self::new(repr, self.ty()) }
+
     /// Get the [`FloatType`] of this value.
     #[must_use]
     pub const fn ty(&self) -> FloatType {
@@ -494,6 +577,10 @@ impl FloatDescription {
             _ => unsafe { core::hint::unreachable_unchecked() },
         }
     }
+
+    /// Set the [`FloatType`] of this value.
+    #[must_use]
+    pub const fn with_ty(self, ty: FloatType) -> Self { Self::new(self.repr(), ty) }
 }
 
 impl fmt::Debug for FloatDescription {
@@ -538,12 +625,13 @@ impl FloatValue {
 }
 
 pub(crate) static FLOAT_FORMAT: u128 = NumberFormatBuilder::new()
-    .digit_separator(NonZeroU8::new(b'_'))
     .no_exponent_notation(false)
-    .consecutive_digit_separator(true)
-    .internal_digit_separator(true)
+    .digit_separator(NonZeroU8::new(b'_'))
+    .integer_digit_separator_flags(true)
     .leading_digit_separator(false)
     .trailing_digit_separator(false)
+    .internal_digit_separator(true)
+    .consecutive_digit_separator(true)
     .build_strict();
 
 pub(crate) static FLOAT_OPTIONS: ParseFloatOptions = ParseFloatOptions::builder().build_strict();
@@ -554,10 +642,6 @@ impl IndexableValue for Float {
     unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
         // SAFETY: The caller ensures that this is safe.
         let slice = unsafe { root.get_unchecked(index.range) };
-
-        // Trim the suffix char from the end of the slice.
-        debug_assert!(slice.len() >= 2);
-        let slice = unsafe { slice.get_unchecked(..slice.len() - 1) };
 
         // SAFETY: `Index` guarantees that this is valid.
         unsafe {

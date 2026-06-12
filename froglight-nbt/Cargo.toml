@@ -51,6 +51,8 @@ froglight-facet = ["dep:froglight-facet", "facet"]
 
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-mutf8/tracing"]
+# Enable extended `tracing` support.
+tracing_ext = ["tracing"]
 
 # Enable support for a global allocator
 alloc = ["facet?/alloc", "froglight-mutf8/alloc"]

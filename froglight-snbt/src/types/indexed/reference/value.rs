@@ -1,13 +1,13 @@
 use alloc::string::String;
-use core::{fmt, marker::PhantomData};
+use core::fmt;
 
 // use froglight_nbt::types::indexed::types::{IndexedListType, IndexedMapType};
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::IndexCore,
-    entry::ValueIndex,
+    entry::{ValueDescription, ValueIndex},
     index::numeric::{FloatValue, IntegerValue},
-    list::IndexedList,
+    list::{IndexedList, IndexedSlice},
     reference::IndexedReference,
 };
 
@@ -28,7 +28,7 @@ pub enum ValueReference<'data, C: IndexCore> {
     /// A [`f64`] value.
     Double(IndexedReference<'data, f64>),
     /// A slice of [`u8`] values.
-    ByteArray(PhantomData<C>),
+    ByteArray(IndexedSlice<'data, C, u8>),
     /// A [`String`] value.
     String(IndexedReference<'data, String>),
     /// A list of values.
@@ -36,9 +36,9 @@ pub enum ValueReference<'data, C: IndexCore> {
     /// A compound of named entries.
     Compound(IndexedCompound<'data, C>),
     /// A slice of [`u32`] values.
-    IntArray(PhantomData<C>),
+    IntArray(IndexedSlice<'data, C, u32>),
     /// A slice of [`u64`] values.
-    LongArray(PhantomData<C>),
+    LongArray(IndexedSlice<'data, C, u64>),
 }
 
 impl<'data, C: IndexCore> ValueReference<'data, C> {
@@ -84,9 +84,34 @@ impl<'data, C: IndexCore> ValueReference<'data, C> {
                 Self::Compound(unsafe { IndexedCompound::new(core, index.range()) })
             }
 
-            ValueIndex::ByteArray(_index) => todo!(),
-            ValueIndex::IntArray(_index) => todo!(),
-            ValueIndex::LongArray(_index) => todo!(),
+            ValueIndex::ByteArray(index) => {
+                // SAFETY: `Index<IndexedSliceType<u8>>` has a valid `IndexedSlice<u8>` range.
+                Self::ByteArray(unsafe { IndexedSlice::new(core, index.range()) })
+            }
+            ValueIndex::IntArray(index) => {
+                // SAFETY: `Index<IndexedSliceType<u32>>` has a valid `IndexedSlice<u32>` range.
+                Self::IntArray(unsafe { IndexedSlice::new(core, index.range()) })
+            }
+            ValueIndex::LongArray(index) => {
+                // SAFETY: `Index<IndexedSliceType<u64>>` has a valid `IndexedSlice<u64>` range.
+                Self::LongArray(unsafe { IndexedSlice::new(core, index.range()) })
+            }
+        }
+    }
+
+    /// Get a description of this value.
+    #[must_use]
+    pub const fn description(&self) -> ValueDescription {
+        match self {
+            Self::Bool(index) => ValueDescription::Bool(index.description()),
+            Self::Byte(index) => ValueDescription::Int(index.description()),
+            Self::Short(index) => ValueDescription::Int(index.description()),
+            Self::Int(index) => ValueDescription::Int(index.description()),
+            Self::Long(index) => ValueDescription::Int(index.description()),
+            Self::Float(index) => ValueDescription::Float(index.description()),
+            Self::Double(index) => ValueDescription::Float(index.description()),
+            Self::String(index) => ValueDescription::String(index.description()),
+            _ => ValueDescription::None,
         }
     }
 }
@@ -175,6 +200,27 @@ impl<'data, C: IndexCore> ValueReference<'data, C> {
     pub const fn as_compound(self) -> Option<IndexedCompound<'data, C>> {
         if let Self::Compound(value) = self { Some(value) } else { None }
     }
+
+    /// Return a reference to the stored value if it is of type [`IndexedSlice`]
+    /// of [`u8`], else `None`.
+    #[must_use]
+    pub const fn as_byte_array(self) -> Option<IndexedSlice<'data, C, u8>> {
+        if let Self::ByteArray(value) = self { Some(value) } else { None }
+    }
+
+    /// Return a reference to the stored value if it is of type [`IndexedSlice`]
+    /// of [`u32`], else `None`.
+    #[must_use]
+    pub const fn as_int_array(self) -> Option<IndexedSlice<'data, C, u32>> {
+        if let Self::IntArray(value) = self { Some(value) } else { None }
+    }
+
+    /// Return a reference to the stored value if it is of type [`IndexedSlice`]
+    /// of [`u64`], else `None`.
+    #[must_use]
+    pub const fn as_long_array(self) -> Option<IndexedSlice<'data, C, u64>> {
+        if let Self::LongArray(value) = self { Some(value) } else { None }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -194,9 +240,9 @@ impl<C: IndexCore> fmt::Debug for ValueReference<'_, C> {
             Self::List(value) => f.debug_tuple("List").field(value).finish(),
             Self::Compound(value) => f.debug_tuple("Compound").field(value).finish(),
 
-            Self::ByteArray(_) => f.debug_tuple("ByteArray").finish_non_exhaustive(),
-            Self::IntArray(_) => f.debug_tuple("IntArray").finish_non_exhaustive(),
-            Self::LongArray(_) => f.debug_tuple("LongArray").finish_non_exhaustive(),
+            Self::ByteArray(value) => f.debug_tuple("ByteArray").field(value).finish(),
+            Self::IntArray(value) => f.debug_tuple("IntArray").field(value).finish(),
+            Self::LongArray(value) => f.debug_tuple("LongArray").field(value).finish(),
         }
     }
 }
@@ -223,9 +269,9 @@ impl<C: IndexCore> PartialEq for ValueReference<'_, C> {
             (Self::List(a), Self::List(b)) => a == b,
             (Self::Compound(a), Self::Compound(b)) => a == b,
 
-            (Self::ByteArray(_), Self::ByteArray(_)) => todo!(),
-            (Self::IntArray(_), Self::IntArray(_)) => todo!(),
-            (Self::LongArray(_), Self::LongArray(_)) => todo!(),
+            (Self::ByteArray(a), Self::ByteArray(b)) => a == b,
+            (Self::IntArray(a), Self::IntArray(b)) => a == b,
+            (Self::LongArray(a), Self::LongArray(b)) => a == b,
 
             _ => false,
         }

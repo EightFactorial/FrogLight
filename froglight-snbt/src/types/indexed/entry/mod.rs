@@ -4,7 +4,7 @@ use alloc::string::String;
 use core::fmt;
 
 mod index;
-pub use index::{EntryIndex, ValueIndex};
+pub use index::{EntryIndex, ValueDescription, ValueIndex};
 
 use crate::types::indexed::{
     core::IndexCore,

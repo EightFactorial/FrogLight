@@ -27,6 +27,10 @@ froglight-snbt = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
+bevy_app = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true }
+bevy_sprite = { workspace = true, optional = true }
+bevy_ui = { workspace = true, optional = true }
 facet = { features = ["alloc", "reflect"], workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
@@ -38,6 +42,12 @@ tracing = { workspace = true, optional = true }
 [features]
 default = ["std"]
 
+# Enable `bevy` support.
+bevy = ["dep:bevy_app", "dep:bevy_ecs"]
+# Enable `bevy_ui` (Text) support.
+bevy_ui = ["bevy", "dep:bevy_ui", "std"]
+# Enable `bevy_sprite` (Text2d) support.
+bevy_sprite = ["bevy", "dep:bevy_sprite", "std"]
 # Enable `facet` support.
 facet = ["dep:facet", "froglight-nbt?/facet", "froglight-snbt/facet"]
 # Enable `nbt` support.
@@ -47,6 +57,6 @@ nbt = ["dep:froglight-nbt", "froglight-snbt/nbt"]
 tracing = ["dep:tracing", "froglight-nbt?/tracing", "froglight-snbt/tracing"]
 
 # Enable support for the standard library
-std = ["froglight-nbt?/std", "froglight-snbt/std", "uuid/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-nbt?/std", "froglight-snbt/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-nbt?/nightly", "froglight-snbt/nightly"]

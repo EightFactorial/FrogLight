@@ -2,11 +2,13 @@
 
 use core::{fmt, range::Range};
 
-use crate::types::indexed::{
-    core::IndexCore, entry::EntryIndex, list::iter::ListIter, reference::ValueReference,
-};
+use crate::types::indexed::{core::IndexCore, entry::EntryIndex, reference::ValueReference};
 
 mod iter;
+pub use iter::{ListIter, SliceIter};
+
+mod slice;
+pub use slice::IndexedSlice;
 
 /// A list of values indexed by an [`IndexCore`].
 pub struct IndexedList<'data, C: IndexCore> {

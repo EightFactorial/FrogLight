@@ -6,11 +6,11 @@ use bevy_ecs::{
     prelude::*,
     world::DeferredWorld,
 };
-use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 
 use crate::components::Position;
 
-/// A [`Resource`] containing all colliding entities.
+/// A [`Resource`] containing all colliding [`Entities`](Entity).
 #[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Resource)]
 pub struct EntityCollisions(EntityHashMap<EntityHashSet>);

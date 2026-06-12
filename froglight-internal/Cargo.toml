@@ -21,15 +21,20 @@ workspace = true
 [dependencies]
 froglight-biome = { features = ["biome_data"], workspace = true }
 froglight-block = { workspace = true }
-froglight-common = { workspace = true }
+froglight-common = { features = ["aabb", "facet", "uuid"], workspace = true }
 froglight-entity = { workspace = true }
-froglight-registry = { workspace = true }
+froglight-facet = { workspace = true }
 froglight-inventory = { workspace = true }
 froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-math = { workspace = true }
+froglight-mutf8 = { features = ["facet"], workspace = true }
+froglight-nbt = { features = ["froglight-facet"], workspace = true }
 froglight-packet = { workspace = true }
 froglight-physics = { workspace = true }
 froglight-player = { workspace = true }
+froglight-registry = { workspace = true }
+froglight-snbt = { features = ["facet", "nbt"], workspace = true }
+froglight-text = { features = ["facet", "nbt"], workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
 # Optional dependencies
@@ -42,18 +47,16 @@ froglight-network = { features = ["futures-lite"], workspace = true, optional = 
 # --- Features ---
 
 [features]
-default = ["network", "multi_threaded", "std"]
+default = ["network", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:froglight-brigadier", "froglight-api?/bevy", "froglight-common/bevy", "froglight-entity/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-physics/bevy", "froglight-player/bevy", "froglight-world/bevy"]
-# Enable multi-threading.
-multi_threaded = ["bevy", "bevy_ecs?/multi_threaded", "std"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:froglight-brigadier", "froglight-api?/bevy", "froglight-common/bevy", "froglight-entity/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-physics/bevy", "froglight-player/bevy", "froglight-text/bevy", "froglight-world/bevy"]
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "std"]
 # Enable `tracing` support.
-tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-brigadier?/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-world/tracing"]
+tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-brigadier?/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-facet/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-text/tracing", "froglight-world/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-network?/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
+tracing_ext = ["froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-facet/tracing_ext", "froglight-nbt/tracing_ext", "froglight-network?/tracing_ext", "froglight-snbt/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-brigadier?/libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "froglight-packet/libm", "froglight-physics/libm", "froglight-world/libm"]
@@ -63,9 +66,9 @@ once_cell = ["froglight-biome/once_cell", "froglight-inventory/once_cell", "frog
 parking_lot = ["froglight-biome/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-biome/std", "froglight-block/std", "froglight-brigadier?/std", "froglight-common/std", "froglight-entity/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-packet/std", "froglight-physics/std", "froglight-player/std", "froglight-registry/std", "froglight-world/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-biome/std", "froglight-block/std", "froglight-brigadier?/std", "froglight-common/std", "froglight-entity/std", "froglight-facet/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-mutf8/std", "froglight-nbt/std", "froglight-packet/std", "froglight-physics/std", "froglight-player/std", "froglight-registry/std", "froglight-text/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-api?/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-brigadier?/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-network?/nightly", "froglight-packet/nightly", "froglight-physics/nightly", "froglight-player/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
+nightly = ["froglight-api?/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-brigadier?/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-facet/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-mutf8/nightly", "froglight-nbt/nightly", "froglight-network?/nightly", "froglight-packet/nightly", "froglight-physics/nightly", "froglight-player/nightly", "froglight-registry/nightly", "froglight-text/nightly", "froglight-world/nightly", "std"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
