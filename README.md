@@ -29,10 +29,12 @@ Additionally, some libraries provide plugins for the [Bevy](https://github.com/b
 
 Support for Minecraft versions is enabled using features.
 
-| Version | Feature |
-| ------- | ------- |
-| 26.1.x  | `v26_1` |
-| 26.2.x  | `v26_2` |
+| Version    | Feature |
+| ---------- | ------- |
+| 26.1.x     | `v26_1` |
+| ~~26.2.x~~ | `v26_2` |
+
+<sup> Note: 26.2 was built from a snapshot and has not been updated! </sup>
 
 If you are writing a library on top of FrogLight, consider putting version-specific behavior behind features.
 
