@@ -42,9 +42,13 @@ unknown-registry = "deny"
 
 # --- Duplicate Exceptions ---
 
-# [[bans.skip-tree]]
-# crate = "windows-sys"
-# reason = "Updates are too frequent for many crates, leaving multiple versions unavoidable."
+[[bans.skip-tree]]
+crate = "windows-sys"
+reason = "Multiple versions are unavoidable due to update frequency"
+
+[[bans.skip-tree]]
+crate = "wit-bindgen"
+reason = "Multiple versions are unavoidable due to update frequency"
 
 # --- Executable Exceptions ---
 

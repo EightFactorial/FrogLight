@@ -1,11 +1,14 @@
 //! TODO
 #![no_std]
 
-use facet::{Facet, Partial, ReflectError};
+use facet::Facet;
 use froglight_facet::{
     self as mc,
     facet::FacetTemplate,
-    format::{Reader, Writer, WriterError, serialize::SerializeItem},
+    format::{
+        Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
+        serialize::SerializeItem,
+    },
     to_vec,
 };
 
@@ -43,7 +46,7 @@ fn variable_inner() {
     // Check that `outer` was serialized correctly.
     let outer = Outer { first: Inner(100), second: Ignored(100), third: Inner(100) };
     let serialized = to_vec(&outer).unwrap();
-    assert_eq!(serialized, [100, 0, 0, 0, 100, 0, 0, 0, 100]);
+    assert_eq!(serialized, [0, 0, 0, 100, 0, 0, 0, 100, 100]);
 }
 
 #[test]
@@ -59,21 +62,22 @@ fn template() {
             item: SerializeItem<'_, '_>,
             writer: &mut Writer<'_>,
         ) -> Result<(), WriterError> {
-            let val = item.peek().get::<Templated>().unwrap();
-            writer.write_bytes(&val.0.to_be_bytes())
+            let val = item.peek().get::<Templated>()?;
+            writer.write_bytes(&val.0.to_le_bytes())
         }
 
-        fn deserialize(
-            _partial: Partial<'static, false>,
-            _reader: &mut Reader<'_>,
-        ) -> Result<Partial<'static, false>, ReflectError> {
-            todo!()
+        fn deserialize<'facet, const BORROW: bool>(
+            item: DeserializeItem<'facet, BORROW>,
+            reader: &mut Reader<'_>,
+        ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+            let val = u32::from_le_bytes(*reader.get_array()?);
+            item.set(Templated(val))
         }
     }
 
     // Check that `Templated(42)` was serialized correctly.
     let serialized = to_vec(&Templated(42)).unwrap();
-    assert_eq!(serialized, [0, 0, 0, 42]);
+    assert_eq!(serialized, [42, 0, 0, 0]);
 }
 
 #[test]
@@ -88,19 +92,20 @@ fn template_field() {
             item: SerializeItem<'_, '_>,
             writer: &mut Writer<'_>,
         ) -> Result<(), WriterError> {
-            let val = item.peek().get::<u32>().unwrap();
-            writer.write_bytes(&val.to_be_bytes())
+            let val = item.peek().get::<u32>()?;
+            writer.write_bytes(&val.to_le_bytes())
         }
 
-        fn deserialize(
-            _partial: Partial<'static, false>,
-            _reader: &mut Reader<'_>,
-        ) -> Result<Partial<'static, false>, ReflectError> {
-            todo!()
+        fn deserialize<'facet, const BORROW: bool>(
+            item: DeserializeItem<'facet, BORROW>,
+            reader: &mut Reader<'_>,
+        ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+            let val = u32::from_le_bytes(*reader.get_array()?);
+            item.set(val)
         }
     }
 
     // Check that `Templated(42)` was serialized correctly.
     let serialized = to_vec(&Templated(42)).unwrap();
-    assert_eq!(serialized, [0, 0, 0, 42]);
+    assert_eq!(serialized, [42, 0, 0, 0]);
 }

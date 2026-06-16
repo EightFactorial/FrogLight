@@ -12,7 +12,17 @@ use super::{Deserialize, DeserializeError};
 /// TODO
 #[inline(always)]
 pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
-    <T as Deserialize>::from_slice(slice)
+    <T as Deserialize>::from_slice(slice, false)
+}
+
+/// TODO
+///
+/// # Errors
+///
+/// TODO
+#[inline(always)]
+pub fn from_slice_variable<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
+    <T as Deserialize>::from_slice(slice, true)
 }
 
 /// TODO
@@ -24,7 +34,7 @@ pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError
 pub fn from_slice_remainder<T: Facet<'static>>(
     slice: &[u8],
 ) -> Result<(T, &[u8]), DeserializeError> {
-    <T as Deserialize>::from_slice_remainder(slice)
+    <T as Deserialize>::from_slice_remainder(slice, false)
 }
 
 /// TODO
@@ -36,5 +46,5 @@ pub fn from_slice_remainder<T: Facet<'static>>(
 pub fn from_slice_borrowed<'facet, T: Facet<'facet>>(
     slice: &'facet [u8],
 ) -> Result<(T, &'facet [u8]), DeserializeError> {
-    <T as Deserialize>::from_slice_borrowed(slice)
+    <T as Deserialize>::from_slice_borrowed(slice, false)
 }

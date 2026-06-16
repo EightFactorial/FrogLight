@@ -211,7 +211,7 @@ fn handle_def<'mem, 'facet>(
             Ok(())
         }
 
-        Def::Map(_) => {
+        Def::Map(..) => {
             let map = item.peek().into_map()?;
             // Serialize the length of the map.
             core(Item::Size(map.len().try_into().map_err(WriterError::other)?))?;
@@ -225,7 +225,7 @@ fn handle_def<'mem, 'facet>(
 
             Ok(())
         }
-        Def::Set(_) => {
+        Def::Set(..) => {
             let set = item.peek().into_set()?;
             // Serialize the length of the set.
             core(Item::Size(set.len().try_into().map_err(WriterError::other)?))?;
@@ -239,7 +239,7 @@ fn handle_def<'mem, 'facet>(
             Ok(())
         }
 
-        Def::List(_) | Def::Slice(_) => {
+        Def::List(..) | Def::Slice(..) => {
             let list = item.peek().into_list()?;
             // Serialize the length of the list.
             core(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
@@ -252,7 +252,7 @@ fn handle_def<'mem, 'facet>(
 
             Ok(())
         }
-        Def::Array(_) => {
+        Def::Array(..) => {
             let array = item.peek().into_list_like()?;
 
             // Push the items in reverse order.
@@ -264,7 +264,7 @@ fn handle_def<'mem, 'facet>(
             Ok(())
         }
 
-        Def::NdArray(_) => {
+        Def::NdArray(..) => {
             let array = item.peek().into_ndarray()?;
 
             // Push the items in reverse order.
@@ -276,7 +276,7 @@ fn handle_def<'mem, 'facet>(
             Ok(())
         }
 
-        Def::Option(_) => {
+        Def::Option(..) => {
             let option = item.peek().into_option()?;
             // Serialize the discriminant of the option.
             core(Item::Size(u32::from(option.is_some())))?;
@@ -288,16 +288,16 @@ fn handle_def<'mem, 'facet>(
 
             Ok(())
         }
-        Def::Result(_) => {
+        Def::Result(..) => {
             let result = item.peek().into_result()?;
             // Serialize the discriminant of the result.
             core(Item::Size(u32::from(result.is_ok())))?;
 
             if let Some(value) = result.ok() {
-                // Push `Ok(_)`.
+                // Push `Ok(..)`.
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             } else if let Some(value) = result.err() {
-                // Push `Err(_)`.
+                // Push `Err(..)`.
                 stack.push(SerializeItem::new(value, ItemType::Other, item.is_variable()));
             }
 
@@ -323,12 +323,12 @@ fn handle_type<'mem, 'facet>(
 
     match item.shape().ty {
         // Directly serialize primitives.
-        Type::Primitive(_) => {
+        Type::Primitive(..) => {
             stack.push(item.with_ty(ItemType::Value));
             Ok(())
         }
 
-        Type::Sequence(_) => {
+        Type::Sequence(..) => {
             let list = item.peek().into_list_like()?;
             // Serialize the length of the list.
             core(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
@@ -342,7 +342,7 @@ fn handle_type<'mem, 'facet>(
             Ok(())
         }
 
-        Type::User(UserType::Struct(_)) => {
+        Type::User(UserType::Struct(..)) => {
             // Push the fields in reverse order.
             let iter = item.peek().into_struct()?.fields_for_serialize();
 
@@ -377,7 +377,7 @@ fn handle_type<'mem, 'facet>(
 
             Ok(())
         }
-        Type::User(UserType::Enum(_)) => {
+        Type::User(UserType::Enum(..)) => {
             let enum_ = item.peek().into_enum()?;
 
             // Determine whether the enum should pass the variable flag to its fields.
@@ -419,9 +419,9 @@ fn handle_type<'mem, 'facet>(
 
             Ok(())
         }
-        Type::User(_) => todo!(),
+        Type::User(..) => todo!(),
 
-        Type::Pointer(_) => todo!(),
+        Type::Pointer(..) => todo!(),
 
         Type::Undefined => {
             todo!("Unsupported type `{}`: {:?}", item.shape().type_name(), item.peek())

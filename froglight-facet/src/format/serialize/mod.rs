@@ -19,15 +19,21 @@ pub mod varint;
 
 use crate::format::writer::{Writer, WriterError};
 
-/// A trait for types that can be deserialized.
-#[expect(clippy::missing_errors_doc, missing_docs, reason = "WIP")]
+/// A trait for types that can be serialized.
 pub trait Serialize<'facet> {
-    #[inline]
-    fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError> {
-        let mut buffer = Vec::new();
-        <Self as Serialize>::to_writer(value, false, Writer::new(&mut buffer)).map(|_| buffer)
-    }
+    /// Serialize the value into a new [`Vec`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the serialization fails.
+    fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError>;
 
+    /// Serialize the value into the given [`Writer`],
+    /// returning the number of bytes written.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the serialization fails.
     fn to_writer(value: &Self, variable: bool, writer: Writer<'_>)
     -> Result<usize, SerializeError>;
 }
@@ -59,11 +65,7 @@ fn serialize<'mem, 'facet>(
     let mut core = |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         let item = match item {
             Item::Item(item) => item,
-            Item::Size(size) => {
-                let (bytes, len) = varint::encode_u32(size);
-                writer.write_bytes(&bytes[..len as usize])?;
-                return Ok(());
-            }
+            Item::Size(size) => return varint::encode_u32_into(size, &mut writer),
         };
 
         // Handle field attributes.
@@ -104,7 +106,7 @@ fn serialize<'mem, 'facet>(
 
     // Return the number of bytes written.
     drop(ser);
-    Ok(writer.total_written())
+    Ok(writer.position())
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -116,28 +118,26 @@ fn serialize_core(
     writer: &mut Writer<'_>,
 ) -> Result<(), WriterError> {
     macro_rules! handle {
-        (@num $var:expr, $peek:expr => $($ty:ty: $fn:ident),*) => {
+        ($var:expr, $peek:expr => $($ty:ty: $fn:ident),*) => {
             $(
                 if let Ok(value) = $peek.get::<$ty>() {
                     return if $var {
-                        let (bytes, len) = varint::$fn(*value);
-                        writer.write_bytes(&bytes[..len as usize])
+                        varint::$fn(*value, writer)
                     } else {
-                        writer.write_bytes(&value.to_le_bytes())
+                        writer.write_bytes(&value.to_be_bytes())
                     }
                 }
             )*
         };
-        (@numcast $var:expr, $peek:expr => $($ty:ty, $cast:ty => $fn:ident),*) => {
+        (@cast $var:expr, $peek:expr => $($ty:ty, $cast:ty => $fn:ident),*) => {
             $(
                 if let Ok(value) = $peek.get::<$ty>() {
                     #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
                     let cast = *value as $cast;
                     return if $var {
-                        let (bytes, len) = varint::$fn(cast);
-                        writer.write_bytes(&bytes[..len as usize])
+                        varint::$fn(cast, writer)
                     } else {
-                        writer.write_bytes(&cast.to_le_bytes())
+                        writer.write_bytes(&cast.to_be_bytes())
                     }
                 }
             )*
@@ -155,8 +155,9 @@ fn serialize_core(
     }
 
     // Handle integer types
-    handle!(@num variable, peek => u8: encode_u8, u16: encode_u16, u32: encode_u32, u64: encode_u64, u128: encode_u128);
-    handle!(@numcast variable, peek => i8, u8 => encode_u8, i16, u16 => encode_u16, i32, u32 => encode_u32, i64, u64 => encode_u64, i128, u128 => encode_u128);
+    handle!(variable, peek => u8: encode_u8_into, u16: encode_u16_into, u32: encode_u32_into, u64: encode_u64_into, u128: encode_u128_into);
+    handle!(@cast variable, peek => i8, u8 => encode_u8_into, i16, u16 => encode_u16_into, i32, u32 => encode_u32_into, i64, u64 => encode_u64_into, i128, u128 => encode_u128_into);
+
     // Handle floating-point types
     if let Ok(f32) = peek.get::<f32>() {
         return writer.write_bytes(&f32.to_le_bytes());

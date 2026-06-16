@@ -17,7 +17,7 @@ macro_rules! assert_eq_bytes {
             $(
                 bytes.clear();
                 to_writer(&$input, &mut bytes).unwrap();
-                assert_eq!(bytes, $input.to_le_bytes());
+                assert_eq!(bytes, $input.to_be_bytes());
 
                 bytes.clear();
                 to_writer_variable(&$input, &mut bytes).unwrap();

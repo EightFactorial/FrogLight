@@ -1,15 +1,46 @@
 use facet::{AllocError, ReflectError, ShapeMismatchError};
 
+use crate::format::ReaderError;
+
 /// TODO
 #[derive(Debug, Clone)]
 pub struct DeserializeError;
 
+impl From<ReaderError> for DeserializeError {
+    #[allow(unused_variables, reason = "Temporary")]
+    fn from(value: ReaderError) -> Self {
+        #[cfg(feature = "std")]
+        match value {
+            ReaderError::InvalidBool(err) => std::println!("InvalidBool: {err}"),
+            ReaderError::EndOfInput(err) => std::println!("EndOfInput: {err}"),
+            ReaderError::Reflect(err) => std::println!("ReflectError: {err}"),
+            ReaderError::IO(err) => std::println!("IOError: {err}"),
+            ReaderError::Other(err) => std::println!("Other: {err}"),
+        }
+        DeserializeError
+    }
+}
 impl From<AllocError> for DeserializeError {
-    fn from(_value: AllocError) -> Self { todo!() }
+    #[allow(unused_variables, reason = "Temporary")]
+    fn from(value: AllocError) -> Self {
+        #[cfg(feature = "std")]
+        std::println!("AllocError: {value}");
+        DeserializeError
+    }
 }
 impl From<ReflectError> for DeserializeError {
-    fn from(_value: ReflectError) -> Self { todo!() }
+    #[allow(unused_variables, reason = "Temporary")]
+    fn from(value: ReflectError) -> Self {
+        #[cfg(feature = "std")]
+        std::println!("ReflectError: {value}");
+        DeserializeError
+    }
 }
 impl From<ShapeMismatchError> for DeserializeError {
-    fn from(_value: ShapeMismatchError) -> Self { todo!() }
+    #[allow(unused_variables, reason = "Temporary")]
+    fn from(value: ShapeMismatchError) -> Self {
+        #[cfg(feature = "std")]
+        std::println!("ShapeMismatchError: {value}");
+        DeserializeError
+    }
 }

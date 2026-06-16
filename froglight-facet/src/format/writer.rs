@@ -3,9 +3,11 @@
 use alloc::boxed::Box;
 use core::error::Error;
 
+use facet::ReflectError;
+
 /// A `no_std`-compatible writer.
 pub struct Writer<'a> {
-    written: usize,
+    position: usize,
     inner: &'a mut dyn WriterType,
 }
 
@@ -13,12 +15,13 @@ impl<'a> Writer<'a> {
     /// Create a new [`Writer`] for the given slice.
     #[inline]
     #[must_use]
-    pub const fn new<T: WriterType>(inner: &'a mut T) -> Self { Self { written: 0, inner } }
+    pub const fn new<T: WriterType>(inner: &'a mut T) -> Self { Self { position: 0, inner } }
 
-    /// Get the total number of bytes written so far.
+    /// Get the "position" of the writer,
+    /// or the number of bytes written so far.
     #[inline]
     #[must_use]
-    pub const fn total_written(&self) -> usize { self.written }
+    pub const fn position(&self) -> usize { self.position }
 
     /// Write a single byte to the writer.
     ///
@@ -26,8 +29,8 @@ impl<'a> Writer<'a> {
     ///
     /// Returns an error if the writer cannot be written to.
     pub fn write_byte(&mut self, byte: u8) -> Result<(), WriterError> {
-        self.inner.write_byte(byte)?;
-        self.written += 1;
+        self.inner.write_byte(self.position, byte)?;
+        self.position += 1;
         Ok(())
     }
 
@@ -37,8 +40,16 @@ impl<'a> Writer<'a> {
     ///
     /// Returns an error if the writer cannot be written to.
     pub fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), WriterError> {
-        self.written += self.inner.write_bytes(bytes)?;
+        self.inner.write_bytes(self.position, bytes)?;
+        self.position += bytes.len();
         Ok(())
+    }
+
+    /// Reborrow the [`Writer`] with a shorter lifetime.
+    #[inline]
+    #[must_use]
+    pub const fn reborrow(&mut self) -> Writer<'_> {
+        Writer { position: self.position, inner: self.inner }
     }
 }
 
@@ -56,19 +67,19 @@ pub trait WriterType {
     /// # Errors
     ///
     /// Returns an error if the writer cannot be written to.
-    fn write_byte(&mut self, byte: u8) -> Result<(), WriterError>;
+    fn write_byte(&mut self, position: usize, byte: u8) -> Result<(), WriterError>;
 
     /// Write a slice of bytes to the writer.
     ///
     /// # Errors
     ///
     /// Returns an error if the writer cannot be written to.
-    fn write_bytes(&mut self, bytes: &[u8]) -> Result<usize, WriterError>;
+    fn write_bytes(&mut self, position: usize, bytes: &[u8]) -> Result<(), WriterError>;
 }
 
 impl WriterType for [u8] {
-    fn write_byte(&mut self, byte: u8) -> Result<(), WriterError> {
-        if let Some(pos) = self.get_mut(0) {
+    fn write_byte(&mut self, position: usize, byte: u8) -> Result<(), WriterError> {
+        if let Some(pos) = self.get_mut(position) {
             *pos = byte;
             Ok(())
         } else {
@@ -76,10 +87,10 @@ impl WriterType for [u8] {
         }
     }
 
-    fn write_bytes(&mut self, bytes: &[u8]) -> Result<usize, WriterError> {
-        if let Some(pos) = self.get_mut(0..bytes.len()) {
+    fn write_bytes(&mut self, position: usize, bytes: &[u8]) -> Result<(), WriterError> {
+        if let Some(pos) = self.get_mut(position..position + bytes.len()) {
             pos.copy_from_slice(bytes);
-            Ok(bytes.len())
+            Ok(())
         } else {
             Err(WriterError::WriterFull)
         }
@@ -88,26 +99,25 @@ impl WriterType for [u8] {
 
 #[cfg(not(feature = "std"))]
 impl WriterType for alloc::vec::Vec<u8> {
-    fn write_byte(&mut self, byte: u8) -> Result<(), WriterError> {
+    fn write_byte(&mut self, _: usize, byte: u8) -> Result<(), WriterError> {
         self.push(byte);
         Ok(())
     }
 
-    fn write_bytes(&mut self, bytes: &[u8]) -> Result<usize, WriterError> {
+    fn write_bytes(&mut self, _: usize, bytes: &[u8]) -> Result<(), WriterError> {
         self.extend_from_slice(bytes);
-        Ok(bytes.len())
+        Ok(())
     }
 }
 
 #[cfg(feature = "std")]
 impl<T: std::io::Write> WriterType for T {
-    fn write_byte(&mut self, byte: u8) -> Result<(), WriterError> {
-        std::io::Write::write(self, core::array::from_ref(&byte))
-            .map_or_else(|err| Err(WriterError::IO(err)), |_| Ok(()))
+    fn write_byte(&mut self, _: usize, byte: u8) -> Result<(), WriterError> {
+        std::io::Write::write_all(self, core::array::from_ref(&byte)).map_err(WriterError::IO)
     }
 
-    fn write_bytes(&mut self, bytes: &[u8]) -> Result<usize, WriterError> {
-        std::io::Write::write(self, bytes).map_err(WriterError::IO)
+    fn write_bytes(&mut self, _: usize, bytes: &[u8]) -> Result<(), WriterError> {
+        std::io::Write::write_all(self, bytes).map_err(WriterError::IO)
     }
 }
 
@@ -118,6 +128,8 @@ impl<T: std::io::Write> WriterType for T {
 pub enum WriterError {
     /// The writer is full and cannot accept more bytes.
     WriterFull,
+    /// An error occurred during reflection.
+    Reflect(ReflectError),
 
     /// An I/O error occurred while writing.
     #[cfg(feature = "std")]
@@ -133,6 +145,10 @@ impl WriterError {
     pub fn other<T: Error + Send + Sync + 'static>(err: T) -> Self { Self::Other(Box::new(err)) }
 }
 
+impl From<ReflectError> for WriterError {
+    #[inline]
+    fn from(err: ReflectError) -> Self { Self::Reflect(err) }
+}
 #[cfg(feature = "std")]
 impl From<std::io::Error> for WriterError {
     #[inline]

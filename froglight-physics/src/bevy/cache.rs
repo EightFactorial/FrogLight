@@ -6,7 +6,7 @@ use bevy_ecs::{
     prelude::*,
     world::DeferredWorld,
 };
-use bevy_reflect::{std_traits::ReflectDefault, Reflect};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
 use crate::components::Position;
 

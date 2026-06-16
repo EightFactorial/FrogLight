@@ -3,17 +3,20 @@
 
 use core::{arch::x86_64::*, simd::prelude::*};
 
-use crate::simd::varint::traits::VarIntType;
+use crate::{
+    format::{Writer, WriterError},
+    simd::varint::traits::VarIntType,
+};
 
-macro_rules! encode_fns {
-    ($($fn:ident & $fn_into:ident : $ty:ty => $len:literal),*) => {
+macro_rules! create_fns {
+    (@$method:tt $($fn:ident & $fn_into:ident : $ty:ty => $len:literal),*) => {
         $(
-            encode_fns!(@single $fn & $fn_into : $ty => $len);
+            create_fns!(@$method single $fn & $fn_into : $ty => $len);
         )*
     };
-    (@single $fn:ident & $fn_into:ident : $ty:ty => $len:literal) => {
-        #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128.")]
+    (@encode single $fn:ident & $fn_into:ident : $ty:ty => $len:literal) => {
         #[must_use]
+        #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128.")]
         pub fn $fn(value: $ty) -> ([u8; $len], u8) {
             let (enc, len) = encode_inline(value);
 
@@ -23,31 +26,46 @@ macro_rules! encode_fns {
             (enc, len)
         }
 
-        #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128 into the provided buffer, returning the number of bytes written.")]
-        #[doc = ""]
-        #[doc = concat!("# Panics\n\nPanics if the buffer is not large enough to hold the encoded value.\n\nThis will never happen if the buffer is at least ", stringify!($len), " bytes long.")]
-        #[must_use]
-        pub fn $fn_into(value: $ty, buffer: &mut [u8]) -> usize {
+        #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128 into the provided writer.")]
+        #[doc = concat!("\n# Errors\n\nReturns an error if the [`Writer`] cannot be written to.\n")]
+        #[doc = concat!("\n# Panics\n\nPanics if the buffer is not large enough to hold the encoded value.\n\nThis will never happen if the buffer is at least ", stringify!($len), " bytes long.")]
+        pub fn $fn_into(value: $ty, writer: &mut Writer<'_>) -> Result<(), WriterError> {
             let (enc, len) = encode_inline(value);
-            let len = len as usize;
-
-            // SAFETY: `len` is guaranteed to be <= $len, and is always in-bounds.
-            let src = unsafe { enc.get_unchecked(0..len) };
-            let dst = buffer.get_mut(0..len).expect(concat!("Buffer is too small to hold the encoded value! Requires at most ", stringify!($len), " bytes."));
-            dst.copy_from_slice(src);
-
-            len
+            let slice = unsafe { enc.get_unchecked(0..len as usize) };
+            writer.write_bytes(slice)
+        }
+    };
+    (@decode single $fn:ident & $fn_from:ident : $ty:ty => $len:literal) => {
+        #[must_use]
+        #[doc = concat!("Decode a [`", stringify!($ty), "`] from a byte slice using LEB128, returning the decoded value and the number of bytes read.")]
+        pub fn $fn(slice: &[u8]) -> ($ty, u8) {
+            decode_inline(<$ty>::slice_to_array(slice))
         }
 
+        #[must_use]
+        #[doc = concat!("Decode a [`", stringify!($ty), "`] from a byte array using LEB128, returning the decoded value and the number of bytes read.")]
+        pub fn $fn_from(array: [u8; $len]) -> $ty {
+            decode_inline(array).0
+        }
     };
 }
 
-encode_fns!(
+create_fns!(
+    @encode
     encode_u8 & encode_u8_into: u8 => 2,
     encode_u16 & encode_u16_into: u16 => 3,
     encode_u32 & encode_u32_into: u32 => 5,
     encode_u64 & encode_u64_into: u64 => 10,
     encode_u128 & encode_u128_into: u128 => 19
+);
+
+create_fns!(
+    @decode
+    decode_u8 & decode_u8_from: u8 => 2,
+    decode_u16 & decode_u16_from: u16 => 3,
+    decode_u32 & decode_u32_from: u32 => 5,
+    decode_u64 & decode_u64_from: u64 => 10,
+    decode_u128 & decode_u128_from: u128 => 19
 );
 
 // -------------------------------------------------------------------------------------------------
@@ -68,15 +86,13 @@ pub fn encode<T: VarIntType>(value: T) -> ([u8; 31], u8) { encode_inline::<T>(va
 #[must_use]
 #[inline(always)]
 #[allow(clippy::missing_panics_doc, reason = "Cannot panic")]
-pub fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
+fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     match T::MAX_BYTES {
         0..=5 => unsafe { encode_small(value) },
         6..=19 => unsafe { encode_large(value) },
         _ => panic!("Encoding unsupported for types larger than 19 bytes!"),
     }
 }
-
-// -------------------------------------------------------------------------------------------------
 
 /// Encode [`u8`]s, [`u16`]s, and [`u32`]s using SIMD.
 ///
@@ -104,8 +120,6 @@ unsafe fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
         _ => super::fallback::encode_small(value)
     }
 }
-
-// -------------------------------------------------------------------------------------------------
 
 /// Encode [`u64`]s and [`u128`]s using SIMD.
 ///
@@ -137,4 +151,47 @@ unsafe fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
         // Otherwise use the fallback implementation.
         _ => super::fallback::encode_large(value)
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// Decode integers using SIMD.
+#[must_use]
+pub fn decode<T: VarIntType>(slice: &[u8]) -> (T, u8) {
+    decode_inline::<T>(T::slice_to_array(slice))
+}
+
+/// Decode integers using SIMD.
+#[must_use]
+#[inline(always)]
+#[allow(clippy::missing_panics_doc, reason = "Cannot panic")]
+fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
+    match T::MAX_BYTES {
+        0..=5 => unsafe { decode_small(bytes) },
+        6..=19 => unsafe { decode_large(bytes) },
+        _ => panic!("Encoding unsupported for types larger than 19 bytes!"),
+    }
+}
+
+/// Decode [`u8`]s, [`u16`]s, and [`u32`]s using SIMD.
+///
+/// # Safety
+///
+/// TODO
+#[must_use]
+#[inline(always)]
+unsafe fn decode_small<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
+    super::fallback::decode::<T>(bytes)
+}
+
+/// Decode [`u64`]s and [`u128`]s using SIMD.
+///
+/// # Safety
+///
+/// TODO
+#[must_use]
+#[inline(always)]
+#[allow(clippy::cast_possible_truncation, reason = "Avoids truncation")]
+unsafe fn decode_large<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
+    super::fallback::decode::<T>(bytes)
 }

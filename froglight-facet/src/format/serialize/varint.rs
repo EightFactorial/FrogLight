@@ -8,10 +8,10 @@ macro_rules! create_encode {
                     pub use crate::simd::varint::{$fn, $fn_into};
                 }
                 _ => {
+                    #[must_use]
                     #[allow(trivial_numeric_casts, reason = "Ignored")]
                     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
                     #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128.")]
-                    #[must_use]
                     pub fn $fn(mut value: $ty) -> ([u8; $len], u8) {
                         let mut output = [0u8; $len];
                         let mut count = 0;
@@ -31,20 +31,13 @@ macro_rules! create_encode {
                         (output, count as u8)
                     }
 
-                    #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128 into the provided buffer, returning the number of bytes written.")]
-                    #[doc = ""]
-                    #[doc = concat!("# Panics\n\nPanics if the buffer is not large enough to hold the encoded value.\n\nThis will never happen if the buffer is at least ", stringify!($len), " bytes long.")]
-                    #[must_use]
-                    pub fn $fn_into(value: $ty, buffer: &mut [u8]) -> usize {
+                    #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128 into the provided writer.")]
+                    #[doc = concat!("\n# Errors\n\nReturns an error if the [`Writer`](crate::format::Writer) cannot be written to.\n")]
+                    #[doc = concat!("\n# Panics\n\nPanics if the buffer is not large enough to hold the encoded value.\n\nThis will never happen if the buffer is at least ", stringify!($len), " bytes long.")]
+                    pub fn $fn_into(value: $ty, writer: &mut crate::format::Writer<'_>) -> Result<(), crate::format::WriterError> {
                         let (enc, len) = $fn(value);
-                        let len = len as usize;
-
-                        // SAFETY: `len` is guaranteed to be <= $len, and is always in-bounds.
-                        let src = unsafe { enc.get_unchecked(0..len) };
-                        let dst = buffer.get_mut(0..len).expect(concat!("Buffer is too small to hold the encoded value! Requires at most ", stringify!($len), " bytes."));
-                        dst.copy_from_slice(src);
-
-                        len
+                        let slice = unsafe { enc.get_unchecked(0..len as usize) };
+                        writer.write_bytes(slice)
                     }
                 }
             }

@@ -17,7 +17,7 @@ pub use storage::InventoryStorage;
 ///
 /// Uses internal plugins to manage slots and menus.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component, opaque))]
 pub struct Inventory {
     menus: &'static MenuGroup,
