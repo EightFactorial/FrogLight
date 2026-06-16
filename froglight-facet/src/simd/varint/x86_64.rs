@@ -4,7 +4,7 @@
 use core::{arch::x86_64::*, simd::prelude::*};
 
 use crate::{
-    format::{Writer, WriterError},
+    format::{Reader, ReaderError, Writer, WriterError},
     simd::varint::traits::VarIntType,
 };
 
@@ -42,10 +42,12 @@ macro_rules! create_fns {
             decode_inline(<$ty>::slice_to_array(slice))
         }
 
-        #[must_use]
-        #[doc = concat!("Decode a [`", stringify!($ty), "`] from a byte array using LEB128, returning the decoded value and the number of bytes read.")]
-        pub fn $fn_from(array: [u8; $len]) -> $ty {
-            decode_inline(array).0
+        #[doc = concat!("Decode a [`", stringify!($ty), "`] using LEB128 from the provided reader.")]
+        #[doc = concat!("\n# Errors\n\nReturns an error if the [`Reader`] cannot be read from.\n")]
+        pub fn $fn_from(reader: &mut Reader<'_>) -> Result<$ty, ReaderError> {
+            let (dec, len) = decode_inline(<$ty>::slice_to_array(reader.remaining()));
+            reader.consume(len as usize)?;
+            Ok(dec)
         }
     };
 }
@@ -181,7 +183,7 @@ fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
 #[must_use]
 #[inline(always)]
 unsafe fn decode_small<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
-    super::fallback::decode::<T>(bytes)
+    super::fallback::decode_inline::<T>(bytes)
 }
 
 /// Decode [`u64`]s and [`u128`]s using SIMD.
@@ -193,5 +195,5 @@ unsafe fn decode_small<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
 #[inline(always)]
 #[allow(clippy::cast_possible_truncation, reason = "Avoids truncation")]
 unsafe fn decode_large<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
-    super::fallback::decode::<T>(bytes)
+    super::fallback::decode_inline::<T>(bytes)
 }

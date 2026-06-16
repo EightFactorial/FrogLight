@@ -1,3 +1,5 @@
+use core::fmt;
+
 use facet::{Attr, Facet, Field, Partial, Shape};
 use smallvec::SmallVec;
 
@@ -15,7 +17,7 @@ pub type IteratorStack = SmallVec<[StackItem; 10]>;
 #[derive(Debug)]
 pub enum StackItem {
     Item(DeserializeDesc),
-    Fields(&'static [Field], bool),
+    Fields(usize, &'static [Field], bool),
 
     Seq(Option<usize>, bool),
     Map(Option<usize>, bool),
@@ -33,7 +35,7 @@ pub struct DeserializeItem<'facet, const BORROW: bool> {
 }
 
 /// A description of a deserialization item.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeserializeDesc {
     variable: bool,
     field_attr: Option<&'static [Attr]>,
@@ -163,6 +165,15 @@ impl DeserializeDesc {
     pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
 }
 
+impl<const BORROW: bool> fmt::Debug for DeserializeItem<'_, BORROW> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("DeserializeItem")
+            .field("ty", &self.partial.shape().type_name())
+            .field("desc", &self.desc)
+            .finish()
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
@@ -178,9 +189,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
     /// Returns `true` if the deserialization process is finished.
     #[inline]
     #[must_use]
-    pub(crate) fn is_finished(&self) -> bool {
-        self.stack.is_empty() && self.partial.frame_count() == 1
-    }
+    pub(crate) fn is_finished(&self) -> bool { self.stack.is_empty() }
 
     /// TODO
     ///

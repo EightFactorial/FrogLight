@@ -4,9 +4,21 @@ pub use ::facet;
 use facet::Facet;
 
 use crate::format::{
-    Reader, ReaderError, Writer, WriterError, deserialize::iterator::DeserializeItem,
+    Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
     serialize::SerializeItem,
 };
+
+pub mod template {
+    //! Re-exports of everything needed for implementing [`FacetTemplate`].
+
+    pub use crate::{
+        facet::{FacetBorrowedTemplate, FacetTemplate},
+        format::{
+            Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
+            serialize::SerializeItem,
+        },
+    };
+}
 
 facet::define_attr_grammar! {
     ns "mc";
@@ -30,6 +42,8 @@ facet::define_attr_grammar! {
         With(fn_ptr WithFnAttr),
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A [`Facet`] attribute containing custom serialization and deserialization
 /// functions.
@@ -170,14 +184,9 @@ pub type DeBorrowFn = for<'facet> fn(
 ///
 /// ```rust
 /// use facet::{Facet, Partial, ReflectError};
-/// use froglight_facet::{
-///     self as mc,
-///     facet::FacetTemplate,
-///     format::{Reader, Writer, WriterError, serialize::SerializeItem},
-///     to_vec,
-/// };
+/// use froglight_facet::{self as mc, facet::template::*, from_slice, to_vec};
 ///
-/// #[derive(Facet)]
+/// #[derive(Debug, Clone, Copy, PartialEq, Eq, Facet)]
 /// #[facet(mc::with = MyType::WITH)]
 /// struct MyType(u32);
 ///
@@ -187,23 +196,32 @@ pub type DeBorrowFn = for<'facet> fn(
 ///         writer: &mut Writer<'_>,
 ///     ) -> Result<(), WriterError> {
 ///         let val = item.peek().get::<MyType>().unwrap();
-///         writer.write_bytes(&val.0.to_be_bytes())
+///         writer.write_bytes(&val.0.to_le_bytes())
 ///     }
 ///
-///     fn deserialize(
-///         _: Partial<'static, false>,
-///         _: &mut Reader<'_>,
-///     ) -> Result<Partial<'static, false>, ReflectError> {
-///         todo!()
+///     fn deserialize<'facet, const BORROW: bool>(
+///         item: DeserializeItem<'facet, BORROW>,
+///         reader: &mut Reader<'_>,
+///     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+///         let val: u32 = u32::from_le_bytes(*reader.get_array()?);
+///         item.set(MyType(val))
 ///     }
 /// }
 ///
 /// // Check that `MyType` was serialized correctly.
 /// let serialized = to_vec(&MyType(42)).unwrap();
-/// assert_eq!(serialized, [0, 0, 0, 42]);
+/// assert_eq!(serialized, [42, 0, 0, 0]);
+///
+/// // Check that `MyType` was deserialized correctly.
+/// let deserialized: MyType = from_slice(&serialized).unwrap();
+/// assert_eq!(deserialized, MyType(42));
 /// ```
 pub trait FacetTemplate: 'static + Sized {
-    /// A [`WithFnAttr`] that uses this template.
+    /// A [`WithFnAttr`] to be used with
+    /// `#[derive(Facet)]` in a `#[facet(mc::with = ...)]`
+    /// attribute.
+    ///
+    /// See [`FacetTemplate`] for more details and an example.
     const WITH: WithFnAttr = WithFnAttr::template::<Self>();
 
     /// The serialization function.
@@ -235,8 +253,14 @@ pub trait FacetTemplate: 'static + Sized {
 ///
 /// Must be used with the `#[facet(mc::with = T::WITH_BORROW)]` attribute to
 /// take effect.
+///
+/// See [`FacetTemplate`] for more details and an example.
 pub trait FacetBorrowedTemplate: FacetTemplate {
-    /// A [`WithFnAttr`] that uses this template.
+    /// A [`WithFnAttr`] to be used with
+    /// `#[derive(Facet)]` in a `#[facet(mc::with = ...)]`
+    /// attribute.
+    ///
+    /// See [`FacetTemplate`] for more details and an example.
     const WITH_BORROW: WithFnAttr =
         WithFnAttr::template::<Self>().with_borrow(Self::deserialize_borrowed);
 

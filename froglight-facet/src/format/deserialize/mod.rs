@@ -102,7 +102,7 @@ fn deserialize_owned(
     variable: bool,
     reader: &mut Reader<'_>,
 ) -> Result<HeapValue<'static, false>, DeserializeError> {
-    let core = move |item| {
+    let mut core = move |item: Item<'static, false>| {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -137,7 +137,7 @@ fn deserialize_owned(
         deserialize_core(item, reader).map(Item::Item)
     };
 
-    let mut de = Deserializer::new(partial, variable, core);
+    let mut de = Deserializer::new(partial, variable, &mut core);
     while let Some(result) = Iterator::next(&mut de) {
         result?;
     }
@@ -150,7 +150,7 @@ fn deserialize_borrowed<'facet>(
     variable: bool,
     reader: &mut Reader<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
-    let core = |item| {
+    let mut core = |item: Item<'facet, true>| {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -204,7 +204,7 @@ fn deserialize_borrowed<'facet>(
         deserialize_core(item, reader).map(Item::Item)
     };
 
-    let mut de = Deserializer::new(partial, variable, core);
+    let mut de = Deserializer::new(partial, variable, &mut core);
     while let Some(result) = Iterator::next(&mut de) {
         result?;
     }

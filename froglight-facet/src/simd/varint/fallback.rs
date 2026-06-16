@@ -4,7 +4,7 @@
 use core::simd::prelude::*;
 
 use crate::{
-    format::{Writer, WriterError},
+    format::{Reader, ReaderError, Writer, WriterError},
     simd::varint::traits::VarIntType,
 };
 
@@ -42,10 +42,12 @@ macro_rules! create_fns {
             decode_inline(<$ty>::slice_to_array(slice))
         }
 
-        #[must_use]
-        #[doc = concat!("Decode a [`", stringify!($ty), "`] from a byte array using LEB128, returning the decoded value and the number of bytes read.")]
-        pub fn $fn_from(array: [u8; $len]) -> $ty {
-            decode_inline(array).0
+        #[doc = concat!("Decode a [`", stringify!($ty), "`] using LEB128 from the provided reader.")]
+        #[doc = concat!("\n# Errors\n\nReturns an error if the [`Reader`] cannot be read from.\n")]
+        pub fn $fn_from(reader: &mut Reader<'_>) -> Result<$ty, ReaderError> {
+            let (dec, len) = decode_inline(<$ty>::slice_to_array(reader.remaining()));
+            reader.consume(len as usize)?;
+            Ok(dec)
         }
     };
 }
@@ -188,7 +190,7 @@ pub fn decode<T: VarIntType>(slice: &[u8]) -> (T, u8) {
 #[must_use]
 #[inline(always)]
 #[allow(clippy::missing_panics_doc, reason = "Cannot panic")]
-fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
+pub(super) fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
     match T::MAX_BYTES {
         0..=5 => decode_small(bytes),
         6..=19 => decode_large(bytes),
@@ -197,6 +199,13 @@ fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
 }
 
 /// Unset all MSBs and extra bytes, and returning the number of bytes read.
+///
+/// # TODO: WARNING
+///
+/// This is currently broken!
+///
+/// This does not "unset" any extra bytes,
+/// causing errors if there is data after the encoded value.
 #[must_use]
 #[inline(always)]
 pub(super) fn unmark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {

@@ -137,20 +137,26 @@ fn handle_other<'mem, 'facet>(
 
     // If the type has a proxy, serialize the proxy type instead.
     // Can't be pushed to the stack since the proxy does not live long enough.
+    //
+    // Based on [`https://github.com/facet-rs/facet-format/blob/b583926d6837756faaf5b6931780de0b7b961230/facet-format/src/serializer.rs#L2167`]
     if let Some(proxy) = item.shape().effective_proxy(Some("mc")) {
-        // Create the proxy value using the original as input.
-        let proxy_ptr = proxy.shape.allocate().unwrap();
-        let proxy_ptr = unsafe {
-            // SAFETY: `data` and `ptr` are guaranteed to be the `from` and `to` types.
-            (proxy.convert_out)(item.peek().data(), proxy_ptr).unwrap_or_else(|_err| {
+        let proxy_shape = proxy.shape;
+        let proxy_layout = proxy_shape.layout.sized_layout().map_err(|_| SerializeError)?;
+
+        // SAFETY: `data` and `uninit` are guaranteed to be the `from` and `to` types.
+        let proxy_uninit = facet::alloc_for_layout(proxy_layout);
+        let convert_result = unsafe { (proxy.convert_out)(item.peek().data(), proxy_uninit) };
+
+        let proxy_ptr = match convert_result {
+            Ok(ptr) => ptr,
+            Err(_err) => {
                 // !! MUST DEALLOC BEFORE RETURNING !!
 
-                // SAFETY: `ptr` was allocated via `shape.allocate()`.
-                // SAFETY: `ptr` was not initialized since `convert_out` failed.
-                proxy.shape.deallocate_uninit(proxy_ptr).unwrap();
+                // SAFETY: `proxy_uninit` was allocated via `alloc_for_layout`.
+                unsafe { facet::dealloc_for_layout(proxy_uninit.assume_init(), proxy_layout) };
 
-                todo!();
-            })
+                return Err(SerializeError);
+            }
         };
 
         // SAFETY: `ptr` and `shape` are guaranteed to be for the same type.
@@ -163,11 +169,11 @@ fn handle_other<'mem, 'facet>(
                 // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
 
                 // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
-                // SAFETY: `ptr` was allocated via `shape.allocate()`.
+                // SAFETY: `ptr` was allocated via `alloc_for_layout`.
                 unsafe {
                     drop(ser);
-                    proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
-                    proxy.shape.deallocate_mut(proxy_ptr).unwrap();
+                    let _ = proxy.shape.call_drop_in_place(proxy_ptr);
+                    facet::dealloc_for_layout(proxy_ptr, proxy_layout);
                 }
 
                 return Err(err);
@@ -177,11 +183,11 @@ fn handle_other<'mem, 'facet>(
         // !! MUST DROP AND DEALLOC BEFORE RETURNING !!
 
         // SAFETY: `ptr` is guaranteed a valid value of the proxy type.
-        // SAFETY: `ptr` was allocated via `shape.allocate()`.
+        // SAFETY: `ptr` was allocated via `alloc_for_layout`.
         unsafe {
             drop(ser);
-            proxy.shape.call_drop_in_place(proxy_ptr).unwrap();
-            proxy.shape.deallocate_mut(proxy_ptr).unwrap();
+            let _ = proxy.shape.call_drop_in_place(proxy_ptr);
+            facet::dealloc_for_layout(proxy_ptr, proxy_layout);
         }
 
         return Ok(());
