@@ -3,7 +3,7 @@
 
 use facet::Facet;
 
-use crate::format::deserialize::{Deserialize, DeserializeError};
+use crate::format::deserialize::{Deserialize, DeserializeError, future::DeserializeAsync};
 
 /// TODO
 ///
@@ -13,6 +13,16 @@ use crate::format::deserialize::{Deserialize, DeserializeError};
 #[inline(always)]
 pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
     <T as Deserialize>::from_slice(slice, false)
+}
+
+/// TODO
+///
+/// # Errors
+///
+/// TODO
+#[inline(always)]
+pub async fn from_slice_async<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
+    <T as DeserializeAsync>::from_slice_async(slice, false).await
 }
 
 /// TODO
@@ -35,6 +45,18 @@ pub fn from_slice_remainder<T: Facet<'static>>(
     slice: &[u8],
 ) -> Result<(T, &[u8]), DeserializeError> {
     <T as Deserialize>::from_slice_remainder(slice, false)
+}
+
+/// TODO
+///
+/// # Errors
+///
+/// TODO
+#[inline(always)]
+pub async fn from_slice_remainder_async<T: Facet<'static>>(
+    slice: &[u8],
+) -> Result<(T, &[u8]), DeserializeError> {
+    <T as DeserializeAsync>::from_slice_remainder_async(slice, false).await
 }
 
 /// TODO

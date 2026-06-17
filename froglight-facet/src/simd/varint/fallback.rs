@@ -199,13 +199,6 @@ pub(super) fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
 }
 
 /// Unset all MSBs and extra bytes, and returning the number of bytes read.
-///
-/// # TODO: WARNING
-///
-/// This is currently broken!
-///
-/// This does not "unset" any extra bytes,
-/// causing errors if there is data after the encoded value.
 #[must_use]
 #[inline(always)]
 pub(super) fn unmark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {

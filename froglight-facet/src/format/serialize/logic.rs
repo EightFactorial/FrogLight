@@ -43,7 +43,6 @@ impl<'mem, 'facet, 'core, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError
     /// # Errors
     ///
     /// Returns an error if serialization fails.
-    #[inline]
     pub fn complete(mut self) -> Result<(), SerializeError> {
         // Drive the iterator to completion.
         while let Some(result) = Iterator::next(&mut self) {
@@ -340,7 +339,7 @@ fn handle_type<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterEr
 
         Type::User(UserType::Struct(..)) => {
             // Push the fields in reverse order.
-            let iter = item.peek().into_struct()?.fields_for_serialize();
+            let iter = item.peek().into_struct()?.fields_for_binary_serialize();
 
             // Determine whether the struct should pass the variable flag to its fields.
             let variable_base =
@@ -393,7 +392,7 @@ fn handle_type<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterEr
             ))?;
 
             // Push the fields in reverse order.
-            let iter = enum_.fields_for_serialize();
+            let iter = enum_.fields_for_binary_serialize();
             for (field, field_item) in iter.collect::<Cache<_>>().into_iter().rev() {
                 let mut field_ty = ItemType::Other;
                 let mut variable = variable_base;

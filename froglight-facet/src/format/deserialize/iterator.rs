@@ -19,9 +19,9 @@ pub enum StackItem {
     Item(DeserializeDesc),
     Fields(usize, &'static [Field], bool),
 
-    Seq(Option<usize>, bool),
-    Map(Option<usize>, bool),
-    Set(Option<usize>, bool),
+    Seq(Option<usize>, bool, bool),
+    Map(Option<usize>, bool, bool, bool),
+    Set(Option<usize>, bool, bool),
 
     Other(DeserializeDesc),
 }

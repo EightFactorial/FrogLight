@@ -13,6 +13,7 @@ mod error;
 pub use error::DeserializeError;
 
 pub mod functions;
+pub mod future;
 
 pub(crate) mod iterator;
 pub use iterator::{DeserializeItem, IteratorStack};

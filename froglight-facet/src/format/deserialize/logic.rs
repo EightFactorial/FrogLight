@@ -14,9 +14,9 @@ use crate::format::{
 
 /// TODO
 pub struct Deserializer<'facet, 'core, const BORROW: bool, C: 'core> {
-    start: usize,
-    iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
-    core: &'core mut C,
+    pub(super) start: usize,
+    pub(super) iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
+    pub(super) core: &'core mut C,
 }
 
 /// A [`Deserializer`] item.
@@ -66,7 +66,6 @@ impl<
     /// # Errors
     ///
     /// Returns an error if the deserialization fails.
-    #[inline]
     pub fn complete(mut self) -> Result<Partial<'facet, BORROW>, DeserializeError> {
         // Drive the iterator to completion.
         while let Some(result) = Iterator::next(&mut self) {
@@ -156,10 +155,74 @@ impl<
                     iter.partial = iter.partial.begin_nth_field(len - fields.len() - 1)?;
                 }
 
-                StackItem::Seq(..) => todo!(),
+                StackItem::Seq(len, end_prev, variable) => {
+                    let len = if let Some(len) = len {
+                        len
+                    } else {
+                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                        iter.partial = iter.partial.init_list_with_capacity(len as usize)?;
+                        len as usize
+                    };
 
-                StackItem::Map(..) => todo!(),
-                StackItem::Set(..) => todo!(),
+                    if end_prev {
+                        iter.partial = iter.partial.end()?;
+                    }
+
+                    if len != 0 {
+                        iter.stack.push(StackItem::Seq(Some(len - 1), true, variable));
+                        iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        iter.partial = iter.partial.begin_list_item()?;
+                    }
+                }
+
+                StackItem::Map(len, end_prev, is_value, variable) => {
+                    let len = if let Some(len) = len {
+                        len
+                    } else {
+                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                        iter.partial = iter.partial.init_map()?;
+                        len as usize
+                    };
+
+                    if end_prev {
+                        iter.partial = iter.partial.end()?;
+                    }
+
+                    if len != 0 {
+                        if is_value {
+                            // `true` means the next item is a value
+
+                            iter.stack.push(StackItem::Map(Some(len - 1), true, true, variable));
+                            iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                            iter.partial = iter.partial.begin_value()?;
+                        } else {
+                            // `false` means the next item is a key
+
+                            iter.stack.push(StackItem::Map(Some(len), true, false, variable));
+                            iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                            iter.partial = iter.partial.begin_key()?;
+                        }
+                    }
+                }
+                StackItem::Set(len, end_prev, variable) => {
+                    let len = if let Some(len) = len {
+                        len
+                    } else {
+                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                        iter.partial = iter.partial.init_set()?;
+                        len as usize
+                    };
+
+                    if end_prev {
+                        iter.partial = iter.partial.end()?;
+                    }
+
+                    if len != 0 {
+                        iter.stack.push(StackItem::Set(Some(len - 1), true, variable));
+                        iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        iter.partial = iter.partial.begin_set_item()?;
+                    }
+                }
 
                 StackItem::Other(desc) => {
                     iter.partial = handle_other(iter.partial, desc, core, &mut iter.stack)?;
