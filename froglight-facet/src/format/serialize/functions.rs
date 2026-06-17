@@ -3,8 +3,10 @@
 
 use alloc::vec::Vec;
 
-use super::{Serialize, SerializeError};
-use crate::format::writer::{Writer, WriterType};
+use crate::format::{
+    serialize::{Serialize, SerializeError},
+    writer::{Writer, WriterType},
+};
 
 /// TODO
 ///

@@ -4,6 +4,8 @@ use alloc::vec::Vec;
 
 use facet::{Facet, Peek};
 
+use crate::format::writer::{Writer, WriterError};
+
 mod error;
 pub use error::SerializeError;
 
@@ -16,8 +18,6 @@ pub(crate) mod logic;
 pub use logic::{Item, Serializer};
 
 pub mod varint;
-
-use crate::format::writer::{Writer, WriterError};
 
 /// A trait for types that can be serialized.
 pub trait Serialize<'facet> {
@@ -99,13 +99,9 @@ fn serialize<'mem, 'facet>(
     };
 
     // Create and complete the serializer.
-    let mut ser = Serializer::new(serialize_peek, serialize_variable, &mut core);
-    while let Some(result) = Iterator::next(&mut ser) {
-        result?;
-    }
+    Serializer::new(serialize_peek, serialize_variable, &mut core).complete()?;
 
     // Return the number of bytes written.
-    drop(ser);
     Ok(writer.position())
 }
 

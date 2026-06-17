@@ -2,23 +2,24 @@
 
 use facet::{Def, Partial, Type, UserType};
 
-use super::iterator::StackItem;
 use crate::format::{
     ReaderError,
     deserialize::{
         DeserializeError,
-        iterator::{DeserializeDesc, DeserializeItem, DeserializeIterator, IteratorStack},
+        iterator::{
+            DeserializeDesc, DeserializeItem, DeserializeIterator, IteratorStack, StackItem,
+        },
     },
 };
 
 /// TODO
-pub struct Deserializer<'facet, const BORROW: bool, C> {
+pub struct Deserializer<'facet, 'core, const BORROW: bool, C: 'core> {
     start: usize,
     iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
-    core: C,
+    core: &'core mut C,
 }
 
-/// A deserializer item.
+/// A [`Deserializer`] item.
 #[derive(Debug)]
 pub enum Item<'facet, const BORROW: bool> {
     /// A size to be deserialized.
@@ -27,53 +28,66 @@ pub enum Item<'facet, const BORROW: bool> {
     Item(DeserializeItem<'facet, BORROW>),
 }
 
-impl<'facet, const BORROW: bool> Deserializer<'facet, BORROW, ()> {
+impl<
+    'facet,
+    'core,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+> Deserializer<'facet, 'core, BORROW, C>
+{
     /// Create a new [`Deserializer`] for the given type.
     #[inline]
     pub(crate) fn new(
         partial: Partial<'facet, BORROW>,
         variable: bool,
-        core: &mut impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
-    ) -> Deserializer<'facet, BORROW, impl DeserializerCore<'facet, BORROW>> {
+        core: &'core mut C,
+    ) -> Self {
         Deserializer {
             start: partial.frame_count(),
             iter: Ok(DeserializeIterator::new_partial(partial, variable)),
-            core: create_core(core),
+            core,
         }
     }
-}
 
-impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>>
-    Deserializer<'facet, BORROW, C>
-{
     /// Returns `true` if the iterator is finished.
     #[inline]
     #[must_use]
-    pub(crate) fn is_finished(&self) -> bool {
+    pub fn is_finished(&self) -> bool {
         match &self.iter {
             Ok(iter) => iter.is_finished(),
             Err(_) => true,
         }
     }
 
-    /// Build the final value from the deserialized data.
+    /// Complete the [`Deserializer`] by deserializing the value.
+    ///
+    /// Returns the initial [`Partial`] if successful.
     ///
     /// # Errors
     ///
-    /// Returns an error if some data was not initialized,
-    /// or the output type does not match the input type.
+    /// Returns an error if the deserialization fails.
     #[inline]
-    pub(crate) fn into_partial(self) -> Result<Partial<'facet, BORROW>, DeserializeError> {
+    pub fn complete(mut self) -> Result<Partial<'facet, BORROW>, DeserializeError> {
+        // Drive the iterator to completion.
+        while let Some(result) = Iterator::next(&mut self) {
+            result?;
+        }
+
+        // Make sure the `Partial` is at the correct frame.
         let mut partial = self.iter.map(DeserializeIterator::into_partial)?;
         while partial.frame_count() > self.start {
             partial = partial.end()?;
         }
+
         Ok(partial)
     }
 }
 
-impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>> Iterator
-    for Deserializer<'facet, BORROW, C>
+impl<
+    'facet,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+> Iterator for Deserializer<'facet, '_, BORROW, C>
 {
     type Item = Result<(), DeserializeError>;
 
@@ -85,7 +99,7 @@ impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>> Iterator
         replace_with::replace_with_and_return(
             &mut self.iter,
             || Err(DeserializeError),
-            |iter| match iter.and_then(|iter| iter.next(self.core.as_fn_once())) {
+            |iter| match iter.and_then(|iter| Self::process(self.core, iter)) {
                 Ok(iter) => (Some(Ok(())), Ok(iter)),
                 Err(err) => (Some(Err(err.clone())), Err(err)),
             },
@@ -95,65 +109,35 @@ impl<'facet, const BORROW: bool, C: DeserializerCore<'facet, BORROW>> Iterator
 
 // -------------------------------------------------------------------------------------------------
 
-/// A trait for deserializer cores.
-pub trait DeserializerCore<'facet, const BORROW: bool> {
-    fn as_fn_once(
-        &mut self,
-    ) -> impl FnOnce(
-        Partial<'facet, BORROW>,
-        &mut IteratorStack,
-    ) -> Result<Partial<'facet, BORROW>, DeserializeError>
-    + '_;
-}
-
-impl<'facet, const BORROW: bool, T> DeserializerCore<'facet, BORROW> for T
-where
-    T: FnMut(
-        Partial<'facet, BORROW>,
-        &mut IteratorStack,
-    ) -> Result<Partial<'facet, BORROW>, DeserializeError>,
+impl<
+    'facet,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+> Deserializer<'facet, '_, BORROW, C>
 {
-    #[inline]
-    fn as_fn_once(
-        &mut self,
-    ) -> impl FnOnce(
-        Partial<'facet, BORROW>,
-        &mut IteratorStack,
-    ) -> Result<Partial<'facet, BORROW>, DeserializeError>
-    + '_ {
-        self
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A generic [`DeserializerCore`] wrapper that only calls the provided
-/// function on values to be deserialized.
-fn create_core<'facet, const BORROW: bool>(
-    mut core: &mut impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
-) -> impl FnMut(
-    Partial<'facet, BORROW>,
-    &mut IteratorStack,
-) -> Result<Partial<'facet, BORROW>, DeserializeError> {
-    move |mut partial, stack| {
-        while let Some(item) = stack.pop() {
+    /// Process one `step` of the deserialization iterator.
+    fn process(
+        core: &mut C,
+        mut iter: DeserializeIterator<'facet, BORROW>,
+    ) -> Result<DeserializeIterator<'facet, BORROW>, DeserializeError> {
+        while let Some(item) = iter.stack.pop() {
             match item {
                 StackItem::Item(desc) => {
-                    let item = Item::Item(DeserializeItem::new(partial, desc));
-                    let Item::Item(item) = core(item)? else { todo!() };
-                    partial = item.into_inner().0;
+                    let item = Item::Item(DeserializeItem::new(iter.partial, desc));
+                    let Item::Item(item) = (core)(item)? else { todo!() };
+                    iter.partial = item.into_inner().0;
 
-                    if partial.frame_count() > 1 {
-                        partial = partial.end()?;
+                    if iter.partial.frame_count() > 1 {
+                        iter.partial = iter.partial.end()?;
                     }
 
-                    return Ok(partial);
+                    return Ok(iter);
                 }
 
                 StackItem::Fields(len, fields, variable_base) => {
                     let Some((field, fields)) = fields.split_first() else {
-                        if partial.frame_count() > 1 {
-                            partial = partial.end()?;
+                        if iter.partial.frame_count() > 1 {
+                            iter.partial = iter.partial.end()?;
                         }
                         continue;
                     };
@@ -162,14 +146,14 @@ fn create_core<'facet, const BORROW: bool>(
                     let variable = variable_base | field.has_attr(Some("mc"), "variable");
 
                     // Push the remaining fields to the stack.
-                    stack.push(StackItem::Fields(len, fields, variable_base));
+                    iter.stack.push(StackItem::Fields(len, fields, variable_base));
 
                     // Push the current field to the stack.
                     let desc = DeserializeDesc::new(variable, Some(field.attributes));
-                    stack.push(StackItem::Other(desc));
+                    iter.stack.push(StackItem::Other(desc));
 
                     // Begin the current field.
-                    partial = partial.begin_nth_field(len - fields.len() - 1)?;
+                    iter.partial = iter.partial.begin_nth_field(len - fields.len() - 1)?;
                 }
 
                 StackItem::Seq(..) => todo!(),
@@ -178,21 +162,25 @@ fn create_core<'facet, const BORROW: bool>(
                 StackItem::Set(..) => todo!(),
 
                 StackItem::Other(desc) => {
-                    partial = handle_other(partial, desc, &mut core, stack)?;
+                    iter.partial = handle_other(iter.partial, desc, core, &mut iter.stack)?;
                 }
             }
         }
 
-        Ok(partial)
+        Ok(iter)
     }
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_other<'facet, const BORROW: bool>(
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_other<
+    'facet,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+>(
     mut partial: Partial<'facet, BORROW>,
     mut desc: DeserializeDesc,
-    core: &mut impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+    core: &mut C,
     stack: &mut IteratorStack,
 ) -> Result<Partial<'facet, BORROW>, DeserializeError> {
     {
@@ -234,11 +222,11 @@ fn handle_other<'facet, const BORROW: bool>(
 
         if has_proxy {
             // Deserialize the proxied type.
-            partial = Deserializer::new(proxy_partial, desc.is_variable(), core).into_partial()?;
-        } else {
-            // Otherwise return the partial unchanged.
-            partial = proxy_partial;
+            return Deserializer::new(proxy_partial, desc.is_variable(), core).complete();
         }
+
+        // Otherwise return the partial unchanged.
+        partial = proxy_partial;
     }
 
     // Handle the partial based on its definition.
@@ -249,11 +237,15 @@ fn handle_other<'facet, const BORROW: bool>(
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_def<'facet, const BORROW: bool>(
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_def<
+    'facet,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+>(
     partial: Partial<'facet, BORROW>,
     desc: DeserializeDesc,
-    core: &mut impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+    core: &mut C,
     stack: &mut IteratorStack,
 ) -> Result<Partial<'facet, BORROW>, DeserializeError> {
     match partial.shape().def {
@@ -282,11 +274,15 @@ fn handle_def<'facet, const BORROW: bool>(
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_type<'facet, const BORROW: bool>(
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_type<
+    'facet,
+    const BORROW: bool,
+    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+>(
     partial: Partial<'facet, BORROW>,
     desc: DeserializeDesc,
-    core: &mut impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
+    core: &mut C,
     stack: &mut IteratorStack,
 ) -> Result<Partial<'facet, BORROW>, DeserializeError> {
     match partial.shape().ty {

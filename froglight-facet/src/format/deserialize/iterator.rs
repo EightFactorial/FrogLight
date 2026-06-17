@@ -7,8 +7,8 @@ use crate::format::ReaderError;
 
 /// TODO
 pub(super) struct DeserializeIterator<'facet, const BORROW: bool> {
-    partial: Partial<'facet, BORROW>,
-    stack: IteratorStack,
+    pub(super) partial: Partial<'facet, BORROW>,
+    pub(super) stack: IteratorStack,
 }
 
 /// A stack of deserialization frames.
@@ -190,22 +190,6 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
     #[inline]
     #[must_use]
     pub(crate) fn is_finished(&self) -> bool { self.stack.is_empty() }
-
-    /// TODO
-    ///
-    /// # Errors
-    ///
-    /// TODO
-    pub(crate) fn next<Err>(
-        mut self,
-        f: impl FnOnce(
-            Partial<'facet, BORROW>,
-            &mut IteratorStack,
-        ) -> Result<Partial<'facet, BORROW>, Err>,
-    ) -> Result<Self, Err> {
-        self.partial = f(self.partial, &mut self.stack)?;
-        Ok(self)
-    }
 
     /// Get the [`Partial`] from the iterator.
     #[inline]

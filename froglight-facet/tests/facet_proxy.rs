@@ -28,7 +28,7 @@ fn proxy() {
 
         fn try_from(value: ByteString) -> Result<Self, Self::Error> {
             let f = |res: Result<u8, ParseIntError>| {
-                res.map_err(|err| alloc::format!("Failed to parse byte: {err}"))
+                res.map_err(|err| alloc::format!("Failed to parse byte, {err}"))
             };
 
             let mut iter = value.0.split(',').map(str::parse::<u8>);

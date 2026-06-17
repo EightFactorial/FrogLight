@@ -7,6 +7,8 @@ use alloc::{
 
 use facet::{Facet, HeapValue, Partial};
 
+use crate::format::{ReaderError, reader::Reader};
+
 mod error;
 pub use error::DeserializeError;
 
@@ -19,8 +21,6 @@ pub(crate) mod logic;
 pub use logic::{Deserializer, Item};
 
 pub mod varint;
-
-use crate::format::{ReaderError, reader::Reader};
 
 /// A trait for types that can be deserialized.
 pub trait Deserialize<'facet>: Facet<'facet> + Sized {
@@ -137,11 +137,9 @@ fn deserialize_owned(
         deserialize_core(item, reader).map(Item::Item)
     };
 
-    let mut de = Deserializer::new(partial, variable, &mut core);
-    while let Some(result) = Iterator::next(&mut de) {
-        result?;
-    }
-    de.into_partial()?.build().map_err(DeserializeError::from)
+    // Create and complete the deserializer.
+    let de = Deserializer::new(partial, variable, &mut core);
+    de.complete()?.build().map_err(DeserializeError::from)
 }
 
 #[inline(never)]
@@ -204,11 +202,9 @@ fn deserialize_borrowed<'facet>(
         deserialize_core(item, reader).map(Item::Item)
     };
 
-    let mut de = Deserializer::new(partial, variable, &mut core);
-    while let Some(result) = Iterator::next(&mut de) {
-        result?;
-    }
-    de.into_partial()?.build().map_err(DeserializeError::from)
+    // Create and complete the deserializer.
+    let de = Deserializer::new(partial, variable, &mut core);
+    de.complete()?.build().map_err(DeserializeError::from)
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -10,12 +10,12 @@ use crate::format::{
 };
 
 /// TODO
-pub struct Serializer<'mem, 'facet, C> {
+pub struct Serializer<'mem, 'facet, 'core, C: 'core> {
     iter: SerializeIterator<'mem, 'facet>,
-    core: C,
+    core: &'core mut C,
 }
 
-/// A serializer item.
+/// A [`Serializer`] item.
 pub enum Item<'mem, 'facet> {
     /// A size to be serialized.
     Size(u32),
@@ -23,72 +23,62 @@ pub enum Item<'mem, 'facet> {
     Item(SerializeItem<'mem, 'facet>),
 }
 
-impl<'mem, 'facet> Serializer<'mem, 'facet, ()> {
+impl<'mem, 'facet, 'core, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
+    Serializer<'mem, 'facet, 'core, C>
+{
     /// Create a new [`Serializer`] for the given type.
     #[inline]
     #[must_use]
-    pub fn new(
-        peek: Peek<'mem, 'facet>,
-        variable: bool,
-        core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
-    ) -> Serializer<'mem, 'facet, impl SerializerCore<'mem, 'facet>> {
-        Serializer { iter: SerializeIterator::new(peek, variable), core: create_core(core) }
+    pub fn new(peek: Peek<'mem, 'facet>, variable: bool, core: &'core mut C) -> Self {
+        Serializer { iter: SerializeIterator::new(peek, variable), core }
     }
-}
 
-impl<'mem, 'facet, C: SerializerCore<'mem, 'facet>> Serializer<'mem, 'facet, C> {
     /// Returns `true` if the iterator is finished.
     #[inline]
     #[must_use]
     pub fn is_finished(&self) -> bool { self.iter.is_empty() }
 
-    /// Returns the inner [`SerializeIterator`].
+    /// Complete the [`Serializer`] by fully serializing the value.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if serialization fails.
     #[inline]
-    #[must_use]
-    pub fn into_inner(self) -> SerializeIterator<'mem, 'facet> { self.iter }
+    pub fn complete(mut self) -> Result<(), SerializeError> {
+        // Drive the iterator to completion.
+        while let Some(result) = Iterator::next(&mut self) {
+            result?;
+        }
+
+        Ok(())
+    }
 }
 
-impl<'mem, 'facet, C: SerializerCore<'mem, 'facet>> Iterator for Serializer<'mem, 'facet, C> {
+impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>> Iterator
+    for Serializer<'mem, 'facet, '_, C>
+{
     type Item = Result<(), SerializeError>;
 
     #[inline]
-    fn next(&mut self) -> Option<Self::Item> { self.iter.next(self.core.as_fn_once()) }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A trait for serializer cores.
-pub trait SerializerCore<'mem, 'facet> {
-    fn as_fn_once(
-        &mut self,
-    ) -> impl FnOnce(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError> + '_;
-}
-
-impl<'mem, 'facet, F> SerializerCore<'mem, 'facet> for F
-where
-    F: FnMut(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError>,
-{
-    #[inline]
-    fn as_fn_once(
-        &mut self,
-    ) -> impl FnOnce(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError> + '_ {
-        self
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.iter.is_empty() { None } else { Some(self.process()) }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-fn create_core<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
-) -> impl FnMut(&mut IteratorStack<'mem, 'facet>) -> Result<(), SerializeError> {
-    move |stack| {
-        while let Some(item) = stack.pop() {
+impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
+    Serializer<'mem, 'facet, '_, C>
+{
+    /// Process one `step` of the serialization iterator.
+    fn process(&mut self) -> Result<(), SerializeError> {
+        while let Some(item) = self.iter.stack.pop() {
             match item.ty() {
                 // Process the item into values.
-                ItemType::Other => handle_other(core, item, stack)?,
+                ItemType::Other => handle_other(self.core, item, &mut self.iter.stack)?,
                 // Pass the value to the `core` function.
                 ItemType::Value => {
-                    return core(Item::Item(item)).map_err(SerializeError::from);
+                    return (self.core)(Item::Item(item)).map_err(SerializeError::from);
                 }
             }
         }
@@ -97,9 +87,9 @@ fn create_core<'mem, 'facet>(
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_other<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_other<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>(
+    core: &mut C,
     mut item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
@@ -201,9 +191,9 @@ fn handle_other<'mem, 'facet>(
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_def<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_def<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>(
+    core: &mut C,
     item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {
@@ -318,9 +308,9 @@ fn handle_def<'mem, 'facet>(
 }
 
 #[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `core` type")]
-fn handle_type<'mem, 'facet>(
-    core: &mut impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>,
+#[allow(clippy::inline_always, reason = "Used once per `C`")]
+fn handle_type<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>(
+    core: &mut C,
     item: SerializeItem<'mem, 'facet>,
     stack: &mut IteratorStack<'mem, 'facet>,
 ) -> Result<(), SerializeError> {

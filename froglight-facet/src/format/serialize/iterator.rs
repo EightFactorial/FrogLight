@@ -4,9 +4,8 @@ use facet::{Attr, Field, Peek, Shape};
 use smallvec::SmallVec;
 
 /// TODO
-pub struct SerializeIterator<'mem, 'facet> {
-    shape: &'static Shape,
-    stack: IteratorStack<'mem, 'facet>,
+pub(crate) struct SerializeIterator<'mem, 'facet> {
+    pub(super) stack: IteratorStack<'mem, 'facet>,
     #[expect(clippy::type_complexity, reason = "Force invariance over 'facet")]
     _invariant: PhantomData<(&'mem (), fn(&'facet ()) -> &'facet ())>,
 }
@@ -98,31 +97,14 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
 impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
     /// Create a new [`SerializeIterator`] from the given [`Peek`].
     #[must_use]
-    pub fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
+    pub(crate) fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
         let mut stack = IteratorStack::new_const();
         stack.push(SerializeItem::new(peek, ItemType::Other, variable));
-        Self { shape: peek.shape(), stack, _invariant: PhantomData }
+        Self { stack, _invariant: PhantomData }
     }
-
-    /// Get the [`Shape`] that is being serialized.
-    #[inline]
-    #[must_use]
-    pub const fn shape(&self) -> &'static Shape { self.shape }
 
     /// Returns `true` if the iterator is finished.
     #[inline]
     #[must_use]
-    pub fn is_empty(&self) -> bool { self.stack.is_empty() }
-
-    /// TODO
-    ///
-    /// # Errors
-    ///
-    /// TODO
-    pub fn next<Err>(
-        &mut self,
-        f: impl FnOnce(&mut IteratorStack<'mem, 'facet>) -> Result<(), Err>,
-    ) -> Option<Result<(), Err>> {
-        if self.stack.is_empty() { None } else { Some(f(&mut self.stack)) }
-    }
+    pub(crate) fn is_empty(&self) -> bool { self.stack.is_empty() }
 }
