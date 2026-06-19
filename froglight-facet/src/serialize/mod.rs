@@ -3,20 +3,13 @@
 use alloc::vec::Vec;
 
 use facet::{Facet, Peek};
-
-use crate::format::writer::{Writer, WriterError};
-
-mod error;
-pub use error::SerializeError;
+use froglight_facet_iter::{
+    Writer, WriterError,
+    serialize::{Item, SerializeError, Serializer},
+};
 
 pub mod functions;
-
-pub(crate) mod iterator;
-pub use iterator::{IteratorStack, SerializeItem};
-
-pub(crate) mod logic;
-pub use logic::{Item, Serializer};
-
+pub mod future;
 pub mod varint;
 
 /// A trait for types that can be serialized.
@@ -57,15 +50,34 @@ impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
 
 // -------------------------------------------------------------------------------------------------
 
-fn serialize<'mem, 'facet>(
-    serialize_peek: Peek<'mem, 'facet>,
-    serialize_variable: bool,
+#[inline(never)]
+fn serialize(
+    peek: Peek<'_, '_>,
+    variable: bool,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
-    let mut core = |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
+    // Create and complete the serializer.
+    let mut core = serialize_core(&mut writer);
+    Serializer::new(peek, variable, &mut core).complete()?;
+
+    // Return the number of bytes written.
+    drop(core);
+    Ok(writer.position())
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// The core logic behind [`serialize`], separated out for readability.
+#[doc(hidden)]
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Performance")]
+pub fn serialize_core<'mem, 'facet>(
+    writer: &mut Writer<'_>,
+) -> impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError> {
+    |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         let item = match item {
             Item::Item(item) => item,
-            Item::Size(size) => return varint::encode_u32_into(size, &mut writer),
+            Item::Size(size) => return varint::encode_u32_into(size, writer),
         };
 
         // Handle field attributes.
@@ -77,7 +89,7 @@ fn serialize<'mem, 'facet>(
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
-                    return with.serialize(item, &mut writer);
+                    return with.serialize(item, writer);
                 }
             }
         }
@@ -90,25 +102,19 @@ fn serialize<'mem, 'facet>(
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {
-                return with.serialize(item, &mut writer);
+                return with.serialize(item, writer);
             }
         }
 
         // Serialize the item.
-        serialize_core(item.peek(), item.is_variable(), &mut writer)
-    };
-
-    // Create and complete the serializer.
-    Serializer::new(serialize_peek, serialize_variable, &mut core).complete()?;
-
-    // Return the number of bytes written.
-    Ok(writer.position())
+        serialize_value(item.peek(), item.is_variable(), writer)
+    }
 }
 
-// -------------------------------------------------------------------------------------------------
-
-/// The serializer logic behind [`serialize`], separated out for readability.
-fn serialize_core(
+/// The value logic behind [`serialize`], separated out for readability.
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Performance")]
+fn serialize_value(
     peek: &Peek<'_, '_>,
     variable: bool,
     writer: &mut Writer<'_>,

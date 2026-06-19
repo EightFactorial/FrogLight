@@ -2,7 +2,7 @@
 
 use facet::{Def, Partial, Type, UserType};
 
-use crate::format::{
+use crate::{
     ReaderError,
     deserialize::{
         DeserializeError,
@@ -37,17 +37,18 @@ impl<
 {
     /// Create a new [`Deserializer`] for the given type.
     #[inline]
-    pub(crate) fn new(
-        partial: Partial<'facet, BORROW>,
-        variable: bool,
-        core: &'core mut C,
-    ) -> Self {
+    pub fn new(partial: Partial<'facet, BORROW>, variable: bool, core: &'core mut C) -> Self {
         Deserializer {
             start: partial.frame_count(),
             iter: Ok(DeserializeIterator::new_partial(partial, variable)),
             core,
         }
     }
+
+    /// Returns the starting frame count of this [`Deserializer`].
+    #[inline]
+    #[must_use]
+    pub const fn start(&self) -> usize { self.start }
 
     /// Returns `true` if the iterator is finished.
     #[inline]
@@ -74,6 +75,30 @@ impl<
 
         // Make sure the `Partial` is at the correct frame.
         let mut partial = self.iter.map(DeserializeIterator::into_partial)?;
+        while partial.frame_count() > self.start {
+            partial = partial.end()?;
+        }
+
+        Ok(partial)
+    }
+
+    /// Complete the [`Deserializer`] by deserializing the value.
+    ///
+    /// Returns the initial [`Partial`] if successful,
+    /// or an error if [`complete_mut`](Self::complete_mut) was already
+    /// called.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the deserialization fails.
+    pub fn complete_mut(&mut self) -> Result<Partial<'facet, BORROW>, DeserializeError> {
+        // Drive the iterator to completion.
+        while let Some(result) = Iterator::next(self) {
+            result?;
+        }
+
+        // Make sure the `Partial` is at the correct frame.
+        let mut partial = core::mem::replace(&mut self.iter, Err(DeserializeError))?.into_partial();
         while partial.frame_count() > self.start {
             partial = partial.end()?;
         }

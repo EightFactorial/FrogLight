@@ -30,8 +30,8 @@ macro_rules! create_decode {
                     }
 
                     #[doc = concat!("Decode a [`", stringify!($ty), "`] using LEB128 from the provided reader.")]
-                    #[doc = concat!("\n# Errors\n\nReturns an error if the [`Reader`] cannot be read from.\n")]
-                    pub fn $fn_from(reader: &mut crate::format::Reader<'_>) -> Result<$ty, crate::format::ReaderError> {
+                    #[doc = concat!("\n# Errors\n\nReturns an error if the [`Reader`](froglight_facet_iter::Reader) cannot be read from.\n")]
+                    pub fn $fn_from(reader: &mut froglight_facet_iter::Reader<'_>) -> Result<$ty, froglight_facet_iter::ReaderError> {
                         let (dec, len) = $fn(reader.remaining());
                         reader.consume(len as usize)?;
                         Ok(dec)

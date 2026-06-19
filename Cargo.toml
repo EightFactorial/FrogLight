@@ -11,6 +11,7 @@ froglight-brigadier = { default-features = false, path = "froglight-brigadier", 
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
 froglight-entity = { default-features = false, path = "froglight-entity", version = "0.0.1" }
 froglight-facet = { default-features = false, path = "froglight-facet", version = "0.0.1" }
+froglight-facet-iter = { default-features = false, path = "froglight-facet-iter", version = "0.0.1" }
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
 froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
@@ -18,7 +19,7 @@ froglight-math = { default-features = false, path = "froglight-math", version = 
 froglight-mutf8 = { default-features = false, path = "froglight-mutf8", version = "0.0.1" }
 froglight-nbt = { default-features = false, path = "froglight-nbt", version = "0.0.1" }
 froglight-network = { default-features = false, path = "froglight-network", version = "0.0.1" }
-froglight-packet = { default-features = false, path = "froglight-packet" }
+froglight-packet = { default-features = false, path = "froglight-packet", version = "0.0.1" }
 froglight-physics = { default-features = false, path = "froglight-physics", version = "0.0.1" }
 froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
@@ -139,6 +140,7 @@ members = [
   "froglight-common",
   "froglight-entity",
   "froglight-facet",
+  "froglight-facet-iter",
   "froglight-internal",
   "froglight-inventory",
   "froglight-item",

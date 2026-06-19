@@ -1,9 +1,7 @@
 //! TODO
 
-pub use ::facet;
 use facet::Facet;
-
-use crate::format::{
+use froglight_facet_iter::{
     Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
     serialize::SerializeItem,
 };
@@ -11,13 +9,12 @@ use crate::format::{
 pub mod template {
     //! Re-exports of everything needed for implementing [`FacetTemplate`].
 
-    pub use crate::{
-        facet::{FacetBorrowedTemplate, FacetTemplate},
-        format::{
-            Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
-            serialize::SerializeItem,
-        },
+    pub use froglight_facet_iter::{
+        Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
+        serialize::SerializeItem,
     };
+
+    pub use crate::facet::{FacetBorrowedTemplate, FacetTemplate};
 }
 
 facet::define_attr_grammar! {

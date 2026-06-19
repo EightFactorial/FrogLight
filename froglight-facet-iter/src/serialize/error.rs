@@ -1,6 +1,6 @@
 use facet::ReflectError;
 
-use crate::format::writer::WriterError;
+use crate::writer::WriterError;
 
 /// TODO
 #[derive(Debug, Clone)]

@@ -31,8 +31,8 @@ bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_sprite = { workspace = true, optional = true }
 bevy_ui = { workspace = true, optional = true }
-facet = { features = ["alloc", "reflect"], workspace = true, optional = true }
-froglight-nbt = { workspace = true, optional = true }
+facet = { features = ["alloc", "reflect", "uuid"], workspace = true, optional = true }
+froglight-nbt = { features = ["alloc"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---

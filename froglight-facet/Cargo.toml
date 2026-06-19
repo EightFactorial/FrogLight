@@ -23,20 +23,16 @@ criterion = { features = ["default", "html_reports"], workspace = true }
 rand = { workspace = true }
 
 [dependencies]
-facet = { features = ["alloc", "reflect", "smallvec", "uuid"], workspace = true }
-facet-path = { features = ["alloc"], workspace = true }
-replace_with = { workspace = true }
-smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
+facet = { features = ["alloc", "reflect", "uuid"], workspace = true }
+froglight-facet-iter = { workspace = true }
 uuid = { workspace = true }
+simdutf8 = { workspace = true }
 
 # Optional dependencies
-ariadne = { workspace = true, optional = true }
-# cranelift = { features = ["frontend", "jit", "module", "std"], workspace = true, optional = true }
-simdutf8 = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
-simdutf8 = { features = ["aarch64_neon"], workspace = true, optional = true }
+simdutf8 = { features = ["aarch64_neon"], workspace = true }
 
 # --- Tests/Benchmarks ---
 
@@ -58,22 +54,20 @@ required-features = ["simd", "std"]
 [features]
 default = ["std"]
 
-# # Enable support for JIT using Cranelift.
-# jit = ["dep:cranelift", "std"]
 # Enable support for error reports.
-report = ["dep:ariadne", "std"]
+report = ["froglight-facet-iter/report", "std"]
 # Enable support for SIMD optimizations.
-simd = ["dep:simdutf8", "nightly"]
+simd = ["nightly"]
 # Force the use of the generic fallback SIMD implementation.
 # This is typically used for testing and debugging.
 simd_fallback = ["simd"]
 
 # Enable `tracing` support.
-tracing = ["dep:tracing"]
+tracing = ["dep:tracing", "froglight-facet-iter/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["tracing"]
+tracing_ext = ["froglight-facet-iter/tracing_ext", "tracing"]
 
 # Enable support for the standard library
-std = ["facet/std", "facet-path/std", "replace_with/std", "simdutf8?/std", "smallvec/write", "tracing?/std", "uuid/std"]
+std = ["facet/std", "froglight-facet-iter/std", "simdutf8/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["replace_with/nightly", "simdutf8?/aarch64_neon_prefetch", "smallvec/specialization"]
+nightly = ["froglight-facet-iter/nightly", "simdutf8/aarch64_neon_prefetch"]

@@ -1,6 +1,6 @@
 use facet::{AllocError, ReflectError, ShapeMismatchError};
 
-use crate::format::ReaderError;
+use crate::ReaderError;
 
 /// TODO
 #[derive(Debug, Clone)]

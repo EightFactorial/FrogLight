@@ -3,10 +3,9 @@
 
 use alloc::vec::Vec;
 
-use crate::format::{
-    serialize::{Serialize, SerializeError},
-    writer::{Writer, WriterType},
-};
+use froglight_facet_iter::{Writer, WriterType};
+
+use crate::serialize::{Serialize, SerializeError, future::SerializeAsync};
 
 /// TODO
 ///
@@ -22,6 +21,18 @@ pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, SerializeErro
 ///
 /// # Errors
 ///
+/// Returns an error if the value cannot be serialized.
+#[inline(always)]
+pub async fn to_vec_async<T: SerializeAsync<'static>>(
+    value: &T,
+) -> Result<Vec<u8>, SerializeError> {
+    <T as SerializeAsync>::to_vec_async(value).await
+}
+
+/// TODO
+///
+/// # Errors
+///
 /// Returns an error if the value cannot be serialized
 /// or if the writer encounters an error.
 #[inline(always)]
@@ -30,6 +41,20 @@ pub fn to_writer<T: Serialize<'static>, W: WriterType>(
     writer: &mut W,
 ) -> Result<usize, SerializeError> {
     <T as Serialize>::to_writer(value, false, Writer::new(writer))
+}
+
+/// TODO
+///
+/// # Errors
+///
+/// Returns an error if the value cannot be serialized
+/// or if the writer encounters an error.
+#[inline(always)]
+pub async fn to_writer_async<T: SerializeAsync<'static>, W: WriterType>(
+    value: &T,
+    writer: &mut W,
+) -> Result<usize, SerializeError> {
+    <T as SerializeAsync>::to_writer_async(value, false, Writer::new(writer)).await
 }
 
 /// Serialize the value to the given [`WriterType`].

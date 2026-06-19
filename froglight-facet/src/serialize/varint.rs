@@ -32,9 +32,9 @@ macro_rules! create_encode {
                     }
 
                     #[doc = concat!("Encode a [`", stringify!($ty), "`] using LEB128 into the provided writer.")]
-                    #[doc = concat!("\n# Errors\n\nReturns an error if the [`Writer`](crate::format::Writer) cannot be written to.\n")]
+                    #[doc = concat!("\n# Errors\n\nReturns an error if the [`Writer`](froglight_facet_iter::Writer) cannot be written to.\n")]
                     #[doc = concat!("\n# Panics\n\nPanics if the buffer is not large enough to hold the encoded value.\n\nThis will never happen if the buffer is at least ", stringify!($len), " bytes long.")]
-                    pub fn $fn_into(value: $ty, writer: &mut crate::format::Writer<'_>) -> Result<(), crate::format::WriterError> {
+                    pub fn $fn_into(value: $ty, writer: &mut froglight_facet_iter::Writer<'_>) -> Result<(), froglight_facet_iter::WriterError> {
                         let (enc, len) = $fn(value);
                         let slice = unsafe { enc.get_unchecked(0..len as usize) };
                         writer.write_bytes(slice)

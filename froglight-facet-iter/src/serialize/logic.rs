@@ -1,7 +1,7 @@
 use facet::{Def, HasFields, Peek, Type, UserType};
 use smallvec::SmallVec;
 
-use crate::format::{
+use crate::{
     serialize::{
         SerializeError,
         iterator::{ItemType, IteratorStack, SerializeItem, SerializeIterator},

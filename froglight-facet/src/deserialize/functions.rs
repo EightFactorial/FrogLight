@@ -3,7 +3,7 @@
 
 use facet::Facet;
 
-use crate::format::deserialize::{Deserialize, DeserializeError, future::DeserializeAsync};
+use crate::deserialize::{Deserialize, DeserializeError, future::DeserializeAsync};
 
 /// TODO
 ///

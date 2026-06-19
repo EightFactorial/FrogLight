@@ -6,21 +6,13 @@ use alloc::{
 };
 
 use facet::{Facet, HeapValue, Partial};
-
-use crate::format::{ReaderError, reader::Reader};
-
-mod error;
-pub use error::DeserializeError;
+use froglight_facet_iter::{
+    Reader, ReaderError,
+    deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
+};
 
 pub mod functions;
 pub mod future;
-
-pub(crate) mod iterator;
-pub use iterator::{DeserializeItem, IteratorStack};
-
-pub(crate) mod logic;
-pub use logic::{Deserializer, Item};
-
 pub mod varint;
 
 /// A trait for types that can be deserialized.
@@ -64,9 +56,7 @@ pub trait Deserialize<'facet>: Facet<'facet> + Sized {
     fn from_slice_borrowed(
         slice: &'facet [u8],
         variable: bool,
-    ) -> Result<(Self, &'facet [u8]), DeserializeError>
-    where
-        Self: Facet<'facet>;
+    ) -> Result<(Self, &'facet [u8]), DeserializeError>;
 }
 
 impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
@@ -85,10 +75,7 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
     fn from_slice_borrowed(
         slice: &'facet [u8],
         variable: bool,
-    ) -> Result<(Self, &'facet [u8]), DeserializeError>
-    where
-        Self: Facet<'facet>,
-    {
+    ) -> Result<(Self, &'facet [u8]), DeserializeError> {
         let mut cursor = Reader::new(slice);
         let value = deserialize_borrowed(Partial::alloc::<T>()?, variable, &mut cursor)?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
@@ -103,7 +90,20 @@ fn deserialize_owned(
     variable: bool,
     reader: &mut Reader<'_>,
 ) -> Result<HeapValue<'static, false>, DeserializeError> {
-    let mut core = move |item: Item<'static, false>| {
+    // Create and complete the deserializer.
+    let mut core = deserialize_owned_core(reader);
+    let de = Deserializer::new(partial, variable, &mut core);
+    de.complete()?.build().map_err(DeserializeError::from)
+}
+
+/// The core logic behind [`deserialize_owned`], separated out for readability.
+#[doc(hidden)]
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Performance")]
+pub fn deserialize_owned_core(
+    reader: &mut Reader<'_>,
+) -> impl FnMut(Item<'static, false>) -> Result<Item<'static, false>, ReaderError> {
+    move |item: Item<'static, false>| {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -135,13 +135,11 @@ fn deserialize_owned(
             }
         }
 
-        deserialize_core(item, reader).map(Item::Item)
-    };
-
-    // Create and complete the deserializer.
-    let de = Deserializer::new(partial, variable, &mut core);
-    de.complete()?.build().map_err(DeserializeError::from)
+        deserialize_value(item, reader).map(Item::Item)
+    }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[inline(never)]
 fn deserialize_borrowed<'facet>(
@@ -149,7 +147,21 @@ fn deserialize_borrowed<'facet>(
     variable: bool,
     reader: &mut Reader<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
-    let mut core = |item: Item<'facet, true>| {
+    // Create and complete the deserializer.
+    let mut core = deserialize_borrowed_core(reader);
+    let de = Deserializer::new(partial, variable, &mut core);
+    de.complete()?.build().map_err(DeserializeError::from)
+}
+
+/// The core logic behind [`deserialize_borrowed`], separated out for
+/// readability.
+#[doc(hidden)]
+#[inline(always)]
+#[allow(clippy::inline_always, reason = "Performance")]
+pub fn deserialize_borrowed_core<'facet>(
+    reader: &mut Reader<'facet>,
+) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
+    |item: Item<'facet, true>| {
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -186,10 +198,7 @@ fn deserialize_borrowed<'facet>(
             let length = varint::decode_u32_from(reader)? as usize;
             let bytes = reader.get(length)?;
 
-            #[cfg(feature = "simd")]
-            let str: &str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
-            #[cfg(not(feature = "simd"))]
-            let str: &str = core::str::from_utf8(bytes).map_err(ReaderError::other)?;
+            let str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
 
             return if item.is_type::<&str>() {
                 item.set(str).map(Item::Item)
@@ -200,21 +209,17 @@ fn deserialize_borrowed<'facet>(
             };
         }
 
-        deserialize_core(item, reader).map(Item::Item)
-    };
-
-    // Create and complete the deserializer.
-    let de = Deserializer::new(partial, variable, &mut core);
-    de.complete()?.build().map_err(DeserializeError::from)
+        deserialize_value(item, reader).map(Item::Item)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// The deserializer logic behind [`deserialize_owned`] and
+/// The value logic behind [`deserialize_owned`] and
 /// [`deserialize_borrowed`], separated out for readability.
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
-fn deserialize_core<'facet, const BORROW: bool>(
+fn deserialize_value<'facet, const BORROW: bool>(
     item: DeserializeItem<'facet, BORROW>,
     reader: &mut Reader<'_>,
 ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
@@ -274,10 +279,7 @@ fn deserialize_core<'facet, const BORROW: bool>(
         let length = varint::decode_u32_from(reader)? as usize;
         let bytes = reader.get(length)?;
 
-        #[cfg(feature = "simd")]
-        let str: &str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
-        #[cfg(not(feature = "simd"))]
-        let str: &str = core::str::from_utf8(bytes).map_err(ReaderError::other)?;
+        let str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
 
         return if item.is_type::<String>() {
             item.set(String::from(str))

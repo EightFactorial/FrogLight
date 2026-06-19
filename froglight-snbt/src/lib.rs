@@ -5,6 +5,8 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+#[cfg(feature = "facet")]
+pub mod facet;
 pub mod types;
 pub mod unicode;
 

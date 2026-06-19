@@ -3,7 +3,7 @@ use core::fmt;
 use facet::{Attr, Facet, Field, Partial, Shape};
 use smallvec::SmallVec;
 
-use crate::format::ReaderError;
+use crate::ReaderError;
 
 /// TODO
 pub(super) struct DeserializeIterator<'facet, const BORROW: bool> {

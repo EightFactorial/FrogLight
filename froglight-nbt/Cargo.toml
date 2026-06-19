@@ -24,13 +24,12 @@ rand = { workspace = true }
 
 [dependencies]
 froglight-mutf8 = { workspace = true }
-replace_with = { workspace = true }
-smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-facet = { features = ["nonzero", "reflect", "smallvec"], workspace = true, optional = true }
+facet = { features = ["reflect", "uuid"], workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
+froglight-facet-iter = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---
@@ -45,18 +44,18 @@ required-features = ["alloc"]
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["alloc", "dep:facet", "froglight-mutf8/facet"]
+facet = ["alloc", "dep:facet", "dep:froglight-facet-iter", "froglight-mutf8/facet"]
 # Enable `froglight-facet` support.
 froglight-facet = ["dep:froglight-facet", "facet"]
 
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-mutf8/tracing"]
+tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-facet-iter?/tracing", "froglight-mutf8/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["tracing"]
+tracing_ext = ["froglight-facet-iter?/tracing_ext", "tracing"]
 
 # Enable support for a global allocator
 alloc = ["facet?/alloc", "froglight-mutf8/alloc"]
 # Enable support for the standard library
-std = ["alloc", "facet?/std", "froglight-facet?/std", "froglight-mutf8/std", "replace_with/std", "smallvec/write", "tracing?/std", "uuid/std"]
+std = ["alloc", "facet?/std", "froglight-facet?/std", "froglight-facet-iter?/std", "froglight-mutf8/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "froglight-mutf8/simd", "smallvec/specialization"]
+nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8/simd"]

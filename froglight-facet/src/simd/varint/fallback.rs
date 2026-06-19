@@ -3,10 +3,9 @@
 
 use core::simd::prelude::*;
 
-use crate::{
-    format::{Reader, ReaderError, Writer, WriterError},
-    simd::varint::traits::VarIntType,
-};
+use froglight_facet_iter::{Reader, ReaderError, Writer, WriterError};
+
+use crate::simd::varint::traits::VarIntType;
 
 macro_rules! create_fns {
     (@$method:tt $($fn:ident & $fn_into:ident : $ty:ty => $len:literal),*) => {
