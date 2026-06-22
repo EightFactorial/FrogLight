@@ -2,14 +2,16 @@
 
 use bevy_app::{App, Plugin};
 
-mod hook;
-use hook::{instance_insert_hook, instance_replace_hook};
+pub mod instance;
+use instance::WorldInstance;
+
+mod instance_hook;
+use instance_hook::{discard_hook, insert_hook};
+
+pub mod query;
 
 pub mod relationship;
 use relationship::EntityOfInstance;
-
-pub mod world;
-use world::WorldInstance;
 
 use crate::entity::{EntityId, EntityUuid};
 
@@ -26,11 +28,11 @@ impl Plugin for CommonPlugin {
 
         world
             .register_component_hooks::<EntityId>()
-            .on_insert(instance_insert_hook::<EntityId>)
-            .on_discard(instance_replace_hook::<EntityId>);
+            .on_insert(insert_hook::<EntityId>)
+            .on_discard(discard_hook::<EntityId>);
         world
             .register_component_hooks::<EntityUuid>()
-            .on_insert(instance_insert_hook::<EntityUuid>)
-            .on_discard(instance_replace_hook::<EntityUuid>);
+            .on_insert(insert_hook::<EntityUuid>)
+            .on_discard(discard_hook::<EntityUuid>);
     }
 }

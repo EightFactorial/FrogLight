@@ -1,14 +1,14 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 #[cfg(feature = "std")]
 use facet_minecraft::deserialize::error::DeserializeError;
 use froglight_common::{entity::EntityUuid, prelude::EntityId};
 use froglight_entity::entity::EntityDataSet;
 #[cfg(feature = "std")]
 use froglight_entity::{entity::DataSetSerializer, prelude::EntityVersion};
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 
 use crate::common::{entity_id::VarEntityId, lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
 

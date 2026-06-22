@@ -7,7 +7,7 @@ use bevy_ecs::reflect::ReflectComponent;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
 
-#[expect(clippy::wildcard_imports, reason = "Generated code")]
+#[allow(clippy::wildcard_imports, reason = "Generated code")]
 use crate::types::*;
 
 generate! {

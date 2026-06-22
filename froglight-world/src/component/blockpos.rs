@@ -8,13 +8,10 @@ use core::ops::{Add, Div, Mul, Sub};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
-use facet::{Partial, Peek};
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, bytes_to_variable, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{
+    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
+    serialize::varint::encode_u32_into,
 };
 use glam::IVec3;
 #[cfg(feature = "serde")]
@@ -27,8 +24,7 @@ use crate::{CHUNK_LENGTH, CHUNK_WIDTH, component::ChunkBlockPos, prelude::ChunkP
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = BlockPos::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = BlockPos::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = BlockPos::WITH))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -94,44 +90,28 @@ impl BlockPos {
 // -------------------------------------------------------------------------------------------------
 
 #[cfg(feature = "facet")]
-impl BlockPos {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
-
-    #[expect(clippy::cast_possible_truncation, reason = "Desired behavior")]
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let [mut x, mut y, mut z] = [0; 3];
-        for val in [&mut x, &mut y, &mut z] {
-            let (len, value) = bytes_to_variable(cursor.as_slice())?;
-            cursor.consume(len)?;
-            *val = value as i32;
+#[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
+#[expect(clippy::cast_possible_wrap, reason = "Expected behavior")]
+impl FacetTemplate for BlockPos {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<Self>()?;
+        for val in value.as_ivec3().to_array() {
+            encode_u32_into(val as u32, writer)?;
         }
 
-        let value = Self::new(IVec3::new(x, y, z));
-        replace_with_or_abort(partial, |partial| partial.set(value).unwrap());
         Ok(())
     }
 
-    #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        let value = peek.get::<Self>()?;
-
-        let mut buffer = [0; _];
-        for val in [value.x(), value.y(), value.z()] {
-            let len = variable_to_bytes(val as u128, &mut buffer);
-            if !writer.write_data(&buffer[..len]) {
-                return Err(SerializeIterError::new());
-            }
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let [mut x, mut y, mut z] = [0; 3];
+        for val in [&mut x, &mut y, &mut z] {
+            *val = decode_u32_from(reader)? as i32;
         }
 
-        Ok(())
+        item.set(Self::new_xyz(x, y, z))
     }
 }
 

@@ -4,16 +4,13 @@ use core::ops::{Deref, DerefMut};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
-#[cfg(feature = "facet")]
-use facet::{Partial, Peek};
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, bytes_to_variable, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
-};
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{
+    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
+    serialize::varint::encode_u32_into,
+};
 
 /// A variable-length [`i32`].
 #[repr(transparent)]
@@ -69,43 +66,26 @@ impl From<EntityVarLong> for i64 {
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = EntityOptionalVarInt::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = EntityOptionalVarInt::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = EntityOptionalVarInt::WITH))]
 pub struct EntityOptionalVarInt(pub Option<i32>);
 
 #[cfg(feature = "facet")]
 #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
-#[expect(clippy::cast_possible_truncation, reason = "Desired behavior")]
-impl EntityOptionalVarInt {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
-
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let (len, val) = bytes_to_variable(cursor.as_slice())?;
-        cursor.consume(len)?;
-
-        let val = if val == 0 { None } else { Some((val - 1) as i32) };
-        replace_with_or_abort(partial, |partial| partial.set(Self(val)).unwrap());
-        Ok(())
+#[expect(clippy::cast_possible_wrap, reason = "Desired behavior")]
+impl FacetTemplate for EntityOptionalVarInt {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<Self>()?;
+        let value = value.0.map_or_default(|v| v + 1) as u32;
+        encode_u32_into(value, writer)
     }
 
-    fn facet_serialize<'input, 'facet>(
-        peek: Peek<'input, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'input, 'facet>> {
-        let val = peek.get::<Self>()?.0;
-
-        let mut buffer = [0; _];
-        let len = if let Some(val) = val {
-            variable_to_bytes(i128::from(val + 1) as u128, &mut buffer)
-        } else {
-            1
-        };
-        if writer.write_data(&buffer[..len]) { Ok(()) } else { Err(SerializeIterError::new()) }
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let value = decode_u32_from(reader)?;
+        let value = value.checked_sub(1).map(|v| v as i32);
+        item.set(Self(value))
     }
 }
 

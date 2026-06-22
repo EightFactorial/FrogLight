@@ -198,7 +198,9 @@ pub fn deserialize_borrowed_core<'facet>(
             let length = varint::decode_u32_from(reader)? as usize;
             let bytes = reader.get(length)?;
 
-            let str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
+            let str = simdutf8::compat::from_utf8(bytes).map_err(|err| {
+                ReaderError::from_string(alloc::format!("Invalid UTF-8 string: {err}"))
+            })?;
 
             return if item.is_type::<&str>() {
                 item.set(str).map(Item::Item)
@@ -279,7 +281,9 @@ fn deserialize_value<'facet, const BORROW: bool>(
         let length = varint::decode_u32_from(reader)? as usize;
         let bytes = reader.get(length)?;
 
-        let str = simdutf8::compat::from_utf8(bytes).map_err(ReaderError::other)?;
+        let str = simdutf8::compat::from_utf8(bytes).map_err(|err| {
+            ReaderError::from_string(alloc::format!("Invalid UTF-8 string: {err}"))
+        })?;
 
         return if item.is_type::<String>() {
             item.set(String::from(str))

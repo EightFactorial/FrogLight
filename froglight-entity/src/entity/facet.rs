@@ -2,15 +2,8 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 use facet::Facet;
-#[cfg(feature = "facet")]
-use facet::{Partial, Peek};
-use facet_minecraft::replace_with::replace_with_or_abort;
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, error::DeserializeValueError},
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 
 use crate::{entity::EntityDataSet, version::EntityVersion};
 
@@ -18,9 +11,7 @@ use crate::{entity::EntityDataSet, version::EntityVersion};
 ///
 /// Requires the `facet` feature to be enabled.
 #[derive(Debug, Clone, PartialEq, Facet)]
-#[facet(opaque)]
-#[facet(mc::serialize = DataSetSerializer::<V>::SERIALIZE)]
-#[facet(mc::deserialize = DataSetSerializer::<V>::DESERIALIZE)]
+#[facet(opaque, mc::with = DataSetSerializer::<V>::WITH)]
 pub struct DataSetSerializer<V: EntityVersion> {
     dataset: EntityDataSet<'static>,
     _phantom: PhantomData<V>,
@@ -49,18 +40,25 @@ impl<V: EntityVersion> DataSetSerializer<V> {
     pub fn into_inner(self) -> EntityDataSet<'static> { self.dataset }
 }
 
-impl<V: EntityVersion> DataSetSerializer<V> {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let ser = item.get::<Self>()?;
+        for (id, val) in ser.dataset.to_ref() {
+            writer.write_byte(*id)?;
 
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
+            (V::DATATYPE_SERIALIZE)(&(), val, writer)?;
+        }
+
+        writer.write_byte(0xff)
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let mut list = Vec::new();
         loop {
-            let id = cursor.take(1)?[0];
+            let id = reader.get_array::<1>()?[0];
             #[cfg(feature = "tracing_ext")]
             tracing::trace!(target: "froglight_entity::entity", "EntityDataPos: {id:?}");
 
@@ -68,25 +66,9 @@ impl<V: EntityVersion> DataSetSerializer<V> {
                 break;
             }
 
-            list.push((id, (V::DATATYPE_DESERIALIZE)(cursor)?));
+            list.push((id, (V::DATATYPE_DESERIALIZE)(reader)?));
         }
 
-        let serializer = Self::new(EntityDataSet::new(list));
-        replace_with_or_abort(partial, |partial| partial.set(serializer).unwrap());
-        Ok(())
-    }
-
-    fn facet_serialize<'input, 'facet>(
-        peek: Peek<'input, 'facet>,
-        buffer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'input, 'facet>> {
-        let serializer = peek.get::<Self>()?;
-        for (id, val) in serializer.dataset.to_ref() {
-            if !buffer.write_data(&[*id]) {
-                return Err(SerializeIterError::new());
-            }
-            (V::DATATYPE_SERIALIZE)(&(), val, buffer)?;
-        }
-        if buffer.write_data(&[0xff]) { Ok(()) } else { Err(SerializeIterError::new()) }
+        item.set(Self::new(EntityDataSet::new(list)))
     }
 }

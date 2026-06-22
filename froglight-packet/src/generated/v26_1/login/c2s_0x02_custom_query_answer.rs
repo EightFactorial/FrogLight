@@ -3,7 +3,7 @@
 //! @manual packet for "minecraft:custom_query_answer"
 
 #[cfg(feature = "facet")]
-use facet_minecraft as mc;
+use froglight_facet as mc;
 
 use crate::common::unsized_buffer::UnsizedBuffer;
 

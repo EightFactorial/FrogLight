@@ -1,4 +1,5 @@
-use alloc::vec::Vec;
+//! TODO
+
 use core::{error, fmt};
 
 use bevy_ecs::{
@@ -6,15 +7,11 @@ use bevy_ecs::{
     query::{
         NestedQuery, QueryData, QueryEntityError, QueryFilter, QueryManyIter, ReadOnlyQueryData,
     },
-    system::SystemParam,
 };
 
 use crate::bevy::CollidingWith;
 
 /// [`QueryData`] for entities that are colliding with the current [`Entity`].
-///
-/// Used to query the [`Component`](bevy_ecs::component::Component)s of entities
-/// that are colliding with the current entity.
 ///
 /// Note that this requires the inner query to be a read-only to prevent mutable
 /// aliasing.
@@ -42,6 +39,8 @@ pub struct Colliding<D: ReadOnlyQueryData + 'static, F: QueryFilter + 'static = 
 impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     /// Returns the read-only query item for the given [`Entity`].
     ///
+    /// # Errors
+    ///
     /// If the entity is not colliding with the current entity, a
     /// [`CollidingError::NotColliding`] is returned instead.
     ///
@@ -63,6 +62,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     /// This consumes the [`Query`] to return results with the actual "inner"
     /// world lifetime.
     ///
+    /// # Errors
+    ///
     /// If the entity is not colliding with the current entity, a
     /// [`CollidingError::NotColliding`] is returned instead.
     ///
@@ -82,6 +83,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     }
 
     /// Returns the read-only query items for the given array of [`Entity`].
+    ///
+    /// # Errors
     ///
     /// The returned query items are in the same order as the input.
     ///
@@ -112,6 +115,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     /// world lifetime.
     ///
     /// The returned query items are in the same order as the input.
+    ///
+    /// # Errors
     ///
     /// If any of the entities are not colliding with the current entity, a
     /// [`CollidingError::NotColliding`] is returned instead with the first
@@ -173,8 +178,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator for CollidingIte
     fn into_iter(self) -> Self::IntoIter { self.iter_inner() }
 }
 
-impl<'iter, 'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
-    for &'iter CollidingItem<'w, 's, D, F>
+impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
+    for &'iter CollidingItem<'_, 's, D, F>
 {
     type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter>>;
     type Item = D::Item<'iter, 's>;
@@ -182,8 +187,9 @@ impl<'iter, 'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
     #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
-impl<'iter, 'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
-    for &'iter mut CollidingItem<'w, 's, D, F>
+#[allow(clippy::into_iter_without_iter, reason = "Read-Only")]
+impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
+    for &'iter mut CollidingItem<'_, 's, D, F>
 {
     type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter>>;
     type Item = D::Item<'iter, 's>;

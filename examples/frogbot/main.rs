@@ -135,7 +135,7 @@ impl BotPlugin {
                                 data.position_y as f32,
                                 data.position_z as f32,
                             )),
-                            Velocity::new(data.velocity.as_vec3()),
+                            Velocity::new(data.velocity.as_vec3a()),
                         ));
 
                         let entities = Version::entities().load();
@@ -247,16 +247,20 @@ impl BotPlugin {
                             let mut entity = entity.into_world_mut().entity_mut(target);
                             trace!("Moving Entity {target} ({})", entity_id.0);
 
-                            if let Some(mut transform) = entity.get_mut::<Transform>() {
-                                transform.translation =
+                            if let Some(mut position) = entity.get_mut::<Position>() {
+                                **position =
                                     DVec3::new(data.position_x, data.position_y, data.position_z)
-                                        .as_vec3();
-                                // TODO: Yaw/Pitch
+                                        .as_vec3a();
                             }
+
+                            if let Some(mut rotation) = entity.get_mut::<Rotation>() {
+                                *rotation = Rotation::new(data.yaw, data.pitch);
+                            }
+
                             if let Some(mut velocity) = entity.get_mut::<Velocity>() {
-                                velocity.0 =
+                                **velocity =
                                     DVec3::new(data.velocity_x, data.velocity_y, data.velocity_z)
-                                        .as_vec3();
+                                        .as_vec3a();
                             }
 
                             if let Some(mut ground) = entity.get_mut::<OnGround>() {
@@ -375,13 +379,13 @@ impl BotPlugin {
                         let data = *data;
                         let flags = *flags;
                         commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut| {
-                            if let Ok((mut transform, mut velocity)) = entity.get_components_mut::<(
-                                &mut Transform,
+                            if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
+                                &mut Position,
+                                &mut Rotation,
                                 &mut Velocity,
                             )>(
                             ) {
-                                let Transform { translation, rotation, .. } = &mut *transform;
-                                data.apply_relative(translation, rotation, &mut velocity, &flags);
+                                data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
                             } else {
                                 error!(
                                     "Received TeleportEntity for Player without Transform, Velocity, or OnGround!"
@@ -554,14 +558,14 @@ impl BotPlugin {
                             if let Some(target) = instance.get(&id) {
                                 let mut entity = entity.into_world_mut().entity_mut(target);
 
-                                if let Ok((mut transform, mut velocity, mut ground)) = entity.get_components_mut::<(
-                                    &mut Transform,
+                                if let Ok((mut position, mut rotation, mut velocity, mut ground)) = entity.get_components_mut::<(
+                                    &mut Position,
+                                    &mut Rotation,
                                     &mut Velocity,
                                     &mut OnGround,
                                 )>(
                                 ) {
-                                    let Transform { translation, rotation, .. } = &mut *transform;
-                                    data.apply_relative(translation, rotation, &mut velocity, &flags);
+                                    data.apply_relative(&mut translation, rotation.as_vec3a(), &mut velocity, &flags);
                                     ground.0 = on_ground;
                                 } else {
                                     error!(

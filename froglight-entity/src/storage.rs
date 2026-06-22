@@ -194,15 +194,15 @@ macro_rules! __implement_storage_inner {
 
             #[cfg(feature = "facet")]
             const DATATYPE_DESERIALIZE: fn(
-                &mut facet_minecraft::deserialize::InputCursor,
-            ) -> Result<$crate::generated::datatype::EntityDataType, facet_minecraft::deserialize::error::DeserializeValueError> = $read;
+                &mut froglight_facet::facet::template::Reader,
+            ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::template::ReaderError>  = $read;
 
             #[cfg(feature = "facet")]
             const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
                 &'facet (),
                 &'input $crate::generated::datatype::EntityDataType,
-                &mut dyn facet_minecraft::serialize::buffer::SerializeWriter,
-            ) -> Result<(), facet_minecraft::serialize::error::SerializeIterError<'input, 'facet>> = $write;
+                &mut froglight_facet::facet::template::Writer,
+            ) -> Result<(), froglight_facet::facet::template::WriterError> = $write;
         }
     };
 }

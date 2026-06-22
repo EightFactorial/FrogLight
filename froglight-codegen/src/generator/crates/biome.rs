@@ -422,7 +422,7 @@ fn generate_value(name: &str, value: &Value, content: &mut String) -> Result<Vec
                         extra.push(format!("{type_name} {type_content}"));
                         extra.extend(extra_types);
                     }
-                    ValueType::DateTime | ValueType::Uuid | ValueType::QName => {
+                    _ => {
                         miette::bail!("Unsupported attribute value type: {:?}", val.value_type());
                     }
                 }

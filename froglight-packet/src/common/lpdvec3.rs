@@ -18,7 +18,7 @@ use facet_minecraft::{
     replace_with::replace_with_or_abort,
     serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
 };
-use glam::{DVec3, Vec3};
+use glam::{DVec3, Vec3, Vec3A};
 
 /// A variable-length [`DVec3`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -137,7 +137,14 @@ impl LpDVec3 {
     #[must_use]
     pub const fn as_vec3(self) -> Vec3 {
         let dvec = self.as_dvec3();
-        Vec3 { x: dvec.x as f32, y: dvec.y as f32, z: dvec.z as f32 }
+        Vec3::new(dvec.x as f32, dvec.y as f32, dvec.z as f32)
+    }
+
+    /// Create a [`Vec3A`] from a [`LpDVec3`].
+    #[must_use]
+    pub const fn as_vec3a(self) -> Vec3A {
+        let dvec = self.as_dvec3();
+        Vec3A::new(dvec.x as f32, dvec.y as f32, dvec.z as f32)
     }
 
     /// Create a [`DVec3`] from a [`LpDVec3`].

@@ -7,7 +7,10 @@ use bevy_ecs::{
     world::DeferredWorld,
 };
 use bevy_reflect::{Reflect, TypePath};
-use hashbrown::HashMap;
+use hashbrown::{
+    HashMap,
+    hash_map::{Iter, Values},
+};
 
 use crate::{
     bevy::EntityOfInstance,
@@ -18,7 +21,7 @@ use crate::{
 /// A world instance containing information about entities.
 #[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
 #[reflect(opaque, Debug, Clone, PartialEq, Component)]
-#[component(on_remove = WorldInstance::remove_hook)]
+#[component(on_discard = WorldInstance::discard_hook)]
 pub struct WorldInstance {
     identifier: Identifier<'static>,
     entity_id: HashMap<EntityId, Entity>,
@@ -53,7 +56,8 @@ impl WorldInstance {
 
     /// Get an iterator over all entities in the [`WorldInstance`].
     #[inline]
-    pub fn iter_entity(&self) -> impl Iterator<Item = &Entity> { self.entity_id.values() }
+    #[must_use]
+    pub fn iter_entity(&self) -> Values<'_, EntityId, Entity> { self.entity_id.values() }
 
     /// Get an iterator over all data-entity pairs in the [`WorldInstance`].
     ///
@@ -63,14 +67,13 @@ impl WorldInstance {
     ///   - [`EntityId`]
     ///   - [`EntityUuid`]
     #[inline]
+    #[must_use]
     #[expect(private_bounds, reason = "Only two possible data types")]
-    pub fn iter_data<T: InstanceData>(&self) -> impl Iterator<Item = (&T, &Entity)> {
-        T::iter(self)
-    }
+    pub fn iter_data<T: InstanceData>(&self) -> Iter<'_, T, Entity> { T::iter(self) }
 
     /// Hook for when a [`WorldInstance`] is removed from an entity.
     #[allow(unused_variables, reason = "Used by tracing macros")]
-    fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
+    fn discard_hook(mut world: DeferredWorld, ctx: HookContext) {
         let mut instance = world
             .get_mut::<WorldInstance>(ctx.entity)
             .expect("WorldInstance does not exist after being removed?");
@@ -80,25 +83,26 @@ impl WorldInstance {
         let (mut id_map, mut uuid_map) =
             (core::mem::take(&mut instance.entity_id), core::mem::take(&mut instance.entity_uuid));
 
+        let mut commands = world.commands();
         for (entity_id, entity) in id_map.drain() {
             if entity == ctx.entity {
-                world.commands().entity(entity).remove::<EntityOfInstance>().remove::<EntityId>();
+                commands.entity(entity).remove::<(EntityOfInstance, EntityId)>();
                 continue;
             }
 
             #[cfg(feature = "tracing")]
             tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityId {}!", entity, entity_id.0);
-            world.commands().entity(entity).despawn();
+            commands.entity(entity).despawn();
         }
         for (entity_uuid, entity) in uuid_map.drain() {
             if entity == ctx.entity {
-                world.commands().entity(entity).remove::<EntityOfInstance>().remove::<EntityUuid>();
+                commands.entity(entity).remove::<(EntityOfInstance, EntityUuid)>();
                 continue;
             }
 
             #[cfg(feature = "tracing")]
             tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityUuid {}!", entity, entity_uuid.0.as_hyphenated());
-            world.commands().entity(entity).despawn();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -110,9 +114,11 @@ pub(super) trait InstanceData: Clone + Component + TypePath {
     type Relationship: Component + TypePath + Deref<Target = Entity>;
 
     /// Get an iterator over all data-entity pairs in the [`WorldInstance`].
-    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)>;
+    #[must_use]
+    fn iter(instance: &WorldInstance) -> Iter<'_, Self, Entity>;
 
     /// Query the [`WorldInstance`] for the associated [`Entity`].
+    #[must_use]
     fn query(&self, instance: &WorldInstance) -> Option<Entity>;
     /// Insert the associated [`Entity`] into the [`WorldInstance`].
     ///
@@ -128,9 +134,7 @@ impl InstanceData for EntityId {
     type Relationship = EntityOfInstance;
 
     #[inline]
-    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)> {
-        instance.entity_id.iter()
-    }
+    fn iter(instance: &WorldInstance) -> Iter<'_, Self, Entity> { instance.entity_id.iter() }
 
     #[inline]
     fn query(&self, instance: &WorldInstance) -> Option<Entity> {
@@ -152,9 +156,7 @@ impl InstanceData for EntityUuid {
     type Relationship = EntityOfInstance;
 
     #[inline]
-    fn iter(instance: &WorldInstance) -> impl Iterator<Item = (&Self, &Entity)> {
-        instance.entity_uuid.iter()
-    }
+    fn iter(instance: &WorldInstance) -> Iter<'_, Self, Entity> { instance.entity_uuid.iter() }
 
     #[inline]
     fn query(&self, instance: &WorldInstance) -> Option<Entity> {

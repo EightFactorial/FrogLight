@@ -53,6 +53,18 @@ impl<'a> Writer<'a> {
     }
 }
 
+impl WriterType for Writer<'_> {
+    #[inline]
+    fn write_byte(&mut self, position: usize, byte: u8) -> Result<(), WriterError> {
+        self.inner.write_byte(position, byte)
+    }
+
+    #[inline]
+    fn write_bytes(&mut self, position: usize, bytes: &[u8]) -> Result<(), WriterError> {
+        self.inner.write_bytes(position, bytes)
+    }
+}
+
 impl<'a, T: WriterType> From<&'a mut T> for Writer<'a> {
     #[inline]
     fn from(inner: &'a mut T) -> Self { Self::new(inner) }
@@ -143,6 +155,13 @@ impl WriterError {
     #[inline]
     #[must_use]
     pub fn other<T: Error + Send + Sync + 'static>(err: T) -> Self { Self::Other(Box::new(err)) }
+
+    /// Create a [`WriterError::Other`] from a string.
+    #[inline]
+    #[must_use]
+    pub fn from_string(err: alloc::string::String) -> Self {
+        Self::Other(Box::<dyn Error + Send + Sync>::from(err))
+    }
 }
 
 impl From<ReflectError> for WriterError {

@@ -3,10 +3,10 @@
 use alloc::vec::Vec;
 use core::ops::{Deref, DerefMut};
 
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 use indexmap::IndexMap;
 
 /// A map of registry identifiers to their tags and values.

@@ -56,6 +56,18 @@ impl Rotation {
     #[inline]
     #[must_use]
     pub fn pitch_mut(&mut self) -> &mut f32 { &mut self.0.y }
+
+    /// Get the underlying [`Vec3A`] of this [`Rotation`].
+    ///
+    /// # Note
+    ///
+    /// This is *not* a vector!
+    /// It is just being stored in a [`Vec3A`] for performance.
+    ///
+    /// Stored as `[yaw, pitch, 0.0]`.
+    #[inline]
+    #[must_use]
+    pub const fn as_vec3a(&mut self) -> &mut Vec3A { &mut self.0 }
 }
 
 // -------------------------------------------------------------------------------------------------

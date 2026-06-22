@@ -3,7 +3,7 @@
 //! @manual packet for "minecraft:player_position"
 
 #[cfg(feature = "facet")]
-use facet_minecraft as mc;
+use froglight_facet as mc;
 
 use crate::common::position::{EntityPositionRotationData, EntityRelativeFlags};
 

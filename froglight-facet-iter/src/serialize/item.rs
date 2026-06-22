@@ -1,4 +1,4 @@
-use facet::{Attr, Field, Peek, Shape};
+use facet::{Attr, Facet, Field, Peek, ReflectError, Shape};
 
 /// A [`Serializer`] item.
 pub enum Item<'mem, 'facet> {
@@ -35,6 +35,14 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
         Self { peek, ty, variable: var, field_attr: None }
     }
+
+    /// Get the value of this [`StackItem`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the value is not of the expected type.
+    #[inline]
+    pub fn get<T: Facet<'facet>>(&self) -> Result<&'mem T, ReflectError> { self.peek.get::<T>() }
 
     /// Get the [`Peek`] for this [`StackItem`].
     #[inline]

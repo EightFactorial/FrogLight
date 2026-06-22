@@ -25,6 +25,7 @@ rand = { workspace = true }
 [dependencies]
 froglight-snbt = { workspace = true }
 uuid = { workspace = true }
+yansi = { features = ["alloc"], workspace = true }
 
 # Optional dependencies
 bevy_app = { workspace = true, optional = true }
@@ -57,6 +58,6 @@ nbt = ["dep:froglight-nbt", "froglight-snbt/nbt"]
 tracing = ["dep:tracing", "froglight-nbt?/tracing", "froglight-snbt/tracing"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-nbt?/std", "froglight-snbt/std", "uuid/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-nbt?/std", "froglight-snbt/std", "uuid/std", "yansi/hyperlink", "yansi/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-nbt?/nightly", "froglight-snbt/nightly"]

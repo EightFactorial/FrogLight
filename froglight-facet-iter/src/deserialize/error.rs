@@ -1,3 +1,5 @@
+use core::{error, fmt};
+
 use facet::{AllocError, ReflectError, ShapeMismatchError};
 
 use crate::ReaderError;
@@ -5,6 +7,13 @@ use crate::ReaderError;
 /// TODO
 #[derive(Debug, Clone)]
 pub struct DeserializeError;
+
+impl error::Error for DeserializeError {}
+impl fmt::Display for DeserializeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "DeserializeError") }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 impl From<ReaderError> for DeserializeError {
     #[allow(unused_variables, reason = "Temporary")]

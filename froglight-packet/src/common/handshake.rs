@@ -12,9 +12,9 @@ use bevy_reflect::Reflect;
 use bevy_reflect::std_traits::ReflectDefault;
 #[cfg(feature = "facet")]
 use facet::Facet;
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 use froglight_common::version::Version;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 
 /// The content of a handshake packet.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

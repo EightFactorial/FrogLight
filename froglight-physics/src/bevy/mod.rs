@@ -1,6 +1,6 @@
 //! TODO
 
-use bevy_app::{App, Plugin, Update};
+use bevy_app::{App, Plugin};
 #[cfg(feature = "tracing")]
 use bevy_ecs::entity::EntityNotSpawnedError;
 use bevy_ecs::{prelude::*, world::DeferredWorld};

@@ -12,7 +12,7 @@ use facet_minecraft::{
     serialize::{buffer::SerializeWriter, error::SerializeIterError},
 };
 use froglight_common::prelude::EntityId;
-use glam::{DVec3, Quat, Vec3};
+use glam::{DVec3, Vec3, Vec3A};
 
 use crate::generated::v26_1::play::{
     MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket, MoveEntityRotS2CPacket,
@@ -97,9 +97,9 @@ impl EntityPositionRotationData {
     #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
     pub fn apply_relative(
         &self,
-        position: &mut Vec3,
-        _rotation: &mut Quat,
-        velocity: &mut Vec3,
+        position: &mut Vec3A,
+        rotation: &mut Vec3A,
+        velocity: &mut Vec3A,
         flags: &EntityRelativeFlags,
     ) {
         macro_rules! apply {
@@ -115,6 +115,10 @@ impl EntityPositionRotationData {
         apply!(self.position_x as f32, &mut position.x, flags.x);
         apply!(self.position_y as f32, &mut position.y, flags.y);
         apply!(self.position_z as f32, &mut position.z, flags.z);
+
+        // Stored as `[yaw, pitch, _]`
+        apply!(self.yaw, &mut rotation.x, flags.y_rot);
+        apply!(self.pitch, &mut rotation.y, flags.x_rot);
 
         apply!(self.velocity_x as f32, &mut velocity.x, flags.delta_x);
         apply!(self.velocity_y as f32, &mut velocity.y, flags.delta_y);

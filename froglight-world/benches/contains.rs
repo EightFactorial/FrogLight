@@ -31,6 +31,7 @@ macro_rules! create {
             core::array::from_fn(|_| unsafe {
                 BorrowedSection::new_unchecked(
                     0,
+                    0,
                     $($tt)*,
                     BorrowedSectionData::new_unchecked(
                         0,
@@ -45,6 +46,7 @@ macro_rules! create {
         black_box(BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
             core::array::from_fn(|_| unsafe {
                 BorrowedSection::new_unchecked(
+                    0,
                     0,
                     BorrowedSectionData::new_unchecked(
                         0,
@@ -314,6 +316,7 @@ impl BiomeType<TestVersion> for Plains {
                 0.0,
             )
         };
+
         &STATIC
     };
 }
@@ -338,6 +341,7 @@ impl BiomeType<TestVersion> for Forest {
                 0.0,
             )
         };
+
         &STATIC
     };
 }

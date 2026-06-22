@@ -284,40 +284,34 @@ macro_rules! generate {
                 ])
             },
             read: { |cursor| {
-                let (len, val) = facet_minecraft::deserialize::bytes_to_variable(cursor.as_slice())?;
-                cursor.consume(len);
+                let val = froglight_facet::deserialize::varint::decode_u32_from(cursor)?;
 
                 match val {
                     $(
-                        $dataid => match facet_minecraft::from_slice_remainder(cursor.as_slice()) {
-                            Ok((value, rem)) => {
-                                cursor.consume(cursor.as_slice().len() - rem.len());
-                                Ok(crate::generated::datatype::EntityDataType::$datatype(value))
-                            }
-                            Err(_) => Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow)
+                        $dataid => {
+                            let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining())
+                                .map_err(froglight_facet::facet::template::ReaderError::other)?;
+                            cursor.consume(cursor.remaining().len() - rem.len());
+
+                            Ok(crate::generated::datatype::EntityDataType::$datatype(value))
                         }
                     )*
-                    _ => Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow),
+                    _ => todo!("TODO: Create an error type"),
                 }
             } },
             write: { |(), data, buffer| {
-                let mut content = alloc::vec::Vec::with_capacity(8);
-
                 match data {
                     $(
                         crate::generated::datatype::EntityDataType::$datatype(value) => {
-                            content.push($dataid);
-                            facet_minecraft::to_buffer(value, &mut content).unwrap();
+                            buffer.write_byte($dataid)?;
+                            froglight_facet::to_writer(value, buffer)
+                                .map_err(froglight_facet::facet::template::WriterError::other)?;
                         }
                     )*
-                    _ => todo!(),
+                    _ => todo!("TODO: Create an error type"),
                 }
 
-                if buffer.write_data(&content) {
-                    Ok(())
-                } else {
-                    Err(facet_minecraft::serialize::error::SerializeIterError::new())
-                }
+                Ok(())
             } }
         );
     };

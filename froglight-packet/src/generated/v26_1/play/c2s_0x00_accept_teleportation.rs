@@ -3,7 +3,7 @@
 //! @manual packet for "minecraft:accept_teleportation"
 
 #[cfg(feature = "facet")]
-use facet_minecraft as mc;
+use froglight_facet as mc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]

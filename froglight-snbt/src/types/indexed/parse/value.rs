@@ -1,8 +1,5 @@
-#![expect(
-    clippy::match_wildcard_for_single_variants,
-    clippy::wildcard_imports,
-    reason = "Cleanliness"
-)]
+#![allow(clippy::wildcard_imports, reason = "Cleanliness")]
+#![expect(clippy::match_wildcard_for_single_variants, reason = "Cleanliness")]
 #![expect(unused, reason = "WIP")]
 
 use alloc::{collections::VecDeque, string::String};

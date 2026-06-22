@@ -3,12 +3,12 @@
 use alloc::vec::Vec;
 use core::fmt::Debug;
 
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 #[cfg(feature = "std")]
 use froglight_biome::prelude::BiomeVersion;
 #[cfg(feature = "std")]
 use froglight_block::prelude::BlockVersion;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 use froglight_world::{
     chunk::ParseError,
     prelude::{Chunk, NaiveChunk},

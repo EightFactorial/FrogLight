@@ -18,7 +18,8 @@ use crate::{
 };
 
 impl PacketData {
-    #[expect(clippy::unused_async, reason = "Yes")]
+    #[allow(clippy::unused_async, reason = "Yes")]
+    #[allow(clippy::unused_async_trait_impl, reason = "Yes")]
     pub(super) async fn analyze_packet_protocol(
         packet: &mut PacketInfo,
         jar: &JarData,

@@ -8,9 +8,9 @@ use alloc::vec::Vec;
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Facet;
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 use froglight_common::{entity::EntityId, prelude::Identifier};
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 use froglight_player::prelude::{PlayerProfile, Username};
 use uuid::Uuid;
 

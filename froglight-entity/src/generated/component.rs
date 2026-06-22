@@ -5,7 +5,7 @@ use alloc::borrow::Cow;
 #[cfg(feature = "bevy")]
 use bevy_ecs::reflect::ReflectComponent;
 
-#[expect(clippy::wildcard_imports, reason = "Generated code")]
+#[allow(clippy::wildcard_imports, reason = "Generated code")]
 use crate::types::*;
 
 generate! {

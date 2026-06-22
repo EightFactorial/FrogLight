@@ -1,11 +1,9 @@
 //! TODO
 
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    deserialize::{InputCursor, error::DeserializeValueError},
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
 use froglight_common::prelude::*;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::facet::template::*;
 
 #[cfg(feature = "facet")]
 use crate::generated::datatype::EntityDataType;
@@ -40,9 +38,7 @@ pub trait EntityVersion: Version {
     ///
     /// Requires the `facet` feature to be enabled.
     #[cfg(feature = "facet")]
-    const DATATYPE_DESERIALIZE: fn(
-        &mut InputCursor,
-    ) -> Result<EntityDataType, DeserializeValueError>;
+    const DATATYPE_DESERIALIZE: fn(&mut Reader) -> Result<EntityDataType, ReaderError>;
     /// This [`Version`]'s erializer for
     /// [`EntityDataType`](crate::generated::data::EntityDataType)s
     ///
@@ -51,9 +47,6 @@ pub trait EntityVersion: Version {
     const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
         &'facet (),
         &'input EntityDataType,
-        &mut dyn SerializeWriter,
-    ) -> Result<
-        (),
-        SerializeIterError<'input, 'facet>,
-    >;
+        &mut Writer,
+    ) -> Result<(), WriterError>;
 }

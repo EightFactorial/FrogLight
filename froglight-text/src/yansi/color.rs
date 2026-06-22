@@ -1,4 +1,4 @@
-use yansi::{Color as YansiColor, Style as YansiStyle};
+use ::yansi::{Color as YansiColor, Style as YansiStyle};
 
 use crate::yansi::{Attribute, Style};
 

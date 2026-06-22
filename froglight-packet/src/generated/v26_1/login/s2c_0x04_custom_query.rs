@@ -2,9 +2,9 @@
 //!
 //! @manual packet for "minecraft:custom_query"
 
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 
 use crate::common::unsized_buffer::UnsizedBuffer;
 

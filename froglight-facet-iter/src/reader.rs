@@ -106,6 +106,13 @@ impl ReaderError {
     #[inline]
     #[must_use]
     pub fn other<T: Error + Send + Sync + 'static>(err: T) -> Self { Self::Other(Box::new(err)) }
+
+    /// Create a [`ReaderError::Other`] from a string.
+    #[inline]
+    #[must_use]
+    pub fn from_string(err: alloc::string::String) -> Self {
+        Self::Other(Box::<dyn Error + Send + Sync>::from(err))
+    }
 }
 
 impl From<ReflectError> for ReaderError {

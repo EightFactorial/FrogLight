@@ -75,6 +75,11 @@ impl BorrowMut<ArcSwap<Chunk>> for SharedChunk {
     fn borrow_mut(&mut self) -> &mut ArcSwap<Chunk> { &mut self.chunk }
 }
 
+impl Clone for SharedChunk {
+    #[inline]
+    fn clone(&self) -> Self { Self::new_from(ArcSwap::new(self.load().clone())) }
+}
+
 impl Deref for SharedChunk {
     type Target = ArcSwap<Chunk>;
 

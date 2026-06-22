@@ -29,12 +29,15 @@ impl EntityOfInstance {
 impl Deref for EntityOfInstance {
     type Target = Entity;
 
+    #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl From<Entity> for EntityOfInstance {
+    #[inline]
     fn from(entity: Entity) -> Self { Self::new(entity) }
 }
 impl From<EntityOfInstance> for Entity {
+    #[inline]
     fn from(entity: EntityOfInstance) -> Self { entity.0 }
 }
