@@ -6,6 +6,7 @@ use bevy_ecs::{
     entity::Entity,
     query::{
         NestedQuery, QueryData, QueryEntityError, QueryFilter, QueryManyIter, ReadOnlyQueryData,
+        With,
     },
 };
 use hashbrown::hash_map::Values;
@@ -102,33 +103,13 @@ impl Deref for InstanceItem<'_, '_> {
 /// ```
 #[derive(QueryData)]
 pub struct OnInstance<D: ReadOnlyQueryData + 'static, F: QueryFilter + 'static = ()> {
-    instance: Instance,
-    query: NestedQuery<D, F>,
+    entity_of: &'static EntityOfInstance,
+    query: NestedQuery<D, (With<WorldInstance>, F)>,
 }
 
 impl<'w, 's, D: ReadOnlyQueryData + 'static, F: QueryFilter + 'static>
     OnInstanceItem<'w, 's, D, F>
 {
-    /// Get the [`WorldInstance`] of the current entity.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the current entity's [`WorldInstance`] cannot be retrieved.
-    #[inline]
-    #[must_use]
-    pub fn instance(&self) -> &WorldInstance { self.instance.instance() }
-
-    /// Try to get the [`WorldInstance`] of the current entity.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the current entity's [`WorldInstance`] cannot be
-    /// retrieved.
-    #[inline]
-    pub fn try_instance(&self) -> Result<&WorldInstance, QueryEntityError> {
-        self.instance.try_instance()
-    }
-
     /// Returns the read-only query item for the current entity.
     ///
     /// # Errors
@@ -141,8 +122,9 @@ impl<'w, 's, D: ReadOnlyQueryData + 'static, F: QueryFilter + 'static>
     /// # Panics
     ///
     /// Panics if the current entity's [`WorldInstance`] cannot be retrieved.
+    #[inline]
     pub fn get(&self) -> Result<D::Item<'_, 's>, QueryEntityError> {
-        self.query.get(self.instance.entity_of.entity())
+        self.query.get(self.entity_of.entity())
     }
 
     /// Returns the query item for the current entity.
@@ -160,8 +142,9 @@ impl<'w, 's, D: ReadOnlyQueryData + 'static, F: QueryFilter + 'static>
     /// # Panics
     ///
     /// Panics if the current entity's [`WorldInstance`] cannot be retrieved.
+    #[inline]
     pub fn get_inner(self) -> Result<D::Item<'w, 's>, QueryEntityError> {
-        self.query.get_inner(self.instance.entity_of.entity())
+        self.query.get_inner(self.entity_of.entity())
     }
 }
 

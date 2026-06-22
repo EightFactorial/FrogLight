@@ -10,13 +10,12 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
-use facet::{Facet, Partial, Peek};
+use facet::Facet;
 #[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, bytes_to_variable, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{
+    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
+    serialize::varint::encode_u32_into,
 };
 use glam::{DVec3, Vec3, Vec3A};
 
@@ -25,8 +24,7 @@ use glam::{DVec3, Vec3, Vec3A};
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet), facet(opaque))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = LpDVec3::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = LpDVec3::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = LpDVec3::WITH))]
 pub struct LpDVec3(LpDVec3Inner);
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -184,74 +182,43 @@ impl LpDVec3 {
 }
 
 #[cfg(feature = "facet")]
-impl LpDVec3 {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
-
-    #[expect(clippy::cast_possible_truncation, reason = "Expected behavior")]
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let a = cursor.take_array::<1>()?[0];
-        if a == 0 {
-            replace_with_or_abort(partial, |partial| {
-                partial.set(Self(LpDVec3Inner::Zero)).unwrap()
-            });
-            return Ok(());
-        }
-
-        let b = cursor.take_array::<1>()?[0];
-        let c = u32::from_be_bytes(*cursor.take_array::<4>()?);
-        if a & 4 == 4 {
-            let (len, d) = bytes_to_variable(cursor.as_slice())?;
-            cursor.consume(len)?;
-
-            let d = d as u32;
-            replace_with_or_abort(partial, |partial| {
-                partial.set(Self(LpDVec3Inner::Extended { a, b, c, d })).unwrap()
-            });
-        } else {
-            replace_with_or_abort(partial, |partial| {
-                partial.set(Self(LpDVec3Inner::Normal { a, b, c })).unwrap()
-            });
-        }
-
-        Ok(())
-    }
-
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        macro_rules! write {
-            ($data:expr) => {
-                if !writer.write_data($data) {
-                    return Err(SerializeIterError::new());
-                }
-            };
-        }
-
-        match peek.get::<Self>()?.0 {
-            LpDVec3Inner::Zero => write!(&[0]),
+impl FacetTemplate for LpDVec3 {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        match item.get::<Self>()?.0 {
+            LpDVec3Inner::Zero => writer.write_byte(0),
             LpDVec3Inner::Normal { a, b, c } => {
-                write!(&[a]);
-                write!(&[b]);
-                write!(&c.to_be_bytes());
+                writer.write_byte(a)?;
+                writer.write_byte(b)?;
+                writer.write_bytes(&c.to_be_bytes())
             }
             LpDVec3Inner::Extended { a, b, c, d } => {
-                write!(&[a]);
-                write!(&[b]);
-                write!(&c.to_be_bytes());
+                writer.write_byte(a)?;
+                writer.write_byte(b)?;
+                writer.write_bytes(&c.to_be_bytes())?;
 
-                let mut buffer = [0; _];
-                let len = variable_to_bytes(u128::from(d), &mut buffer);
-                write!(&buffer[len..]);
+                encode_u32_into(d, writer)
             }
         }
+    }
 
-        Ok(())
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let a = reader.get_array::<1>()?[0];
+        if a == 0 {
+            return item.set(Self(LpDVec3Inner::Zero));
+        }
+
+        let b = reader.get_array::<1>()?[0];
+        let c = u32::from_be_bytes(*reader.get_array::<4>()?);
+
+        if a & 4 == 4 {
+            let d = decode_u32_from(reader)?;
+            item.set(Self(LpDVec3Inner::Extended { a, b, c, d }))
+        } else {
+            item.set(Self(LpDVec3Inner::Normal { a, b, c }))
+        }
     }
 }
 

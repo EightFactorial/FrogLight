@@ -6,9 +6,10 @@ use alloc::{
 };
 
 use facet::{Facet, HeapValue, Partial};
+pub use froglight_facet_iter::deserialize::DeserializeError;
 use froglight_facet_iter::{
     Reader, ReaderError,
-    deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
+    deserialize::{DeserializeItem, Deserializer, Item},
 };
 
 pub mod functions;
@@ -290,6 +291,12 @@ fn deserialize_value<'facet, const BORROW: bool>(
         } else {
             item.set(Cow::<'_, str>::Owned(String::from(str)))
         };
+    }
+
+    // Handle `Uuid`.
+    if item.is_type::<uuid::Uuid>() {
+        let bytes = reader.get_array::<16>()?;
+        return item.set(uuid::Uuid::from_bytes_le(*bytes));
     }
 
     todo!("Unsupported type: `{}`", item.shape().type_name());

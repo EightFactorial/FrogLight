@@ -47,7 +47,7 @@ impl Plugin for InventoryPlugin {
         // Initialize the `GlobalInventory` with the collected groups.
         if GlobalInventory::try_initialize(init).is_ok() {
             #[cfg(feature = "tracing")]
-            tracing::debug!(target: "froglight_inventory", "Initialized the `GlobalInventory` with {} menus.", init.len());
+            tracing::debug!(target: "froglight_inventory", "Initialized the `GlobalInventory`");
         } else {
             #[cfg(feature = "tracing")]
             tracing::error!(target: "froglight_inventory", "Failed to initialize the `GlobalInventory`, were there duplicate menus?");

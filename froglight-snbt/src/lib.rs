@@ -12,4 +12,7 @@ pub mod unicode;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
+
+    /// TODO: Delete me!
+    pub struct SnbtPlaceholder;
 }

@@ -372,7 +372,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     // Read the packet length prefix.
     let packet_length = read_varint_bytewise(reader).await? as usize;
     if packet_length > LengthError::MAX_LENGTH {
-        return Err(LengthError(packet_length))?;
+        Err(LengthError(packet_length))?;
     }
 
     // Read the packet data.
@@ -397,7 +397,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 
     // Deserialize the packet.
     #[allow(unused_variables, reason = "Variables are used if tracing is enabled")]
-    match facet_minecraft::from_slice_remainder::<T>(packet) {
+    match froglight_facet::from_slice_remainder::<T>(packet) {
         Ok((val, rem)) => {
             #[cfg(feature = "tracing_ext")]
             if !rem.is_empty() {
@@ -453,7 +453,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     buffer_b.clear();
 
     // Serialize the packet.
-    facet_minecraft::to_buffer(packet, buffer_a)?;
+    froglight_facet::to_writer(packet, buffer_a)?;
 
     #[cfg(feature = "tracing_ext")]
     tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_a:?}");
@@ -461,7 +461,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     // Compress the packet.
     let compressed = writer.compress(buffer_a).await?;
     if compressed.len() > LengthError::MAX_LENGTH {
-        return Err(LengthError(compressed.len()))?;
+        Err(LengthError(compressed.len()))?;
     }
 
     // Add the length prefix.

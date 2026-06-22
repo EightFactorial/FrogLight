@@ -55,7 +55,7 @@ impl GlobalInventory {
                     if a.type_id() == b.type_id() {
                         #[cfg(feature = "tracing")]
                         tracing::error!(
-                            "Failed to initialize the `GlobalInventory`, found duplicate entries {:?} ({}) and {:?} ({})",
+                            "Failed to initialize the `GlobalInventory`, found duplicate entries {:?} ({:?}) and {:?} ({:?})",
                             a.identifier().as_str(),
                             a.type_id(),
                             b.identifier().as_str(),

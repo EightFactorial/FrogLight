@@ -6,14 +6,10 @@ use alloc::string::String;
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
-use facet::{Facet, Partial, Peek};
+use facet::Facet;
 #[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 
 /// Information about the client and player.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -102,8 +98,7 @@ pub enum PlayerHand {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = ModelCustomization::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = ModelCustomization::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = ModelCustomization::WITH))]
 pub struct ModelCustomization {
     /// The cape layer of the player's model.
     pub cape: bool,
@@ -136,34 +131,10 @@ impl Default for ModelCustomization {
 }
 
 #[cfg(feature = "facet")]
-impl ModelCustomization {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+impl FacetTemplate for ModelCustomization {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<Self>()?;
 
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let byte = cursor.take(1)?[0];
-        let model = Self {
-            cape: byte & 0b0000_0001 != 0,
-            jacket: byte & 0b0000_0010 != 0,
-            left_sleeve: byte & 0b0000_0100 != 0,
-            right_sleeve: byte & 0b0000_1000 != 0,
-            left_pants: byte & 0b0001_0000 != 0,
-            right_pants: byte & 0b0010_0000 != 0,
-            hat: byte & 0b0100_0000 != 0,
-        };
-        replace_with_or_abort(partial, |partial| partial.set(model).unwrap());
-        Ok(())
-    }
-
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        let value = peek.get::<Self>()?;
         let mut byte = 0u8;
         if value.cape {
             byte |= 0b0000_0001;
@@ -186,6 +157,24 @@ impl ModelCustomization {
         if value.hat {
             byte |= 0b0100_0000;
         }
-        if writer.write_data(&[byte]) { Ok(()) } else { Err(SerializeIterError::new()) }
+
+        writer.write_byte(byte)
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let byte = reader.get_array::<1>()?[0];
+
+        item.set(Self {
+            cape: byte & 0b0000_0001 != 0,
+            jacket: byte & 0b0000_0010 != 0,
+            left_sleeve: byte & 0b0000_0100 != 0,
+            right_sleeve: byte & 0b0000_1000 != 0,
+            left_pants: byte & 0b0001_0000 != 0,
+            right_pants: byte & 0b0010_0000 != 0,
+            hat: byte & 0b0100_0000 != 0,
+        })
     }
 }

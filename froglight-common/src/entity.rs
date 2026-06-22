@@ -9,6 +9,8 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 use facet::Facet;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "uuid")]
@@ -21,7 +23,7 @@ use uuid::Uuid;
 #[cfg_attr(feature = "bevy", component(immutable))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(feature = "facet", derive(Facet))]
-#[cfg_attr(feature = "facet", facet(transparent))]
+#[cfg_attr(feature = "facet", facet(transparent, mc::variable_inner))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]

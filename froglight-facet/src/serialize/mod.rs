@@ -3,9 +3,10 @@
 use alloc::vec::Vec;
 
 use facet::{Facet, Peek};
+pub use froglight_facet_iter::serialize::SerializeError;
 use froglight_facet_iter::{
     Writer, WriterError,
-    serialize::{Item, SerializeError, Serializer},
+    serialize::{Item, Serializer},
 };
 
 pub mod functions;
@@ -172,6 +173,11 @@ fn serialize_value(
         let (bytes, len) = varint::encode_u32(string.len().try_into().map_err(WriterError::other)?);
         writer.write_bytes(&bytes[..len as usize])?;
         return writer.write_bytes(string.as_bytes());
+    }
+
+    // Handle `Uuid`
+    if let Ok(uuid) = peek.get::<uuid::Uuid>() {
+        return writer.write_bytes(&uuid.to_bytes_le());
     }
 
     todo!("Unsupported type: `{}`", peek.shape().type_name());

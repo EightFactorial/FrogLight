@@ -1,7 +1,7 @@
 //! TODO
 
 use bevy_app::{App, Plugin};
-use bevy_ecs::prelude::*;
+use bevy_ecs::{prelude::*, resource::IsResource};
 
 mod client;
 pub use client::{ClientConnection, ClientDespawn};
@@ -36,7 +36,7 @@ impl NetworkPlugin {
     ///
     /// Not added by default, must be added manually.
     pub fn serverbound_messages(
-        query: Query<(EntityRef, &ClientConnection)>,
+        query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut messages: ResMut<Messages<ServerboundMessage>>,
     ) {
         for message in messages.drain() {
@@ -69,7 +69,7 @@ impl NetworkPlugin {
     ///
     /// Not added by default, must added manually.
     pub fn clientbound_messages(
-        query: Query<(EntityRef, &ClientConnection)>,
+        query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut writer: MessageWriter<ClientboundMessage>,
     ) {
         for (entity, conn) in &query {
@@ -95,7 +95,7 @@ impl NetworkPlugin {
     ///
     /// Not added by default, must added manually.
     pub fn poll_connections(
-        mut query: Query<(Entity, &mut ClientConnection)>,
+        mut query: Query<(Entity, &mut ClientConnection), Without<IsResource>>,
         mut commands: Commands,
     ) {
         for (entity, mut conn) in &mut query {

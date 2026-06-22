@@ -2,14 +2,19 @@
 //!
 //! @manual packet for "minecraft:entity_position_sync"
 
-use crate::common::{entity_id::VarEntityId, position::EntityPositionRotationData};
+use froglight_common::prelude::EntityId;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
+
+use crate::common::position::EntityPositionRotationData;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityPositionSyncS2CPacket {
-    pub entity_id: VarEntityId,
+    #[cfg_attr(feature = "bevy", facet(mc::variable))]
+    pub entity_id: EntityId,
     pub data: EntityPositionRotationData,
     pub on_ground: bool,
 }

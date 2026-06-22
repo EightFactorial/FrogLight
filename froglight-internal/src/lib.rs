@@ -38,9 +38,9 @@ pub mod prelude {
     pub use crate::modules::{api::prelude::*, network::prelude::*};
     pub use crate::modules::{
         biome::prelude::*, block::prelude::*, common::prelude::*, entity::prelude::*,
-        facet::prelude::*, inventory::prelude::*, math::prelude::*, mutf8::prelude::*,
-        nbt::prelude::*, packet::prelude::*, physics::prelude::*, player::prelude::*,
-        registry::prelude::*, snbt::prelude::*, text::prelude::*, world::prelude::*,
+        inventory::prelude::*, math::prelude::*, mutf8::prelude::*, nbt::prelude::*,
+        packet::prelude::*, physics::prelude::*, player::prelude::*, registry::prelude::*,
+        snbt::prelude::*, text::prelude::*, world::prelude::*,
     };
     #[cfg(feature = "bevy")]
     pub use crate::{bevy::plugins::FroglightPlugins, modules::brigadier::prelude::*};

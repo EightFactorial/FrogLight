@@ -9,14 +9,8 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 #[cfg(feature = "facet")]
-use facet::{Partial, Peek};
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 
 /// A buffer of bytes that has no length prefix.
 ///
@@ -26,8 +20,7 @@ use facet_minecraft::{
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = UnsizedBuffer::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = UnsizedBuffer::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = UnsizedBuffer::WITH_BORROW))]
 pub struct UnsizedBuffer<'a>(pub Cow<'a, [u8]>);
 
 impl<'a> UnsizedBuffer<'a> {
@@ -81,39 +74,33 @@ impl<'a> UnsizedBuffer<'a> {
 }
 
 #[cfg(feature = "facet")]
-impl UnsizedBuffer<'_> {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize_borrowed, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+impl FacetTemplate for UnsizedBuffer<'_> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let slice = item.get::<UnsizedBuffer<'_>>()?.as_slice();
 
-    fn facet_deserialize_borrowed<'facet>(
-        partial: &mut Partial<'facet, true>,
-        cursor: &mut InputCursor<'facet, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let slice = cursor.take(cursor.as_slice().len())?;
-        replace_with_or_abort(partial, |partial| {
-            partial.set(UnsizedBuffer::from_slice(slice)).unwrap()
-        });
-        Ok(())
+        writer.write_bytes(slice)
     }
 
-    fn facet_deserialize<'facet>(
-        partial: &mut Partial<'facet, false>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let vec = cursor.take(cursor.as_slice().len())?.to_vec();
-        replace_with_or_abort(partial, |partial| {
-            partial.set(UnsizedBuffer::from_vec(vec)).unwrap()
-        });
-        Ok(())
-    }
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let slice = reader.remaining();
+        reader.consume(slice.len())?;
 
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        let value = peek.get::<UnsizedBuffer<'facet>>()?;
-        if writer.write_data(value.as_slice()) { Ok(()) } else { Err(SerializeIterError::new()) }
+        item.set(UnsizedBuffer::from_vec(slice.to_vec()))
+    }
+}
+#[cfg(feature = "facet")]
+impl FacetBorrowedTemplate for UnsizedBuffer<'_> {
+    fn deserialize_borrowed<'facet>(
+        item: DeserializeItem<'facet, true>,
+        reader: &mut Reader<'facet>,
+    ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
+        let slice = reader.remaining();
+        reader.consume(slice.len())?;
+
+        item.set(UnsizedBuffer::from_slice(slice))
     }
 }
 

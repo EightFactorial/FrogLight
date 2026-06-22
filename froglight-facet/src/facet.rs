@@ -213,7 +213,7 @@ pub type DeBorrowFn = for<'facet> fn(
 /// let deserialized: MyType = from_slice(&serialized).unwrap();
 /// assert_eq!(deserialized, MyType(42));
 /// ```
-pub trait FacetTemplate: 'static + Sized {
+pub trait FacetTemplate: Sized {
     /// A [`WithFnAttr`] to be used with
     /// `#[derive(Facet)]` in a `#[facet(mc::with = ...)]`
     /// attribute.

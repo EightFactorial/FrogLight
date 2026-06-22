@@ -3,7 +3,7 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
-use bevy::{math::DVec3, prelude::*, tasks::block_on};
+use bevy::{ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on};
 use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
@@ -105,7 +105,7 @@ impl BotPlugin {
     ///
     /// Run every frame during [`Update`].
     fn message_handler(
-        bot: Single<EntityRef, With<ClientConnection>>,
+        bot: Single<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
         mut writer: MessageWriter<ServerboundMessage>,
         mut commands: Commands,
@@ -128,7 +128,7 @@ impl BotPlugin {
                     ClientboundPlayEvent::AddEntity(data) => {
                         let mut entity = commands.spawn((
                             EntityOfInstance::new(bot.id()),
-                            data.entity_id.0,
+                            data.entity_id,
                             data.entity_uuid,
                             Transform::from_translation(Vec3::new(
                                 data.position_x as f32,
@@ -145,7 +145,7 @@ impl BotPlugin {
                             error!("Unknown Entity Type {:?}!", data.entity_type);
                         }
 
-                        debug!("Spawning Entity {} ({})", entity.id(), data.entity_id.0.0);
+                        debug!("Spawning Entity {} ({})", entity.id(), data.entity_id.0);
                     }
                     // ClientboundPlayEvent::Animate() => todo!(),
                     // ClientboundPlayEvent::AwardStats() => todo!(),
@@ -232,7 +232,7 @@ impl BotPlugin {
                     ClientboundPlayEvent::EntityPosition(entity_id, data, on_ground) => {
                         let entity_id = *entity_id;
                         let data = *data;
-                        let on_ground = *on_ground;
+                        let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<WorldInstance>() else { return };
@@ -263,9 +263,10 @@ impl BotPlugin {
                                         .as_vec3a();
                             }
 
-                            if let Some(mut ground) = entity.get_mut::<OnGround>() {
-                                ground.0 = on_ground;
-                            }
+                            // if let Some(mut ground) =
+                            // entity.get_mut::<OnGround>() {
+                            //     ground.0 = on_ground;
+                            // }
                         });
                     }
                     // ClientboundPlayEvent::Explode() => todo!(),
@@ -343,9 +344,10 @@ impl BotPlugin {
                                 // TODO: Yaw/Pitch
                             }
 
-                            if let Some(mut on_ground) = entity.get_mut::<OnGround>() {
-                                on_ground.0 = data.on_ground;
-                            }
+                            // if let Some(mut on_ground) =
+                            // entity.get_mut::<OnGround>() {
+                            //     on_ground.0 = data.on_ground;
+                            // }
                         });
                     }
                     // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
@@ -507,7 +509,7 @@ impl BotPlugin {
                                 if let Some(mut velocity) =
                                     entity.into_world_mut().get_mut::<Velocity>(target)
                                 {
-                                    **velocity += delta.as_vec3();
+                                    **velocity += delta.as_vec3a();
                                 } else {
                                     error!(
                                         "Received SetEntityMotion for Entity {target} without Velocity!"
@@ -550,7 +552,7 @@ impl BotPlugin {
                         let id = *id;
                         let data = *data;
                         let flags = *flags;
-                        let on_ground = *on_ground;
+                        let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<WorldInstance>() else { return };
@@ -558,15 +560,15 @@ impl BotPlugin {
                             if let Some(target) = instance.get(&id) {
                                 let mut entity = entity.into_world_mut().entity_mut(target);
 
-                                if let Ok((mut position, mut rotation, mut velocity, mut ground)) = entity.get_components_mut::<(
+                                if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
                                     &mut Position,
                                     &mut Rotation,
                                     &mut Velocity,
-                                    &mut OnGround,
+                                    // &mut OnGround,
                                 )>(
                                 ) {
-                                    data.apply_relative(&mut translation, rotation.as_vec3a(), &mut velocity, &flags);
-                                    ground.0 = on_ground;
+                                    data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
+                                    // ground.0 = on_ground;
                                 } else {
                                     error!(
                                         "Received TeleportEntity for Entity {target} without Transform, Velocity, or OnGround!"

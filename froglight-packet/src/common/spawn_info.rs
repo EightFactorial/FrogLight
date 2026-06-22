@@ -4,15 +4,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
-use facet::{Facet, Partial, Peek};
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
+use facet::Facet;
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 use froglight_world::component::DimensionPos;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -25,8 +21,7 @@ pub struct PlayerSpawnInfo {
     pub dimension: Identifier<'static>,
     pub seed: i64,
     pub gamemode: u8,
-    #[cfg_attr(feature = "facet", facet(mc::serialize = PlayerSpawnInfo::PREVIOUS_GAMEMODE_SERIALIZE))]
-    #[cfg_attr(feature = "facet", facet(mc::deserialize = PlayerSpawnInfo::PREVIOUS_GAMEMODE_DESERIALIZE))]
+    #[cfg_attr(feature = "facet", facet(mc::with = PlayerSpawnInfo::WITH))]
     pub previous_gamemode: Option<u8>,
     pub is_debug: bool,
     pub is_flat: bool,
@@ -38,29 +33,20 @@ pub struct PlayerSpawnInfo {
 }
 
 #[cfg(feature = "facet")]
-impl PlayerSpawnInfo {
-    const PREVIOUS_GAMEMODE_DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const PREVIOUS_GAMEMODE_SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
-
-    #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let byte = cursor.take(1)?[0];
-        let value = if byte == -1i8 as u8 { None } else { Some(byte) };
-        replace_with_or_abort(partial, |partial| partial.set(value).unwrap());
-        Ok(())
+#[allow(clippy::cast_sign_loss, reason = "Desired behavior")]
+impl FacetTemplate for PlayerSpawnInfo {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<Option<u8>>()?;
+        let byte = value.unwrap_or(-1i8 as u8);
+        writer.write_byte(byte)
     }
 
-    #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        let value = peek.get::<Option<u8>>()?;
-        let byte = value.map_or(-1i8 as u8, |v| v);
-        if writer.write_data(&[byte]) { Ok(()) } else { Err(SerializeIterError::new()) }
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let byte = reader.get_array::<1>()?[0];
+        let value = if byte == (-1i8 as u8) { None } else { Some(byte) };
+        item.set(value)
     }
 }

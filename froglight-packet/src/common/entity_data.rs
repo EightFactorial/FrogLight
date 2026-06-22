@@ -1,23 +1,23 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
-#[cfg(feature = "std")]
-use facet_minecraft::deserialize::error::DeserializeError;
 use froglight_common::{entity::EntityUuid, prelude::EntityId};
 use froglight_entity::entity::EntityDataSet;
 #[cfg(feature = "std")]
 use froglight_entity::{entity::DataSetSerializer, prelude::EntityVersion};
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
+use froglight_facet::deserialize::DeserializeError;
 
-use crate::common::{entity_id::VarEntityId, lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
+use crate::common::{lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct AddEntityBundle {
-    pub entity_id: VarEntityId,
+    #[cfg_attr(feature = "facet", facet(mc::variable))]
+    pub entity_id: EntityId,
     pub entity_uuid: EntityUuid,
     #[cfg_attr(feature = "facet", facet(mc::variable))]
     pub entity_type: u32,
@@ -37,9 +37,10 @@ pub struct AddEntityBundle {
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "facet", facet(opaque))]
 pub struct SetEntityBundle {
-    entity_id: VarEntityId,
+    #[cfg_attr(feature = "facet", facet(mc::variable))]
+    entity_id: EntityId,
     raw_data: UnsizedBuffer<'static>,
-    fn_ptr: fn(&[u8]) -> Result<EntityDataSet<'static>, DeserializeError<'static>>,
+    fn_ptr: fn(&[u8]) -> Result<EntityDataSet<'static>, DeserializeError>,
 }
 
 impl Eq for SetEntityBundle {}
@@ -54,11 +55,11 @@ impl SetEntityBundle {
     #[must_use]
     #[cfg(feature = "std")]
     pub const fn new<V: EntityVersion>(
-        entity_id: VarEntityId,
+        entity_id: EntityId,
         raw_data: UnsizedBuffer<'static>,
     ) -> Self {
         Self::new_using(entity_id, raw_data, |slice| {
-            facet_minecraft::from_slice_owned::<DataSetSerializer<V>>(slice)
+            froglight_facet::from_slice::<DataSetSerializer<V>>(slice)
                 .map(DataSetSerializer::into_inner)
         })
     }
@@ -68,9 +69,9 @@ impl SetEntityBundle {
     #[inline]
     #[must_use]
     pub const fn new_using(
-        entity_id: VarEntityId,
+        entity_id: EntityId,
         raw_data: UnsizedBuffer<'static>,
-        fn_ptr: fn(&[u8]) -> Result<EntityDataSet<'static>, DeserializeError<'static>>,
+        fn_ptr: fn(&[u8]) -> Result<EntityDataSet<'static>, DeserializeError>,
     ) -> Self {
         Self { entity_id, raw_data, fn_ptr }
     }
@@ -78,7 +79,7 @@ impl SetEntityBundle {
     /// Get the [`EntityId`] of who to apply this [`EntityDataSet`] to.
     #[inline]
     #[must_use]
-    pub const fn entity_id(&self) -> EntityId { self.entity_id.0 }
+    pub const fn entity_id(&self) -> EntityId { self.entity_id }
 
     /// Get the raw data buffer of this [`SetEntityBundle`].
     #[inline]
@@ -92,7 +93,7 @@ impl SetEntityBundle {
     ///
     /// Returns an error if the data is invalid.
     #[inline]
-    pub fn parse(&self) -> Result<EntityDataSet<'static>, DeserializeError<'static>> {
+    pub fn parse(&self) -> Result<EntityDataSet<'static>, DeserializeError> {
         (self.fn_ptr)(self.as_raw_data())
     }
 }

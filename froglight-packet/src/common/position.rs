@@ -3,15 +3,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
-use facet::{Facet, Partial, Peek};
-#[cfg(feature = "facet")]
-use facet_minecraft::{
-    self as mc, DeserializeFn, SerializeFn,
-    deserialize::{InputCursor, error::DeserializeValueError},
-    replace_with::replace_with_or_abort,
-    serialize::{buffer::SerializeWriter, error::SerializeIterError},
-};
+use facet::Facet;
 use froglight_common::prelude::EntityId;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 use glam::{DVec3, Vec3, Vec3A};
 
 use crate::generated::v26_1::play::{
@@ -37,7 +33,7 @@ pub struct EntityPositionUpdateData {
 impl From<MoveEntityPosS2CPacket> for EntityPositionUpdateData {
     fn from(value: MoveEntityPosS2CPacket) -> Self {
         Self {
-            entity_id: value.entity_id.0,
+            entity_id: value.entity_id,
             delta: Some(value.delta),
             yaw_pitch: None,
             on_ground: value.on_ground,
@@ -47,7 +43,7 @@ impl From<MoveEntityPosS2CPacket> for EntityPositionUpdateData {
 impl From<MoveEntityPosRotS2CPacket> for EntityPositionUpdateData {
     fn from(value: MoveEntityPosRotS2CPacket) -> Self {
         Self {
-            entity_id: value.entity_id.0,
+            entity_id: value.entity_id,
             delta: Some(value.delta),
             yaw_pitch: Some((value.yaw, value.pitch)),
             on_ground: value.on_ground,
@@ -57,7 +53,7 @@ impl From<MoveEntityPosRotS2CPacket> for EntityPositionUpdateData {
 impl From<MoveEntityRotS2CPacket> for EntityPositionUpdateData {
     fn from(value: MoveEntityRotS2CPacket) -> Self {
         Self {
-            entity_id: value.entity_id.0,
+            entity_id: value.entity_id,
             delta: None,
             yaw_pitch: Some((value.yaw, value.pitch)),
             on_ground: value.on_ground,
@@ -132,8 +128,7 @@ impl EntityPositionRotationData {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = EntityRelativeFlags::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = EntityRelativeFlags::DESERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::with = EntityRelativeFlags::WITH))]
 #[expect(clippy::struct_excessive_bools, reason = "That's just how it is")]
 #[expect(missing_docs, reason = "TODO")]
 pub struct EntityRelativeFlags {
@@ -176,39 +171,10 @@ impl EntityRelativeFlags {
 }
 
 #[cfg(feature = "facet")]
-impl EntityRelativeFlags {
-    const DESERIALIZE: DeserializeFn =
-        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
-    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+impl FacetTemplate for EntityRelativeFlags {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let data = item.get::<Self>()?;
 
-    fn facet_deserialize<'facet, const BORROW: bool>(
-        partial: &mut Partial<'facet, BORROW>,
-        cursor: &mut InputCursor<'_, 'facet>,
-    ) -> Result<(), DeserializeValueError> {
-        let data = u32::from_be_bytes(*cursor.take_array::<4>()?);
-        replace_with_or_abort(partial, |partial| {
-            partial
-                .set(Self {
-                    x: data & 0b0000_0000_0001 != 0,
-                    y: data & 0b0000_0000_0010 != 0,
-                    z: data & 0b0000_0000_0100 != 0,
-                    y_rot: data & 0b0000_0000_1000 != 0,
-                    x_rot: data & 0b0000_0001_0000 != 0,
-                    delta_x: data & 0b0000_0010_0000 != 0,
-                    delta_y: data & 0b0000_0100_0000 != 0,
-                    delta_z: data & 0b0000_1000_0000 != 0,
-                    rotate_delta: data & 0b0001_0000_0000 != 0,
-                })
-                .unwrap()
-        });
-        Ok(())
-    }
-
-    fn facet_serialize<'mem, 'facet>(
-        peek: Peek<'mem, 'facet>,
-        writer: &mut dyn SerializeWriter,
-    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
-        let data = peek.get::<Self>()?;
         let mut output = 0u32;
         if data.x {
             output |= 0b0000_0000_0001;
@@ -238,11 +204,26 @@ impl EntityRelativeFlags {
             output |= 0b0001_0000_0000;
         }
 
-        if writer.write_data(&output.to_be_bytes()) {
-            Ok(())
-        } else {
-            Err(SerializeIterError::new())
-        }
+        writer.write_bytes(&output.to_be_bytes())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let data = u32::from_be_bytes(*reader.get_array::<4>()?);
+
+        item.set(Self {
+            x: data & 0b0000_0000_0001 != 0,
+            y: data & 0b0000_0000_0010 != 0,
+            z: data & 0b0000_0000_0100 != 0,
+            y_rot: data & 0b0000_0000_1000 != 0,
+            x_rot: data & 0b0000_0001_0000 != 0,
+            delta_x: data & 0b0000_0010_0000 != 0,
+            delta_y: data & 0b0000_0100_0000 != 0,
+            delta_z: data & 0b0000_1000_0000 != 0,
+            rotate_delta: data & 0b0001_0000_0000 != 0,
+        })
     }
 }
 
