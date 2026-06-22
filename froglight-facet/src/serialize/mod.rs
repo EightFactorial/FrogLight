@@ -58,7 +58,7 @@ fn serialize(
 ) -> Result<usize, SerializeError> {
     // Create and complete the serializer.
     let mut core = serialize_core(&mut writer);
-    Serializer::new(peek, variable, &mut core).complete()?;
+    Serializer::new(peek, variable, &mut core, Some("mc")).complete()?;
 
     // Return the number of bytes written.
     drop(core);

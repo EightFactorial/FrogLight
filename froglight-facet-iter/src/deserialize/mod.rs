@@ -6,8 +6,8 @@ pub use error::DeserializeError;
 mod future;
 pub use future::DeserializerFuture;
 
-pub(crate) mod iterator;
-pub use iterator::{DeserializeItem, IteratorStack};
+pub(crate) mod item;
+pub use item::{DeserializeItem, Item};
 
 pub(crate) mod logic;
-pub use logic::{Deserializer, Item};
+pub use logic::Deserializer;

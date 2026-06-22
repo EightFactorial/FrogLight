@@ -61,7 +61,7 @@ async fn serialize_async(
 ) -> Result<usize, SerializeError> {
     // Create and complete the serializer.
     let mut core = super::serialize_core(&mut writer);
-    SerializerFuture::from_sync(Serializer::new(peek, variable, &mut core)).await?;
+    SerializerFuture::from_sync(Serializer::new(peek, variable, &mut core, Some("mc"))).await?;
 
     // Return the number of bytes written.
     drop(core);

@@ -6,8 +6,8 @@ pub use error::SerializeError;
 mod future;
 pub use future::SerializerFuture;
 
-pub(crate) mod iterator;
-pub use iterator::{IteratorStack, SerializeItem};
+pub(crate) mod item;
+pub use item::{Item, SerializeItem};
 
 pub(crate) mod logic;
-pub use logic::{Item, Serializer};
+pub use logic::Serializer;

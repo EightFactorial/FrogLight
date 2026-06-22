@@ -58,7 +58,7 @@ impl<
             Some(Err(err)) => Poll::Ready(Err(err)),
 
             None => {
-                let starting_frame = self.de.start();
+                let starting_frame = self.de.starting_frame();
                 let mut partial = self.de.complete_mut()?;
 
                 // Make sure the `Partial` is at the correct frame.

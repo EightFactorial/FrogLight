@@ -1,31 +1,29 @@
 //! TODO
 
 use facet::{Def, Partial, Type, UserType};
+use smallvec::SmallVec;
 
 use crate::{
     ReaderError,
     deserialize::{
         DeserializeError,
-        iterator::{
-            DeserializeDesc, DeserializeItem, DeserializeIterator, IteratorStack, StackItem,
-        },
+        item::{DeserializeDesc, DeserializeItem, Item, StackItem},
     },
 };
 
 /// TODO
 pub struct Deserializer<'facet, 'core, const BORROW: bool, C: 'core> {
-    pub(super) start: usize,
-    pub(super) iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
-    pub(super) core: &'core mut C,
+    iter: Result<DeserializeIterator<'facet, BORROW>, DeserializeError>,
+    core: &'core mut C,
 }
 
-/// A [`Deserializer`] item.
-#[derive(Debug)]
-pub enum Item<'facet, const BORROW: bool> {
-    /// A size to be deserialized.
-    Size(u32),
-    /// An item to be deserialized.
-    Item(DeserializeItem<'facet, BORROW>),
+/// TODO
+struct DeserializeIterator<'facet, const BORROW: bool> {
+    start: usize,
+    namespace: Option<&'static str>,
+
+    partial: Partial<'facet, BORROW>,
+    stack: SmallVec<[StackItem; 10]>,
 }
 
 impl<
@@ -37,25 +35,41 @@ impl<
 {
     /// Create a new [`Deserializer`] for the given type.
     #[inline]
-    pub fn new(partial: Partial<'facet, BORROW>, variable: bool, core: &'core mut C) -> Self {
+    pub fn new(
+        partial: Partial<'facet, BORROW>,
+        variable: bool,
+        core: &'core mut C,
+        namespace: Option<&'static str>,
+    ) -> Self {
+        let mut stack = SmallVec::new_const();
+        stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+
         Deserializer {
-            start: partial.frame_count(),
-            iter: Ok(DeserializeIterator::new_partial(partial, variable)),
+            iter: Ok(DeserializeIterator {
+                start: partial.frame_count(),
+                namespace,
+                partial,
+                stack,
+            }),
             core,
         }
     }
 
     /// Returns the starting frame count of this [`Deserializer`].
+    ///
+    /// Returns `0` if the deserializer returned an error.
     #[inline]
     #[must_use]
-    pub const fn start(&self) -> usize { self.start }
+    pub const fn starting_frame(&self) -> usize {
+        if let Ok(iter) = &self.iter { iter.start } else { 0 }
+    }
 
     /// Returns `true` if the iterator is finished.
     #[inline]
     #[must_use]
     pub fn is_finished(&self) -> bool {
         match &self.iter {
-            Ok(iter) => iter.is_finished(),
+            Ok(iter) => iter.stack.is_empty(),
             Err(_) => true,
         }
     }
@@ -74,8 +88,8 @@ impl<
         }
 
         // Make sure the `Partial` is at the correct frame.
-        let mut partial = self.iter.map(DeserializeIterator::into_partial)?;
-        while partial.frame_count() > self.start {
+        let DeserializeIterator { start, mut partial, .. } = self.iter?;
+        while partial.frame_count() > start {
             partial = partial.end()?;
         }
 
@@ -98,8 +112,9 @@ impl<
         }
 
         // Make sure the `Partial` is at the correct frame.
-        let mut partial = core::mem::replace(&mut self.iter, Err(DeserializeError))?.into_partial();
-        while partial.frame_count() > self.start {
+        let DeserializeIterator { start, mut partial, .. } =
+            core::mem::replace(&mut self.iter, Err(DeserializeError))?;
+        while partial.frame_count() > start {
             partial = partial.end()?;
         }
 
@@ -123,7 +138,7 @@ impl<
         replace_with::replace_with_and_return(
             &mut self.iter,
             || Err(DeserializeError),
-            |iter| match iter.and_then(|iter| Self::process(self.core, iter)) {
+            |iter| match iter.and_then(|iter| iter.process(self.core)) {
                 Ok(iter) => (Some(Ok(())), Ok(iter)),
                 Err(err) => (Some(Err(err.clone())), Err(err)),
             },
@@ -133,35 +148,30 @@ impl<
 
 // -------------------------------------------------------------------------------------------------
 
-impl<
-    'facet,
-    const BORROW: bool,
-    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
-> Deserializer<'facet, '_, BORROW, C>
-{
+impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
     /// Process one `step` of the deserialization iterator.
-    fn process(
+    fn process<C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>>(
+        mut self,
         core: &mut C,
-        mut iter: DeserializeIterator<'facet, BORROW>,
-    ) -> Result<DeserializeIterator<'facet, BORROW>, DeserializeError> {
-        while let Some(item) = iter.stack.pop() {
+    ) -> Result<Self, DeserializeError> {
+        while let Some(item) = self.stack.pop() {
             match item {
                 StackItem::Item(desc) => {
-                    let item = Item::Item(DeserializeItem::new(iter.partial, desc));
+                    let item = Item::Item(DeserializeItem::new(self.partial, desc));
                     let Item::Item(item) = (core)(item)? else { todo!() };
-                    iter.partial = item.into_inner().0;
+                    self.partial = item.into_inner().0;
 
-                    if iter.partial.frame_count() > 1 {
-                        iter.partial = iter.partial.end()?;
+                    if self.partial.frame_count() > self.start {
+                        self.partial = self.partial.end()?;
                     }
 
-                    return Ok(iter);
+                    return Ok(self);
                 }
 
                 StackItem::Fields(len, fields, variable_base) => {
                     let Some((field, fields)) = fields.split_first() else {
-                        if iter.partial.frame_count() > 1 {
-                            iter.partial = iter.partial.end()?;
+                        if self.partial.frame_count() > self.start {
+                            self.partial = self.partial.end()?;
                         }
                         continue;
                     };
@@ -170,14 +180,14 @@ impl<
                     let variable = variable_base | field.has_attr(Some("mc"), "variable");
 
                     // Push the remaining fields to the stack.
-                    iter.stack.push(StackItem::Fields(len, fields, variable_base));
+                    self.stack.push(StackItem::Fields(len, fields, variable_base));
 
                     // Push the current field to the stack.
                     let desc = DeserializeDesc::new(variable, Some(field.attributes));
-                    iter.stack.push(StackItem::Other(desc));
+                    self.stack.push(StackItem::Other(desc));
 
                     // Begin the current field.
-                    iter.partial = iter.partial.begin_nth_field(len - fields.len() - 1)?;
+                    self.partial = self.partial.begin_nth_field(len - fields.len() - 1)?;
                 }
 
                 StackItem::Seq(len, end_prev, variable) => {
@@ -185,18 +195,18 @@ impl<
                         len
                     } else {
                         let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        iter.partial = iter.partial.init_list_with_capacity(len as usize)?;
+                        self.partial = self.partial.init_list_with_capacity(len as usize)?;
                         len as usize
                     };
 
                     if end_prev {
-                        iter.partial = iter.partial.end()?;
+                        self.partial = self.partial.end()?;
                     }
 
                     if len != 0 {
-                        iter.stack.push(StackItem::Seq(Some(len - 1), true, variable));
-                        iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                        iter.partial = iter.partial.begin_list_item()?;
+                        self.stack.push(StackItem::Seq(Some(len - 1), true, variable));
+                        self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        self.partial = self.partial.begin_list_item()?;
                     }
                 }
 
@@ -205,27 +215,27 @@ impl<
                         len
                     } else {
                         let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        iter.partial = iter.partial.init_map()?;
+                        self.partial = self.partial.init_map()?;
                         len as usize
                     };
 
                     if end_prev {
-                        iter.partial = iter.partial.end()?;
+                        self.partial = self.partial.end()?;
                     }
 
                     if len != 0 {
                         if is_value {
                             // `true` means the next item is a value
 
-                            iter.stack.push(StackItem::Map(Some(len - 1), true, true, variable));
-                            iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                            iter.partial = iter.partial.begin_value()?;
+                            self.stack.push(StackItem::Map(Some(len - 1), true, true, variable));
+                            self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                            self.partial = self.partial.begin_value()?;
                         } else {
                             // `false` means the next item is a key
 
-                            iter.stack.push(StackItem::Map(Some(len), true, false, variable));
-                            iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                            iter.partial = iter.partial.begin_key()?;
+                            self.stack.push(StackItem::Map(Some(len), true, false, variable));
+                            self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                            self.partial = self.partial.begin_key()?;
                         }
                     }
                 }
@@ -234,158 +244,145 @@ impl<
                         len
                     } else {
                         let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        iter.partial = iter.partial.init_set()?;
+                        self.partial = self.partial.init_set()?;
                         len as usize
                     };
 
                     if end_prev {
-                        iter.partial = iter.partial.end()?;
+                        self.partial = self.partial.end()?;
                     }
 
                     if len != 0 {
-                        iter.stack.push(StackItem::Set(Some(len - 1), true, variable));
-                        iter.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                        iter.partial = iter.partial.begin_set_item()?;
+                        self.stack.push(StackItem::Set(Some(len - 1), true, variable));
+                        self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        self.partial = self.partial.begin_set_item()?;
                     }
                 }
 
                 StackItem::Other(desc) => {
-                    iter.partial = handle_other(iter.partial, desc, core, &mut iter.stack)?;
+                    self = self.handle_other(desc, core)?;
                 }
             }
         }
 
-        Ok(iter)
+        Ok(self)
     }
-}
 
-#[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `C`")]
-fn handle_other<
-    'facet,
-    const BORROW: bool,
-    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
->(
-    mut partial: Partial<'facet, BORROW>,
-    mut desc: DeserializeDesc,
-    core: &mut C,
-    stack: &mut IteratorStack,
-) -> Result<Partial<'facet, BORROW>, DeserializeError> {
-    {
-        // Set `var` and `with` using the field and type attributes.
-        let mut var = desc.is_variable();
-        let mut with = false;
+    #[inline(always)]
+    #[allow(clippy::inline_always, reason = "Used once per `C`")]
+    fn handle_other<C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>>(
+        mut self,
+        mut desc: DeserializeDesc,
+        core: &mut C,
+    ) -> Result<Self, DeserializeError> {
+        // TODO: Pass this into `Deserializer` to allow more flexibility?
+        if self.namespace.is_some_and(|ns| ns == "mc") {
+            // Set `var` and `with` using the field and type attributes.
+            let mut var = desc.is_variable();
+            let mut with = false;
 
-        if let Some(attrs) = desc.field_attr() {
-            for attr in attrs.iter().filter(|attr| attr.ns.is_some_and(|ns| ns == "mc")) {
-                // #[facet(mc::variable)]
-                var |= attr.key == "variable";
-                // #[facet(mc::with = ...)]
-                with |= attr.key == "with";
+            if let Some(attrs) = desc.field_attr() {
+                for attr in attrs.iter().filter(|attr| attr.ns.is_some_and(|ns| ns == "mc")) {
+                    // #[facet(mc::variable)]
+                    var |= attr.key == "variable";
+                    // #[facet(mc::with = ...)]
+                    with |= attr.key == "with";
+                }
+            }
+            for attr in self.partial.shape().attributes {
+                if attr.ns.is_some_and(|ns| ns == "mc") {
+                    // #[facet(mc::variable)]
+                    var |= attr.key == "variable";
+                    // #[facet(mc::with = ...)]
+                    with |= attr.key == "with";
+                }
+            }
+
+            // Update whether `item` is variable.
+            desc.set_variable(var);
+
+            // If the type has a custom deserializer, treat it as a value.
+            if with {
+                self.stack.push(StackItem::Item(desc));
+                return Ok(self);
             }
         }
-        for attr in partial.shape().attributes {
-            if attr.ns.is_some_and(|ns| ns == "mc") {
-                // #[facet(mc::variable)]
-                var |= attr.key == "variable";
-                // #[facet(mc::with = ...)]
-                with |= attr.key == "with";
+
+        // If the type has a proxy, deserialize the proxy type instead.
+        if self.partial.shape().effective_proxy(Some("mc")).is_some() {
+            let (proxy_partial, has_proxy) =
+                self.partial.begin_custom_deserialization_from_shape_with_format(Some("mc"))?;
+
+            if has_proxy {
+                // Deserialize the proxied type.
+                self.partial =
+                    Deserializer::new(proxy_partial, desc.is_variable(), core, self.namespace)
+                        .complete()?;
+                return Ok(self);
             }
+
+            // Otherwise return the partial unchanged.
+            self.partial = proxy_partial;
         }
 
-        // Update whether `item` is variable.
-        desc.set_variable(var);
-
-        // If the type has a custom deserializer, treat it as a value.
-        if with {
-            stack.push(StackItem::Item(desc));
-            return Ok(partial);
+        // Handle the partial based on its definition.
+        match self.partial.shape().def {
+            Def::Undefined => self.handle_type(desc, core),
+            _ => self.handle_def(desc, core),
         }
     }
 
-    // If the type has a proxy, deserialize the proxy type instead.
-    if partial.shape().effective_proxy(Some("mc")).is_some() {
-        let (proxy_partial, has_proxy) =
-            partial.begin_custom_deserialization_from_shape_with_format(Some("mc"))?;
+    #[inline(always)]
+    #[allow(clippy::inline_always, reason = "Used once per `C`")]
+    fn handle_def<C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>>(
+        mut self,
+        desc: DeserializeDesc,
+        core: &mut C,
+    ) -> Result<Self, DeserializeError> {
+        match self.partial.shape().def {
+            // Directly deserialize primitives.
+            Def::Scalar => {
+                self.stack.push(StackItem::Item(desc));
+                Ok(self)
+            }
 
-        if has_proxy {
-            // Deserialize the proxied type.
-            return Deserializer::new(proxy_partial, desc.is_variable(), core).complete();
+            Def::Map(..) => todo!(),
+            Def::Set(..) => todo!(),
+
+            Def::List(..) | Def::Slice(..) => todo!(),
+            Def::Array(..) => todo!(),
+
+            Def::NdArray(..) => todo!(),
+
+            Def::Option(..) => todo!(),
+            Def::Result(..) => todo!(),
+
+            // Fallback to `Type` for undefined types.
+            Def::Undefined => self.handle_type(desc, core),
+
+            _ => todo!("Unsupported type `{}`", self.partial.shape()),
         }
-
-        // Otherwise return the partial unchanged.
-        partial = proxy_partial;
     }
 
-    // Handle the partial based on its definition.
-    match partial.shape().def {
-        Def::Undefined => handle_type(partial, desc, core, stack),
-        _ => handle_def(partial, desc, core, stack),
-    }
-}
+    #[inline(always)]
+    #[allow(clippy::inline_always, reason = "Used once per `C`")]
+    fn handle_type<C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>>(
+        mut self,
+        desc: DeserializeDesc,
+        core: &mut C,
+    ) -> Result<Self, DeserializeError> {
+        match self.partial.shape().ty {
+            // Directly deserialize primitives.
+            Type::Primitive(..) => {
+                self.stack.push(StackItem::Item(desc));
+                Ok(self)
+            }
 
-#[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `C`")]
-fn handle_def<
-    'facet,
-    const BORROW: bool,
-    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
->(
-    partial: Partial<'facet, BORROW>,
-    desc: DeserializeDesc,
-    core: &mut C,
-    stack: &mut IteratorStack,
-) -> Result<Partial<'facet, BORROW>, DeserializeError> {
-    match partial.shape().def {
-        // Directly deserialize primitives.
-        Def::Scalar => {
-            stack.push(StackItem::Item(desc));
-            Ok(partial)
-        }
+            Type::Sequence(..) => todo!(),
 
-        Def::Map(..) => todo!(),
-        Def::Set(..) => todo!(),
-
-        Def::List(..) | Def::Slice(..) => todo!(),
-        Def::Array(..) => todo!(),
-
-        Def::NdArray(..) => todo!(),
-
-        Def::Option(..) => todo!(),
-        Def::Result(..) => todo!(),
-
-        // Fallback to `Type` for undefined types.
-        Def::Undefined => handle_type(partial, desc, core, stack),
-
-        _ => todo!("Unsupported type `{}`", partial.shape().type_name()),
-    }
-}
-
-#[inline(always)]
-#[allow(clippy::inline_always, reason = "Used once per `C`")]
-fn handle_type<
-    'facet,
-    const BORROW: bool,
-    C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
->(
-    partial: Partial<'facet, BORROW>,
-    desc: DeserializeDesc,
-    core: &mut C,
-    stack: &mut IteratorStack,
-) -> Result<Partial<'facet, BORROW>, DeserializeError> {
-    match partial.shape().ty {
-        // Directly deserialize primitives.
-        Type::Primitive(..) => {
-            stack.push(StackItem::Item(desc));
-            Ok(partial)
-        }
-
-        Type::Sequence(..) => todo!(),
-
-        Type::User(UserType::Struct(ty)) => {
-            // Determine whether the struct should pass the variable flag to its fields.
-            let variable_base =
-                if partial.shape().attributes.iter().any(|attr| {
+            Type::User(UserType::Struct(ty)) => {
+                // Determine whether the struct should pass the variable flag to its fields.
+                let variable_base = if self.partial.shape().attributes.iter().any(|attr| {
                     attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
                 }) {
                     desc.is_variable()
@@ -393,15 +390,14 @@ fn handle_type<
                     false
                 };
 
-            // Push the fields to the stack.
-            stack.push(StackItem::Fields(ty.fields.len(), ty.fields, variable_base));
+                // Push the fields to the stack.
+                self.stack.push(StackItem::Fields(ty.fields.len(), ty.fields, variable_base));
 
-            Ok(partial)
-        }
-        Type::User(UserType::Enum(..)) => {
-            // Determine whether the struct should pass the variable flag to its fields.
-            let variable_base =
-                if partial.shape().attributes.iter().any(|attr| {
+                Ok(self)
+            }
+            Type::User(UserType::Enum(..)) => {
+                // Determine whether the struct should pass the variable flag to its fields.
+                let variable_base = if self.partial.shape().attributes.iter().any(|attr| {
                     attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
                 }) {
                     desc.is_variable()
@@ -409,27 +405,30 @@ fn handle_type<
                     false
                 };
 
-            // Deserialize the discriminant of the enum.
-            let Item::Size(discriminant) = core(Item::Size(0))? else { todo!() };
-            #[expect(clippy::cast_possible_wrap, reason = "Expected behavior")]
-            let partial = partial.select_variant(i64::from(discriminant as i32))?;
+                #[expect(clippy::cast_possible_wrap, reason = "Expected behavior")]
+                {
+                    // Deserialize the discriminant of the enum.
+                    let Item::Size(discriminant) = core(Item::Size(0))? else { todo!() };
+                    self.partial = self.partial.select_variant(i64::from(discriminant as i32))?;
+                }
 
-            // Push the fields to the stack.
-            let variant = partial.selected_variant().unwrap();
-            stack.push(StackItem::Fields(
-                variant.data.fields.len(),
-                variant.data.fields,
-                variable_base,
-            ));
+                // Push the fields to the stack.
+                let variant = self.partial.selected_variant().unwrap();
+                self.stack.push(StackItem::Fields(
+                    variant.data.fields.len(),
+                    variant.data.fields,
+                    variable_base,
+                ));
 
-            Ok(partial)
-        }
-        Type::User(..) => todo!(),
+                Ok(self)
+            }
+            Type::User(..) => todo!(),
 
-        Type::Pointer(..) => todo!(),
+            Type::Pointer(..) => todo!(),
 
-        Type::Undefined => {
-            todo!("Unsupported type `{}`", partial.shape().type_name())
+            Type::Undefined => {
+                todo!("Unsupported type `{}`", self.partial.shape())
+            }
         }
     }
 }

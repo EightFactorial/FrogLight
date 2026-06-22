@@ -28,15 +28,15 @@ froglight-text = { default-features = false, path = "froglight-text", version = 
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
-bevy = { default-features = false, version = "0.19.0-rc.3" }
-bevy_app = { default-features = false, version = "0.19.0-rc.3" }
-bevy_ecs = { default-features = false, version = "0.19.0-rc.3" }
-bevy_math = { default-features = false, version = "0.19.0-rc.3" }
-bevy_reflect = { default-features = false, version = "0.19.0-rc.3" }
-bevy_sprite = { default-features = false, version = "0.19.0-rc.3" }
-bevy_tasks = { default-features = false, version = "0.19.0-rc.3" }
-bevy_transform = { default-features = false, version = "0.19.0-rc.3" }
-bevy_ui = { default-features = false, version = "0.19.0-rc.3" }
+bevy = { default-features = false, version = "0.19" }
+bevy_app = { default-features = false, version = "0.19" }
+bevy_ecs = { default-features = false, version = "0.19" }
+bevy_math = { default-features = false, version = "0.19" }
+bevy_reflect = { default-features = false, version = "0.19" }
+bevy_sprite = { default-features = false, version = "0.19" }
+bevy_tasks = { default-features = false, version = "0.19" }
+bevy_transform = { default-features = false, version = "0.19" }
+bevy_ui = { default-features = false, version = "0.19" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "=0.46" }

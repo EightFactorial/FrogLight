@@ -1,21 +1,12 @@
 use core::fmt;
 
 use facet::{Attr, Facet, Field, Partial, Shape};
-use smallvec::SmallVec;
 
 use crate::ReaderError;
 
-/// TODO
-pub(super) struct DeserializeIterator<'facet, const BORROW: bool> {
-    pub(super) partial: Partial<'facet, BORROW>,
-    pub(super) stack: IteratorStack,
-}
-
-/// A stack of deserialization frames.
-pub type IteratorStack = SmallVec<[StackItem; 10]>;
-
 #[derive(Debug)]
-pub enum StackItem {
+#[expect(dead_code, reason = "WIP")]
+pub(super) enum StackItem {
     Item(DeserializeDesc),
     Fields(usize, &'static [Field], bool),
 
@@ -26,19 +17,54 @@ pub enum StackItem {
     Other(DeserializeDesc),
 }
 
-// -------------------------------------------------------------------------------------------------
-
-/// An item to be deserialized.
-pub struct DeserializeItem<'facet, const BORROW: bool> {
-    partial: Partial<'facet, BORROW>,
-    desc: DeserializeDesc,
+/// A [`Deserializer`] item.
+#[derive(Debug)]
+pub enum Item<'facet, const BORROW: bool> {
+    /// A size to be deserialized.
+    Size(u32),
+    /// An item to be deserialized.
+    Item(DeserializeItem<'facet, BORROW>),
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A description of a deserialization item.
 #[derive(Debug, Clone)]
 pub struct DeserializeDesc {
     variable: bool,
     field_attr: Option<&'static [Attr]>,
+}
+
+impl DeserializeDesc {
+    /// Create a new [`DeserializeDesc`].
+    #[inline]
+    #[must_use]
+    pub const fn new(variable: bool, field_attr: Option<&'static [Attr]>) -> Self {
+        Self { variable, field_attr }
+    }
+
+    /// Returns `true` if this [`DeserializeDesc`] is variable-length.
+    #[inline]
+    #[must_use]
+    pub const fn is_variable(&self) -> bool { self.variable }
+
+    /// Set whether this [`DeserializeDesc`] is variable-length.
+    #[inline]
+    pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
+
+    /// Get the [`Attr`]s of the field this [`DeserializeDesc`] came from, if
+    /// any.
+    #[inline]
+    #[must_use]
+    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// An item to be deserialized.
+pub struct DeserializeItem<'facet, const BORROW: bool> {
+    partial: Partial<'facet, BORROW>,
+    desc: DeserializeDesc,
 }
 
 impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
@@ -141,58 +167,11 @@ impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
     }
 }
 
-impl DeserializeDesc {
-    /// Create a new [`DeserializeDesc`].
-    #[inline]
-    #[must_use]
-    pub const fn new(variable: bool, field_attr: Option<&'static [Attr]>) -> Self {
-        Self { variable, field_attr }
-    }
-
-    /// Returns `true` if this [`DeserializeDesc`] is variable-length.
-    #[inline]
-    #[must_use]
-    pub const fn is_variable(&self) -> bool { self.variable }
-
-    /// Set whether this [`DeserializeDesc`] is variable-length.
-    #[inline]
-    pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
-
-    /// Get the [`Attr`]s of the field this [`DeserializeDesc`] came from, if
-    /// any.
-    #[inline]
-    #[must_use]
-    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
-}
-
 impl<const BORROW: bool> fmt::Debug for DeserializeItem<'_, BORROW> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("DeserializeItem")
-            .field("ty", &self.partial.shape().type_name())
+            .field("ty", &self.partial.shape())
             .field("desc", &self.desc)
             .finish()
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
-    /// Create a new [`DeserializeIterator`] for the given [`Partial`].
-    #[inline]
-    #[must_use]
-    pub(crate) fn new_partial(partial: Partial<'facet, BORROW>, variable: bool) -> Self {
-        let mut stack = IteratorStack::new_const();
-        stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-        Self { partial, stack }
-    }
-
-    /// Returns `true` if the deserialization process is finished.
-    #[inline]
-    #[must_use]
-    pub(crate) fn is_finished(&self) -> bool { self.stack.is_empty() }
-
-    /// Get the [`Partial`] from the iterator.
-    #[inline]
-    #[must_use]
-    pub(crate) fn into_partial(self) -> Partial<'facet, BORROW> { self.partial }
 }

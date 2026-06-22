@@ -1,17 +1,14 @@
-use core::marker::PhantomData;
-
 use facet::{Attr, Field, Peek, Shape};
-use smallvec::SmallVec;
 
-/// TODO
-pub(crate) struct SerializeIterator<'mem, 'facet> {
-    pub(super) stack: IteratorStack<'mem, 'facet>,
-    #[expect(clippy::type_complexity, reason = "Force invariance over 'facet")]
-    _invariant: PhantomData<(&'mem (), fn(&'facet ()) -> &'facet ())>,
+/// A [`Serializer`] item.
+pub enum Item<'mem, 'facet> {
+    /// A size to be serialized.
+    Size(u32),
+    /// An item to be serialized.
+    Item(SerializeItem<'mem, 'facet>),
 }
 
-/// A stack of serialization frames.
-pub type IteratorStack<'mem, 'facet> = SmallVec<[SerializeItem<'mem, 'facet>; 10]>;
+// -------------------------------------------------------------------------------------------------
 
 /// An item to be serialized.
 #[derive(Debug)]
@@ -90,21 +87,4 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
         }
         self
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl<'mem, 'facet> SerializeIterator<'mem, 'facet> {
-    /// Create a new [`SerializeIterator`] from the given [`Peek`].
-    #[must_use]
-    pub(crate) fn new(peek: Peek<'mem, 'facet>, variable: bool) -> Self {
-        let mut stack = IteratorStack::new_const();
-        stack.push(SerializeItem::new(peek, ItemType::Other, variable));
-        Self { stack, _invariant: PhantomData }
-    }
-
-    /// Returns `true` if the iterator is finished.
-    #[inline]
-    #[must_use]
-    pub(crate) fn is_empty(&self) -> bool { self.stack.is_empty() }
 }
