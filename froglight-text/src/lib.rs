@@ -7,10 +7,10 @@ extern crate std;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
+pub mod yansi;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Delete Me!
-    pub struct TextPlaceholder;
+    pub use crate::yansi::{Color, Paint};
 }

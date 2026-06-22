@@ -91,7 +91,7 @@ fn encode_inline<T: VarIntType>(value: T) -> ([u8; 31], u8) {
     }
 }
 
-/// Set all MSBs expect the last one, and return the number of non-zero bytes.
+/// Set all MSBs except the last one, and return the number of non-zero bytes.
 #[inline(always)]
 pub(super) fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8) {
     #[inline(always)]
@@ -106,8 +106,9 @@ pub(super) fn mark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, u8
 
     #[expect(clippy::cast_possible_truncation, reason = "<= 64")]
     let bytes = 64u32.saturating_sub(input.simd_ne(zero).to_bitmask().leading_zeros()) as u8;
+
     let msbmask = ascending.simd_lt(Simd::splat(bytes)).shift_elements_left::<1>(false);
-    let bytemask = msbmask.to_simd().cast::<u8>() & msbs;
+    let bytemask = msbmask.select(msbs, zero);
 
     (input | bytemask, bytes)
 }
@@ -209,12 +210,13 @@ pub(super) fn unmark_bytes<const N: usize>(input: Simd<u8, N>) -> (Simd<u8, N>, 
     // to guarantee this is a compile-time constant.
     let ascending: Simd<u8, N> = const { Simd::from_array(core::array::from_fn(usize_to_u8)) };
     let msbs: Simd<u8, N> = const { Simd::splat(0x80) };
+    let zero: Simd<u8, N> = const { Simd::splat(0x00) };
 
     #[expect(clippy::cast_possible_truncation, reason = "<= 64")]
     let bytes = input.simd_ge(msbs).to_bitmask().trailing_ones() as u8;
 
     let msbmask = ascending.simd_le(Simd::splat(bytes));
-    let bytemask = msbmask.to_simd().cast::<u8>() & !msbs;
+    let bytemask = msbmask.select(!msbs, zero);
 
     (input & bytemask, bytes + 1)
 }

@@ -426,9 +426,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
 
             Type::Pointer(..) => todo!(),
 
-            Type::Undefined => {
-                todo!("Unsupported type `{}`", self.partial.shape())
-            }
+            _ => todo!("Unsupported type `{}`", self.partial.shape()),
         }
     }
 }

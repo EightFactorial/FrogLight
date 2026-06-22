@@ -442,9 +442,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
 
             Type::Pointer(..) => todo!(),
 
-            Type::Undefined => {
-                todo!("Unsupported type `{}`: {:?}", item.shape(), item.peek())
-            }
+            _ => todo!("Unsupported type `{}`: {:?}", item.shape(), item.peek()),
         }
     }
 }
