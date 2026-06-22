@@ -14,5 +14,10 @@ pub mod components;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "bevy")]
+    pub use crate::bevy::{
+        colliding::Colliding,
+        collision_cache::{CollidingWith, EntityCollisions},
+    };
     pub use crate::components::*;
 }

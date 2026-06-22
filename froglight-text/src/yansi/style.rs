@@ -6,7 +6,7 @@ use crate::yansi::Color;
 ///
 /// See [`yansi::Style`] for more details.
 #[repr(transparent)]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Style(pub(super) YansiStyle);
 
 impl Style {

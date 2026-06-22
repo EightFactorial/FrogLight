@@ -1,6 +1,6 @@
 //! TODO
 
-use bevy_app::{App, Plugin};
+use bevy_app::{App, Plugin, Update};
 #[cfg(feature = "tracing")]
 use bevy_ecs::entity::EntityNotSpawnedError;
 use bevy_ecs::{prelude::*, world::DeferredWorld};
@@ -9,8 +9,8 @@ use froglight_entity::{bevy::EntityBundleEvent, prelude::EntityBundle};
 
 use crate::prelude::*;
 
-mod cache;
-pub use cache::{CollidingWith, EntityCollisions};
+pub mod colliding;
+pub mod collision_cache;
 
 /// A [`Plugin`] that adds physics components and systems.
 ///
@@ -79,7 +79,7 @@ impl PhysicsPlugin {
             }
             #[cfg(feature = "tracing")]
             Err(EntityNotSpawnedError::ValidButNotSpawned(..)) => {
-                tracing::error!(target: "froglight_physics", "Failed to add Collider, Entity {entity_id} has not been spawned");
+                tracing::error!(target: "froglight_physics", "Failed to add Collider, Entity {entity_id} does not exist?");
             }
             #[cfg(not(feature = "tracing"))]
             Err(_) => {}

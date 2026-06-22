@@ -84,7 +84,8 @@ impl EntityCollisions {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A [`Component`] containing colliding entities.
+/// A [`Component`] containing which [`Entities`](Entity) are currently
+/// colliding with the current [`Entity`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, Eq, Component, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]

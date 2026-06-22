@@ -9,7 +9,7 @@ use crate::yansi::{Attribute, Style};
 /// by hardcoded RGB values instead of terminal color codes.
 ///
 /// See the [`minecraft.wiki`](https://minecraft.wiki/w/Formatting_codes) for more details on Minecraft's formatting codes.
-#[derive(Debug, PartialEq, Eq, Copy, Clone, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Color {
     /// Minecraft's standard "black" color.
     ///
