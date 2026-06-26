@@ -3,28 +3,25 @@ use core::{any::TypeId, fmt};
 use froglight_common::identifier::Identifier;
 
 use crate::{
-    block::{BlockAttribute, BlockAttributes, BlockBehavior, BlockType},
-    state::{GlobalId, StateId},
-    version::BlockVersion,
+    attribute::{BlockAttribute, BlockAttributeBundle},
+    block::{BlockAttributes, BlockBehavior},
+    prelude::{BlockType, BlockVersion},
+    state::{GlobalStateId, RelativeStateId},
 };
 
 /// Metadata about a block type.
 pub struct BlockMetadata {
     /// The string identifier of the block.
     identifier: Identifier<'static>,
-    /// The lowest [`GlobalId`] assigned to this block.
-    base_id: u32,
+    /// The lowest [`GlobalStateId`] assigned to this block.
+    base_global_id: GlobalStateId,
+    /// The default [`RelativeStateId`] for this block.
+    default_state: RelativeStateId,
+
     /// The behavior of this block.
     behavior: BlockBehavior,
-
-    /// The number of states for this block.
-    state_count: u16,
-    /// The default [`StateId`] for this block.
-    state_default: u16,
-
-    attr_data: &'static [(&'static str, TypeId)],
-    get_attr_fn: fn(state: usize, attr: &str) -> Option<&'static str>,
-    set_attr_fn: fn(state: usize, attr: &str, value: &str) -> Option<(usize, &'static str)>,
+    /// The attributes of this block.
+    attributes: BlockAttributes,
 
     /// The [`TypeId`] of the block type.
     block_ty: TypeId,
@@ -46,32 +43,21 @@ impl BlockMetadata {
     #[must_use]
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
         identifier: Identifier<'static>,
-        base_id: u32,
-        state_default: u16,
+        base_global_id: GlobalStateId,
+        default_state: RelativeStateId,
     ) -> Self {
-        assert!(state_default < B::Attributes::TOTAL, "Default StateId is out of range!");
+        assert!(
+            default_state.into_inner() < B::Attributes::TOTAL,
+            "Default StateId is out of range!"
+        );
 
         BlockMetadata {
             identifier,
-            base_id,
+            base_global_id,
+            default_state,
+
             behavior: BlockBehavior::new::<B, V>(),
-
-            state_count: B::Attributes::TOTAL,
-            state_default,
-
-            attr_data: B::ATTRDATA,
-            get_attr_fn: |state, name| {
-                let attributes = B::Attributes::from_set_index(state)?;
-                let index = B::ATTRDATA.iter().position(|&(attr, _)| attr == name)?;
-                attributes.get_attr_str(index)
-            },
-            set_attr_fn: |state, name, value| {
-                let mut attributes = B::Attributes::from_set_index(state)?;
-                let index = B::ATTRDATA.iter().position(|&(attr, _)| attr == name)?;
-                let old_value = attributes.set_attr_str(index, value)?;
-                let new_state = attributes.to_set_index();
-                Some((new_state, old_value))
-            },
+            attributes: BlockAttributes::new::<B, V>(),
 
             block_ty: TypeId::of::<B>(),
             version_ty: TypeId::of::<V>(),
@@ -84,9 +70,9 @@ impl BlockMetadata {
     #[must_use]
     pub fn try_using_metadata(
         &self,
-        mut state: StateId,
+        mut state: RelativeStateId,
         metadata: &'static BlockMetadata,
-    ) -> StateId {
+    ) -> RelativeStateId {
         if self.state_count() < state.into_inner() {
             state = self.state_default();
         }
@@ -111,22 +97,24 @@ impl BlockMetadata {
     #[must_use]
     pub const fn behavior(&self) -> &BlockBehavior { &self.behavior }
 
-    /// Get the base [`GlobalId`] of this block.
+    /// Get the base [`GlobalStateId`] of this block.
     ///
     /// ## Note
     ///
     /// This is not equivalent to the block's default state!
     #[must_use]
-    pub fn base_id(&self) -> GlobalId { GlobalId::new(self.base_id) }
+    pub const fn base_id(&self) -> GlobalStateId { self.base_global_id }
 
     /// Get the default [`StateId`] for this block.
     #[must_use]
-    pub fn state_default(&self) -> StateId { StateId::new(self.state_default) }
+    pub const fn state_default(&self) -> RelativeStateId { self.default_state }
 
-    /// Get the default [`GlobalId`] of this block.
+    /// Get the default [`GlobalStateId`] of this block.
     #[must_use]
-    pub fn default_id(&self) -> GlobalId {
-        GlobalId::new(self.base_id + u32::from(self.state_default))
+    pub const fn default_id(&self) -> GlobalStateId {
+        let base_global = self.base_global_id.into_inner();
+        let default_state = self.default_state.into_inner() as u32;
+        GlobalStateId::new(base_global + default_state)
     }
 
     /// Get the number of [`StateId`]s for this block.
@@ -137,12 +125,12 @@ impl BlockMetadata {
     /// Blocks with no attributes have a state count of `1`.
     #[inline]
     #[must_use]
-    pub const fn state_count(&self) -> u16 { self.state_count }
+    pub const fn state_count(&self) -> u16 { self.attributes.states }
 
     /// Get the value of an attribute for a given state.
     #[must_use]
-    pub fn get_attribute<A: BlockAttribute>(&self, state: StateId) -> Option<A> {
-        self.attr_data.iter().find_map(|(name, ty)| {
+    pub fn get_attribute<A: BlockAttribute>(&self, state: RelativeStateId) -> Option<A> {
+        self.attributes.list.iter().find_map(|(name, ty)| {
             if *ty == TypeId::of::<A>() {
                 self.get_attribute_str(state, name).and_then(A::from_name)
             } else {
@@ -153,16 +141,16 @@ impl BlockMetadata {
 
     /// Get the value of an attribute as a string for a given state.
     #[must_use]
-    pub fn get_attribute_str(&self, state: StateId, name: &str) -> Option<&'static str> {
-        (self.get_attr_fn)(usize::from(state.into_inner()), name)
+    pub fn get_attribute_str(&self, state: RelativeStateId, name: &str) -> Option<&'static str> {
+        (self.attributes.get_attr_fn)(usize::from(state.into_inner()), name)
     }
 
     /// Get the value of all block attributes for a given state.
     pub fn get_attributes(
         &self,
-        state: StateId,
+        state: RelativeStateId,
     ) -> impl Iterator<Item = (&'static str, &'static str)> {
-        self.attr_data.iter().filter_map(move |(name, _)| {
+        self.attributes.list.iter().filter_map(move |(name, _)| {
             self.get_attribute_str(state, name).map(|value| (*name, value))
         })
     }
@@ -173,10 +161,10 @@ impl BlockMetadata {
     #[must_use]
     pub fn set_attribute<A: BlockAttribute>(
         &self,
-        state: StateId,
+        state: RelativeStateId,
         attribute: A,
-    ) -> Option<(StateId, A)> {
-        self.attr_data.iter().find_map(|(name, ty)| {
+    ) -> Option<(RelativeStateId, A)> {
+        self.attributes.list.iter().find_map(|(name, ty)| {
             if *ty == TypeId::of::<A>() {
                 let value = attribute.to_name();
                 self.set_attribute_str(state, name, value).and_then(|(new_state, old_value)| {
@@ -198,13 +186,16 @@ impl BlockMetadata {
     )]
     pub fn set_attribute_str(
         &self,
-        state: StateId,
+        state: RelativeStateId,
         name: &str,
         value: &str,
-    ) -> Option<(StateId, &'static str)> {
-        let (state, value) = (self.set_attr_fn)(usize::from(state.into_inner()), name, value)?;
-        let state = StateId::new(u16::try_from(state).expect("Invalid StateId, overflowed!"));
-        if state.into_inner() < self.state_count { Some((state, value)) } else { None } // Validate in-range
+    ) -> Option<(RelativeStateId, &'static str)> {
+        let (state, value) =
+            (self.attributes.set_attr_fn)(usize::from(state.into_inner()), name, value)?;
+        let state =
+            RelativeStateId::new(u16::try_from(state).expect("Invalid StateId, overflowed!"));
+
+        if state.into_inner() < self.attributes.states { Some((state, value)) } else { None }
     }
 
     /// Returns `true` if this block is of type `B`.
@@ -234,7 +225,7 @@ impl fmt::Debug for BlockMetadata {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BlockMetadata")
             .field("identifier", &self.identifier)
-            .field("base", &self.base_id)
+            .field("base", &self.base_global_id)
             .finish_non_exhaustive()
     }
 }

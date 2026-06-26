@@ -14,7 +14,7 @@ macro_rules! generate {
                     $val,
                 )*
             }
-            impl $crate::block::BlockAttribute for $ident {
+            impl $crate::attribute::BlockAttribute for $ident {
                 const STATES: &'static [(&'static str, Self)] = &[$(($str, Self::$val)),*];
             }
         )*
@@ -114,30 +114,32 @@ macro_rules! generate {
             #[automatically_derived]
             impl $crate::block::BlockType<$version> for $ident {
                 type Attributes = ($($ty,)*);
+
                 const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[$(
                     ($name, core::any::TypeId::of::<$ty>()),
                 )*];
+
                 const METADATA: &'static $crate::block::BlockMetadata = {
                     static STATIC: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
-                        $global,
-                        $default
+                        $crate::state::GlobalStateId::new($global),
+                        $crate::state::RelativeStateId::new($default)
                     ) };
                     &STATIC
                 };
 
-                fn is_air(_: $crate::state::StateId) -> bool { $air }
+                fn is_air(_: $crate::state::RelativeStateId) -> bool { $air }
 
-                fn is_solid(_: $crate::state::StateId) -> bool { $solid }
+                fn is_solid(_: $crate::state::RelativeStateId) -> bool { $solid }
 
-                fn is_liquid(_: $crate::state::StateId) -> bool { $liquid }
+                fn is_liquid(_: $crate::state::RelativeStateId) -> bool { $liquid }
 
-                fn has_collision(_: $crate::state::StateId) -> bool { $collision }
+                fn has_collision(_: $crate::state::RelativeStateId) -> bool { $collision }
 
-                fn has_occlusion(_: $crate::state::StateId) -> bool { $occlusion }
+                fn has_occlusion(_: $crate::state::RelativeStateId) -> bool { $occlusion }
 
                 #[allow(unused, reason = "Automatically generated")]
-                fn shape_of(state: $crate::state::StateId) -> &'static $crate::block::BlockShape<'static> {
+                fn shape_of(state: $crate::state::RelativeStateId) -> &'static $crate::block::BlockShape<'static> {
                     $shape
                 }
             }

@@ -3,9 +3,10 @@
 use core::any::TypeId;
 
 use froglight_block::{
+    attribute::BlockAttribute,
     block::{BlockMetadata, BlockType},
     prelude::*,
-    state::{GlobalId, StateId},
+    state::{GlobalStateId, RelativeStateId},
     storage::BlockStorage,
     version::version_implement,
 };
@@ -31,16 +32,20 @@ impl BlockType<TestVersion> for Air {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Air, TestVersion>(Identifier::new_unchecked("test:air"), 0, 0)
+            BlockMetadata::new::<Air, TestVersion>(
+                Identifier::new_static("test:air"),
+                GlobalStateId::new(0),
+                RelativeStateId::new(0),
+            )
         };
         &STATIC
     };
 
-    fn is_air(_: StateId) -> bool { true }
+    fn is_air(_: RelativeStateId) -> bool { true }
 
-    fn is_solid(_: StateId) -> bool { false }
+    fn is_solid(_: RelativeStateId) -> bool { false }
 
-    fn is_transparent(_: StateId) -> bool { true }
+    fn is_transparent(_: RelativeStateId) -> bool { true }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,7 +57,11 @@ impl BlockType<TestVersion> for Stone {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Stone, TestVersion>(Identifier::new_unchecked("test:stone"), 1, 0)
+            BlockMetadata::new::<Stone, TestVersion>(
+                Identifier::new_static("test:stone"),
+                GlobalStateId::new(1),
+                RelativeStateId::new(0),
+            )
         };
         &STATIC
     };
@@ -67,7 +76,11 @@ impl BlockType<TestVersion> for Dirt {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Dirt, TestVersion>(Identifier::new_unchecked("test:stone"), 2, 0)
+            BlockMetadata::new::<Dirt, TestVersion>(
+                Identifier::new_static("test:stone"),
+                GlobalStateId::new(2),
+                RelativeStateId::new(0),
+            )
         };
         &STATIC
     };
@@ -84,7 +97,11 @@ impl BlockType<TestVersion> for Grass {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[("snowy", TypeId::of::<Snowy>())];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Grass, TestVersion>(Identifier::new_unchecked("test:grass"), 3, 1)
+            BlockMetadata::new::<Grass, TestVersion>(
+                Identifier::new_static("test:grass"),
+                GlobalStateId::new(3),
+                RelativeStateId::new(1),
+            )
         };
         &STATIC
     };
@@ -127,11 +144,11 @@ fn air() {
     #[cfg(feature = "std")]
     {
         let global = TestVersion::blocks();
-        assert_eq!(global.get_block(GlobalId::new(0)), Some(air));
+        assert_eq!(global.get_block_by_state(GlobalStateId::new(0)), Some(air));
     }
 
-    assert!(Block::new_state::<Air, TestVersion>(StateId::new(0)).is_some());
-    assert!(Block::new_state::<Air, TestVersion>(StateId::new(1)).is_none());
+    assert!(Block::try_new_from::<Air, TestVersion>(RelativeStateId::new(0)).is_some());
+    assert!(Block::try_new_from::<Air, TestVersion>(RelativeStateId::new(1)).is_none());
 }
 
 #[test]
@@ -150,11 +167,11 @@ fn stone() {
     #[cfg(feature = "std")]
     {
         let global = TestVersion::blocks();
-        assert_eq!(global.get_block(GlobalId::new(1)), Some(stone));
+        assert_eq!(global.get_block_by_state(GlobalStateId::new(1)), Some(stone));
     }
 
-    assert!(Block::new_state::<Stone, TestVersion>(StateId::new(0)).is_some());
-    assert!(Block::new_state::<Stone, TestVersion>(StateId::new(1)).is_none());
+    assert!(Block::try_new_from::<Stone, TestVersion>(RelativeStateId::new(0)).is_some());
+    assert!(Block::try_new_from::<Stone, TestVersion>(RelativeStateId::new(1)).is_none());
 }
 
 #[test]
@@ -173,17 +190,17 @@ fn dirt() {
     #[cfg(feature = "std")]
     {
         let global = TestVersion::blocks();
-        assert_eq!(global.get_block(GlobalId::new(2)), Some(dirt));
+        assert_eq!(global.get_block_by_state(GlobalStateId::new(2)), Some(dirt));
     }
 
-    assert!(Block::new_state::<Dirt, TestVersion>(StateId::new(0)).is_some());
-    assert!(Block::new_state::<Dirt, TestVersion>(StateId::new(1)).is_none());
+    assert!(Block::try_new_from::<Dirt, TestVersion>(RelativeStateId::new(0)).is_some());
+    assert!(Block::try_new_from::<Dirt, TestVersion>(RelativeStateId::new(1)).is_none());
 }
 
 #[test]
 fn grass() {
     let mut grassy = Block::new::<Grass, TestVersion>(Snowy(false));
-    assert_eq!(Block::new_state::<Grass, TestVersion>(StateId::new(1)), Some(grassy));
+    assert_eq!(Block::try_new_from::<Grass, TestVersion>(RelativeStateId::new(1)), Some(grassy));
     assert_eq!(Block::new_default::<Grass, TestVersion>(), grassy);
     assert_eq!(grassy.global_id(), 4u32);
     assert_eq!(grassy.state_id(), 1u16);
@@ -207,7 +224,7 @@ fn grass() {
     assert_eq!(attr_iter.next(), None);
 
     let mut snowy = Block::new::<Grass, TestVersion>(Snowy(true));
-    assert_eq!(Block::new_state::<Grass, TestVersion>(StateId::new(0)), Some(snowy));
+    assert_eq!(Block::try_new_from::<Grass, TestVersion>(RelativeStateId::new(0)), Some(snowy));
     assert_eq!(snowy.global_id(), 3u32);
     assert_eq!(snowy.state_id(), 0u16);
 
@@ -232,11 +249,11 @@ fn grass() {
     #[cfg(feature = "std")]
     {
         let global = TestVersion::blocks();
-        assert_eq!(global.get_block(GlobalId::new(4)), Some(grassy));
-        assert_eq!(global.get_block(GlobalId::new(3)), Some(snowy));
+        assert_eq!(global.get_block_by_state(GlobalStateId::new(4)), Some(grassy));
+        assert_eq!(global.get_block_by_state(GlobalStateId::new(3)), Some(snowy));
     }
 
-    assert!(Block::new_state::<Grass, TestVersion>(StateId::new(0)).is_some());
-    assert!(Block::new_state::<Grass, TestVersion>(StateId::new(1)).is_some());
-    assert!(Block::new_state::<Grass, TestVersion>(StateId::new(2)).is_none());
+    assert!(Block::try_new_from::<Grass, TestVersion>(RelativeStateId::new(0)).is_some());
+    assert!(Block::try_new_from::<Grass, TestVersion>(RelativeStateId::new(1)).is_some());
+    assert!(Block::try_new_from::<Grass, TestVersion>(RelativeStateId::new(2)).is_none());
 }

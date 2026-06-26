@@ -193,4 +193,26 @@ macro_rules! implement_wrapper {
             )*
         }
     };
+
+    (
+        impl $outer:ident {
+            $(
+                [ $($att:tt)* ]: {
+
+
+                    $($tt:tt)*
+                }
+            )*
+        }
+    ) => {
+        $(
+            $crate::implement_wrapper! {
+                impl $outer {
+                    [ $($att)* ]
+
+                    $($tt)*
+                }
+            }
+        )*
+    };
 }

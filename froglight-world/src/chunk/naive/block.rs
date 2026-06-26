@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_block::{block::BlockType, prelude::*, state::GlobalId, storage::BlockStorage};
+use froglight_block::{block::BlockType, prelude::*, storage::BlockStorage};
 
 use crate::{
     chunk::{NaiveChunk, section::SectionPalette},
@@ -62,7 +62,8 @@ impl NaiveChunk {
         position: P,
         storage: &BlockStorage,
     ) -> Option<Block> {
-        self.get_raw_block_pos::<P>(position).and_then(|id| storage.get_block(GlobalId::new(id)))
+        self.get_raw_block_pos::<P>(position)
+            .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 
     /// Set the [`Block`] at the given position within the chunk,
@@ -121,11 +122,16 @@ impl NaiveChunk {
         block: Block,
         storage: &BlockStorage,
     ) -> Option<Block> {
-        let is_air = |id| storage.get_block(GlobalId::new(id)).is_some_and(|block| block.is_air());
-        let is_fluid =
-            |id| storage.get_block(GlobalId::new(id)).is_some_and(|block| block.is_liquid());
+        let is_air = |id| {
+            storage.get_block_by_state(GlobalStateId::new(id)).is_some_and(|block| block.is_air())
+        };
+        let is_fluid = |id| {
+            storage
+                .get_block_by_state(GlobalStateId::new(id))
+                .is_some_and(|block| block.is_liquid())
+        };
         self.set_raw_block_pos::<P>(position, block.global_id().into_inner(), is_air, is_fluid)
-            .and_then(|id| storage.get_block(GlobalId::new(id)))
+            .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 
     /// Returns `true` if the chunk contains at least one block of the same
@@ -166,7 +172,9 @@ impl NaiveChunk {
     pub fn contains_block_type_using(&self, block_type: TypeId, storage: &BlockStorage) -> bool {
         // Closure to check if a block id matches the desired block type.
         let matches = |id: u32| {
-            storage.get_block(GlobalId::new(id)).is_some_and(|block| block.block_ty() == block_type)
+            storage
+                .get_block_by_state(GlobalStateId::new(id))
+                .is_some_and(|block| block.block_ty() == block_type)
         };
 
         self.storage.as_slice().iter().any(|section| match section.block_data().palette() {

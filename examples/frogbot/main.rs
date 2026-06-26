@@ -712,8 +712,9 @@ impl BotPlugin {
 
                         trace!("Example UpdateTags: \"minecraft:block\" -> \"minecraft:slabs\"");
                         for val in slabs_val.values() {
-                            if let Some(meta) =
-                                u32::try_from(*val).ok().and_then(|v| blocks.get_block_by_id(v))
+                            if let Some(meta) = u16::try_from(*val)
+                                .ok()
+                                .and_then(|v| blocks.get_block_by_id(GlobalBlockId::new(v)))
                             {
                                 trace!(" - \"{}\"", meta.identifier());
                             } else {

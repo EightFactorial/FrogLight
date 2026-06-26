@@ -150,7 +150,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// position is out of bounds, or if the block is not recognized.
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        if block.version_ty() != self.blocks.version() {
+        if block.version_ty() != self.blocks.version_ty() {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
             return None;
@@ -169,7 +169,7 @@ impl Chunk {
         position: P,
         block: Block,
     ) -> Option<Block> {
-        if block.version_ty() != self.blocks.version() {
+        if block.version_ty() != self.blocks.version_ty() {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
             return None;
@@ -239,7 +239,7 @@ impl Chunk {
     pub fn convert_into<V: BiomeVersion + BlockVersion>(&mut self) {
         // Skip if the chunk is already in the correct version.
         if self.biomes.version_ty() == V::biomes().version_ty()
-            && self.blocks.version() == V::BLOCKS.load().version()
+            && self.blocks.version_ty() == V::BLOCKS.load().version_ty()
         {
             return;
         }
@@ -271,7 +271,7 @@ impl Chunk {
             if let Some((_, new)) = block_cache.iter().find(|(o, _)| *o == old) {
                 // Use the cached value
                 *new
-            } else if let Some(old_block) = old_blocks.get_block(old.into())
+            } else if let Some(old_block) = old_blocks.get_block_by_state(old.into())
                 && let Some(new_block) = new_blocks.get_block_by_identifier(old_block.identifier())
                 && let Some(converted) = old_block.try_using_metadata(new_block.metadata())
             {
@@ -341,7 +341,7 @@ impl Eq for Chunk {}
 impl PartialEq for Chunk {
     fn eq(&self, other: &Self) -> bool {
         self.biomes.version_ty() == other.biomes.version_ty()
-            && self.blocks.version() == other.blocks.version()
+            && self.blocks.version_ty() == other.blocks.version_ty()
             && self.naive == other.naive
     }
 }

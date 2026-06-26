@@ -3,13 +3,13 @@
 
 use crate::{
     block::{BlockShape, BlockType},
-    state::StateId,
+    state::RelativeStateId,
     version::BlockVersion,
 };
 
-type StateFn<T> = fn(StateId) -> T;
+type StateFn<T> = fn(RelativeStateId) -> T;
 
-/// A collection of functions that define a block's behavior.
+/// Functions that define a block's behavior.
 #[derive(Clone, Copy)]
 pub struct BlockBehavior {
     pub is_air: StateFn<bool>,
@@ -65,42 +65,42 @@ impl BlockBehavior {
     /// Returns `true` if the block is air.
     #[inline]
     #[must_use]
-    pub fn is_air(&self, state: StateId) -> bool { (self.is_air)(state) }
+    pub fn is_air(&self, state: RelativeStateId) -> bool { (self.is_air)(state) }
 
     /// Returns `true` if the block is solid.
     #[inline]
     #[must_use]
-    pub fn is_solid(&self, state: StateId) -> bool { (self.is_solid)(state) }
+    pub fn is_solid(&self, state: RelativeStateId) -> bool { (self.is_solid)(state) }
 
     /// Returns `true` if the block is liquid.
     #[inline]
     #[must_use]
-    pub fn is_liquid(&self, state: StateId) -> bool { (self.is_liquid)(state) }
+    pub fn is_liquid(&self, state: RelativeStateId) -> bool { (self.is_liquid)(state) }
 
     /// Returns `true` if the block has collision.
     #[inline]
     #[must_use]
-    pub fn has_collision(&self, state: StateId) -> bool { (self.has_collision)(state) }
+    pub fn has_collision(&self, state: RelativeStateId) -> bool { (self.has_collision)(state) }
 
     /// Returns `true` if the block has occlusion.
     #[inline]
     #[must_use]
-    pub fn has_occlusion(&self, state: StateId) -> bool { (self.has_occlusion)(state) }
+    pub fn has_occlusion(&self, state: RelativeStateId) -> bool { (self.has_occlusion)(state) }
 
     /// Returns `true` if the block is transparent.
     #[inline]
     #[must_use]
-    pub fn is_transparent(&self, state: StateId) -> bool { (self.is_transparent)(state) }
+    pub fn is_transparent(&self, state: RelativeStateId) -> bool { (self.is_transparent)(state) }
 
     /// Returns the light emission level of the block.
     #[inline]
     #[must_use]
-    pub fn light_emission(&self, state: StateId) -> u8 { (self.light_emission)(state) }
+    pub fn light_emission(&self, state: RelativeStateId) -> u8 { (self.light_emission)(state) }
 
     /// Returns the shape of the block.
     #[inline]
     #[must_use]
-    pub fn shape_of(&self, state: StateId) -> &'static BlockShape<'static> {
+    pub fn shape_of(&self, state: RelativeStateId) -> &'static BlockShape<'static> {
         (self.shape_of)(state)
     }
 }

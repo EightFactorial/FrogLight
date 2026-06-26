@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_block::{block::BlockType, prelude::*, state::GlobalId, storage::BlockStorage};
+use froglight_block::{block::BlockType, prelude::*, storage::BlockStorage};
 
 use crate::{
     borrowed::{BorrowedChunk, section::BorrowedPalette},
@@ -62,7 +62,8 @@ impl BorrowedChunk<'_> {
         position: P,
         storage: &BlockStorage,
     ) -> Option<Block> {
-        self.get_raw_block_pos::<P>(position).and_then(|id| storage.get_block(GlobalId::new(id)))
+        self.get_raw_block_pos::<P>(position)
+            .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 
     /// Returns `true` if the chunk contains at least one block of the same
@@ -103,7 +104,9 @@ impl BorrowedChunk<'_> {
     pub fn contains_block_type_using(&self, block_type: TypeId, storage: &BlockStorage) -> bool {
         // Closure to check if a block id matches the desired block type.
         let matches = |id: u32| {
-            storage.get_block(GlobalId::new(id)).is_some_and(|block| block.block_ty() == block_type)
+            storage
+                .get_block_by_state(GlobalStateId::new(id))
+                .is_some_and(|block| block.block_ty() == block_type)
         };
 
         self.storage.as_slice().iter().any(|section| match section.block_data().palette() {

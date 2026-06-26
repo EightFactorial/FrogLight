@@ -10,11 +10,7 @@ use divan::prelude::*;
 #[cfg(feature = "froglight-biome")]
 use froglight_biome::{biome::BiomeMetadata, implement_biomes, prelude::*, storage::BiomeStorage};
 #[cfg(feature = "froglight-block")]
-use froglight_block::{
-    block::{BlockBehavior, BlockMetadata, StateId},
-    prelude::*,
-    storage::BlockStorage,
-};
+use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
 use froglight_world::borrowed::{
@@ -407,9 +403,8 @@ impl BlockType<TestVersion> for Air {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Air, TestVersion>(
                 Identifier::new_unchecked("test:air"),
-                0,
-                0,
-                BlockBehavior::new::<Air, TestVersion>(),
+                GlobalStateId::new(0),
+                RelativeStateId::new(0),
             )
         };
         &STATIC
@@ -438,9 +433,8 @@ impl BlockType<TestVersion> for Stone {
 
             BlockMetadata::new::<Stone, TestVersion>(
                 Identifier::new_unchecked("test:stone"),
-                1,
-                0,
-                BlockBehavior::new::<Stone, TestVersion>(),
+                GlobalStateId::new(1),
+                RelativeStateId::new(0),
             )
         };
         &STATIC
@@ -448,12 +442,15 @@ impl BlockType<TestVersion> for Stone {
 }
 
 #[cfg(feature = "froglight-block")]
-froglight_block::implement_blocks! {
-    TestVersion => unsafe {
-        BlockStorage::new_static(&[
-            Air::METADATA,
-            Stone::METADATA,
-        ])
+froglight_block::version::version_implement! {
+    impl BlockVersion => TestVersion {
+        const BLOCKS: BlockStorage;
+        fn new_blocks() => {
+            BlockStorage::new_static(&[
+                Air::METADATA,
+                Stone::METADATA,
+            ])
+        }
     }
 }
 
