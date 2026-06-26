@@ -43,7 +43,7 @@ bevy_ui = { default-features = false, version = "0.19" }
 facet = { default-features = false, version = "=0.50.0-rc.2" }
 facet-format = { default-features = false, version = "=0.50.0-rc.2" }
 facet-json = { default-features = false, version = "=0.50.0-rc.2" }
-facet-path = { default-features = false, version = "=0.50.0-rc.2" }
+facet-path = { default-features = false, version = "=0.50.0-rc.4" }
 facet-toml = { default-features = false, version = "=0.50.0-rc.2" }
 facet-value = { default-features = false, version = "=0.50.0-rc.2" }
 
