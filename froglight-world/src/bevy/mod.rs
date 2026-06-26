@@ -1,32 +1,21 @@
 //! TODO
 
 use bevy_app::{App, Plugin};
-use froglight_common::prelude::WorldInstance;
 
-mod hook;
-use hook::{instance_insert_hook, instance_replace_hook};
+use crate::{
+    component::{ChunkBlockPos, DimensionPos},
+    prelude::{BlockPos, ChunkPos},
+};
 
-pub mod relationship;
-use relationship::ChunkOfInstance;
-
-pub mod world;
-use world::WorldInstanceChunks;
-
-use crate::prelude::ChunkPos;
-
-/// A [`Plugin`] that adds [`ChunkPos`]-[`WorldInstance`] relationships.
+/// A [`Plugin`] that ...
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<ChunkOfInstance>()
-            .register_type::<WorldInstanceChunks>()
-            .register_type::<WorldInstance>();
-
-        app.world_mut()
-            .register_component_hooks::<ChunkPos>()
-            .on_insert(instance_insert_hook)
-            .on_discard(instance_replace_hook);
+        app.register_type::<BlockPos>()
+            .register_type::<ChunkPos>()
+            .register_type::<ChunkBlockPos>()
+            .register_type::<DimensionPos>();
     }
 }

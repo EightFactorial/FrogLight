@@ -30,8 +30,6 @@ const SECTION_VOLUME: u16 = SECTION_LENGTH as u16 * SECTION_WIDTH as u16 * SECTI
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "bevy")]
-    pub use crate::bevy::{relationship::ChunkOfInstance, world::WorldInstanceChunks};
     #[cfg(feature = "alloc")]
     pub use crate::chunk::NaiveChunk;
     #[cfg(all(feature = "froglight-biome", feature = "froglight-block", feature = "std"))]

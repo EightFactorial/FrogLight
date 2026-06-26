@@ -10,10 +10,10 @@ pub mod plugins {
     pub use crate::{
         bevy::FroglightPlugins,
         modules::{
-            brigadier::bevy::BrigadierPlugin, common::bevy::CommonPlugin,
-            entity::bevy::EntityPlugin, instance::plugin::InstancePlugin,
-            inventory::bevy::InventoryPlugin, physics::bevy::PhysicsPlugin,
-            player::bevy::PlayerPlugin, text::bevy::TextPlugin, world::bevy::WorldPlugin,
+            brigadier::bevy::BrigadierPlugin, entity::bevy::EntityPlugin,
+            instance::plugin::InstancePlugin, inventory::bevy::InventoryPlugin,
+            physics::bevy::PhysicsPlugin, player::bevy::PlayerPlugin, text::bevy::TextPlugin,
+            world::bevy::WorldPlugin,
         },
     };
 }
@@ -36,7 +36,6 @@ impl PluginGroup for FroglightPlugins {
 
         group
             .add(plugins::BrigadierPlugin)
-            .add(plugins::CommonPlugin)
             .add(plugins::EntityPlugin)
             .add(plugins::InstancePlugin)
             .add(plugins::InventoryPlugin)

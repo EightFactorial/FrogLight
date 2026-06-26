@@ -8,6 +8,7 @@ use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
         api::api::ClientApi,
+        instance::relationship::PartOfInstance,
         network::{
             bevy::ClientDespawn,
             connection::FuturesLite,
@@ -129,7 +130,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ActionBarText() => todo!(),
                     ClientboundPlayEvent::AddEntity(data) => {
                         let mut entity = commands.spawn((
-                            EntityOfInstance::new(bot.id()),
+                            PartOfInstance::new(bot.id()),
                             data.entity_id,
                             data.entity_uuid,
                             Transform::from_translation(Vec3::new(
@@ -174,34 +175,27 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
                     // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    ClientboundPlayEvent::ChunkWithLight(chunk_pos, chunk_data, _) => {
-                        let Some(instance) = bot.get::<WorldInstanceChunks>() else {
-                            error!(
-                                "Received ChunkWithLight but bot doesn't have a WorldInstanceChunks!"
-                            );
-                            continue;
-                        };
+                    ClientboundPlayEvent::ChunkWithLight(_chunk_pos, _chunk_data, _) => {
+                        // match chunk_data.as_chunk::<Version>(Some((
+                        //     instance.height_max(),
+                        //     instance.height_min(),
+                        // ))) {
+                        //     Ok(chunk) => {
+                        //         let entity = commands.spawn((
+                        //             PartOfInstance::new(bot.id()),
+                        //             SharedChunk::new(chunk),
+                        //             *chunk_pos,
+                        //         ));
 
-                        match chunk_data.as_chunk::<Version>(Some((
-                            instance.height_max(),
-                            instance.height_min(),
-                        ))) {
-                            Ok(chunk) => {
-                                let entity = commands.spawn((
-                                    ChunkOfInstance::new(bot.id()),
-                                    SharedChunk::new(chunk),
-                                    *chunk_pos,
-                                ));
-
-                                debug!(
-                                    "Spawning Chunk as Entity {} ({}, {})",
-                                    entity.id(),
-                                    chunk_pos.x(),
-                                    chunk_pos.z()
-                                );
-                            }
-                            Err(err) => error!("Failed to convert chunk data: {err:?}"),
-                        }
+                        //         debug!(
+                        //             "Spawning Chunk as Entity {} ({}, {})",
+                        //             entity.id(),
+                        //             chunk_pos.x(),
+                        //             chunk_pos.z()
+                        //         );
+                        //     }
+                        //     Err(err) => error!("Failed to convert chunk data:
+                        // {err:?}"), }
                     }
                     // ClientboundPlayEvent::ClearDialog => todo!(),
                     // ClientboundPlayEvent::ClearTitles() => todo!(),
@@ -237,8 +231,8 @@ impl BotPlugin {
                         let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<WorldInstance>() else { return };
-                            let Some(target) = instance.get(&entity_id) else {
+                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                            let Some(target) = instance.query_id(&entity_id) else {
                                 error!(
                                     "Received EntityPosition for unknown EntityId {}!",
                                     entity_id.0
@@ -300,12 +294,12 @@ impl BotPlugin {
                         // TODO: Get the `height_max` and `height_min` from the server.
                         // Currently panics if the bot logs into other dimensions.
 
-                        // Prepare the bot's `WorldInstance` for tracking entities
+                        // Prepare the bot's `SessionInstance` for tracking entities
                         let mut commands = commands.entity(bot.id());
                         commands.insert((
-                            WorldInstance::new(login.spawn_info.dimension.clone()),
-                            WorldInstanceChunks::new(320, -64),
-                            EntityOfInstance::new(bot.id()),
+                            SessionInstance::new(login.spawn_info.dimension.clone()),
+                            // SessionInstanceChunks::new(320, -64),
+                            PartOfInstance::new(bot.id()),
                             EntityBundle::new::<entity::Player, Version>(),
                         ));
 
@@ -322,8 +316,8 @@ impl BotPlugin {
                         let data = *data;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<WorldInstance>() else { return };
-                            let Some(target) = instance.get(&data.entity_id) else {
+                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                            let Some(target) = instance.query_id(&data.entity_id) else {
                                 error!(
                                     "Received MoveEntity for unknown EntityId {}!",
                                     data.entity_id.0
@@ -406,13 +400,15 @@ impl BotPlugin {
                     // ClientboundPlayEvent::RecipeBookRemove() => todo!(),
                     // ClientboundPlayEvent::RecipeBookSettings() => todo!(),
                     ClientboundPlayEvent::RemoveEntities(entities) => {
-                        let Some(instance) = bot.get::<WorldInstance>() else {
-                            error!("Received RemoveEntities but bot doesn't have a WorldInstance!");
+                        let Some(instance) = bot.get::<SessionInstance>() else {
+                            error!(
+                                "Received RemoveEntities but bot doesn't have a SessionInstance!"
+                            );
                             continue;
                         };
 
                         for entity_id in entities {
-                            if let Some(entity) = instance.get(entity_id) {
+                            if let Some(entity) = instance.query_id(entity_id) {
                                 debug!("Despawning Entity {entity} ({})", entity_id.0);
 
                                 let mut entity = commands.entity(entity);
@@ -475,9 +471,9 @@ impl BotPlugin {
                         };
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+                            let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.get(&id) {
+                            if let Some(target) = instance.query_id(&id) {
                                 let mut entity = entity.into_world_mut().entity_mut(target);
 
                                 if let Some(bundle) = entity.get::<EntityBundle>().cloned()
@@ -505,9 +501,9 @@ impl BotPlugin {
                         let delta = *delta;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+                            let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.get(&id) {
+                            if let Some(target) = instance.query_id(&id) {
                                 if let Some(mut velocity) =
                                     entity.into_world_mut().get_mut::<Velocity>(target)
                                 {
@@ -542,7 +538,8 @@ impl BotPlugin {
                     ClientboundPlayEvent::StartConfiguration => {
                         info!("Reconfiguring...");
                         let mut commands = commands.entity(bot.id());
-                        commands.remove::<WorldInstance>().remove::<WorldInstanceChunks>();
+
+                        commands.remove::<SessionInstance>();
                     }
                     // ClientboundPlayEvent::StopSound() => todo!(),
                     // ClientboundPlayEvent::StoreCookie() => todo!(),
@@ -557,9 +554,9 @@ impl BotPlugin {
                         let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<WorldInstance>() else { return };
+                            let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.get(&id) {
+                            if let Some(target) = instance.query_id(&id) {
                                 let mut entity = entity.into_world_mut().entity_mut(target);
 
                                 if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(

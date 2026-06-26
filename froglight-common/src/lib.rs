@@ -6,8 +6,6 @@ extern crate alloc;
 
 #[cfg(feature = "aabb")]
 pub mod aabb;
-#[cfg(feature = "bevy")]
-pub mod bevy;
 #[cfg(feature = "uuid")]
 pub mod entity;
 pub mod identifier;
@@ -17,8 +15,6 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "bevy")]
-    pub use crate::bevy::{instance::WorldInstance, relationship::EntityOfInstance};
     #[cfg(feature = "uuid")]
     pub use crate::entity::{EntityId, EntityUuid};
     pub use crate::{identifier::Identifier, version::*};

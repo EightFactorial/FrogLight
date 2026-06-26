@@ -46,9 +46,8 @@ impl PartOfInstance {
         let registry = registry.read();
 
         // Run the `on_insert` hook for `ReflectSession` components.
-        for reflect in components
-            .into_iter()
-            .filter_map(|type_id| registry.get_type_data::<ReflectSession>(type_id))
+        for reflect in
+            components.into_iter().filter_map(|id| registry.get_type_data::<ReflectSession>(id))
         {
             reflect.on_insert(ctx.entity, world.reborrow());
         }
@@ -66,9 +65,8 @@ impl PartOfInstance {
         let registry = registry.read();
 
         // Run the `on_discard` hook for `ReflectSession` components.
-        for reflect in components
-            .into_iter()
-            .filter_map(|type_id| registry.get_type_data::<ReflectSession>(type_id))
+        for reflect in
+            components.into_iter().filter_map(|id| registry.get_type_data::<ReflectSession>(id))
         {
             reflect.on_discard(ctx.entity, world.reborrow());
         }

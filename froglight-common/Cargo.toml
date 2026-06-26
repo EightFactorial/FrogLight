@@ -25,7 +25,6 @@ bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["uuid"], workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
 glam = { workspace = true, optional = true }
-hashbrown = { features = ["core", "default-hasher", "inline-more"], workspace = true, optional = true }
 libm = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
@@ -42,11 +41,11 @@ aabb = ["dep:glam", "bevy_reflect?/glam"]
 uuid = ["dep:uuid"]
 
 # Enable `bevy` support.
-bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:hashbrown", "serde", "uuid"]
+bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "serde", "uuid"]
 # Enable `facet` support.
 facet = ["alloc", "dep:facet", "dep:froglight-facet", "uuid"]
 # Enable `serde` support.
-serde = ["dep:serde", "glam?/serde", "hashbrown?/serde", "uuid?/serde"]
+serde = ["dep:serde", "glam?/serde", "uuid?/serde"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
@@ -54,11 +53,11 @@ tracing = ["dep:tracing"]
 libm = ["dep:libm", "glam?/nostd-libm"]
 
 # Enable support for a global allocator
-alloc = ["facet?/alloc", "hashbrown?/alloc"]
+alloc = ["facet?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "facet?/std", "froglight-facet?/std", "glam?/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "hashbrown?/nightly", "glam?/core-simd"]
+nightly = ["froglight-facet?/nightly", "glam?/core-simd"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
