@@ -6,12 +6,16 @@ use alloc::vec::Vec;
 use core::any::TypeId;
 #[cfg(feature = "std")]
 pub use std::sync::LazyLock;
+#[cfg(all(feature = "std", not(feature = "parking_lot"), feature = "biome_data"))]
+pub use std::sync::RwLock;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
 use froglight_common::prelude::Identifier;
 #[cfg(all(feature = "once_cell", not(feature = "std")))]
 pub use once_cell::sync::OnceCell as LazyLock;
+#[cfg(all(feature = "parking_lot", feature = "biome_data"))]
+pub use parking_lot::RwLock;
 
 use crate::biome::{Biome, BiomeMetadata, GlobalId};
 

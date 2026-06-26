@@ -76,6 +76,11 @@ pub fn serialize_core<'mem, 'facet>(
     writer: &mut Writer<'_>,
 ) -> impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError> {
     |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
+        #[cfg(feature = "tracing_ext")]
+        if let Item::Item(item) = &item {
+            tracing::trace!("Serializing `{}`", item.shape());
+        }
+
         let item = match item {
             Item::Item(item) => item,
             Item::Size(size) => return varint::encode_u32_into(size, writer),

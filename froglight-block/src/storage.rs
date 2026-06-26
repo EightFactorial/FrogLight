@@ -4,10 +4,14 @@
 use alloc::vec::Vec;
 #[cfg(feature = "std")]
 use core::any::TypeId;
+#[cfg(feature = "std")]
+pub use std::sync::LazyLock;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
 use froglight_common::prelude::Identifier;
+#[cfg(all(feature = "once_cell", not(feature = "std")))]
+pub use once_cell::sync::OnceCell as LazyLock;
 
 use crate::block::{Block, BlockMetadata, GlobalId, StateId};
 
@@ -214,8 +218,8 @@ macro_rules! __implement_storage_inner {
     (@global $version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(
             @local {
-                const BLOCKS: &'static std::sync::LazyLock<$crate::storage::GlobalBlockStorage> = {
-                    static STATIC: std::sync::LazyLock<$crate::storage::GlobalBlockStorage> = std::sync::LazyLock::new(|| {
+                const BLOCKS: &'static $crate::storage::LazyLock<$crate::storage::GlobalBlockStorage> = {
+                    static STATIC: $crate::storage::LazyLock<$crate::storage::GlobalBlockStorage> = $crate::storage::LazyLock::new(|| {
                         $crate::storage::GlobalBlockStorage::new::<$version>(<$version as $crate::version::BlockVersion>::new_blocks())
                     });
                     &STATIC

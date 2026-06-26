@@ -1,8 +1,4 @@
-use core::{
-    any::TypeId,
-    cmp::Ordering,
-    fmt::{self, Debug, Display},
-};
+use core::{any::TypeId, cmp::Ordering, fmt};
 
 use froglight_common::identifier::Identifier;
 
@@ -44,7 +40,7 @@ impl Block {
     ///
     /// Returns `None` if the [`StateId`] is invalid for the block type.
     #[must_use]
-    pub fn new_state<B: BlockType<V>, V: BlockVersion>(state: StateId) -> Option<Block> {
+    pub const fn new_state<B: BlockType<V>, V: BlockVersion>(state: StateId) -> Option<Block> {
         let metadata = B::METADATA;
         if state.into_inner() < metadata.state_count() {
             Some(Self { state, reference: metadata })
@@ -221,11 +217,14 @@ impl PartialOrd for Block {
     }
 }
 
-impl Display for Block {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(self.identifier(), f) }
+impl fmt::Display for Block {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <Identifier as fmt::Display>::fmt(self.identifier(), f)
+    }
 }
 
-impl Debug for Block {
+impl fmt::Debug for Block {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Block")
             .field(self.reference.identifier())

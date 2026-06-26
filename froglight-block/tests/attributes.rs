@@ -6,7 +6,7 @@ use core::any::TypeId;
 #[cfg(feature = "std")]
 use froglight_block::block::GlobalId;
 use froglight_block::{
-    block::{BlockAttribute, BlockBehavior, BlockMetadata, BlockType, StateId},
+    block::{BlockAttribute, BlockMetadata, BlockType, StateId},
     implement_blocks,
     prelude::*,
     storage::BlockStorage,
@@ -33,12 +33,7 @@ impl BlockType<TestVersion> for Air {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Air, TestVersion>(
-                Identifier::new_unchecked("test:air"),
-                0,
-                0,
-                BlockBehavior::new::<Air, TestVersion>(),
-            )
+            BlockMetadata::new::<Air, TestVersion>(Identifier::new_unchecked("test:air"), 0, 0)
         };
         &STATIC
     };
@@ -59,12 +54,7 @@ impl BlockType<TestVersion> for Stone {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Stone, TestVersion>(
-                Identifier::new_unchecked("test:stone"),
-                1,
-                0,
-                BlockBehavior::new::<Stone, TestVersion>(),
-            )
+            BlockMetadata::new::<Stone, TestVersion>(Identifier::new_unchecked("test:stone"), 1, 0)
         };
         &STATIC
     };
@@ -79,12 +69,7 @@ impl BlockType<TestVersion> for Dirt {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Dirt, TestVersion>(
-                Identifier::new_unchecked("test:stone"),
-                2,
-                0,
-                BlockBehavior::new::<Dirt, TestVersion>(),
-            )
+            BlockMetadata::new::<Dirt, TestVersion>(Identifier::new_unchecked("test:stone"), 2, 0)
         };
         &STATIC
     };
@@ -101,12 +86,7 @@ impl BlockType<TestVersion> for Grass {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[("snowy", TypeId::of::<Snowy>())];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Grass, TestVersion>(
-                Identifier::new_unchecked("test:grass"),
-                3,
-                1,
-                BlockBehavior::new::<Grass, TestVersion>(),
-            )
+            BlockMetadata::new::<Grass, TestVersion>(Identifier::new_unchecked("test:grass"), 3, 1)
         };
         &STATIC
     };

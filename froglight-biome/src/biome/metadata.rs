@@ -1,18 +1,14 @@
 use core::{any::TypeId, fmt::Debug};
-#[cfg(all(feature = "biome_data", feature = "std"))]
-use std::sync::LazyLock;
 
 use froglight_common::prelude::Identifier;
-#[cfg(all(feature = "biome_data", feature = "once_cell", not(feature = "std")))]
-use once_cell::sync::OnceCell as LazyLock;
 
-#[cfg(feature = "biome_data")]
-use crate::biome::BiomeAttributeSet;
 use crate::{
     atomic::{MaybeAtomicBool, MaybeAtomicF32, MaybeAtomicU32},
     biome::{BiomeType, GlobalId},
     version::BiomeVersion,
 };
+#[cfg(feature = "biome_data")]
+use crate::{biome::BiomeAttributeSet, storage::LazyLock};
 
 /// Metadata about a biome type.
 pub struct BiomeMetadata {

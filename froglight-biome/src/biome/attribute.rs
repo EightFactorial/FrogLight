@@ -3,15 +3,14 @@
 
 #[cfg(all(feature = "alloc", feature = "biome_data"))]
 use alloc::vec::Vec;
-#[cfg(all(feature = "std", not(feature = "parking_lot"), feature = "biome_data"))]
-use std::sync::RwLock;
 
 use facet::Facet;
 use facet_format::SerializeError;
 use facet_value::{ToValueError, Value, ValueError};
 use froglight_common::prelude::Identifier;
-#[cfg(all(feature = "parking_lot", feature = "biome_data"))]
-use parking_lot::RwLock;
+
+#[cfg(feature = "biome_data")]
+use crate::storage::RwLock;
 
 /// A set of biome attributes.
 #[repr(transparent)]
@@ -246,7 +245,7 @@ impl BiomeAttributeStorage {
 }
 
 /// Asserts that the given slice contains no duplicate entries.
-const fn assert_no_duplicates(slice: &[(Identifier<'static>, Value)]) {
+const fn assert_no_duplicates<T>(slice: &[(Identifier<'static>, T)]) {
     let mut i = 0;
     while i < slice.len() {
         let mut j = i + 1;

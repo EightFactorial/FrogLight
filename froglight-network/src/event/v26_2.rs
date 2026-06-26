@@ -4,7 +4,7 @@
 
 use froglight_common::version::V26_2;
 use froglight_packet::{
-    common::{chunk_data::ChunkData, entity_data::SetEntityBundle, entity_id::VarEntityId},
+    common::{chunk_data::ChunkData, entity_data::SetEntityBundle},
     generated::v26_2::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -379,12 +379,8 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityEvent(packet))))
                 }
-                ClientboundPlayEvent::EntityPosition(entity, data, on_ground) => {
-                    let packet = EntityPositionSyncS2CPacket {
-                        entity_id: VarEntityId(entity),
-                        data,
-                        on_ground,
-                    };
+                ClientboundPlayEvent::EntityPosition(entity_id, data, on_ground) => {
+                    let packet = EntityPositionSyncS2CPacket { entity_id, data, on_ground };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityPositionSync(
                         packet,
                     ))))
@@ -460,15 +456,15 @@ impl EventVersion for V26_2 {
                 | ClientboundPlayEvent::MoveEntityRot(data) => match (data.delta, data.yaw_pitch) {
                     (Some(delta), None) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityPos(MoveEntityPosS2CPacket {
-                            entity_id: VarEntityId(data.entity_id),
                             delta,
+                            entity_id: data.entity_id,
                             on_ground: data.on_ground,
                         }),
                     ))),
                     (Some(delta), Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityPosRot(MoveEntityPosRotS2CPacket {
-                            entity_id: VarEntityId(data.entity_id),
                             delta,
+                            entity_id: data.entity_id,
                             yaw: y_rot,
                             pitch: x_rot,
                             on_ground: data.on_ground,
@@ -476,7 +472,7 @@ impl EventVersion for V26_2 {
                     ))),
                     (None, Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityRot(MoveEntityRotS2CPacket {
-                            entity_id: VarEntityId(data.entity_id),
+                            entity_id: data.entity_id,
                             yaw: y_rot,
                             pitch: x_rot,
                             on_ground: data.on_ground,
@@ -579,7 +575,6 @@ impl EventVersion for V26_2 {
                     ))))
                 }
                 ClientboundPlayEvent::RemoveEntities(entities) => {
-                    let entities = entities.into_iter().map(VarEntityId).collect();
                     let packet = RemoveEntitiesS2CPacket { entities };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::RemoveEntities(packet))))
                 }
@@ -673,8 +668,8 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityLink(packet))))
                 }
-                ClientboundPlayEvent::SetEntityMotion(entity, delta) => {
-                    let packet = SetEntityMotionS2CPacket { entity_id: VarEntityId(entity), delta };
+                ClientboundPlayEvent::SetEntityMotion(entity_id, delta) => {
+                    let packet = SetEntityMotionS2CPacket { entity_id, delta };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityMotion(packet))))
                 }
                 ClientboundPlayEvent::SetEquipment() => {
@@ -781,13 +776,8 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::TakeItemEntity(packet))))
                 }
-                ClientboundPlayEvent::TeleportEntity(entity, data, relative, on_ground) => {
-                    let packet = TeleportEntityS2CPacket {
-                        entity_id: VarEntityId(entity),
-                        data,
-                        relative,
-                        on_ground,
-                    };
+                ClientboundPlayEvent::TeleportEntity(entity_id, data, relative, on_ground) => {
+                    let packet = TeleportEntityS2CPacket { entity_id, data, relative, on_ground };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::TeleportEntity(packet))))
                 }
                 ClientboundPlayEvent::TestBlockStatus() => {
@@ -1065,7 +1055,7 @@ impl EventVersion for V26_2 {
                 }
                 PlayClientboundPackets::EntityPositionSync(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityPosition(
-                        packet.entity_id.0,
+                        packet.entity_id,
                         packet.data,
                         packet.on_ground,
                     ))))
@@ -1205,7 +1195,7 @@ impl EventVersion for V26_2 {
                 }
                 PlayClientboundPackets::RemoveEntities(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveEntities(
-                        packet.entities.into_iter().map(|entity| entity.0).collect(),
+                        packet.entities,
                     ))))
                 }
                 PlayClientboundPackets::RemoveMobEffect(_packet) => {
@@ -1281,7 +1271,7 @@ impl EventVersion for V26_2 {
                 }
                 PlayClientboundPackets::SetEntityMotion(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityMotion(
-                        packet.entity_id.0,
+                        packet.entity_id,
                         packet.delta,
                     ))))
                 }
@@ -1356,7 +1346,7 @@ impl EventVersion for V26_2 {
                 }
                 PlayClientboundPackets::TeleportEntity(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TeleportEntity(
-                        packet.entity_id.0,
+                        packet.entity_id,
                         packet.data,
                         packet.relative,
                         packet.on_ground,

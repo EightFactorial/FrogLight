@@ -105,6 +105,11 @@ pub fn deserialize_owned_core(
     reader: &mut Reader<'_>,
 ) -> impl FnMut(Item<'static, false>) -> Result<Item<'static, false>, ReaderError> {
     move |item: Item<'static, false>| {
+        #[cfg(feature = "tracing_ext")]
+        if let Item::Item(item) = &item {
+            tracing::trace!("Deserializing `{}`", item.shape());
+        }
+
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -163,6 +168,11 @@ pub fn deserialize_borrowed_core<'facet>(
     reader: &mut Reader<'facet>,
 ) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
     |item: Item<'facet, true>| {
+        #[cfg(feature = "tracing_ext")]
+        if let Item::Item(item) = &item {
+            tracing::trace!("Deserializing `{}`", item.shape());
+        }
+
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),

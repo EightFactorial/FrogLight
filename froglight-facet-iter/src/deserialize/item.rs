@@ -5,14 +5,13 @@ use facet::{Attr, Facet, Field, Partial, Shape};
 use crate::ReaderError;
 
 #[derive(Debug)]
-#[expect(dead_code, reason = "WIP")]
 pub(super) enum StackItem {
     Item(DeserializeDesc),
     Fields(usize, &'static [Field], bool),
 
-    Seq(Option<usize>, bool, bool),
-    Map(Option<usize>, bool, bool, bool),
-    Set(Option<usize>, bool, bool),
+    Seq(usize, bool, bool),
+    Map(usize, bool, bool, bool),
+    Set(usize, bool, bool),
 
     Other(DeserializeDesc),
 }
@@ -32,15 +31,15 @@ pub enum Item<'facet, const BORROW: bool> {
 #[derive(Debug, Clone)]
 pub struct DeserializeDesc {
     variable: bool,
-    field_attr: Option<&'static [Attr]>,
+    field: Option<&'static Field>,
 }
 
 impl DeserializeDesc {
     /// Create a new [`DeserializeDesc`].
     #[inline]
     #[must_use]
-    pub const fn new(variable: bool, field_attr: Option<&'static [Attr]>) -> Self {
-        Self { variable, field_attr }
+    pub const fn new(variable: bool, field: Option<&'static Field>) -> Self {
+        Self { variable, field }
     }
 
     /// Returns `true` if this [`DeserializeDesc`] is variable-length.
@@ -52,11 +51,17 @@ impl DeserializeDesc {
     #[inline]
     pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
 
-    /// Get the [`Attr`]s of the field this [`DeserializeDesc`] came from, if
-    /// any.
+    /// Get the [`Field`] this [`DeserializeDesc`] came from, if any.
     #[inline]
     #[must_use]
-    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
+    pub const fn field(&self) -> Option<&'static Field> { self.field }
+
+    /// Get the [`Field`] [`Attr`]s of this [`DeserializeDesc`], if any.
+    #[inline]
+    #[must_use]
+    pub const fn field_attr(&self) -> Option<&'static [Attr]> {
+        if let Some(field) = self.field { Some(field.attributes) } else { None }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -100,18 +105,17 @@ impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
     #[must_use]
     pub fn shape_attr(&self) -> &'static [Attr] { self.partial.shape().attributes }
 
-    /// Get the [`Attr`]s of the field this [`DeserializeItem`] came from, if
-    /// any.
+    /// Get the [`Field`] [`Attr`]s of the [`DeserializeItem`], if any.
     #[inline]
     #[must_use]
-    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.desc.field_attr }
+    pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.desc.field_attr() }
 
-    /// Set the [`Field`] [`Attr`]s of this [`DeserializeItem`].
+    /// Set the [`Field`] of this [`DeserializeItem`].
     #[inline]
     #[must_use]
-    pub const fn with_field(mut self, field: Option<Field>) -> Self {
+    pub const fn with_field(mut self, field: Option<&'static Field>) -> Self {
         if let Some(field) = field {
-            self.desc.field_attr = Some(field.attributes);
+            self.desc.field = Some(field);
         }
         self
     }

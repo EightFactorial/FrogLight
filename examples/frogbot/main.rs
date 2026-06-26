@@ -7,6 +7,7 @@ use bevy::{ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on};
 use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
+        api::api::ClientApi,
         network::{
             bevy::ClientDespawn,
             connection::FuturesLite,
@@ -68,6 +69,7 @@ impl BotPlugin {
         };
 
         // Prepare the connection and player profile.
+        let api = ClientApi::mojang(); // TODO: Change to `offline`
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
         let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(
             stream,
@@ -85,7 +87,7 @@ impl BotPlugin {
         let login = LoginHelloContent::new_from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
-        let mut entity = world.spawn((connection, profile));
+        let mut entity = world.spawn((api, profile, connection));
         entity.observe(BotPlugin::exit_on_despawn);
 
         // Send the handshake and login events.
@@ -756,9 +758,11 @@ impl BotPlugin {
                             profile.username(),
                             profile.uuid().as_hyphenated()
                         );
+
                         commands
                             .entity(bot.entity())
                             .insert((profile.username().clone(), profile.clone()));
+
                         writer.write(ServerboundMessage::new(
                             bot.id(),
                             ServerboundLoginEvent::AcknowledgeLogin,

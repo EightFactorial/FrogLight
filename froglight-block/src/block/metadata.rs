@@ -1,7 +1,4 @@
-use core::{
-    any::TypeId,
-    fmt::{Debug, Display, Formatter},
-};
+use core::{any::TypeId, fmt};
 
 use froglight_common::identifier::Identifier;
 
@@ -51,14 +48,13 @@ impl BlockMetadata {
         identifier: Identifier<'static>,
         base_id: u32,
         default_state: u16,
-        behavior: BlockBehavior,
     ) -> Self {
         assert!(default_state < B::Attributes::TOTAL, "Default StateId is out of range!");
 
         BlockMetadata {
             identifier,
             base_id: MaybeAtomicU32::new(base_id),
-            behavior,
+            behavior: BlockBehavior::new::<B, V>(),
 
             state_count: B::Attributes::TOTAL,
             state_default: MaybeAtomicU16::new(default_state),
@@ -160,7 +156,7 @@ impl BlockMetadata {
     /// Blocks with no attributes have a state count of `1`.
     #[inline]
     #[must_use]
-    pub fn state_count(&self) -> u16 { self.state_count }
+    pub const fn state_count(&self) -> u16 { self.state_count }
 
     /// Get the value of an attribute for a given state.
     #[must_use]
@@ -249,12 +245,12 @@ impl BlockMetadata {
     pub const fn version_ty(&self) -> TypeId { self.version_ty }
 }
 
-impl Display for BlockMetadata {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result { write!(f, "{}", self.identifier) }
+impl fmt::Display for BlockMetadata {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.identifier) }
 }
 
-impl Debug for BlockMetadata {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+impl fmt::Debug for BlockMetadata {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BlockMetadata")
             .field("identifier", &self.identifier)
             .field("base", &self.base_id)

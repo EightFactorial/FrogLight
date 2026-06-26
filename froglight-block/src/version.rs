@@ -10,7 +10,7 @@ use crate::storage::GlobalBlockStorage;
 pub trait BlockVersion: Version {
     /// The [`GlobalBlockStorage`] for this [`Version`].
     #[cfg(feature = "std")]
-    const BLOCKS: &'static std::sync::LazyLock<GlobalBlockStorage>;
+    const BLOCKS: &'static crate::storage::LazyLock<GlobalBlockStorage>;
 
     /// Get the [`GlobalBlockStorage`] for this [`Version`].
     #[inline]

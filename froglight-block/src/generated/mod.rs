@@ -120,8 +120,7 @@ macro_rules! generate {
                     static METADATA: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
-                        $default,
-                        $crate::block::BlockBehavior::new::<$ident, $version>(),
+                        $default
                     ) };
                     &METADATA
                 };

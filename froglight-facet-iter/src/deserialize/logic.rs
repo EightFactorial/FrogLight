@@ -1,6 +1,6 @@
 //! TODO
 
-use facet::{Def, Partial, Type, UserType};
+use facet::{Def, KnownPointer, Partial, SequenceType, Type, UserType};
 use smallvec::SmallVec;
 
 use crate::{
@@ -176,14 +176,14 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                         continue;
                     };
 
-                    // Update `variable` using the field's attributes.
-                    let variable = variable_base | field.has_attr(Some("mc"), "variable");
-
                     // Push the remaining fields to the stack.
                     self.stack.push(StackItem::Fields(len, fields, variable_base));
 
+                    // Update `variable` using the field's attributes.
+                    let variable = variable_base | field.has_attr(Some("mc"), "variable");
+
                     // Push the current field to the stack.
-                    let desc = DeserializeDesc::new(variable, Some(field.attributes));
+                    let desc = DeserializeDesc::new(variable, Some(field));
                     self.stack.push(StackItem::Other(desc));
 
                     // Begin the current field.
@@ -191,34 +191,20 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 }
 
                 StackItem::Seq(len, end_prev, variable) => {
-                    let len = if let Some(len) = len {
-                        len
-                    } else {
-                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        self.partial = self.partial.init_list_with_capacity(len as usize)?;
-                        len as usize
-                    };
-
                     if end_prev {
                         self.partial = self.partial.end()?;
                     }
 
                     if len != 0 {
-                        self.stack.push(StackItem::Seq(Some(len - 1), true, variable));
+                        // Get the next item in the sequence.
+
+                        self.stack.push(StackItem::Seq(len - 1, true, variable));
                         self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
                         self.partial = self.partial.begin_list_item()?;
                     }
                 }
 
                 StackItem::Map(len, end_prev, is_value, variable) => {
-                    let len = if let Some(len) = len {
-                        len
-                    } else {
-                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        self.partial = self.partial.init_map()?;
-                        len as usize
-                    };
-
                     if end_prev {
                         self.partial = self.partial.end()?;
                     }
@@ -227,39 +213,36 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                         if is_value {
                             // `true` means the next item is a value
 
-                            self.stack.push(StackItem::Map(Some(len - 1), true, true, variable));
+                            self.stack.push(StackItem::Map(len - 1, true, true, variable));
                             self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
                             self.partial = self.partial.begin_value()?;
                         } else {
                             // `false` means the next item is a key
 
-                            self.stack.push(StackItem::Map(Some(len), true, false, variable));
+                            self.stack.push(StackItem::Map(len, true, false, variable));
                             self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
                             self.partial = self.partial.begin_key()?;
                         }
                     }
                 }
                 StackItem::Set(len, end_prev, variable) => {
-                    let len = if let Some(len) = len {
-                        len
-                    } else {
-                        let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                        self.partial = self.partial.init_set()?;
-                        len as usize
-                    };
-
                     if end_prev {
                         self.partial = self.partial.end()?;
                     }
 
                     if len != 0 {
-                        self.stack.push(StackItem::Set(Some(len - 1), true, variable));
+                        // Get the next item in the set.
+
+                        self.stack.push(StackItem::Set(len - 1, true, variable));
                         self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
                         self.partial = self.partial.begin_set_item()?;
                     }
                 }
 
                 StackItem::Other(desc) => {
+                    #[cfg(feature = "tracing_ext")]
+                    tracing::trace!(target: "froglight_facet_iter::deserialize", "Looking at `{}`", self.partial.shape());
+
                     self = self.handle_other(desc, core)?;
                 }
             }
@@ -346,21 +329,85 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 Ok(self)
             }
 
-            Def::Map(..) => todo!(),
-            Def::Set(..) => todo!(),
+            Def::Map(..) => {
+                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                self.partial = self.partial.init_map()?;
 
-            Def::List(..) | Def::Slice(..) => todo!(),
-            Def::Array(..) => todo!(),
+                self.stack.push(StackItem::Map(len as usize, false, false, desc.is_variable()));
+                Ok(self)
+            }
+            Def::Set(..) => {
+                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                self.partial = self.partial.init_set()?;
+
+                self.stack.push(StackItem::Set(len as usize, false, desc.is_variable()));
+                Ok(self)
+            }
+
+            Def::List(..) | Def::Slice(..) => {
+                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
+                self.partial = self.partial.init_list_with_capacity(len as usize)?;
+
+                self.stack.push(StackItem::Seq(len as usize, false, desc.is_variable()));
+                Ok(self)
+            }
+            Def::Array(def) => {
+                self.partial = self.partial.init_array()?;
+
+                self.stack.push(StackItem::Seq(def.n, false, desc.is_variable()));
+                Ok(self)
+            }
 
             Def::NdArray(..) => todo!(),
 
-            Def::Option(..) => todo!(),
-            Def::Result(..) => todo!(),
+            Def::Option(..) => {
+                let Item::Size(variant) = (core)(Item::Size(0))? else { todo!() };
 
-            // Fallback to `Type` for undefined types.
-            Def::Undefined => self.handle_type(desc, core),
+                match variant {
+                    0 => {
+                        // Set `None`
+                        self.partial = self.partial.set_default()?;
+                        Ok(self)
+                    }
+                    1 => {
+                        // Begin `Some`
+                        self.partial = self.partial.begin_some()?;
+                        self.stack.push(StackItem::Other(desc));
+                        Ok(self)
+                    }
+                    _ => todo!("Invalid ID `{variant}` for `Option`"),
+                }
+            }
+            Def::Result(..) => {
+                let Item::Size(variant) = (core)(Item::Size(0))? else { todo!() };
 
-            _ => todo!("Unsupported type `{}`", self.partial.shape()),
+                match variant {
+                    0 => {
+                        // Begin `Ok`
+                        self.partial = self.partial.begin_ok()?;
+                        self.stack.push(StackItem::Other(desc));
+                        Ok(self)
+                    }
+                    1 => {
+                        // Begin `Err`
+                        self.partial = self.partial.begin_err()?;
+                        self.stack.push(StackItem::Other(desc));
+                        Ok(self)
+                    }
+                    _ => todo!("Invalid ID `{variant}` for `Result`"),
+                }
+            }
+
+            Def::Pointer(def) if def.constructible_from_pointee() => match def.known {
+                Some(KnownPointer::Cow) => {
+                    self.stack.push(StackItem::Item(desc));
+                    Ok(self)
+                }
+                _ => todo!("\n\nTODO: PointerType {} -> {def:?}\n\n", self.partial.shape()),
+            },
+
+            // Fallback to `Type` for other/undefined types.
+            _ => self.handle_type(desc, core),
         }
     }
 
@@ -378,7 +425,11 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 Ok(self)
             }
 
-            Type::Sequence(..) => todo!(),
+            // Type::Sequence(SequenceType::Slice(..)) => {}
+            Type::Sequence(SequenceType::Array(ty)) => {
+                self.stack.push(StackItem::Seq(ty.n, false, desc.is_variable()));
+                Ok(self)
+            }
 
             Type::User(UserType::Struct(ty)) => {
                 // Determine whether the struct should pass the variable flag to its fields.

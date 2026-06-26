@@ -38,7 +38,8 @@ pub use mojang::Mojang;
 pub struct ClientApi(Arc<dyn NetworkApi>);
 
 impl Default for ClientApi {
-    fn default() -> Self { Self::new(Mojang) }
+    #[inline]
+    fn default() -> Self { Self::mojang() }
 }
 
 impl ClientApi {
@@ -46,6 +47,13 @@ impl ClientApi {
     #[inline]
     #[must_use]
     pub fn new<T: NetworkApi>(agent: T) -> Self { Self::new_arc(Arc::new(agent)) }
+
+    /// Creates a new [`ClientApi`] using the [`Mojang`] API.
+    ///
+    /// This is also the default.
+    #[inline]
+    #[must_use]
+    pub fn mojang() -> Self { Self::new(Mojang) }
 
     /// Creates a new [`ClientApi`] from an [`Arc<dyn NetworkApi>`].
     #[inline]
