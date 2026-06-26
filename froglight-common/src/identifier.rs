@@ -4,13 +4,12 @@
     reason = "Allowed, as while important, it does not cause undefined behavior"
 )]
 
-#[cfg(feature = "alloc")]
-use alloc::borrow::Cow;
+use alloc::{borrow::Cow, string::String};
 use core::{
     borrow::Borrow,
     cmp::Ordering,
     error::Error,
-    fmt::{self, Debug, Display},
+    fmt::{self},
     hash::{Hash, Hasher},
     ops::Deref,
 };
@@ -25,7 +24,6 @@ use serde::{Deserialize, Serialize};
 /// An identifier.
 #[repr(transparent)]
 #[derive(Clone)]
-#[cfg(feature = "alloc")]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet))]
@@ -34,20 +32,6 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Identifier<'a> {
     inner: Cow<'a, str>,
-}
-
-/// An identifier.
-#[repr(transparent)]
-#[derive(Clone)]
-#[cfg(not(feature = "alloc"))]
-#[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-#[cfg_attr(feature = "facet", derive(Facet))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
-pub struct Identifier<'a> {
-    inner: &'a str,
 }
 
 impl Identifier<'_> {
@@ -61,14 +45,7 @@ impl Identifier<'_> {
     /// This will panic if the string is not a valid identifier.
     #[must_use]
     pub const fn new_static(s: &'static str) -> Identifier<'static> {
-        #[cfg(feature = "alloc")]
-        {
-            Identifier { inner: Cow::Borrowed(s) }
-        }
-        #[cfg(not(feature = "alloc"))]
-        {
-            Identifier { inner: s }
-        }
+        Identifier { inner: Cow::Borrowed(s) }
     }
 
     /// Try to create a new [`Identifier`] from a string slice.
@@ -87,16 +64,10 @@ impl Identifier<'_> {
                 // SAFETY: We just checked that `s` is valid.
                 Ok(unsafe { Self::new_unchecked(s.as_ref()) })
             }
-            #[cfg(feature = "alloc")]
             Err(IdentifierError::RequiresNamespace) => {
-                // SAFETY: We know that `s` is not empty, so we can prepend a namespace.
-                Ok(unsafe {
-                    Self::new_owned_unchecked(alloc::format!(
-                        "{}:{}",
-                        Self::DEFAULT_NAMESPACE,
-                        s.as_ref()
-                    ))
-                })
+                // SAFETY: We know that `s` is valid besides the missing namespace.
+                let appended = alloc::format!("{}:{}", Self::DEFAULT_NAMESPACE, s.as_ref());
+                Ok(unsafe { Self::new_owned_unchecked(appended) })
             }
             Err(err) => Err(err),
         }
@@ -112,7 +83,6 @@ impl Identifier<'_> {
     /// # Errors
     ///
     /// Returns an error if the string is not a valid identifier.
-    #[cfg(feature = "alloc")]
     pub fn try_new_owned<T: AsRef<str> + ?Sized>(
         s: &T,
     ) -> Result<Identifier<'static>, IdentifierError> {
@@ -130,8 +100,7 @@ impl Identifier<'_> {
     /// # Errors
     ///
     /// Returns an error if the string is not a valid identifier.
-    #[cfg(feature = "alloc")]
-    pub fn try_new_string(s: alloc::string::String) -> Result<Self, IdentifierError> {
+    pub fn try_new_string(s: String) -> Result<Self, IdentifierError> {
         match Self::validate_string(s.as_str()) {
             Ok(()) => {
                 // SAFETY: We just checked that `s` is valid.
@@ -149,7 +118,6 @@ impl Identifier<'_> {
 
     /// Convert this [`Identifier`] into an owned version.
     #[must_use]
-    #[cfg(feature = "alloc")]
     pub fn into_owned(self) -> Identifier<'static> {
         Identifier { inner: Cow::Owned(self.inner.into_owned()) }
     }
@@ -205,32 +173,18 @@ impl Identifier<'_> {
     /// cloning.
     #[must_use]
     pub const fn reborrow(&self) -> Identifier<'_> {
-        #[cfg(feature = "alloc")]
-        {
-            match &self.inner {
-                Cow::Borrowed(s) => Identifier { inner: Cow::Borrowed(s) },
-                Cow::Owned(s) => Identifier { inner: Cow::Borrowed(s.as_str()) },
-            }
-        }
-        #[cfg(not(feature = "alloc"))]
-        {
-            Identifier { inner: self.inner }
+        match &self.inner {
+            Cow::Borrowed(s) => Identifier { inner: Cow::Borrowed(s) },
+            Cow::Owned(s) => Identifier { inner: Cow::Borrowed(s.as_str()) },
         }
     }
 
     /// Get the content of this [`Identifier`] as a string slice.
     #[must_use]
     pub const fn as_str(&self) -> &str {
-        #[cfg(feature = "alloc")]
-        {
-            match &self.inner {
-                Cow::Borrowed(s) => s,
-                Cow::Owned(s) => s.as_str(),
-            }
-        }
-        #[cfg(not(feature = "alloc"))]
-        {
-            self.inner
+        match &self.inner {
+            Cow::Borrowed(s) => s,
+            Cow::Owned(s) => s.as_str(),
         }
     }
 
@@ -265,14 +219,7 @@ impl Identifier<'_> {
     #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(s: &str) -> Identifier<'_> {
-        #[cfg(feature = "alloc")]
-        {
-            Identifier { inner: Cow::Borrowed(s) }
-        }
-        #[cfg(not(feature = "alloc"))]
-        {
-            Identifier { inner: s }
-        }
+        Identifier { inner: Cow::Borrowed(s) }
     }
 
     /// Create a new owned [`Identifier`] without checking its validity.
@@ -282,8 +229,7 @@ impl Identifier<'_> {
     /// The caller must ensure that the provided string is a valid identifier.
     #[inline]
     #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const unsafe fn new_owned_unchecked(s: alloc::string::String) -> Identifier<'static> {
+    pub const unsafe fn new_owned_unchecked(s: String) -> Identifier<'static> {
         Identifier { inner: Cow::Owned(s) }
     }
 }
@@ -302,11 +248,11 @@ impl Deref for Identifier<'_> {
     fn deref(&self) -> &Self::Target { self.as_str() }
 }
 
-impl Display for Identifier<'_> {
+impl fmt::Display for Identifier<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_str(self.as_str()) }
 }
 
-impl Debug for Identifier<'_> {
+impl fmt::Debug for Identifier<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Identifier").field(&self.as_str()).finish()
     }
@@ -354,11 +300,11 @@ pub enum IdentifierError {
     Invalid,
 }
 
-impl Display for IdentifierError {
+impl fmt::Display for IdentifierError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result { todo!() }
 }
 
-impl Debug for IdentifierError {
+impl fmt::Debug for IdentifierError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result { todo!() }
 }
 

@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-common = { features = ["aabb"], workspace = true }
+froglight-common = { workspace = true }
 glam = { workspace = true }
 variadics_please = { workspace = true }
 
@@ -39,12 +39,12 @@ atomic = []
 tracing = ["dep:tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["froglight-common/libm", "glam/nostd-libm"]
+libm = ["glam/nostd-libm"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["dep:once_cell"]
 
 # Enable support for a global allocator
-alloc = ["froglight-common/alloc"]
+alloc = []
 # Enable support for the standard library
 std = ["alloc", "dep:arc-swap", "froglight-common/std", "glam/std"]
 # Enable optimizations using the nightly toolchain

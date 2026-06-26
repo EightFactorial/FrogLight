@@ -1,6 +1,6 @@
 use bevy_ecs::{component::Component, entity::Entity};
 use bevy_reflect::TypePath;
-use froglight_common::prelude::{EntityId, EntityUuid};
+use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::ChunkPos;
 use hashbrown::hash_map::Iter;
 

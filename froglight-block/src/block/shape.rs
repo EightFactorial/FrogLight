@@ -2,31 +2,38 @@
 use alloc::{borrow::Cow, vec};
 use core::ops::Add;
 
-use froglight_common::aabb::{DCommonAabb, EPSILON_F64};
 use glam::DVec3;
 
-/// The shape of a block.
-///
-/// Defined as zero or more [`CommonDAabb`]s.
+/// Using larger epsilon to match original behavior.
+const EPSILON_F64: f64 = 1e-7;
+
+/// The shape of a block, defined as zero or more [`BlockAabb`]s.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BlockShape<'a> {
     /// An empty block shape with no AABBs.
     None,
     /// A block shape with a single AABB.
-    Single(DCommonAabb),
+    Single(BlockAabb),
     /// A block shape with multiple AABBs.
     #[cfg(not(feature = "alloc"))]
-    Collection(&'a [DCommonAabb]),
+    Collection(&'a [BlockAabb]),
     /// A block shape with multiple AABBs.
     #[cfg(feature = "alloc")]
-    Collection(Cow<'a, [DCommonAabb]>),
+    Collection(Cow<'a, [BlockAabb]>),
+}
+
+/// A block's axis-aligned bounding box (AABB).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BlockAabb {
+    pub min: DVec3,
+    pub max: DVec3,
 }
 
 impl BlockShape<'_> {
     /// An empty block.
     pub const EMPTY: Self = BlockShape::None;
     /// A full block.
-    pub const FULL: Self = BlockShape::Single(DCommonAabb::ONE);
+    pub const FULL: Self = BlockShape::Single(BlockAabb { min: DVec3::ZERO, max: DVec3::ONE });
 
     /// Creates a new [`BlockShape`] from the given minimum and maximum
     /// coordinates.
@@ -38,7 +45,7 @@ impl BlockShape<'_> {
         {
             BlockShape::None
         } else {
-            BlockShape::Single(DCommonAabb::new(min, max))
+            BlockShape::Single(BlockAabb { min, max })
         }
     }
 
@@ -66,7 +73,10 @@ impl BlockShape<'_> {
         {
             BlockShape::None
         } else {
-            BlockShape::Single(DCommonAabb::new_corners(b, a))
+            BlockShape::Single(BlockAabb {
+                min: DVec3::new(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z)),
+                max: DVec3::new(a.x.max(b.x), a.y.max(b.y), a.z.max(b.z)),
+            })
         }
     }
 
@@ -80,7 +90,7 @@ impl BlockShape<'_> {
         {
             BlockShape::None
         } else {
-            BlockShape::Single(DCommonAabb::new_corners(b, a))
+            BlockShape::Single(BlockAabb::new_corners(b, a))
         }
     }
 
@@ -90,9 +100,18 @@ impl BlockShape<'_> {
     pub const fn contains(&self, point: DVec3) -> bool {
         let mut index = 0;
         while index < self.as_slice().len() {
-            if self.as_slice()[index].contains(point) {
+            let aabb = self.as_slice()[index];
+
+            if point.x >= aabb.min.x
+                && point.x <= aabb.max.x
+                && point.y >= aabb.min.y
+                && point.y <= aabb.max.y
+                && point.z >= aabb.min.z
+                && point.z <= aabb.max.z
+            {
                 return true;
             }
+
             index += 1;
         }
         false
@@ -103,7 +122,14 @@ impl BlockShape<'_> {
     pub const fn is_empty(&self) -> bool {
         match self {
             BlockShape::None => true,
-            BlockShape::Single(shape) => shape.const_eq(&DCommonAabb::ZERO),
+            BlockShape::Single(shape) => {
+                shape.min.x.abs() < EPSILON_F64
+                    && shape.min.y.abs() < EPSILON_F64
+                    && shape.min.z.abs() < EPSILON_F64
+                    && shape.max.x.abs() < EPSILON_F64
+                    && shape.max.y.abs() < EPSILON_F64
+                    && shape.max.z.abs() < EPSILON_F64
+            }
             #[cfg(not(feature = "alloc"))]
             BlockShape::Collection(slice) => slice.is_empty(),
             #[cfg(feature = "alloc")]
@@ -115,7 +141,7 @@ impl BlockShape<'_> {
 
     /// Returns the block's [`CommonDAabb`]s as a slice.
     #[must_use]
-    pub const fn as_slice(&self) -> &[DCommonAabb] {
+    pub const fn as_slice(&self) -> &[BlockAabb] {
         match self {
             BlockShape::None => &[],
             BlockShape::Single(aabb) => core::slice::from_ref(aabb),

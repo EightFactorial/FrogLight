@@ -3,7 +3,8 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use facet::Facet;
-use froglight_common::{entity::EntityId, prelude::Identifier};
+use froglight_common::prelude::Identifier;
+use froglight_entity::prelude::EntityId;
 use froglight_packet::common::{
     chunk_data::ChunkData,
     client_information::ClientInformation,

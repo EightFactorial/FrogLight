@@ -1,10 +1,12 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
-use froglight_common::{entity::EntityUuid, prelude::EntityId};
-use froglight_entity::entity::EntityDataSet;
 #[cfg(feature = "std")]
 use froglight_entity::{entity::DataSetSerializer, prelude::EntityVersion};
+use froglight_entity::{
+    entity::EntityDataSet,
+    prelude::{EntityId, EntityUuid},
+};
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
 use froglight_facet::deserialize::DeserializeError;

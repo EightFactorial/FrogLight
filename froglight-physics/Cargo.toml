@@ -21,7 +21,7 @@ workspace = true
 [dependencies]
 bitflags = { workspace = true }
 froglight-block = { workspace = true }
-froglight-common = { features = ["aabb"], workspace = true }
+froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
 froglight-math = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
@@ -50,12 +50,12 @@ bevy = ["alloc", "dep:arc-swap", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_tasks
 serde = ["dep:serde", "froglight-common/serde", "glam/serde"]
 
 # Enable `libm` for `no_std` support.
-libm = ["bevy_transform?/libm", "dep:libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
+libm = ["bevy_transform?/libm", "dep:libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing"]
+tracing = ["dep:tracing", "froglight-block/tracing", "froglight-entity/tracing"]
 
 # Enable support for a global allocator
-alloc = ["froglight-common/alloc", "serde?/alloc"]
+alloc = ["serde?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bevy_transform?/std", "bitflags/std", "dep:quick_cache", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-math/std", "froglight-world/std", "glam/std", "serde?/std"]
 # Enable optimizations using the nightly toolchain

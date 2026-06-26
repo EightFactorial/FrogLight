@@ -22,7 +22,7 @@ workspace = true
 foldhash = { workspace = true }
 froglight-biome = { workspace = true }
 froglight-block = { workspace = true }
-froglight-common = { features = ["uuid"], workspace = true }
+froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
 froglight-player = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
@@ -51,12 +51,12 @@ facet = ["dep:facet", "froglight-common/facet", "froglight-entity/facet", "dep:f
 # Enable `serde` support.
 serde = ["dep:serde", "froglight-common/serde", "froglight-player/serde", "froglight-world/serde", "indexmap/serde", "uuid/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-player/tracing", "froglight-world/tracing"]
+tracing = ["dep:tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-entity/tracing", "froglight-player/tracing", "froglight-world/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["froglight-facet/tracing", "tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["dep:libm", "froglight-block/libm", "froglight-common/libm", "froglight-entity/libm", "froglight-world/libm", "glam/nostd-libm"]
+libm = ["dep:libm", "froglight-block/libm", "froglight-entity/libm", "froglight-world/libm", "glam/nostd-libm"]
 
 # Enable support for the standard library
 std = ["facet?/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-facet?/std", "froglight-player/std", "froglight-world/std", "indexmap/std", "tracing?/std", "uuid/std"]

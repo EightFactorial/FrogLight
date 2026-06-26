@@ -1,7 +1,7 @@
 //! TODO
 
 use bevy_app::{App, Plugin};
-use froglight_common::prelude::{EntityId, EntityUuid};
+use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::ChunkPos;
 
 use crate::{

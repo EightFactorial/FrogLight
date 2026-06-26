@@ -23,7 +23,7 @@ divan = { workspace = true }
 
 [dependencies]
 bitvec = { workspace = true }
-froglight-common = { features = ["uuid"], workspace = true }
+froglight-common = { workspace = true }
 glam = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
@@ -64,13 +64,13 @@ froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing", "froglight-common/tracing"]
+tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 
 # Enable support for a global allocator
-alloc = ["bitvec/alloc", "froglight-biome?/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
+alloc = ["bitvec/alloc", "froglight-biome?/alloc", "froglight-block?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "dep:arc-swap", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
 # Enable optimizations using the nightly toolchain

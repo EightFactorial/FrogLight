@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-common = { features = ["alloc", "aabb"], workspace = true }
+froglight-common = { workspace = true }
 foldhash = { workspace = true }
 indexmap = { workspace = true }
 md-5 = { features = ["alloc"], workspace = true }

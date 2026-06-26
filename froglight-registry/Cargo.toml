@@ -42,7 +42,7 @@ async = ["dep:async-lock"]
 parking_lot = ["dep:parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["froglight-common/alloc", "dep:indexmap", "dep:foldhash"]
+alloc = ["dep:indexmap", "dep:foldhash"]
 # Enable support for the standard library
 std = ["alloc", "async-lock?/std", "foldhash?/std", "froglight-common/std", "indexmap?/std"]
 # Enable optimizations using the nightly toolchain

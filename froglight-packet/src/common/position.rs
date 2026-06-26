@@ -4,7 +4,7 @@
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Facet;
-use froglight_common::prelude::EntityId;
+use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::{self as mc, facet::template::*};

@@ -42,7 +42,7 @@ tracing = ["dep:tracing", "froglight-block?/tracing"]
 parking_lot = ["dep:parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["froglight-block?/alloc", "froglight-common/alloc"]
+alloc = ["froglight-block?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "dep:arc-swap", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain

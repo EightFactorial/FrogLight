@@ -2,7 +2,7 @@
 //!
 //! @manual packet for "minecraft:set_entity_motion"
 
-use froglight_common::prelude::EntityId;
+use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
 

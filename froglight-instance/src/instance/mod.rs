@@ -3,7 +3,8 @@
 use bevy_ecs::{component::Component, entity::Entity, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 use foldhash::fast::FixedState;
-use froglight_common::prelude::{EntityId, EntityUuid, Identifier};
+use froglight_common::prelude::Identifier;
+use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::ChunkPos;
 use hashbrown::{HashMap, hash_map::Values};
 

@@ -46,8 +46,8 @@ impl Collider {
     #[inline]
     #[must_use]
     pub const fn new_entity(entity: EntityAabb) -> Self {
-        let [min_x, min_y, min_z] = entity.common().min.to_array();
-        let [max_x, max_y, max_z] = entity.common().max.to_array();
+        let [min_x, min_y, min_z] = entity.min.to_array();
+        let [max_x, max_y, max_z] = entity.max.to_array();
         Self::new(Vec3A::new(min_x, min_y, min_z), Vec3A::new(max_x, max_y, max_z))
     }
 

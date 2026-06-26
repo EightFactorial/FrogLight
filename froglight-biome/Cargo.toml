@@ -48,7 +48,7 @@ once_cell = ["dep:once_cell"]
 parking_lot = ["dep:parking_lot", "once_cell?/parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["facet-value?/alloc", "froglight-common/alloc", "once_cell?/alloc"]
+alloc = ["facet-value?/alloc", "once_cell?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "dep:arc-swap", "facet-value?/std", "froglight-common/std", "once_cell?/std"]
 # Enable optimizations using the nightly toolchain

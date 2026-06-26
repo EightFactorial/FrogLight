@@ -1,4 +1,4 @@
-//! TODO
+//! [`Impossible`]
 
 #[cfg(all(feature = "bevy", feature = "serde"))]
 use bevy_reflect::{ReflectDeserialize, ReflectSerialize};

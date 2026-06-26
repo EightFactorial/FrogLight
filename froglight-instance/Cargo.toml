@@ -25,7 +25,7 @@ bevy_reflect = { features = ["hashbrown"], workspace = true }
 foldhash = { workspace = true }
 froglight-biome = { features = ["alloc"], workspace = true }
 froglight-block = { features = ["alloc"], workspace = true }
-froglight-common = { features = ["alloc", "bevy"], workspace = true }
+froglight-common = { features = ["bevy"], workspace = true }
 froglight-entity = { features = ["bevy"], workspace = true }
 froglight-world = { features = ["alloc", "bevy", "froglight-biome", "froglight-block"], workspace = true }
 hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true }
@@ -39,7 +39,7 @@ tracing = { workspace = true, optional = true }
 default = ["std"]
 
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-world/tracing"]
+tracing = ["dep:tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-entity/tracing", "froglight-world/tracing"]
 
 # Enable support for the standard library
 std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-world/std", "tracing?/std"]

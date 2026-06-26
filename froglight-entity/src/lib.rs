@@ -10,6 +10,7 @@ mod atomic;
 pub mod bevy;
 pub mod entity;
 pub mod generated;
+pub mod id;
 pub mod storage;
 pub mod types;
 pub mod version;
@@ -23,6 +24,7 @@ pub mod prelude {
             component as entity_data,
             entity::{self, VanillaEntity},
         },
+        id::{EntityId, EntityUuid},
         version::EntityVersion,
     };
 }
