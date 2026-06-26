@@ -13,6 +13,8 @@ pub mod modules {
     pub use froglight_common as common;
     pub use froglight_entity as entity;
     pub use froglight_facet as facet;
+    #[cfg(feature = "bevy")]
+    pub use froglight_instance as instance;
     pub use froglight_inventory as inventory;
     pub use froglight_math as math;
     pub use froglight_mutf8 as mutf8;
@@ -43,5 +45,8 @@ pub mod prelude {
         snbt::prelude::*, text::prelude::*, world::prelude::*,
     };
     #[cfg(feature = "bevy")]
-    pub use crate::{bevy::plugins::FroglightPlugins, modules::brigadier::prelude::*};
+    pub use crate::{
+        bevy::plugins::FroglightPlugins,
+        modules::{brigadier::prelude::*, instance::prelude::*},
+    };
 }

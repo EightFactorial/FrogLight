@@ -1,0 +1,72 @@
+//! TODO
+
+use bevy_ecs::{component::Component, entity::Entity, reflect::ReflectComponent};
+use bevy_reflect::Reflect;
+use foldhash::fast::FixedState;
+use froglight_common::prelude::{EntityId, EntityUuid, Identifier};
+use froglight_world::prelude::ChunkPos;
+use hashbrown::{HashMap, hash_map::Values};
+
+pub(crate) mod data;
+pub(crate) mod hook;
+pub(crate) mod reflect;
+
+/// An instance of a session.
+///
+/// Tracks information about which entities belong to the session and more.
+#[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
+#[reflect(opaque, Debug, Clone, PartialEq, Component)]
+pub struct SessionInstance {
+    world: Identifier<'static>,
+
+    entity_id: HashMap<EntityId, Entity, FixedState>,
+    entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
+    chunk_pos: HashMap<ChunkPos, Entity, FixedState>,
+}
+
+impl SessionInstance {
+    /// Create a new, empty [`SessionInstance`].
+    #[must_use]
+    pub const fn new(world: Identifier<'static>) -> Self {
+        let bytes = world.as_str().as_bytes();
+        let mut seed_a = Self::create_seed(0, bytes);
+        let mut seed_b = Self::create_seed(2, bytes);
+        let mut seed_c = Self::create_seed(4, bytes);
+
+        // Fiddle with the seeds a bit.
+        seed_a ^= seed_b.rotate_left(8);
+        seed_b ^= seed_a.rotate_left(18);
+        seed_c ^= seed_b.rotate_left(32);
+
+        Self {
+            world,
+            entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
+            entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
+            chunk_pos: HashMap::with_hasher(FixedState::with_seed(seed_c)),
+        }
+    }
+
+    /// Create a [`u64`] seed from `bytes[index..index+8]`.
+    #[must_use]
+    const fn create_seed(mut index: usize, bytes: &[u8]) -> u64 {
+        let max = index + 8;
+        let mut array = [0u8; 8];
+
+        while index < max && index < bytes.len() {
+            array[index] = bytes[index];
+            index += 1;
+        }
+
+        u64::from_le_bytes(array)
+    }
+
+    /// Get the [`Identifier`] of the [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub const fn identifier(&self) -> &Identifier<'static> { &self.world }
+
+    /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub fn iter_entity(&self) -> Values<'_, EntityId, Entity> { self.entity_id.values() }
+}

@@ -18,11 +18,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "bevy")]
-    pub use crate::bevy::{
-        instance::WorldInstance,
-        query::{InInstance, Instance, OnInstance},
-        relationship::EntityOfInstance,
-    };
+    pub use crate::bevy::{instance::WorldInstance, relationship::EntityOfInstance};
     #[cfg(feature = "uuid")]
     pub use crate::entity::{EntityId, EntityUuid};
     pub use crate::{identifier::Identifier, version::*};
