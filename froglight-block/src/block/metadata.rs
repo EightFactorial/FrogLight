@@ -3,8 +3,8 @@ use core::{any::TypeId, fmt};
 use froglight_common::identifier::Identifier;
 
 use crate::{
-    atomic::{MaybeAtomicU16, MaybeAtomicU32},
-    block::{BlockAttribute, BlockAttributes, BlockBehavior, BlockType, GlobalId, StateId},
+    block::{BlockAttribute, BlockAttributes, BlockBehavior, BlockType},
+    state::{GlobalId, StateId},
     version::BlockVersion,
 };
 
@@ -13,14 +13,14 @@ pub struct BlockMetadata {
     /// The string identifier of the block.
     identifier: Identifier<'static>,
     /// The lowest [`GlobalId`] assigned to this block.
-    base_id: MaybeAtomicU32,
+    base_id: u32,
     /// The behavior of this block.
     behavior: BlockBehavior,
 
     /// The number of states for this block.
     state_count: u16,
     /// The default [`StateId`] for this block.
-    state_default: MaybeAtomicU16,
+    state_default: u16,
 
     attr_data: &'static [(&'static str, TypeId)],
     get_attr_fn: fn(state: usize, attr: &str) -> Option<&'static str>,
@@ -47,17 +47,17 @@ impl BlockMetadata {
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
         identifier: Identifier<'static>,
         base_id: u32,
-        default_state: u16,
+        state_default: u16,
     ) -> Self {
-        assert!(default_state < B::Attributes::TOTAL, "Default StateId is out of range!");
+        assert!(state_default < B::Attributes::TOTAL, "Default StateId is out of range!");
 
         BlockMetadata {
             identifier,
-            base_id: MaybeAtomicU32::new(base_id),
+            base_id,
             behavior: BlockBehavior::new::<B, V>(),
 
             state_count: B::Attributes::TOTAL,
-            state_default: MaybeAtomicU16::new(default_state),
+            state_default,
 
             attr_data: B::ATTRDATA,
             get_attr_fn: |state, name| {
@@ -117,35 +117,16 @@ impl BlockMetadata {
     ///
     /// This is not equivalent to the block's default state!
     #[must_use]
-    pub fn base_id(&self) -> GlobalId { GlobalId::new(self.base_id.get()) }
-
-    /// Set the base [`GlobalId`] of this block.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the new id matches the indices in the
-    /// [`BlockStorage`](crate::storage::BlockStorage) it is used in.
-    #[cfg(feature = "atomic")]
-    pub unsafe fn set_base_id(&self, id: GlobalId) { self.base_id.set_atomic(id.into_inner()) }
+    pub fn base_id(&self) -> GlobalId { GlobalId::new(self.base_id) }
 
     /// Get the default [`StateId`] for this block.
     #[must_use]
-    pub fn state_default(&self) -> StateId { StateId::new(self.state_default.get()) }
-
-    /// Set the default [`StateId`] of this block.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the state is valid for this block.
-    #[cfg(feature = "atomic")]
-    pub unsafe fn set_state_default(&self, state: StateId) {
-        self.state_default.set_atomic(state.into_inner());
-    }
+    pub fn state_default(&self) -> StateId { StateId::new(self.state_default) }
 
     /// Get the default [`GlobalId`] of this block.
     #[must_use]
     pub fn default_id(&self) -> GlobalId {
-        GlobalId::new(self.base_id.get() + u32::from(self.state_default.get()))
+        GlobalId::new(self.base_id + u32::from(self.state_default))
     }
 
     /// Get the number of [`StateId`]s for this block.

@@ -55,7 +55,7 @@ bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:froglight-brigadier", "dep:frogligh
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "std"]
 # Enable `tracing` support.
-tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-brigadier?/tracing", "froglight-entity/tracing", "froglight-facet/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-text/tracing", "froglight-world/tracing"]
+tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-brigadier?/tracing", "froglight-entity/tracing", "froglight-facet/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-text/tracing", "froglight-world/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["bevy_app?/trace", "bevy_ecs?/debug", "bevy_ecs?/trace", "froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-facet/tracing_ext", "froglight-nbt/tracing_ext", "froglight-network?/tracing_ext", "froglight-snbt/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
 

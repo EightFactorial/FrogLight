@@ -1,4 +1,3 @@
-#[cfg(feature = "alloc")]
 use alloc::{borrow::Cow, vec};
 use core::ops::Add;
 
@@ -15,10 +14,6 @@ pub enum BlockShape<'a> {
     /// A block shape with a single AABB.
     Single(BlockAabb),
     /// A block shape with multiple AABBs.
-    #[cfg(not(feature = "alloc"))]
-    Collection(&'a [BlockAabb]),
-    /// A block shape with multiple AABBs.
-    #[cfg(feature = "alloc")]
     Collection(Cow<'a, [BlockAabb]>),
 }
 
@@ -130,11 +125,7 @@ impl BlockShape<'_> {
                     && shape.max.y.abs() < EPSILON_F64
                     && shape.max.z.abs() < EPSILON_F64
             }
-            #[cfg(not(feature = "alloc"))]
-            BlockShape::Collection(slice) => slice.is_empty(),
-            #[cfg(feature = "alloc")]
             BlockShape::Collection(Cow::Borrowed(slice)) => slice.is_empty(),
-            #[cfg(feature = "alloc")]
             BlockShape::Collection(Cow::Owned(vec)) => vec.is_empty(),
         }
     }
@@ -145,18 +136,13 @@ impl BlockShape<'_> {
         match self {
             BlockShape::None => &[],
             BlockShape::Single(aabb) => core::slice::from_ref(aabb),
-            #[cfg(not(feature = "alloc"))]
-            BlockShape::Collection(slice) => slice,
-            #[cfg(feature = "alloc")]
             BlockShape::Collection(Cow::Borrowed(slice)) => slice,
-            #[cfg(feature = "alloc")]
             BlockShape::Collection(Cow::Owned(vec)) => vec.as_slice(),
         }
     }
 
     /// Combine this [`BlockShape`] with another.
     #[must_use]
-    #[cfg(feature = "alloc")]
     pub fn with_shape(self, shape: BlockShape<'_>) -> BlockShape<'static> {
         match (self, shape) {
             (aabb, BlockShape::None) | (BlockShape::None, aabb) => aabb.into_owned(),
@@ -179,7 +165,6 @@ impl BlockShape<'_> {
 
     /// Creates an owned [`BlockShape`], cloning data if necessary.
     #[must_use]
-    #[cfg(feature = "alloc")]
     pub fn into_owned(self) -> BlockShape<'static> {
         match self {
             BlockShape::None => BlockShape::None,
@@ -196,7 +181,6 @@ impl Default for BlockShape<'_> {
     fn default() -> Self { Self::FULL }
 }
 
-#[cfg(feature = "alloc")]
 impl Add<BlockShape<'_>> for BlockShape<'_> {
     type Output = BlockShape<'static>;
 

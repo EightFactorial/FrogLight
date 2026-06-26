@@ -34,15 +34,15 @@ tracing = { workspace = true, optional = true }
 default = ["alloc", "std"]
 
 # Enable support for atomics
-atomic = ["froglight-block?/atomic"]
+atomic = []
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block?/tracing"]
+tracing = ["dep:tracing"]
 
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["dep:parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["froglight-block?/alloc"]
+alloc = []
 # Enable support for the standard library
 std = ["alloc", "dep:arc-swap", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain

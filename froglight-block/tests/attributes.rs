@@ -1,17 +1,15 @@
 //! TODO
-#![cfg_attr(not(feature = "std"), no_std)]
 
 use core::any::TypeId;
 
-#[cfg(feature = "std")]
-use froglight_block::block::GlobalId;
 use froglight_block::{
-    block::{BlockAttribute, BlockMetadata, BlockType, StateId},
-    implement_blocks,
+    block::{BlockMetadata, BlockType},
     prelude::*,
+    state::{GlobalId, StateId},
     storage::BlockStorage,
+    version::version_implement,
 };
-use froglight_common::{prelude::Identifier, version::Version};
+use froglight_common::prelude::{Identifier, Version};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct TestVersion;
@@ -96,15 +94,18 @@ impl BlockAttribute for Snowy {
     const STATES: &'static [(&'static str, Self)] = &[("true", Self(true)), ("false", Self(false))];
 }
 
-implement_blocks! {
-    TestVersion => unsafe {
-        BlockStorage::new_static(&[
-            Air::METADATA,
-            Stone::METADATA,
-            Dirt::METADATA,
-            Grass::METADATA,
-            Grass::METADATA,
-        ])
+version_implement! {
+    impl BlockVersion => TestVersion {
+        const BLOCKS: BlockStorage;
+        fn new_blocks() => {
+            BlockStorage::build::<TestVersion>(vec![
+                Air::METADATA,
+                Stone::METADATA,
+                Dirt::METADATA,
+                Grass::METADATA,
+                Grass::METADATA,
+            ])
+        }
     }
 }
 
@@ -125,7 +126,7 @@ fn air() {
 
     #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().load();
+        let global = TestVersion::blocks();
         assert_eq!(global.get_block(GlobalId::new(0)), Some(air));
     }
 
@@ -148,7 +149,7 @@ fn stone() {
 
     #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().load();
+        let global = TestVersion::blocks();
         assert_eq!(global.get_block(GlobalId::new(1)), Some(stone));
     }
 
@@ -171,7 +172,7 @@ fn dirt() {
 
     #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().load();
+        let global = TestVersion::blocks();
         assert_eq!(global.get_block(GlobalId::new(2)), Some(dirt));
     }
 
@@ -230,7 +231,7 @@ fn grass() {
 
     #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().load();
+        let global = TestVersion::blocks();
         assert_eq!(global.get_block(GlobalId::new(4)), Some(grassy));
         assert_eq!(global.get_block(GlobalId::new(3)), Some(snowy));
     }

@@ -24,6 +24,7 @@ froglight-packet = { default-features = false, path = "froglight-packet", versio
 froglight-physics = { default-features = false, path = "froglight-physics", version = "0.0.1" }
 froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
+froglight-registry-template = { default-features = false, path = "froglight-registry-template", version = "0.0.1" }
 froglight-snbt = { default-features = false, path = "froglight-snbt", version = "0.0.1" }
 froglight-text = { default-features = false, path = "froglight-text", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
@@ -40,17 +41,12 @@ bevy_transform = { default-features = false, version = "0.19" }
 bevy_ui = { default-features = false, version = "0.19" }
 
 # Facet Dependencies
-facet = { default-features = false, version = "=0.50.0-rc.2" }
-facet-format = { default-features = false, version = "=0.50.0-rc.2" }
-facet-json = { default-features = false, version = "=0.50.0-rc.2" }
-facet-path = { default-features = false, version = "=0.50.0-rc.2" }
-facet-toml = { default-features = false, version = "=0.50.0-rc.2" }
-facet-value = { default-features = false, version = "=0.50.0-rc.2" }
-
-# # Cranelift Dependencies
-# cranelift = { default-features = false, version = "0.132" }
-# cranelift-jit = { default-features = false, version = "0.132" }
-# cranelift-module = { default-features = false, version = "0.132" }
+facet = { default-features = false, version = "=0.50.0-rc.4" }
+facet-format = { default-features = false, version = "=0.50.0-rc.4" }
+facet-json = { default-features = false, version = "=0.50.0-rc.4" }
+facet-path = { default-features = false, version = "=0.50.0-rc.4" }
+facet-toml = { default-features = false, version = "=0.50.0-rc.4" }
+facet-value = { default-features = false, version = "=0.50.0-rc.4" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.1" }
@@ -153,6 +149,7 @@ members = [
   "froglight-physics",
   "froglight-player",
   "froglight-registry",
+  "froglight-registry-template",
   "froglight-snbt",
   "froglight-text",
   "froglight-world",

@@ -52,7 +52,7 @@ serde = ["dep:serde", "froglight-common/serde", "glam/serde"]
 # Enable `libm` for `no_std` support.
 libm = ["bevy_transform?/libm", "dep:libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block/tracing", "froglight-entity/tracing"]
+tracing = ["dep:tracing", "froglight-entity/tracing"]
 
 # Enable support for a global allocator
 alloc = ["serde?/alloc"]

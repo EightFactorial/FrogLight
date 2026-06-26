@@ -1,0 +1,41 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-registry-template"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+foldhash = { workspace = true, optional = true }
+froglight-common = { workspace = true }
+hazarc = { workspace = true }
+indexmap = { workspace = true }
+
+# Optional dependencies
+once_cell = { features = ["critical-section"], workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["std"]
+
+# Enable `once_cell` for `no_std` support.
+once_cell = ["dep:once_cell"]
+
+# Enable support for the standard library
+std = ["foldhash/std", "froglight-common/std", "hazarc/default-domain", "indexmap/std", "once_cell?/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["foldhash/nightly", "froglight-common/nightly"]

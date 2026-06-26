@@ -2,11 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_block::{
-    block::{BlockType, GlobalId},
-    prelude::*,
-    storage::BlockStorage,
-};
+use froglight_block::{block::BlockType, prelude::*, state::GlobalId, storage::BlockStorage};
 
 use crate::{
     borrowed::{BorrowedChunk, section::BorrowedPalette},
@@ -23,7 +19,7 @@ impl BorrowedChunk<'_> {
     #[must_use]
     #[cfg(feature = "std")]
     pub fn get_block<V: BlockVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.get_block_using::<P>(position, &V::blocks().load())
+        self.get_block_using::<P>(position, &V::blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk,
@@ -52,7 +48,7 @@ impl BorrowedChunk<'_> {
         &self,
         position: P,
     ) -> Option<Block> {
-        self.get_block_pos_using::<P>(position, &V::blocks().load())
+        self.get_block_pos_using::<P>(position, &V::blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk,
@@ -74,7 +70,7 @@ impl BorrowedChunk<'_> {
     #[must_use]
     #[cfg(feature = "std")]
     pub fn contains_block<V: BlockVersion>(&self, block: Block) -> bool {
-        self.contains_block_using(block, &V::blocks().load())
+        self.contains_block_using(block, &V::blocks())
     }
 
     /// Returns `true` if the chunk contains at least one block of the same
@@ -98,7 +94,7 @@ impl BorrowedChunk<'_> {
     #[must_use]
     #[cfg(feature = "std")]
     pub fn contains_block_type<B: BlockType<V>, V: BlockVersion>(&self) -> bool {
-        self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks().load())
+        self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks())
     }
 
     /// Returns `true` if the chunk contains at least one block of the same

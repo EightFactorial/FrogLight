@@ -19,36 +19,27 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+foldhash = { workspace = true }
 froglight-common = { workspace = true }
+froglight-registry-template = { workspace = true }
 glam = { workspace = true }
+indexmap = { workspace = true }
 variadics_please = { workspace = true }
-
-# Optional dependencies
-arc-swap = { workspace = true, optional = true }
-once_cell = { features = ["critical-section"], workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
 
 # --- Features ---
 
 [features]
-default = ["alloc", "std"]
-
-# Enable support for atomics
-atomic = []
-# Enable `tracing` support.
-tracing = ["dep:tracing"]
+default = ["std"]
 
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 # Enable `once_cell` for `no_std` support.
-once_cell = ["dep:once_cell"]
+once_cell = ["froglight-registry-template/once_cell"]
 
-# Enable support for a global allocator
-alloc = []
 # Enable support for the standard library
-std = ["alloc", "dep:arc-swap", "froglight-common/std", "glam/std"]
+std = ["foldhash/std", "froglight-common/std", "froglight-registry-template/std", "glam/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-common/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-registry-template/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

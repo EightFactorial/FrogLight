@@ -111,44 +111,49 @@ macro_rules! generate {
         shape: $shape:tt
     }),*) => {
         $(
+            #[automatically_derived]
             impl $crate::block::BlockType<$version> for $ident {
                 type Attributes = ($($ty,)*);
                 const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[$(
                     ($name, core::any::TypeId::of::<$ty>()),
                 )*];
                 const METADATA: &'static $crate::block::BlockMetadata = {
-                    static METADATA: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
+                    static STATIC: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
                         $default
                     ) };
-                    &METADATA
+                    &STATIC
                 };
 
-                fn is_air(_: $crate::block::StateId) -> bool { $air }
+                fn is_air(_: $crate::state::StateId) -> bool { $air }
 
-                fn is_solid(_: $crate::block::StateId) -> bool { $solid }
+                fn is_solid(_: $crate::state::StateId) -> bool { $solid }
 
-                fn is_liquid(_: $crate::block::StateId) -> bool { $liquid }
+                fn is_liquid(_: $crate::state::StateId) -> bool { $liquid }
 
-                fn has_collision(_: $crate::block::StateId) -> bool { $collision }
+                fn has_collision(_: $crate::state::StateId) -> bool { $collision }
 
-                fn has_occlusion(_: $crate::block::StateId) -> bool { $occlusion }
+                fn has_occlusion(_: $crate::state::StateId) -> bool { $occlusion }
 
                 #[allow(unused, reason = "Automatically generated")]
-                fn shape_of(state: $crate::block::StateId) -> &'static $crate::block::BlockShape<'static> {
+                fn shape_of(state: $crate::state::StateId) -> &'static $crate::block::BlockShape<'static> {
                     $shape
                 }
             }
         )*
     };
     (@version @storage $version:ident, $($ident:ident),*) => {
-        static ARRAY: &'static [&'static $crate::block::BlockMetadata] = &[
-            $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
-        ];
-        $crate::implement_blocks!($version => unsafe {
-            $crate::storage::BlockStorage::new_static(ARRAY)
-        });
+        $crate::version::version_implement! {
+            impl $crate::version::BlockVersion => $version {
+                const BLOCKS: $crate::storage::BlockStorage;
+                fn new_blocks() => {
+                    $crate::storage::BlockStorage::build::<Self>(alloc::vec![
+                        $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
+                    ])
+                }
+            }
+        }
     };
 
     (@shape $( $ident:ident => $tt:tt )*) => {

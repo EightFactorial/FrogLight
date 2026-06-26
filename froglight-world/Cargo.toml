@@ -64,13 +64,13 @@ froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing"]
+tracing = ["dep:tracing", "froglight-biome?/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 
 # Enable support for a global allocator
-alloc = ["bitvec/alloc", "froglight-biome?/alloc", "froglight-block?/alloc"]
+alloc = ["bitvec/alloc", "froglight-biome?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "dep:arc-swap", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
 # Enable optimizations using the nightly toolchain

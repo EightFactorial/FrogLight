@@ -704,7 +704,7 @@ impl BotPlugin {
                         }
 
                         // As an example, trace log the "minecraft:slabs" tag.
-                        let blocks = Version::blocks().load();
+                        let blocks = Version::blocks();
                         let Some(block_reg) = registry.get("minecraft:block") else { continue };
                         let Some(slabs_val) = block_reg.get_by_name("minecraft:slabs") else {
                             continue;

@@ -1,5 +1,6 @@
 //! TODO
 
+use alloc::sync::Arc;
 use core::ops::Range;
 
 #[cfg(feature = "bevy")]
@@ -7,7 +8,7 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use froglight_biome::{biome::Biome, storage::GlobalBiomeStorage, version::BiomeVersion};
-use froglight_block::{block::Block, storage::GlobalBlockStorage, version::BlockVersion};
+use froglight_block::{block::Block, storage::BlockStorage, version::BlockVersion};
 use smallvec::SmallVec;
 
 use super::section::SectionPalette;
@@ -24,7 +25,7 @@ use crate::{
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
 pub struct Chunk {
     biomes: &'static GlobalBiomeStorage,
-    blocks: &'static GlobalBlockStorage,
+    blocks: Arc<BlockStorage>,
     naive: NaiveChunk,
 }
 
@@ -33,7 +34,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn new<V: BiomeVersion + BlockVersion>(naive: NaiveChunk) -> Self {
-        Self { biomes: V::biomes(), blocks: V::blocks(), naive }
+        Self { biomes: V::biomes(), blocks: V::BLOCKS.load_owned(), naive }
     }
 
     /// Create a new [`Chunk`] using the given [`ChunkStorage`].
@@ -42,7 +43,7 @@ impl Chunk {
     pub const fn new_from(
         storage: ChunkStorage,
         biomes: &'static GlobalBiomeStorage,
-        blocks: &'static GlobalBlockStorage,
+        blocks: Arc<BlockStorage>,
     ) -> Self {
         Self { biomes, blocks, naive: NaiveChunk::new(storage) }
     }
@@ -53,7 +54,7 @@ impl Chunk {
     /// or 24 sections (384 blocks) tall with an offset of -64.
     #[must_use]
     pub fn new_empty_large<V: BiomeVersion + BlockVersion>() -> Self {
-        Self::new_from(ChunkStorage::empty_large(), V::biomes(), V::blocks())
+        Self::new_from(ChunkStorage::empty_large(), V::biomes(), V::BLOCKS.load_owned())
     }
 
     /// Create a new empty normal [`Chunk`].
@@ -62,7 +63,7 @@ impl Chunk {
     /// or 16 sections (256 blocks) tall with an offset of 0.
     #[must_use]
     pub fn new_empty_normal<V: BiomeVersion + BlockVersion>() -> Self {
-        Self::new_from(ChunkStorage::empty_normal(), V::biomes(), V::blocks())
+        Self::new_from(ChunkStorage::empty_normal(), V::biomes(), V::BLOCKS.load_owned())
     }
 
     /// Get the [`GlobalBlockStorage`] used by this chunk.
@@ -73,7 +74,7 @@ impl Chunk {
     /// Get the [`GlobalBlockStorage`] used by this chunk.
     #[inline]
     #[must_use]
-    pub const fn blocks(&self) -> &'static GlobalBlockStorage { self.blocks }
+    pub fn blocks(&self) -> &BlockStorage { &self.blocks }
 
     /// Get the inner [`NaiveChunk`] of this chunk.
     #[inline]
@@ -131,7 +132,7 @@ impl Chunk {
     /// or if the block is not recognized.
     #[must_use]
     pub fn get_block<P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_using::<P>(position, &self.blocks().load())
+        self.naive.get_block_using::<P>(position, self.blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk.
@@ -140,7 +141,7 @@ impl Chunk {
     /// or if the block is not recognized.
     #[must_use]
     pub fn get_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_pos_using::<P>(position, &self.blocks().load())
+        self.naive.get_block_pos_using::<P>(position, self.blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk.
@@ -149,13 +150,13 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// position is out of bounds, or if the block is not recognized.
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        if block.version_ty() != self.blocks.version_ty() {
+        if block.version_ty() != self.blocks.version() {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
             return None;
         }
 
-        self.naive.set_block_using::<P>(position, block, &self.blocks().load())
+        self.naive.set_block_using::<P>(position, block, &self.blocks)
     }
 
     /// Set the [`Block`] at the given position within the chunk.
@@ -168,13 +169,13 @@ impl Chunk {
         position: P,
         block: Block,
     ) -> Option<Block> {
-        if block.version_ty() != self.blocks.version_ty() {
+        if block.version_ty() != self.blocks.version() {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
             return None;
         }
 
-        self.naive.set_block_pos_using::<P>(position, block, &self.blocks().load())
+        self.naive.set_block_pos_using::<P>(position, block, &self.blocks)
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
@@ -238,7 +239,7 @@ impl Chunk {
     pub fn convert_into<V: BiomeVersion + BlockVersion>(&mut self) {
         // Skip if the chunk is already in the correct version.
         if self.biomes.version_ty() == V::biomes().version_ty()
-            && self.blocks.version_ty() == V::blocks().version_ty()
+            && self.blocks.version() == V::BLOCKS.load().version()
         {
             return;
         }
@@ -262,8 +263,8 @@ impl Chunk {
             }
         };
 
-        let new_blocks = V::blocks().load();
-        let old_blocks = self.blocks.load();
+        let new_blocks = V::BLOCKS.load_owned();
+        let old_blocks = &Arc::clone(&self.blocks);
         let mut block_cache = SmallVec::<[(u32, u32); 16]>::new();
 
         let mut block_convert = |old: u32| -> u32 {
@@ -332,7 +333,7 @@ impl Chunk {
 
         // Use the new version's biome and block storage.
         self.biomes = V::biomes();
-        self.blocks = V::blocks();
+        self.blocks = V::BLOCKS.load_owned();
     }
 }
 
@@ -340,7 +341,7 @@ impl Eq for Chunk {}
 impl PartialEq for Chunk {
     fn eq(&self, other: &Self) -> bool {
         self.biomes.version_ty() == other.biomes.version_ty()
-            && self.blocks.version_ty() == other.blocks.version_ty()
+            && self.blocks.version() == other.blocks.version()
             && self.naive == other.naive
     }
 }

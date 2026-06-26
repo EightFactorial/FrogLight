@@ -2,7 +2,8 @@
 #![expect(missing_docs, reason = "The functions themselves have documentation")]
 
 use crate::{
-    block::{BlockShape, BlockType, StateId},
+    block::{BlockShape, BlockType},
+    state::StateId,
     version::BlockVersion,
 };
 
