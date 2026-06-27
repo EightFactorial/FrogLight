@@ -14,21 +14,10 @@ pub use iter::ListIter;
 mod value;
 pub use value::IndexedValueList;
 
-cfg_select! {
-    feature = "alloc" => {
-        /// A typed NBT List that is indexed by an [`IndexCore`].
-        pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data = super::alloc::SliceCore<'data, A>> {
-            core: A::CORE<'data, C>,
-            index: Index<T>,
-        }
-    }
-    _ => {
-        /// A typed NBT List that is indexed by an [`IndexCore`].
-        pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> {
-            core: A::CORE<'data, C>,
-            index: Index<T>,
-        }
-    }
+/// A typed NBT List that is indexed by an [`IndexCore`].
+pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> {
+    core: A::CORE<'data, C>,
+    index: Index<T>,
 }
 
 impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, T, A, C> {

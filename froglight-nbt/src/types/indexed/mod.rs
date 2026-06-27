@@ -4,7 +4,6 @@
 use ::core::marker::PhantomData;
 use froglight_mutf8::prelude::MStr;
 
-#[cfg(feature = "alloc")]
 pub mod alloc;
 
 pub mod compound;
@@ -29,7 +28,7 @@ pub mod types;
 pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     core: C,
     name: Option<Index<MStr>>,
-    _phantom: PhantomData<(&'data (), A)>,
+    _phantom: PhantomData<&'data A>,
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
@@ -130,7 +129,6 @@ impl<'data, A: NbtAccess, C: IndexCore<Mut> + IndexCore<A> + 'data> IndexedNbt<'
 
 // -------------------------------------------------------------------------------------------------
 
-#[cfg(feature = "alloc")]
 impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
     /// Parse an unnamed NBT structure from the given byte slice.
     ///
@@ -164,7 +162,6 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
     }
 }
 
-#[cfg(feature = "alloc")]
 impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     /// Parse an unnamed NBT structure from the given byte slice.
     ///

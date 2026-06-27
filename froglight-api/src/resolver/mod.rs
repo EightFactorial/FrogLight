@@ -38,7 +38,7 @@ pub struct DnsResolver(Arc<dyn NetworkResolver>);
 #[cfg(feature = "resolver")]
 impl Default for DnsResolver {
     #[inline]
-    fn default() -> Self { Self::new(hickory::Resolver::default()) }
+    fn default() -> Self { Self::hickory() }
 }
 
 impl DnsResolver {
@@ -46,6 +46,14 @@ impl DnsResolver {
     #[inline]
     #[must_use]
     pub fn new<T: NetworkResolver>(agent: T) -> Self { Self::new_arc(Arc::new(agent)) }
+
+    /// Create a new [`DnsResolver`] using the [`hickory::Resolver`] resolver.
+    ///
+    /// This is the default.
+    #[inline]
+    #[must_use]
+    #[cfg(feature = "resolver")]
+    pub fn hickory() -> Self { Self::new(hickory::Resolver::default()) }
 
     /// Creates a new [`DnsResolver`] from an [`Arc<dyn NetworkResolver>`].
     #[inline]

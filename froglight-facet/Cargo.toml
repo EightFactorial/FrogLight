@@ -65,7 +65,7 @@ simd_fallback = ["simd"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-facet-iter/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["froglight-facet-iter/tracing_ext", "tracing"]
+tracing_ext = ["tracing"]
 
 # Enable support for the standard library
 std = ["facet/std", "froglight-facet-iter/std", "simdutf8/std", "tracing?/std", "uuid/std"]

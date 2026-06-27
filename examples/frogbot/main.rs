@@ -7,7 +7,7 @@ use bevy::{ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on};
 use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
-        api::api::ClientApi,
+        api::api::{ClientApi, Offline},
         instance::relationship::PartOfInstance,
         network::{
             bevy::ClientDespawn,
@@ -70,7 +70,6 @@ impl BotPlugin {
         };
 
         // Prepare the connection and player profile.
-        let api = ClientApi::mojang(); // TODO: Change to `offline`
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
         let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(
             stream,
@@ -82,6 +81,10 @@ impl BotPlugin {
             profile.username(),
             profile.uuid().as_hyphenated()
         );
+
+        // Add the profile to the Offline API.
+        let api = ClientApi::offline();
+        let _ = Offline::insert_profile(profile.clone());
 
         // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<Version>(ADDRESS, ConnectionIntent::Login);

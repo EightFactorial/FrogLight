@@ -25,10 +25,12 @@ tracing-subscriber = { workspace = true }
 
 [dependencies]
 async-trait = { workspace = true }
-froglight-player = { features = ["facet", "std"], workspace = true }
 facet = { features = ["std", "uuid"], workspace = true }
 facet-format = { workspace = true }
 facet-json = { features = ["std"], workspace = true }
+foldhash = { features = ["std"], workspace = true }
+froglight-player = { features = ["facet", "std"], workspace = true }
+indexmap = { features = ["std"], workspace = true }
 uuid = { features = ["std"], workspace = true }
 
 # Optional dependencies
@@ -79,4 +81,4 @@ tracing = ["dep:tracing", "froglight-player/tracing"]
 tracing_ext = ["tracing"]
 
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-player/nightly"]
+nightly = ["foldhash/nightly", "froglight-player/nightly"]

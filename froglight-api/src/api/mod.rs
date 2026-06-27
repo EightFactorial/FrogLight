@@ -24,6 +24,9 @@ use crate::client::{HttpClient, HttpError};
 mod mojang;
 pub use mojang::Mojang;
 
+mod offline;
+pub use offline::Offline;
+
 /// The client's API interface.
 ///
 /// Uses the [`Mojang`] API by default.
@@ -50,10 +53,17 @@ impl ClientApi {
 
     /// Creates a new [`ClientApi`] using the [`Mojang`] API.
     ///
-    /// This is also the default.
+    /// This is the default.
     #[inline]
     #[must_use]
     pub fn mojang() -> Self { Self::new(Mojang) }
+
+    /// Creates a new [`ClientApi`] using the [`Offline`] API.
+    ///
+    /// Requires profiles to be inserted manually.
+    #[inline]
+    #[must_use]
+    pub fn offline() -> Self { Self::new(Offline) }
 
     /// Creates a new [`ClientApi`] from an [`Arc<dyn NetworkApi>`].
     #[inline]
@@ -187,6 +197,13 @@ impl ApiError {
     #[inline]
     #[must_use]
     pub fn other<E: Error + Send + Sync + 'static>(err: E) -> Self { Self::Other(Box::new(err)) }
+
+    /// Create a [`ApiError::Other`] from a string.
+    #[inline]
+    #[must_use]
+    pub fn from_string(err: String) -> Self {
+        Self::Other(Box::<dyn Error + Send + Sync>::from(err))
+    }
 }
 
 impl Error for ApiError {}

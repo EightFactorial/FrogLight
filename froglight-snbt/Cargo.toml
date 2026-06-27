@@ -55,7 +55,7 @@ serde = ["dep:serde_core"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-facet-iter?/tracing", "froglight-mutf8?/tracing", "froglight-nbt?/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["froglight-facet-iter?/tracing_ext", "tracing"]
+tracing_ext = ["tracing"]
 
 # Enable support for the standard library
 std = ["bitflags/std", "dep:regex-lite", "facet?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]

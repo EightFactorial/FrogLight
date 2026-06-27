@@ -1,5 +1,6 @@
 //! TODO
 
+use core::any::{Any, TypeId};
 use std::{
     error::Error,
     fmt::{self, Debug, Display},
@@ -52,6 +53,13 @@ impl HttpClient {
     #[must_use]
     pub const fn as_arc(&self) -> &Arc<dyn NetworkClient> { &self.0 }
 
+    /// Get the [`TypeId`] of the inner [`NetworkClient`].
+    ///
+    /// Potentially useful for caching responses based on the client type.
+    #[inline]
+    #[must_use]
+    pub fn inner_type_id(&self) -> TypeId { <dyn NetworkClient as Any>::type_id(&*self.0) }
+
     /// Performs a `GET` request to the specified URL.
     ///
     /// # Errors
@@ -90,7 +98,7 @@ impl Debug for HttpClient {
 
 /// A trait for types that can act as a network client.
 #[async_trait]
-pub trait NetworkClient: Send + Sync + 'static {
+pub trait NetworkClient: Any + Send + Sync + 'static {
     /// Performs a `GET` request to the specified URL.
     ///
     /// # Errors

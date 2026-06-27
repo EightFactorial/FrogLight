@@ -18,13 +18,13 @@ use crate::{
 pub struct Mojang;
 
 impl Mojang {
-    /// The Mojang API endpoint for querying player profiles.
+    /// The [`Mojang`] API endpoint for querying player profiles.
     pub const PROFILE_ENDPOINT: &'static str =
         "https://sessionserver.mojang.com/session/minecraft/profile";
-    /// The Mojang API endpoint for querying usernames by UUID.
+    /// The [`Mojang`] API endpoint for querying usernames by UUID.
     pub const USERNAME_ENDPOINT: &'static str =
         "https://sessionserver.mojang.com/session/minecraft/profile";
-    /// The Mojang API endpoint for querying UUIDs by username.
+    /// The [`Mojang`] API endpoint for querying UUIDs by username.
     pub const UUID_ENDPOINT: &'static str = "https://api.mojang.com/users/profiles/minecraft";
 }
 
