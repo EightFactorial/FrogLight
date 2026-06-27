@@ -124,8 +124,6 @@ impl NaiveChunk {
         if let Some(section) = self.storage.as_slice().get(index) {
             Some(section.get_raw_block(position.as_section_blockpos()))
         } else {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `NaiveChunk`, position was invalid?");
             None
         }
     }
@@ -164,8 +162,6 @@ impl NaiveChunk {
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
             Some(section.set_raw_block(position.as_section_blockpos(), block_id, is_air, is_fluid))
         } else {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `NaiveChunk`, position was invalid?");
             None
         }
     }
@@ -208,8 +204,6 @@ impl NaiveChunk {
         if let Some(section) = self.storage.as_slice().get(index) {
             Some(section.get_raw_biome(position.as_section_blockpos()))
         } else {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `NaiveChunk`, position was invalid?");
             None
         }
     }
@@ -239,8 +233,6 @@ impl NaiveChunk {
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
             Some(section.set_raw_biome(position.as_section_blockpos(), biome_id))
         } else {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `NaiveChunk`, position was invalid?");
             None
         }
     }

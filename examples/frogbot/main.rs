@@ -3,7 +3,9 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
-use bevy::{ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on};
+use bevy::{
+    app::PluginGroupBuilder, ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on,
+};
 use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{

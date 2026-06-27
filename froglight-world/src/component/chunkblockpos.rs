@@ -58,31 +58,18 @@ impl ChunkBlockPos {
     /// Returns `None` if the resulting Y coordinate is negative or exceeds
     /// `u16::MAX`.
     #[must_use]
-    pub fn try_from_blockpos(position: BlockPos, chunk_offset: i32) -> Option<Self> {
-        let Some(absolute_y) = position.y().checked_sub(chunk_offset) else {
-            #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y underflowed?");
-            return None;
-        };
+    pub const fn try_from_blockpos(position: BlockPos, chunk_offset: i32) -> Option<Self> {
+        let Some(absolute_y) = position.y().checked_sub(chunk_offset) else { return None };
 
-        if absolute_y.is_negative() {
-            #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y is negative?");
-            None
-        } else if absolute_y > i32::from(u16::MAX) {
-            #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y exceeds u16 max?");
+        if absolute_y.is_negative() || absolute_y > u16::MAX as i32 {
             None
         } else {
-            #[expect(
-                clippy::cast_sign_loss,
-                clippy::cast_possible_truncation,
-                reason = "Verified within bounds above"
-            )]
+            #[expect(clippy::cast_sign_loss, reason = "Verified within bounds above")]
+            #[expect(clippy::cast_possible_truncation, reason = "Verified within bounds above")]
             Some(Self(
                 U8Vec2::new(
-                    position.x().rem_euclid(i32::from(CHUNK_LENGTH)) as u8,
-                    position.z().rem_euclid(i32::from(CHUNK_WIDTH)) as u8,
+                    position.x().rem_euclid(CHUNK_LENGTH as i32) as u8,
+                    position.z().rem_euclid(CHUNK_WIDTH as i32) as u8,
                 ),
                 absolute_y as u16,
             ))
@@ -94,27 +81,24 @@ impl ChunkBlockPos {
     ///
     /// Returns `None` if the resulting Y coordinate exceeds `u16::MAX`.
     #[must_use]
-    pub fn try_from_sectionpos(position: SectionBlockPos, section_index: usize) -> Option<Self> {
+    pub const fn try_from_sectionpos(
+        position: SectionBlockPos,
+        section_index: usize,
+    ) -> Option<Self> {
         let Some(total_height) =
             (position.y() as usize).checked_add(section_index * SECTION_HEIGHT as usize)
         else {
-            #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, total Y overflowed?");
             return None;
         };
 
-        if total_height > usize::from(u16::MAX) {
-            #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, total Y exceeds u16 max?");
+        if total_height > u16::MAX as usize {
             None
         } else {
             #[expect(clippy::cast_possible_truncation, reason = "Verified within bounds above")]
             Some(Self(
                 U8Vec2::new(position.x(), position.z()),
-                u16::from(position.y()) + total_height as u16,
+                position.y() as u16 + total_height as u16,
             ))
         }
     }
 }
-
-// -------------------------------------------------------------------------------------------------

@@ -11,6 +11,7 @@ use froglight_facet::{
     self as mc, deserialize::varint::decode_u32_from, facet::template::*,
     serialize::varint::encode_u32_into,
 };
+use glam::IVec3;
 
 /// A variable-length [`i32`].
 #[repr(transparent)]
@@ -163,30 +164,43 @@ impl EntityPosition {
         Self(x | y | z)
     }
 
+    /// Create a new [`EntityPosition`] from the given [`IVec3`].
+    #[inline]
+    #[must_use]
+    pub const fn new_ivec3(vec: IVec3) -> Self { Self::new(vec.x, vec.y, vec.z) }
+
     /// Get the `X` coordinate.
     #[must_use]
-    pub const fn x(&self) -> i32 {
+    pub const fn x(self) -> i32 {
         (self.0 << (64 - Self::X_OFFSET - Self::PACKED_X_LENGTH) >> (64 - Self::PACKED_X_LENGTH))
             as i32
     }
 
     /// Get the `Y` coordinate.
     #[must_use]
-    pub const fn y(&self) -> i32 {
+    pub const fn y(self) -> i32 {
         (self.0 << (64 - Self::PACKED_Y_LENGTH) >> (64 - Self::PACKED_Y_LENGTH)) as i32
     }
 
     /// Get the `Z` coordinate.
     #[must_use]
-    pub const fn z(&self) -> i32 {
+    pub const fn z(self) -> i32 {
         (self.0 << (64 - Self::Z_OFFSET - Self::PACKED_Z_LENGTH) >> (64 - Self::PACKED_Z_LENGTH))
             as i32
     }
 
     /// Get the `X`, `Y`, and `Z` coordinates.
+    #[inline]
     #[must_use]
-    pub const fn xyz(&self) -> (i32, i32, i32) { (self.x(), self.y(), self.z()) }
+    pub const fn xyz(self) -> (i32, i32, i32) { (self.x(), self.y(), self.z()) }
+
+    /// Get the [`IVec3`] representation of this position.
+    #[inline]
+    #[must_use]
+    pub const fn as_ivec3(self) -> IVec3 { IVec3::new(self.x(), self.y(), self.z()) }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// The rotation of an entity.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]

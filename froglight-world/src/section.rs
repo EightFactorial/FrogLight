@@ -5,9 +5,9 @@ use core::fmt::Debug;
 use crate::SECTION_VOLUME;
 
 /// A type of section storage.
+#[expect(clippy::cast_possible_truncation, reason = "Sections will never be that large")]
 pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static {
     /// The volume of this type of section.
-    #[expect(clippy::cast_possible_truncation, reason = "Sections will never be that large")]
     const VOLUME: u16 =
         SECTION_VOLUME / (Self::QUANTIZATION * Self::QUANTIZATION * Self::QUANTIZATION) as u16;
     /// The quantization factor of this type of section.

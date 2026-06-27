@@ -1,7 +1,6 @@
 //! TODO
 
-use alloc::sync::Arc;
-use core::ops::Range;
+use core::{any::TypeId, ops::Range};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
@@ -9,6 +8,7 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 use froglight_biome::{biome::Biome, storage::GlobalBiomeStorage, version::BiomeVersion};
 use froglight_block::{block::Block, storage::BlockStorage, version::BlockVersion};
+use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 use smallvec::SmallVec;
 
 use super::section::SectionPalette;
@@ -25,7 +25,8 @@ use crate::{
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
 pub struct Chunk {
     biomes: &'static GlobalBiomeStorage,
-    blocks: Arc<BlockStorage>,
+    blocks: &'static AtomicArc<BlockStorage>,
+    version: TypeId,
     naive: NaiveChunk,
 }
 
@@ -34,18 +35,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn new<V: BiomeVersion + BlockVersion>(naive: NaiveChunk) -> Self {
-        Self { biomes: V::biomes(), blocks: V::BLOCKS.load_owned(), naive }
-    }
-
-    /// Create a new [`Chunk`] using the given [`ChunkStorage`].
-    #[inline]
-    #[must_use]
-    pub const fn new_from(
-        storage: ChunkStorage,
-        biomes: &'static GlobalBiomeStorage,
-        blocks: Arc<BlockStorage>,
-    ) -> Self {
-        Self { biomes, blocks, naive: NaiveChunk::new(storage) }
+        Self { biomes: V::biomes(), blocks: V::BLOCKS, version: TypeId::of::<V>(), naive }
     }
 
     /// Create a new empty large [`Chunk`].
@@ -53,8 +43,8 @@ impl Chunk {
     /// This is equivalent to an overworld chunk,
     /// or 24 sections (384 blocks) tall with an offset of -64.
     #[must_use]
-    pub fn new_empty_large<V: BiomeVersion + BlockVersion>() -> Self {
-        Self::new_from(ChunkStorage::empty_large(), V::biomes(), V::BLOCKS.load_owned())
+    pub fn empty_large<V: BiomeVersion + BlockVersion>() -> Self {
+        Self::new::<V>(NaiveChunk::new(ChunkStorage::empty_large()))
     }
 
     /// Create a new empty normal [`Chunk`].
@@ -62,29 +52,28 @@ impl Chunk {
     /// This is equivalent to a nether or end chunk,
     /// or 16 sections (256 blocks) tall with an offset of 0.
     #[must_use]
-    pub fn new_empty_normal<V: BiomeVersion + BlockVersion>() -> Self {
-        Self::new_from(ChunkStorage::empty_normal(), V::biomes(), V::BLOCKS.load_owned())
+    pub fn empty_normal<V: BiomeVersion + BlockVersion>() -> Self {
+        Self::new::<V>(NaiveChunk::new(ChunkStorage::empty_normal()))
     }
 
     /// Get the [`GlobalBlockStorage`] used by this chunk.
     #[inline]
     #[must_use]
-    pub const fn biomes(&self) -> &'static GlobalBiomeStorage { self.biomes }
+    pub fn biomes(&self) -> &'static GlobalBiomeStorage { self.biomes }
 
     /// Get the [`GlobalBlockStorage`] used by this chunk.
     #[inline]
-    #[must_use]
-    pub fn blocks(&self) -> &BlockStorage { &self.blocks }
-
-    /// Get the inner [`NaiveChunk`] of this chunk.
-    #[inline]
-    #[must_use]
-    pub fn into_naive(self) -> NaiveChunk { self.naive }
+    pub fn blocks(&self) -> ArcBorrow<BlockStorage> { self.blocks.load() }
 
     /// Get a reference to the inner [`NaiveChunk`] of this chunk.
     #[inline]
     #[must_use]
     pub const fn as_naive(&self) -> &NaiveChunk { &self.naive }
+
+    /// Get the inner [`NaiveChunk`] of this chunk.
+    #[inline]
+    #[must_use]
+    pub fn into_naive(self) -> NaiveChunk { self.naive }
 
     /// Get the height of this [`Chunk`].
     ///
@@ -92,6 +81,7 @@ impl Chunk {
     ///
     /// This is the height in world/coordinate space,
     /// and takes into account the chunk's vertical offset.
+    #[inline]
     #[must_use]
     pub const fn height(&self) -> i32 { self.naive.height() }
 
@@ -101,6 +91,7 @@ impl Chunk {
     ///
     /// This is the range in world/coordinate space and follows the chunk's
     /// vertical offset.
+    #[inline]
     #[must_use]
     pub const fn height_range(&self) -> Range<i32> { self.naive.height_range() }
 
@@ -111,18 +102,22 @@ impl Chunk {
     /// In other words, `y = 0` is always the bottom of the chunk.
     ///
     /// In most cases, you probably want [`Chunk::height`] instead.
+    #[inline]
     #[must_use]
     pub const fn height_total(&self) -> usize { self.naive.height_total() }
 
     /// Get the height offset of this [`Chunk`].
+    #[inline]
     #[must_use]
     pub const fn height_offset(&self) -> i32 { self.naive.height_offset() }
 
     /// Get a reference to the sections in this [`Chunk`].
+    #[inline]
     #[must_use]
     pub const fn sections(&self) -> &[Section] { self.naive.sections() }
 
     /// Get a mutable reference to the sections in this [`Chunk`].
+    #[inline]
     #[must_use]
     pub const fn sections_mut(&mut self) -> &mut [Section] { self.naive.sections_mut() }
 
@@ -132,7 +127,7 @@ impl Chunk {
     /// or if the block is not recognized.
     #[must_use]
     pub fn get_block<P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_using::<P>(position, self.blocks())
+        self.naive.get_block_using::<P>(position, &self.blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk.
@@ -141,7 +136,7 @@ impl Chunk {
     /// or if the block is not recognized.
     #[must_use]
     pub fn get_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_pos_using::<P>(position, self.blocks())
+        self.naive.get_block_pos_using::<P>(position, &self.blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk.
@@ -150,13 +145,11 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// position is out of bounds, or if the block is not recognized.
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        if block.version_ty() != self.blocks.version_ty() {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
+        if self.version != block.version_ty() {
             return None;
         }
 
-        self.naive.set_block_using::<P>(position, block, &self.blocks)
+        self.naive.set_block_using::<P>(position, block, &self.blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk.
@@ -169,13 +162,11 @@ impl Chunk {
         position: P,
         block: Block,
     ) -> Option<Block> {
-        if block.version_ty() != self.blocks.version_ty() {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to set `Chunk` block, version mismatch");
+        if self.version != block.version_ty() {
             return None;
         }
 
-        self.naive.set_block_pos_using::<P>(position, block, &self.blocks)
+        self.naive.set_block_pos_using::<P>(position, block, &self.blocks())
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
@@ -202,9 +193,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// the position is out of bounds, or if the biome is not recognized.
     pub fn set_biome<P: Into<BlockPos>>(&mut self, position: P, biome: Biome) -> Option<Biome> {
-        if biome.version_ty() != self.biomes.version_ty() {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to set `Chunk` biome, version mismatch");
+        if self.version != biome.version_ty() {
             return None;
         }
 
@@ -221,9 +210,7 @@ impl Chunk {
         position: P,
         biome: Biome,
     ) -> Option<Biome> {
-        if biome.version_ty() != self.biomes.version_ty() {
-            #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to set `Chunk` biome, version mismatch");
+        if self.version != biome.version_ty() {
             return None;
         }
 
@@ -238,9 +225,7 @@ impl Chunk {
     #[expect(clippy::missing_panics_doc, reason = "Cannot panic")]
     pub fn convert_into<V: BiomeVersion + BlockVersion>(&mut self) {
         // Skip if the chunk is already in the correct version.
-        if self.biomes.version_ty() == V::biomes().version_ty()
-            && self.blocks.version_ty() == V::BLOCKS.load().version_ty()
-        {
+        if self.version == TypeId::of::<V>() {
             return;
         }
 
@@ -264,7 +249,7 @@ impl Chunk {
         };
 
         let new_blocks = V::BLOCKS.load_owned();
-        let old_blocks = &Arc::clone(&self.blocks);
+        let old_blocks = self.blocks();
         let mut block_cache = SmallVec::<[(u32, u32); 16]>::new();
 
         let mut block_convert = |old: u32| -> u32 {
@@ -279,7 +264,7 @@ impl Chunk {
                 block_cache.push((old, converted.global_id().into_inner()));
                 converted.global_id().into_inner()
             } else {
-                0 // Air
+                1 // Stone
             }
         };
 
@@ -333,15 +318,13 @@ impl Chunk {
 
         // Use the new version's biome and block storage.
         self.biomes = V::biomes();
-        self.blocks = V::BLOCKS.load_owned();
+        self.blocks = V::BLOCKS;
     }
 }
 
 impl Eq for Chunk {}
 impl PartialEq for Chunk {
     fn eq(&self, other: &Self) -> bool {
-        self.biomes.version_ty() == other.biomes.version_ty()
-            && self.blocks.version_ty() == other.blocks.version_ty()
-            && self.naive == other.naive
+        self.version == other.version && self.naive == other.naive
     }
 }

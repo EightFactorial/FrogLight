@@ -22,24 +22,21 @@ workspace = true
 divan = { workspace = true }
 
 [dependencies]
-bitvec = { workspace = true }
+bitvec = { features = ["alloc"], workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
 # Optional dependencies
-arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "hashbrown", "smallvec"], workspace = true, optional = true }
-facet = { features = ["reflect"], workspace = true, optional = true }
+facet = { features = ["reflect", "smallvec"], workspace = true, optional = true }
 froglight-biome = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
-hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true, optional = true }
-parking_lot = { workspace = true, optional = true }
-serde = { features = ["derive"], workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
+froglight-registry-template = { workspace = true, optional = true }
+serde = { features = ["alloc", "derive"], workspace = true, optional = true }
 
 # --- Tests/Benchmarks ---
 
@@ -51,27 +48,25 @@ harness = false
 # --- Features ---
 
 [features]
-default = ["alloc", "std"]
+default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:hashbrown", "froglight-common/bevy", "serde"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:froglight-facet", "froglight-common/facet"]
 # Enable `froglight-biome` support.
-froglight-biome = ["dep:froglight-biome"]
+froglight-biome = ["dep:froglight-biome", "dep:froglight-registry-template"]
 # Enable `froglight-block` support.
-froglight-block = ["dep:froglight-block"]
+froglight-block = ["dep:froglight-block", "dep:froglight-registry-template"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
-# Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome?/tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["glam/nostd-libm"]
+libm = ["glam/nostd-libm", "froglight-block?/libm"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["froglight-registry-template?/once_cell"]
 
-# Enable support for a global allocator
-alloc = ["bitvec/alloc", "froglight-biome?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "dep:arc-swap", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "froglight-registry-template?/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "hashbrown?/nightly", "parking_lot?/nightly", "smallvec/specialization"]
+nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-registry-template?/nightly", "smallvec/specialization", "std"]

@@ -2,13 +2,10 @@
 #![doc = include_str!("../README.md")]
 #![no_std]
 
-#[cfg(feature = "alloc")]
 extern crate alloc;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
-pub mod borrowed;
-#[cfg(feature = "alloc")]
 pub mod chunk;
 pub mod component;
 pub mod section;
@@ -30,9 +27,10 @@ const SECTION_VOLUME: u16 = SECTION_LENGTH as u16 * SECTION_WIDTH as u16 * SECTI
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "alloc")]
-    pub use crate::chunk::NaiveChunk;
-    #[cfg(all(feature = "froglight-biome", feature = "froglight-block", feature = "std"))]
+    #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
     pub use crate::chunk::{Chunk, SharedChunk};
-    pub use crate::component::{BlockPos, ChunkPos};
+    pub use crate::{
+        chunk::NaiveChunk,
+        component::{BlockPos, ChunkPos},
+    };
 }
