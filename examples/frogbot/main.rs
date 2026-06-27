@@ -28,7 +28,22 @@ use froglight::{
 };
 
 fn main() -> AppExit {
-    App::new().add_plugins((DefaultPlugins, FroglightPlugins)).add_plugins(BotPlugin).run()
+    App::new()
+        .add_plugins(default_plugins())
+        .add_plugins(FroglightPlugins)
+        .add_plugins(BotPlugin)
+        .run()
+}
+
+/// Set a custom `LogPlugin` that doesn't escape ANSI :rolling_eyes:
+fn default_plugins() -> PluginGroupBuilder {
+    use bevy::log::LogPlugin;
+    use tracing_subscriber::fmt::Layer;
+
+    let mut log = LogPlugin::default();
+    log.fmt_layer = |_| Some(Box::new(Layer::default().with_ansi_sanitization(false)));
+
+    DefaultPlugins.set(log)
 }
 
 // -------------------------------------------------------------------------------------------------
