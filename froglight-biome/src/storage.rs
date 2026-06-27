@@ -1,207 +1,70 @@
 //! TODO
 
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-#[cfg(feature = "std")]
 use core::any::TypeId;
-#[cfg(feature = "std")]
-pub use std::sync::LazyLock;
-#[cfg(all(feature = "std", not(feature = "parking_lot"), feature = "biome_data"))]
-pub use std::sync::RwLock;
 
-#[cfg(feature = "std")]
-use arc_swap::ArcSwap;
+use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
-#[cfg(all(feature = "once_cell", not(feature = "std")))]
-pub use once_cell::sync::OnceCell as LazyLock;
-#[cfg(all(feature = "parking_lot", feature = "biome_data"))]
-pub use parking_lot::RwLock;
+use indexmap::IndexMap;
 
-use crate::biome::{Biome, BiomeMetadata, GlobalId};
+use crate::{
+    biome::{Biome, BiomeMetadata},
+    state::GlobalBiomeId,
+    version::BiomeVersion,
+};
 
-/// A thread-safe container for a [`BiomeStorage`].
-#[cfg(feature = "std")]
-pub struct GlobalBiomeStorage {
-    storage: ArcSwap<BiomeStorage>,
-    version_ty: TypeId,
-}
-
-#[cfg(feature = "std")]
-impl GlobalBiomeStorage {
-    /// Create a new [`GlobalBiomeStorage`] with the given [`BiomeStorage`].
-    #[must_use]
-    pub fn new<T: 'static>(storage: BiomeStorage) -> Self {
-        Self {
-            storage: ArcSwap::new(alloc::sync::Arc::new(storage)),
-            version_ty: TypeId::of::<T>(),
-        }
-    }
-
-    /// Get the [`TypeId`] of the
-    /// [`Version`](froglight_common::version::Version) this storage belongs to.
-    #[inline]
-    #[must_use]
-    pub const fn version_ty(&self) -> TypeId { self.version_ty }
-}
-
-#[cfg(feature = "std")]
-impl core::ops::Deref for GlobalBiomeStorage {
-    type Target = ArcSwap<BiomeStorage>;
-
-    fn deref(&self) -> &Self::Target { &self.storage }
-}
-#[cfg(feature = "std")]
-impl core::ops::DerefMut for GlobalBiomeStorage {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.storage }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for Biome data storage.
-#[repr(transparent)]
+/// A container for biome data storage.
 #[derive(Debug, Clone)]
 pub struct BiomeStorage {
-    inner: StorageInner,
-}
-
-/// The internal representation of a [`BiomeStorage`].
-#[derive(Debug, Clone)]
-enum StorageInner {
-    /// Dynamic storage allocated at runtime.
-    #[cfg(feature = "alloc")]
-    Runtime(Vec<&'static BiomeMetadata>),
-    /// Static storage allocated at compile time.
-    Static(&'static [&'static BiomeMetadata]),
+    version: TypeId,
+    metadata: IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState>,
 }
 
 impl BiomeStorage {
-    /// Create a new static [`BiomeStorage`].
+    /// Get the default [`Biome`] for a given [`GlobalStateId`].
     ///
-    /// # Safety
+    /// # Note
     ///
-    /// The caller must ensure that the provided slice is valid, with one entry
-    /// per [`GlobalId`] in ascending order.
+    /// This is typically used by the registry and world.
     #[must_use]
-    pub const unsafe fn new_static(slice: &'static [&'static BiomeMetadata]) -> Self {
-        Self { inner: StorageInner::Static(slice) }
+    pub fn get_block_by_id(&self, id: GlobalBiomeId) -> Option<Biome> {
+        self.metadata.get_index(id.into_inner() as usize).map(|(_, meta)| Biome::new_from(meta))
     }
 
-    /// Create a new runtime-allocated [`BiomeStorage`].
+    /// Get the default [`Biome`] for a given [`Identifier`].
     ///
-    /// # Safety
+    /// # Note
     ///
-    /// The caller must ensure that the provided vec is valid, with one entry
-    /// per [`GlobalId`] in ascending order.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const unsafe fn new_runtime(vec: Vec<&'static BiomeMetadata>) -> Self {
-        Self { inner: StorageInner::Runtime(vec) }
-    }
-
-    /// Get the [`Biome`] for a given [`GlobalId`].
-    #[must_use]
-    pub fn get_biome(&self, id: GlobalId) -> Option<Biome> {
-        self.get_metadata(id).map(Biome::new_from)
-    }
-
-    /// Get the [`Biome`] for a given [`Identifier`].
+    /// This is typically used by the registry.
     #[must_use]
     pub fn get_biome_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Biome> {
-        self.to_ref()
-            .iter()
-            .find(|&&meta| meta.identifier() == identifier)
-            .map(|&meta| Biome::new_from(meta))
+        self.metadata.get(identifier).map(|meta| Biome::new_from(meta))
     }
 
-    /// Get the [`BiomeMetadata`] for a given [`GlobalId`].
+    /// Get the [`TypeId`] of the [`Version`] this storage is for.
+    #[inline]
     #[must_use]
-    pub fn get_metadata(&self, id: GlobalId) -> Option<&'static BiomeMetadata> {
-        self.to_ref().get(id.into_inner() as usize).copied()
-    }
+    pub const fn version_ty(&self) -> TypeId { self.version }
 
-    /// Get an immutable reference to underlying storage.
+    /// Get the [`IndexMap`] metadata of this [`BiomeStorage`].
+    #[inline]
     #[must_use]
-    pub const fn to_ref(&self) -> &[&'static BiomeMetadata] {
-        match self.inner {
-            #[cfg(feature = "alloc")]
-            StorageInner::Runtime(ref vec) => vec.as_slice(),
-            StorageInner::Static(slice) => slice,
-        }
+    pub const fn metadata(
+        &self,
+    ) -> &IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState> {
+        &self.metadata
     }
 
-    /// Get a mutable reference to underlying storage.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
+    /// Build a new [`BiomeStorage`] for the given [`BiomeVersion`].
     #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut Vec<&'static BiomeMetadata> {
-        match self.inner {
-            StorageInner::Runtime(ref mut vec) => vec,
-            StorageInner::Static(slice) => {
-                *self = Self { inner: StorageInner::Runtime(Vec::from(slice)) };
-                match self.inner {
-                    StorageInner::Runtime(ref mut vec) => vec,
-                    StorageInner::Static(_) => unreachable!(),
-                }
-            }
+    pub fn build<V: BiomeVersion>(metadata: Vec<&'static BiomeMetadata>) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for meta in metadata {
+            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
         }
+
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A macro helper for implementing
-/// [`BiomeVersion`](crate::version::BiomeVersion) for a given
-/// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
-#[macro_export]
-#[cfg(feature = "std")]
-macro_rules! implement_biomes {
-    ($version:ty => $($tt:tt)*) => {
-        $crate::__implement_storage_inner!(@global $version => $($tt)*);
-    };
-}
-
-/// A macro helper for implementing
-/// [`BiomeVersion`](crate::version::BiomeVersion) for a given
-/// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
-#[macro_export]
-#[cfg(not(feature = "std"))]
-macro_rules! implement_biomes {
-    ($version:ty => $($tt:tt)*) => {
-        $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
-    };
-}
-
-/// A hidden internal macro for the [`implement_biomes`] macro.
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __implement_storage_inner {
-    (@global $version:ty => $($tt:tt)*) => {
-        $crate::__implement_storage_inner!(
-            @local {
-                const BIOMES: &'static $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = {
-                    static STATIC: $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = $crate::storage::LazyLock::new(|| {
-                        $crate::storage::GlobalBiomeStorage::new::<$version>(<$version as $crate::version::BiomeVersion>::new_biomes())
-                    });
-                    &STATIC
-                };
-            },
-            $version => $($tt)*
-        );
-    };
-    (@local {$($constant:tt)*}, $version:ty => $($tt:tt)*) => {
-        impl $crate::version::BiomeVersion for $version {
-            $($constant)*
-
-            fn new_biomes() -> $crate::storage::BiomeStorage {
-                $($tt)*
-            }
-        }
-    };
 }

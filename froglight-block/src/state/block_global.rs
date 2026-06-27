@@ -6,7 +6,7 @@ use crate::block::Block;
 /// relative to all other blocks in the same version.
 ///
 /// This only guarantees uniqueness if both blocks are, for example,
-/// from [`V1_21`](froglight_common::prelude::V1_21).
+/// from [`V26_1`](froglight_common::prelude::V26_1).
 ///
 /// Two blocks of the same type and different states,
 /// like stair orientation, *will* equal each other.

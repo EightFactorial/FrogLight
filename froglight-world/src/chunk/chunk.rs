@@ -6,7 +6,7 @@ use core::{any::TypeId, ops::Range};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-use froglight_biome::{biome::Biome, storage::GlobalBiomeStorage, version::BiomeVersion};
+use froglight_biome::{biome::Biome, storage::BiomeStorage, version::BiomeVersion};
 use froglight_block::{block::Block, storage::BlockStorage, version::BlockVersion};
 use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 use smallvec::SmallVec;
@@ -24,7 +24,7 @@ use crate::{
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
 pub struct Chunk {
-    biomes: &'static GlobalBiomeStorage,
+    biomes: &'static AtomicArc<BiomeStorage>,
     blocks: &'static AtomicArc<BlockStorage>,
     version: TypeId,
     naive: NaiveChunk,
@@ -35,7 +35,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn new<V: BiomeVersion + BlockVersion>(naive: NaiveChunk) -> Self {
-        Self { biomes: V::biomes(), blocks: V::BLOCKS, version: TypeId::of::<V>(), naive }
+        Self { biomes: V::BIOMES, blocks: V::BLOCKS, version: TypeId::of::<V>(), naive }
     }
 
     /// Create a new empty large [`Chunk`].
@@ -56,12 +56,11 @@ impl Chunk {
         Self::new::<V>(NaiveChunk::new(ChunkStorage::empty_normal()))
     }
 
-    /// Get the [`GlobalBlockStorage`] used by this chunk.
+    /// Get the [`BiomeStorage`] used by this chunk.
     #[inline]
-    #[must_use]
-    pub fn biomes(&self) -> &'static GlobalBiomeStorage { self.biomes }
+    pub fn biomes(&self) -> ArcBorrow<BiomeStorage> { self.biomes.load() }
 
-    /// Get the [`GlobalBlockStorage`] used by this chunk.
+    /// Get the [`BlockStorage`] used by this chunk.
     #[inline]
     pub fn blocks(&self) -> ArcBorrow<BlockStorage> { self.blocks.load() }
 
@@ -175,7 +174,7 @@ impl Chunk {
     /// or if the biome is not recognized.
     #[must_use]
     pub fn get_biome<P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_using::<P>(position, &self.biomes().load())
+        self.naive.get_biome_using::<P>(position, &self.biomes())
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
@@ -184,7 +183,7 @@ impl Chunk {
     /// or if the biome is not recognized.
     #[must_use]
     pub fn get_biome_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_pos_using::<P>(position, &self.biomes().load())
+        self.naive.get_biome_pos_using::<P>(position, &self.biomes())
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
@@ -197,7 +196,7 @@ impl Chunk {
             return None;
         }
 
-        self.naive.set_biome_using::<P>(position, biome, &self.biomes().load())
+        self.naive.set_biome_using::<P>(position, biome, &self.biomes())
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
@@ -229,7 +228,7 @@ impl Chunk {
             return;
         }
 
-        let new_biomes = V::biomes().load();
+        let new_biomes = V::biomes();
         let old_biomes = self.biomes.load();
         let mut biome_cache = SmallVec::<[(u32, u32); 16]>::new();
 
@@ -237,7 +236,7 @@ impl Chunk {
             if let Some((_, new)) = biome_cache.iter().find(|(o, _)| *o == old) {
                 // Use the cached value
                 *new
-            } else if let Some(old_meta) = old_biomes.get_metadata(old.into())
+            } else if let Some(old_meta) = old_biomes.get_block_by_id(old.into())
                 && let Some(new) = new_biomes.get_biome_by_identifier(old_meta.identifier())
             {
                 // Add the value to the cache and return it
@@ -317,8 +316,9 @@ impl Chunk {
         }
 
         // Use the new version's biome and block storage.
-        self.biomes = V::biomes();
+        self.biomes = V::BIOMES;
         self.blocks = V::BLOCKS;
+        self.version = TypeId::of::<V>();
     }
 }
 

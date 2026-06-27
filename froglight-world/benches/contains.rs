@@ -5,49 +5,50 @@
 #[cfg(feature = "froglight-block")]
 use core::any::TypeId;
 
-use bitvec::slice::BitSlice;
+use bitvec::vec::BitVec;
 use divan::prelude::*;
 #[cfg(feature = "froglight-biome")]
-use froglight_biome::{biome::BiomeMetadata, implement_biomes, prelude::*, storage::BiomeStorage};
+use froglight_biome::{biome::BiomeMetadata, prelude::*, storage::BiomeStorage};
 #[cfg(feature = "froglight-block")]
 use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
-use froglight_world::borrowed::{
-    BorrowedChunk, BorrowedSection,
-    section::{BorrowedPalette, BorrowedSectionData},
-    storage::{BorrowedArrayStorage, BorrowedChunkStorage},
+use froglight_world::chunk::{
+    NaiveChunk,
+    section::{Section, SectionData, SectionPalette},
+    storage::{ArrayChunkStorage, ChunkStorage},
 };
+use smallvec::SmallVec;
 
 fn main() { divan::main() }
 
 macro_rules! create {
     (@blocks $($tt:tt)*) => {{
-        black_box(BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        black_box(NaiveChunk::new(ChunkStorage::Large(ArrayChunkStorage::new(
             core::array::from_fn(|_| unsafe {
-                BorrowedSection::new_unchecked(
+                Section::new_unchecked(
                     0,
                     0,
                     $($tt)*,
-                    BorrowedSectionData::new_unchecked(
+                    SectionData::new_unchecked(
                         0,
-                        BorrowedPalette::Single(0),
-                        BitSlice::empty(),
+                        SectionPalette::Single(0),
+                        BitVec::EMPTY,
                     ),
                 )
             }),
         ))))
     }};
     (@biomes $($tt:tt)*) => {{
-        black_box(BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        black_box(NaiveChunk::new(ChunkStorage::Large(ArrayChunkStorage::new(
             core::array::from_fn(|_| unsafe {
-                BorrowedSection::new_unchecked(
+                Section::new_unchecked(
                     0,
                     0,
-                    BorrowedSectionData::new_unchecked(
+                    SectionData::new_unchecked(
                         0,
-                        BorrowedPalette::Single(0),
-                        BitSlice::empty(),
+                        SectionPalette::Single(0),
+                        BitVec::EMPTY,
                     ),
                     $($tt)*,
                 )
@@ -61,10 +62,10 @@ fn contains_single_best(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             0,
-            BorrowedPalette::Single(0),
-            BitSlice::empty(),
+            SectionPalette::Single(0),
+            BitVec::EMPTY,
         )
     };
 
@@ -78,10 +79,10 @@ fn contains_single_worst(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             0,
-            BorrowedPalette::Single(0),
-            BitSlice::empty(),
+            SectionPalette::Single(0),
+            BitVec::EMPTY,
         )
     };
 
@@ -95,10 +96,10 @@ fn contains_single_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             0,
-            BorrowedPalette::Single(0),
-            BitSlice::empty(),
+            SectionPalette::Single(0),
+            BitVec::EMPTY,
         )
     };
 
@@ -112,10 +113,10 @@ fn contains_single_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             0,
-            BorrowedPalette::Single(0),
-            BitSlice::empty(),
+            SectionPalette::Single(0),
+            BitVec::EMPTY,
         )
     };
 
@@ -129,10 +130,10 @@ fn contains_vector_best(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Vector(&[0, 1]),
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -146,10 +147,10 @@ fn contains_vector_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Vector(&[0, 1]),
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -163,10 +164,10 @@ fn contains_vector_pass(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Vector(&[0]),
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Vector(SmallVec::from_vec(vec![0])),
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -180,10 +181,10 @@ fn contains_vector_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Vector(&[0, 1]),
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -197,10 +198,10 @@ fn contains_vector_worst(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Vector(&[0, 1]),
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -214,10 +215,10 @@ fn contains_global_best(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -231,10 +232,10 @@ fn contains_global_worst(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -248,10 +249,10 @@ fn contains_global_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -265,10 +266,10 @@ fn contains_global_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -302,7 +303,7 @@ impl BiomeType<TestVersion> for Plains {
         static STATIC: BiomeMetadata = unsafe {
             BiomeMetadata::new::<Plains, TestVersion>(
                 Identifier::new_static("test:plains"),
-                0,
+                GlobalBiomeId::new(0),
                 0,
                 0,
                 0,
@@ -327,7 +328,7 @@ impl BiomeType<TestVersion> for Forest {
         static STATIC: BiomeMetadata = unsafe {
             BiomeMetadata::new::<Forest, TestVersion>(
                 Identifier::new_static("test:forest"),
-                1,
+                GlobalBiomeId::new(1),
                 0,
                 0,
                 0,
@@ -343,12 +344,15 @@ impl BiomeType<TestVersion> for Forest {
 }
 
 #[cfg(feature = "froglight-biome")]
-implement_biomes! {
-    TestVersion => unsafe {
-        BiomeStorage::new_static(&[
-            Plains::METADATA,
-            Forest::METADATA,
-        ])
+froglight_biome::version::version_implement! {
+    impl BiomeVersion => TestVersion {
+        const BIOMES: BiomeStorage;
+        fn new_biomes() => {
+            BiomeStorage::build::<Self>(vec![
+                Plains::METADATA,
+                Forest::METADATA,
+            ])
+        }
     }
 }
 
@@ -358,10 +362,10 @@ fn contains_global_biome_best(b: Bencher) {
     // An empty section with no biomes.
     let global = create! {
         @biomes
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -376,10 +380,10 @@ fn contains_global_biome_worst(b: Bencher) {
     // An empty section with no biomes.
     let global = create! {
         @biomes
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -402,7 +406,7 @@ impl BlockType<TestVersion> for Air {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Air, TestVersion>(
-                Identifier::new_unchecked("test:air"),
+                Identifier::new_static("test:air"),
                 GlobalStateId::new(0),
                 RelativeStateId::new(0),
             )
@@ -410,11 +414,11 @@ impl BlockType<TestVersion> for Air {
         &STATIC
     };
 
-    fn is_air(_: StateId) -> bool { true }
+    fn is_air(_: RelativeStateId) -> bool { true }
 
-    fn is_solid(_: StateId) -> bool { false }
+    fn is_solid(_: RelativeStateId) -> bool { false }
 
-    fn is_transparent(_: StateId) -> bool { true }
+    fn is_transparent(_: RelativeStateId) -> bool { true }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -428,11 +432,10 @@ impl BlockType<TestVersion> for Stone {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            use froglight_block::block::BlockBehavior;
             use froglight_common::prelude::Identifier;
 
             BlockMetadata::new::<Stone, TestVersion>(
-                Identifier::new_unchecked("test:stone"),
+                Identifier::new_static("test:stone"),
                 GlobalStateId::new(1),
                 RelativeStateId::new(0),
             )
@@ -446,7 +449,7 @@ froglight_block::version::version_implement! {
     impl BlockVersion => TestVersion {
         const BLOCKS: BlockStorage;
         fn new_blocks() => {
-            BlockStorage::new_static(&[
+            BlockStorage::build::<Self>(vec![
                 Air::METADATA,
                 Stone::METADATA,
             ])
@@ -460,10 +463,10 @@ fn contains_global_block_best(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 
@@ -478,10 +481,10 @@ fn contains_global_block_worst(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
         @blocks
-        BorrowedSectionData::new_unchecked(
+        SectionData::new_unchecked(
             1,
-            BorrowedPalette::Global,
-            BitSlice::from_slice(&[0; 4096]),
+            SectionPalette::Global,
+            BitVec::from_slice(&[0; 4096]),
         )
     };
 

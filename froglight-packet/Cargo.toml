@@ -51,7 +51,7 @@ facet = ["dep:facet", "froglight-common/facet", "froglight-entity/facet", "dep:f
 # Enable `serde` support.
 serde = ["dep:serde", "froglight-common/serde", "froglight-player/serde", "froglight-world/serde", "indexmap/serde", "uuid/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome/tracing", "froglight-entity/tracing", "froglight-player/tracing"]
+tracing = ["dep:tracing", "froglight-entity/tracing", "froglight-player/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["froglight-facet/tracing", "tracing"]
 

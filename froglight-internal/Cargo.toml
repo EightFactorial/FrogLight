@@ -55,7 +55,7 @@ bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:froglight-brigadier", "dep:frogligh
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "std"]
 # Enable `tracing` support.
-tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-brigadier?/tracing", "froglight-entity/tracing", "froglight-facet/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-text/tracing"]
+tracing = ["froglight-api?/tracing", "froglight-brigadier?/tracing", "froglight-entity/tracing", "froglight-facet/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-text/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["bevy_app?/trace", "bevy_ecs?/debug", "bevy_ecs?/trace", "froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-facet/tracing_ext", "froglight-nbt/tracing_ext", "froglight-network?/tracing_ext", "froglight-snbt/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
 
@@ -64,7 +64,7 @@ libm = ["froglight-block/libm", "froglight-brigadier?/libm", "froglight-entity/l
 # Enable `once_cell` for `no_std` support.
 once_cell = ["froglight-biome/once_cell", "froglight-block/once_cell", "froglight-inventory/once_cell", "froglight-math/once_cell"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-biome/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot"]
+parking_lot = ["froglight-item/parking_lot", "froglight-registry/parking_lot"]
 
 # Enable support for the standard library
 std = ["bevy_app?/std", "bevy_ecs?/std", "froglight-biome/std", "froglight-block/std", "froglight-brigadier?/std", "froglight-common/std", "froglight-entity/std", "froglight-facet/std", "froglight-instance?/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-mutf8/std", "froglight-nbt/std", "froglight-packet/std", "froglight-physics/std", "froglight-player/std", "froglight-registry/std", "froglight-text/std", "froglight-world/std"]

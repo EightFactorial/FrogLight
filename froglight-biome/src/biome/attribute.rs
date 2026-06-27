@@ -1,31 +1,23 @@
 //! TODO
 #![allow(clippy::result_large_err, reason = "Facet's error type")]
 
-#[cfg(all(feature = "alloc", feature = "biome_data"))]
 use alloc::vec::Vec;
+use core::ops::Deref;
 
 use facet::Facet;
 use facet_format::SerializeError;
 use facet_value::{ToValueError, Value, ValueError};
 use froglight_common::prelude::Identifier;
 
-#[cfg(feature = "biome_data")]
-use crate::storage::RwLock;
-
 /// A set of biome attributes.
 #[repr(transparent)]
-#[derive(Debug)]
-pub struct BiomeAttributeSet {
-    #[cfg(any(feature = "parking_lot", feature = "std"))]
-    storage: RwLock<BiomeAttributeStorage>,
-    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
-    storage: BiomeAttributeStorage,
-}
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct BiomeAttributeSet(Vec<(Identifier<'static>, Value)>);
 
 impl BiomeAttributeSet {
     /// Create an empty [`BiomeAttributeSet`] instance.
     #[must_use]
-    pub const fn empty() -> Self { Self::new_static(&[]) }
+    pub const fn empty() -> Self { Self(Vec::new()) }
 
     /// Create a new static [`BiomeAttributeSet`].
     ///
@@ -33,126 +25,15 @@ impl BiomeAttributeSet {
     ///
     /// Panics if the provided slice contains duplicate entries.
     #[must_use]
-    pub const fn new_static(features: &'static [(Identifier<'static>, Value)]) -> Self {
-        Self {
-            #[cfg(any(feature = "parking_lot", feature = "std"))]
-            storage: RwLock::new(BiomeAttributeStorage::new_static(features)),
-            #[cfg(not(any(feature = "parking_lot", feature = "std")))]
-            storage: BiomeAttributeStorage::new_static(features),
-        }
-    }
-
-    /// Create a new runtime-allocated [`BiomeAttributeSet`].
-    ///
-    /// # Panics
-    ///
-    /// Panics if the provided vector contains duplicate entries.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn new_runtime(vec: Vec<(Identifier<'static>, Value)>) -> Self {
-        Self {
-            #[cfg(any(feature = "parking_lot", feature = "std"))]
-            storage: RwLock::new(BiomeAttributeStorage::new_runtime(vec)),
-            #[cfg(not(any(feature = "parking_lot", feature = "std")))]
-            storage: BiomeAttributeStorage::new_runtime(vec),
-        }
-    }
-
-    /// Acquire a reference without blocking the current thread.
-    #[inline]
-    #[must_use]
-    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
-    pub const fn read(&self) -> &BiomeAttributeStorage { &self.storage }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(feature = "parking_lot")]
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, BiomeAttributeStorage> {
-        self.storage.read()
-    }
-
-    /// Acquire a read lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "parking_lot"), feature = "std"))]
-    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, BiomeAttributeStorage> {
-        self.storage.read().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a mutable reference without blocking the current thread.
-    #[inline]
-    #[must_use]
-    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
-    pub const fn write(&mut self) -> &mut BiomeAttributeStorage { &mut self.storage }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(feature = "parking_lot")]
-    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, BiomeAttributeStorage> {
-        self.storage.write()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "parking_lot"), feature = "std"))]
-    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, BiomeAttributeStorage> {
-        self.storage.write().expect("RwLock was poisoned!")
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// The underlying storage for a [`BiomeAttributeSet`].
-#[repr(transparent)]
-#[derive(Debug, Clone)]
-pub struct BiomeAttributeStorage {
-    inner: AttributeSetInner,
-}
-
-#[derive(Debug, Clone)]
-enum AttributeSetInner {
-    /// Dynamic storage allocated at runtime.
-    #[cfg(feature = "alloc")]
-    Runtime(Vec<(Identifier<'static>, Value)>),
-    /// Static storage allocated at compile time.
-    Static(&'static [(Identifier<'static>, Value)]),
-}
-
-impl BiomeAttributeStorage {
-    /// Create a new static [`BiomeAttributeSet`].
-    ///
-    /// # Panics
-    ///
-    /// Panics if the provided slice contains duplicate entries.
-    #[must_use]
-    pub const fn new_static(slice: &'static [(Identifier<'static>, Value)]) -> Self {
-        assert_no_duplicates(slice);
-        Self { inner: AttributeSetInner::Static(slice) }
-    }
-
-    /// Create a new runtime-allocated [`BiomeAttributeSet`].
-    ///
-    /// # Panics
-    ///
-    /// Panics if the provided vector contains duplicate entries.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const fn new_runtime(vec: Vec<(Identifier<'static>, Value)>) -> Self {
+    pub const fn new(vec: Vec<(Identifier<'static>, Value)>) -> Self {
         assert_no_duplicates(vec.as_slice());
-        Self { inner: AttributeSetInner::Runtime(vec) }
+        Self(vec)
     }
 
     /// Returns `true` if the set contains the specified attribute type.
     #[must_use]
     pub fn contains<A: AttributeType>(&self) -> bool {
-        self.to_ref().iter().any(|(id, _)| id == &A::IDENTIFIER)
+        self.0.iter().any(|(id, _)| id == &A::IDENTIFIER)
     }
 
     /// Inserts the attribute type into the set,
@@ -164,7 +45,6 @@ impl BiomeAttributeStorage {
     ///
     /// Returns an error if the attribute could not be converted into a
     /// [`Value`].
-    #[cfg(feature = "alloc")]
     pub fn insert<A: AttributeType>(
         &mut self,
         attribute: &A,
@@ -172,8 +52,7 @@ impl BiomeAttributeStorage {
         let data = attribute.to_attribute_data()?;
 
         // SAFETY: `!self.contains` ensures no duplicates are added.
-        let inserted =
-            (!self.contains::<A>()).then(|| unsafe { self.to_mut().push((A::IDENTIFIER, data)) });
+        let inserted = (!self.contains::<A>()).then(|| self.0.push((A::IDENTIFIER, data)));
         Ok(inserted.is_some())
     }
 
@@ -187,7 +66,7 @@ impl BiomeAttributeStorage {
     /// [`Value`].
     #[must_use]
     pub fn get<A: AttributeType>(&self) -> Option<Result<A, ValueError>> {
-        self.to_ref()
+        self.0
             .iter()
             .find(|(id, _)| id == &A::IDENTIFIER)
             .map(|(_, value)| A::from_attribute_data(value))
@@ -201,45 +80,11 @@ impl BiomeAttributeStorage {
     ///
     /// Returns an error if the attribute type could not be converted from its
     /// [`Value`].
-    #[cfg(feature = "alloc")]
     pub fn remove<A: AttributeType>(&mut self) -> Result<Option<A>, ValueError> {
-        if let Some(pos) = self.to_ref().iter().position(|(id, _)| id == &A::IDENTIFIER) {
-            // SAFETY: Attributes are only being removed, not added.
-            A::from_attribute_data(&unsafe { self.to_mut().remove(pos) }.1).map(Some)
+        if let Some(pos) = self.0.iter().position(|(id, _)| id == &A::IDENTIFIER) {
+            A::from_attribute_data(&self.0.remove(pos).1).map(Some)
         } else {
             Ok(None)
-        }
-    }
-
-    /// Get an immutable reference to underlying storage.
-    #[must_use]
-    pub const fn to_ref(&self) -> &[(Identifier<'static>, Value)] {
-        match self.inner {
-            #[cfg(feature = "alloc")]
-            AttributeSetInner::Runtime(ref vec) => vec.as_slice(),
-            AttributeSetInner::Static(slice) => slice,
-        }
-    }
-
-    /// Get a mutable reference to underlying storage.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that no duplicate entries are added to the set.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub unsafe fn to_mut(&mut self) -> &mut Vec<(Identifier<'static>, Value)> {
-        match self.inner {
-            AttributeSetInner::Runtime(ref mut vec) => vec,
-            AttributeSetInner::Static(slice) => {
-                self.inner = AttributeSetInner::Runtime(Vec::from(slice));
-                match self.inner {
-                    AttributeSetInner::Runtime(ref mut vec) => vec,
-                    AttributeSetInner::Static(_) => unreachable!(),
-                }
-            }
         }
     }
 }
@@ -258,6 +103,13 @@ const fn assert_no_duplicates<T>(slice: &[(Identifier<'static>, T)]) {
         }
         i += 1;
     }
+}
+
+impl Deref for BiomeAttributeSet {
+    type Target = [(Identifier<'static>, Value)];
+
+    #[inline]
+    fn deref(&self) -> &Self::Target { self.0.as_slice() }
 }
 
 // -------------------------------------------------------------------------------------------------

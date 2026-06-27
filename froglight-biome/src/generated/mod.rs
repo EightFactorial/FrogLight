@@ -202,8 +202,8 @@ macro_rules! generate {
             impl crate::biome::BiomeType<$version> for $ident {
                 const METADATA: &'static crate::biome::BiomeMetadata = {
                     #[cfg(feature = "biome_data")]
-                    static ATTRIBUTES: $crate::storage::LazyLock<crate::biome::BiomeAttributeSet> = $crate::storage::LazyLock::new(|| {
-                        crate::biome::BiomeAttributeSet::new_runtime(alloc::vec![
+                    static ATTRIBUTES: $crate::version::LazyLock<crate::biome::BiomeAttributeSet> = $crate::version::LazyLock::new(|| {
+                        crate::biome::BiomeAttributeSet::new(alloc::vec![
                             $(
                                 (<$ty as crate::biome::AttributeType>::IDENTIFIER, facet_value::value!($tt))
                             ),*
@@ -212,7 +212,7 @@ macro_rules! generate {
 
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
-                        $global,
+                        $crate::state::GlobalBiomeId::new($global),
 
                         $foliage, $dry_foliage, $grass, $water, $precip, $temp, $downfall,
 
@@ -225,14 +225,18 @@ macro_rules! generate {
             }
         )*
 
-        static ARRAY: &'static [&'static crate::biome::BiomeMetadata] = &[
-            $(
-                <$ident as crate::biome::BiomeType<$version>>::METADATA,
-            )*
-        ];
-        crate::implement_biomes!($version => unsafe {
-            crate::storage::BiomeStorage::new_static(ARRAY)
-        });
+        $crate::version::version_implement! {
+            impl $crate::version::BiomeVersion => $version {
+                const BIOMES: $crate::storage::BiomeStorage;
+                fn new_biomes() => {
+                    $crate::storage::BiomeStorage::build::<Self>(alloc::vec![
+                        $(
+                            <$ident as crate::biome::BiomeType<$version>>::METADATA,
+                        )*
+                    ])
+                }
+            }
+        }
     };
 }
 

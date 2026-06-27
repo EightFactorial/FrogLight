@@ -1,36 +1,34 @@
 use core::{any::TypeId, fmt::Debug};
 
 use froglight_common::prelude::Identifier;
-
-use crate::{
-    atomic::{MaybeAtomicBool, MaybeAtomicF32, MaybeAtomicU32},
-    biome::{BiomeType, GlobalId},
-    version::BiomeVersion,
-};
 #[cfg(feature = "biome_data")]
-use crate::{biome::BiomeAttributeSet, storage::LazyLock};
+use froglight_registry_template::types::LazyLock;
+
+#[cfg(feature = "biome_data")]
+use crate::biome::BiomeAttributeSet;
+use crate::{biome::BiomeType, state::GlobalBiomeId, version::BiomeVersion};
 
 /// Metadata about a biome type.
 pub struct BiomeMetadata {
     /// The string identifier of the biome.
     identifier: Identifier<'static>,
-    /// The [`GlobalId`] assigned to this biome.
-    global_id: MaybeAtomicU32,
+    /// The [`GlobalBiomeId`] assigned to this biome.
+    global_id: GlobalBiomeId,
 
     /// The foliage color of this biome.
-    color_foliage: MaybeAtomicU32,
+    color_foliage: u32,
     /// The dry foliage color of this biome.
-    color_foliage_dry: MaybeAtomicU32,
+    color_foliage_dry: u32,
     /// The grass color of this biome.
-    color_grass: MaybeAtomicU32,
+    color_grass: u32,
     /// The water color of this biome.
-    color_water: MaybeAtomicU32,
+    color_water: u32,
     /// Whether this biome has precipitation.
-    precipitation: MaybeAtomicBool,
+    precipitation: bool,
     /// The temperature of this biome.
-    temperature: MaybeAtomicF32,
+    temperature: f32,
     /// The downfall of this biome.
-    downfall: MaybeAtomicF32,
+    downfall: f32,
 
     /// The attributes of this biome.
     #[cfg(feature = "biome_data")]
@@ -53,7 +51,7 @@ impl BiomeMetadata {
     #[expect(clippy::too_many_arguments, reason = "Yes")]
     pub const unsafe fn new<B: BiomeType<V>, V: BiomeVersion>(
         identifier: Identifier<'static>,
-        global_id: u32,
+        global_id: GlobalBiomeId,
         foliage_color: u32,
         dry_foliage_color: u32,
         grass_color: u32,
@@ -65,15 +63,15 @@ impl BiomeMetadata {
     ) -> Self {
         Self {
             identifier,
-            global_id: MaybeAtomicU32::new(global_id),
+            global_id,
 
-            color_foliage: MaybeAtomicU32::new(foliage_color),
-            color_foliage_dry: MaybeAtomicU32::new(dry_foliage_color),
-            color_grass: MaybeAtomicU32::new(grass_color),
-            color_water: MaybeAtomicU32::new(water_color),
-            precipitation: MaybeAtomicBool::new(precipitation),
-            temperature: MaybeAtomicF32::new(temperature),
-            downfall: MaybeAtomicF32::new(downfall),
+            color_foliage: foliage_color,
+            color_foliage_dry: dry_foliage_color,
+            color_grass: grass_color,
+            color_water: water_color,
+            precipitation,
+            temperature,
+            downfall,
 
             #[cfg(feature = "biome_data")]
             attributes,
@@ -88,76 +86,45 @@ impl BiomeMetadata {
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
 
-    /// Get the [`GlobalId`] of this biome.
+    /// Get the [`GlobalStateId`] of this biome.
+    #[inline]
     #[must_use]
-    pub fn global_id(&self) -> GlobalId { GlobalId::new(self.global_id.get()) }
-
-    /// Set the base [`GlobalId`] of this biome.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the new id matches the indices in the
-    /// [`BiomeStorage`](crate::storage::BiomeStorage) it is used in.
-    #[cfg(feature = "atomic")]
-    pub unsafe fn set_global_id(&self, id: GlobalId) { self.global_id.set_atomic(id.into_inner()); }
+    pub const fn global_id(&self) -> GlobalBiomeId { self.global_id }
 
     /// Get the foliage color of this biome.
+    #[inline]
     #[must_use]
-    pub fn foliage_color(&self) -> u32 { self.color_foliage.get() }
-
-    /// Set the foliage color of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_foliage_color(&self, color: u32) { self.color_foliage.set_atomic(color); }
+    pub const fn foliage_color(&self) -> u32 { self.color_foliage }
 
     /// Get the dry foliage color of this biome.
+    #[inline]
     #[must_use]
-    pub fn dry_foliage_color(&self) -> u32 { self.color_foliage_dry.get() }
-
-    /// Set the dry foliage color of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_dry_foliage_color(&self, color: u32) { self.color_foliage_dry.set_atomic(color); }
+    pub const fn dry_foliage_color(&self) -> u32 { self.color_foliage_dry }
 
     /// Get the grass color of this biome.
+    #[inline]
     #[must_use]
-    pub fn grass_color(&self) -> u32 { self.color_grass.get() }
-
-    /// Set the grass color of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_grass_color(&self, color: u32) { self.color_grass.set_atomic(color); }
+    pub const fn grass_color(&self) -> u32 { self.color_grass }
 
     /// Get the water color of this biome.
+    #[inline]
     #[must_use]
-    pub fn water_color(&self) -> u32 { self.color_water.get() }
-
-    /// Set the water color of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_water_color(&self, color: u32) { self.color_water.set_atomic(color); }
+    pub const fn water_color(&self) -> u32 { self.color_water }
 
     /// Returns `true` if this biome has precipitation.
+    #[inline]
     #[must_use]
-    pub fn precipitation(&self) -> bool { self.precipitation.get() }
-
-    /// Set whether this biome has precipitation.
-    #[cfg(feature = "atomic")]
-    pub fn set_precipitation(&self, precipitation: bool) {
-        self.precipitation.set_atomic(precipitation);
-    }
+    pub const fn precipitation(&self) -> bool { self.precipitation }
 
     /// Get the temperature of this biome.
+    #[inline]
     #[must_use]
-    pub fn temperature(&self) -> f32 { self.temperature.get() }
-
-    /// Set the temperature of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_temperature(&self, temperature: f32) { self.temperature.set_atomic(temperature); }
+    pub const fn temperature(&self) -> f32 { self.temperature }
 
     /// Get the downfall of this biome.
+    #[inline]
     #[must_use]
-    pub fn downfall(&self) -> f32 { self.downfall.get() }
-
-    /// Set the downfall of this biome.
-    #[cfg(feature = "atomic")]
-    pub fn set_downfall(&self, downfall: f32) { self.downfall.set_atomic(downfall); }
+    pub const fn downfall(&self) -> f32 { self.downfall }
 
     /// Get the attributes of this biome.
     #[must_use]

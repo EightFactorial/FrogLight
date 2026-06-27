@@ -1,14 +1,13 @@
 #![doc = include_str!("../README.md")]
 #![no_std]
 
-#[cfg(feature = "alloc")]
 extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-pub(crate) mod atomic;
 pub mod biome;
 pub mod generated;
+pub mod state;
 pub mod storage;
 pub mod version;
 
@@ -22,6 +21,7 @@ pub mod prelude {
     pub use crate::{
         biome::{Biome, BiomeType},
         generated::biome::{self, VanillaBiome},
+        state::GlobalBiomeId,
         version::BiomeVersion,
     };
 }

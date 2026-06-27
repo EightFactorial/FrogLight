@@ -17,7 +17,6 @@ impl NaiveChunk {
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(feature = "std")]
     pub fn get_block<V: BlockVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
         self.get_block_using::<P>(position, &V::blocks())
     }
@@ -43,7 +42,6 @@ impl NaiveChunk {
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(feature = "std")]
     pub fn get_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
         &self,
         position: P,
@@ -72,7 +70,6 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(feature = "std")]
     pub fn set_block<V: BlockVersion, P: Into<BlockPos>>(
         &mut self,
         position: P,
@@ -102,7 +99,6 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(feature = "std")]
     pub fn set_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
@@ -137,7 +133,6 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
     #[must_use]
-    #[cfg(feature = "std")]
     pub fn contains_block<V: BlockVersion>(&self, block: Block) -> bool {
         self.contains_block_using(block, &V::blocks())
     }
@@ -161,7 +156,6 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
     #[must_use]
-    #[cfg(feature = "std")]
     pub fn contains_block_type<B: BlockType<V>, V: BlockVersion>(&self) -> bool {
         self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks())
     }
