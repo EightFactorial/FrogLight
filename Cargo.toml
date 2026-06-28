@@ -73,7 +73,7 @@ bitflags = { default-features = false, version = "2.13" }
 bitvec = { default-features = false, version = "1.0" }
 blocking = { default-features = false, version = "1.6" }
 futures-lite = { default-features = false, version = "2.0" }
-glam = { default-features = false, version = "=0.32" }
+glam = { default-features = false, version = "=0.33.2" }
 hashbrown = { default-features = false, version = "0.17" }
 hazarc = { default-features = false, version = "0.2" }
 hickory-resolver = { default-features = false, version = "0.26" }
