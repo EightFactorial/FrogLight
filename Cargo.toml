@@ -41,7 +41,7 @@ bevy_transform = { default-features = false, version = "0.19" }
 bevy_ui = { default-features = false, version = "0.19" }
 
 # Facet Dependencies
-facet = { default-features = false, version = "=0.50.0-rc.4" }
+facet = { default-features = false, version = "=0.50.0-rc.5" }
 facet-format = { default-features = false, version = "=0.50.0-rc.4" }
 facet-json = { default-features = false, version = "=0.50.0-rc.4" }
 facet-path = { default-features = false, version = "=0.50.0-rc.4" }
