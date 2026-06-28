@@ -21,4 +21,4 @@ mod metadata;
 pub use metadata::EntityMetadata;
 
 mod state;
-pub use state::GlobalId;
+pub use state::GlobalEntityId;

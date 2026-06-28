@@ -2,26 +2,21 @@
 
 use froglight_common::prelude::*;
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::facet::template::*;
+use froglight_facet::facet::template::{Reader, ReaderError, Writer, WriterError};
+pub use froglight_registry_template::types::{ArcBorrow, AtomicArc, LazyLock};
 
 #[cfg(feature = "facet")]
 use crate::generated::datatype::EntityDataType;
 use crate::storage::EntityStorage;
-#[cfg(feature = "std")]
-use crate::storage::GlobalEntityStorage;
 
 /// A [`Version`]'s associated entity data.
 pub trait EntityVersion: Version {
-    /// The [`GlobalEntityStorage`] for this [`Version`].
-    #[cfg(feature = "std")]
-    const ENTITY: &'static std::sync::LazyLock<GlobalEntityStorage>;
+    /// The [`EntityStorage`] for this [`Version`].
+    const ENTITY: &'static LazyLock<AtomicArc<EntityStorage>>;
 
-    /// Get the [`GlobalEntityStorage`] for this [`Version`].
+    /// Get the [`EntityStorage`] for this [`Version`].
     #[inline]
-    #[must_use]
-    #[cfg(feature = "std")]
-    fn entities() -> &'static GlobalEntityStorage { Self::ENTITY }
+    fn entities() -> ArcBorrow<EntityStorage> { Self::ENTITY.load() }
 
     /// Create a new [`EntityStorage`] for this [`Version`].
     ///
@@ -29,24 +24,19 @@ pub trait EntityVersion: Version {
     ///
     /// This will create a new [`EntityStorage`] each time it is called!
     ///
-    /// Unless you are in a `no_std` environment, you should probably be using
-    /// [`EntityVersion::entities`] or the associated constant.
+    /// Unless you are modifying the global, you should probably be using
+    /// [`EntityVersion::entities`]!
+    #[must_use]
     fn new_entity() -> EntityStorage;
 
-    /// This [`Version`]'s deserializer for
-    /// [`EntityDataType`](crate::generated::data::EntityDataType)s
+    /// This [`Version`]'s deserializer for [`EntityDataType`]s
     ///
     /// Requires the `facet` feature to be enabled.
     #[cfg(feature = "facet")]
     const DATATYPE_DESERIALIZE: fn(&mut Reader) -> Result<EntityDataType, ReaderError>;
-    /// This [`Version`]'s erializer for
-    /// [`EntityDataType`](crate::generated::data::EntityDataType)s
+    /// This [`Version`]'s serializer for [`EntityDataType`]s
     ///
     /// Requires the `facet` feature to be enabled.
     #[cfg(feature = "facet")]
-    const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
-        &'facet (),
-        &'input EntityDataType,
-        &mut Writer,
-    ) -> Result<(), WriterError>;
+    const DATATYPE_SERIALIZE: fn(&EntityDataType, &mut Writer) -> Result<(), WriterError>;
 }

@@ -5,7 +5,6 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-mod atomic;
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod entity;

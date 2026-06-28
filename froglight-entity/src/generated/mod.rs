@@ -25,17 +25,17 @@ macro_rules! generate {
             #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident(pub $ty);
 
-            impl crate::entity::EntityComponentType for $ident {
+            impl $crate::entity::EntityComponentType for $ident {
                 fn try_from_data(data: &crate::generated::datatype::EntityDataType) -> Option<Self> {
-                    if let crate::generated::datatype::EntityDataType::$variant(value) = data {
+                    if let $crate::generated::datatype::EntityDataType::$variant(value) = data {
                         Some($ident(value.clone()))
                     } else {
                         None
                     }
                 }
 
-                fn into_data(self) -> crate::generated::datatype::EntityDataType {
-                    crate::generated::datatype::EntityDataType::$variant(self.0)
+                fn into_data(self) -> $crate::generated::datatype::EntityDataType {
+                    $crate::generated::datatype::EntityDataType::$variant(self.0)
                 }
             }
 
@@ -163,14 +163,14 @@ macro_rules! generate {
             }
 
             #[automatically_derived]
-            impl PartialEq<crate::entity::EntityBundle> for $ident {
+            impl PartialEq<$crate::entity::EntityBundle> for $ident {
                 #[inline]
-                fn eq(&self, other: &crate::entity::EntityBundle) -> bool {
+                fn eq(&self, other: &$crate::entity::EntityBundle) -> bool {
                     other.is_entity::<$ident>()
                 }
             }
             #[automatically_derived]
-            impl PartialEq<$ident> for crate::entity::EntityBundle {
+            impl PartialEq<$ident> for $crate::entity::EntityBundle {
                 #[inline]
                 fn eq(&self, _: &$ident) -> bool {
                     self.is_entity::<$ident>()
@@ -179,9 +179,9 @@ macro_rules! generate {
         )*
 
         #[automatically_derived]
-        impl PartialEq<crate::entity::EntityBundle> for VanillaEntity {
+        impl PartialEq<$crate::entity::EntityBundle> for VanillaEntity {
             #[allow(unreachable_patterns, reason = "Nonexhaustive")]
-            fn eq(&self, other: &crate::entity::EntityBundle) -> bool {
+            fn eq(&self, other: &$crate::entity::EntityBundle) -> bool {
                 match self {
                     $(
                         VanillaEntity::$ident => other.is_entity::<$ident>(),
@@ -191,10 +191,10 @@ macro_rules! generate {
             }
         }
         #[automatically_derived]
-        impl PartialEq<VanillaEntity> for crate::entity::EntityBundle {
+        impl PartialEq<VanillaEntity> for $crate::entity::EntityBundle {
             #[inline]
             fn eq(&self, other: &VanillaEntity) -> bool {
-                PartialEq::<crate::entity::EntityBundle>::eq(other, self)
+                PartialEq::<$crate::entity::EntityBundle>::eq(other, self)
             }
         }
 
@@ -221,13 +221,13 @@ macro_rules! generate {
     ) => {
         $(
             #[automatically_derived]
-            impl crate::entity::EntityType<$version> for $ident {
-                const METADATA: &'static crate::entity::EntityMetadata = {
-                    static METADATA: crate::entity::EntityMetadata = unsafe { crate::entity::EntityMetadata::new::<$ident, $version>(
+            impl $crate::entity::EntityType<$version> for $ident {
+                const METADATA: &'static $crate::entity::EntityMetadata = {
+                    static METADATA: $crate::entity::EntityMetadata = unsafe { $crate::entity::EntityMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
+                        $crate::entity::GlobalEntityId::new($global),
                         [$width, $height],
                         $eye_height,
-                        $global,
                     ) };
 
                     &METADATA
@@ -238,17 +238,17 @@ macro_rules! generate {
                         core::any::TypeId::of::<$component>(),
                     )*
                 ];
-                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[]);
+                const DATASET: $crate::entity::EntityDataSet<'static> = $crate::entity::EntityDataSet::new_slice(&[]);
 
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
-                fn inspect_reflect(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(alloc::boxed::Box<dyn bevy_reflect::PartialReflect>)) {
+                fn inspect_reflect(dataset: &$crate::entity::EntityDataSet, f: &mut dyn FnMut(alloc::boxed::Box<dyn bevy_reflect::PartialReflect>)) {
                     f(alloc::boxed::Box::new(Self));
 
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
-                                $componentid if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) => {
+                                $componentid if let Some(component) = <$component as $crate::entity::EntityComponentType>::try_from_data(data) => {
                                     f(alloc::boxed::Box::new(component));
                                 }
                             )*
@@ -258,13 +258,13 @@ macro_rules! generate {
                 }
                 #[cfg(feature = "facet")]
                 #[allow(unused, reason = "Generated code")]
-                fn inspect_peek(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(facet::Peek<'_, '_>)) {
+                fn inspect_peek(dataset: &$crate::entity::EntityDataSet, f: &mut dyn FnMut(facet::Peek<'_, '_>)) {
                     f(facet::Peek::new(&Self));
 
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
-                                $componentid if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) => {
+                                $componentid if let Some(component) = <$component as $crate::entity::EntityComponentType>::try_from_data(data) => {
                                     f(facet::Peek::new(&component));
                                 },
                             )*
@@ -275,12 +275,10 @@ macro_rules! generate {
             }
         )*
 
-        crate::implement_entities!(
-            $version => unsafe {
-                crate::storage::EntityStorage::new_static(&[
-                    $(
-                        <$ident as crate::entity::EntityType<$version>>::METADATA,
-                    )*
+        $crate::implement_entities!(
+            $version => {
+                $crate::storage::EntityStorage::build::<$version>(alloc::vec![
+                    $( <$ident as $crate::entity::EntityType<$version>>::METADATA, )*
                 ])
             },
             read: { |cursor| {
@@ -293,16 +291,16 @@ macro_rules! generate {
                                 .map_err(froglight_facet::facet::template::ReaderError::other)?;
                             cursor.consume(cursor.remaining().len() - rem.len());
 
-                            Ok(crate::generated::datatype::EntityDataType::$datatype(value))
+                            Ok($crate::generated::datatype::EntityDataType::$datatype(value))
                         }
                     )*
                     _ => todo!("TODO: Create an error type"),
                 }
             } },
-            write: { |(), data, buffer| {
+            write: { |data, buffer| {
                 match data {
                     $(
-                        crate::generated::datatype::EntityDataType::$datatype(value) => {
+                        $crate::generated::datatype::EntityDataType::$datatype(value) => {
                             buffer.write_byte($dataid)?;
                             froglight_facet::to_writer(value, buffer)
                                 .map_err(froglight_facet::facet::template::WriterError::other)?;

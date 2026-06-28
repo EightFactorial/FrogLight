@@ -1,6 +1,9 @@
 //! TODO
 
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
 
 use async_net::TcpStream;
 use bevy::{
@@ -161,8 +164,8 @@ impl BotPlugin {
                             Velocity::new(data.velocity.as_vec3a()),
                         ));
 
-                        let entities = Version::entities().load();
-                        if let Some(bundle) = entities.get_entity(data.entity_type.into()) {
+                        let entities = Version::entities();
+                        if let Some(bundle) = entities.get_entity_by_id(data.entity_type.into()) {
                             entity.insert(bundle);
                         } else {
                             error!("Unknown Entity Type {:?}!", data.entity_type);
@@ -711,36 +714,45 @@ impl BotPlugin {
                         commands.write_message(AppExit::error());
                     }
                     ClientboundConfigEvent::UpdateTags(tags) => {
-                        let mut registry = Version::registry().write();
+                        // Clone the current `REGISTRY`.
+                        let mut registry = Arc::unwrap_or_clone(Version::REGISTRY.load_owned());
+                        let metadata = registry.metadata_mut();
 
+                        // Update the metadata with the new tags.
                         for (identifier, tags) in &tags.0 {
                             info!("Received UpdateTags: \"{identifier}\"");
-                            let storage = registry.get_mut_or_default(identifier.clone());
+                            let storage = metadata.entry(identifier.clone()).or_default();
 
                             for tag in tags.clone() {
-                                debug!(" - \"{}\"", tag.identifier);
-                                storage.get_mut_or_default(tag.identifier).set_values(tag.values);
+                                debug!(" - {}", tag.identifier);
+                                storage.entry(tag.identifier).insert_entry(tag.values.clone());
                             }
                         }
 
                         // As an example, trace log the "minecraft:slabs" tag.
-                        let blocks = Version::blocks();
-                        let Some(block_reg) = registry.get("minecraft:block") else { continue };
-                        let Some(slabs_val) = block_reg.get_by_name("minecraft:slabs") else {
-                            continue;
-                        };
+                        if let Some(block_reg) =
+                            registry.get_registry_by_identifier("minecraft:block")
+                            && let Some(slabs_val) = block_reg.get_by_identifier("minecraft:slabs")
+                        {
+                            let blocks = Version::blocks();
+                            trace!(
+                                "Example UpdateTags: \"minecraft:block\" -> \"minecraft:slabs\""
+                            );
 
-                        trace!("Example UpdateTags: \"minecraft:block\" -> \"minecraft:slabs\"");
-                        for val in slabs_val.values() {
-                            if let Some(meta) = u16::try_from(*val)
-                                .ok()
-                                .and_then(|v| blocks.get_block_by_id(GlobalBlockId::new(v)))
-                            {
-                                trace!(" - \"{}\"", meta.identifier());
-                            } else {
-                                error!("Failed to get metadata for block with ID {val}!");
+                            for val in slabs_val.values() {
+                                if let Ok(val) = u16::try_from(*val)
+                                    && let Some(block) =
+                                        blocks.get_block_by_id(GlobalBlockId::new(v))
+                                {
+                                    trace!(" - {}", block.identifier());
+                                } else {
+                                    error!("Failed to get metadata for block with ID {val}!");
+                                }
                             }
                         }
+
+                        // Replace the `REGISTRY` with the updated one.
+                        Version::REGISTRY.store(Arc::new(registry));
                     }
                     other => warn!("Unhandled Event: {other:?}"),
                 },

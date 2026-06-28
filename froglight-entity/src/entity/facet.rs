@@ -46,7 +46,7 @@ impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
         for (id, val) in ser.dataset.to_ref() {
             writer.write_byte(*id)?;
 
-            (V::DATATYPE_SERIALIZE)(&(), val, writer)?;
+            (V::DATATYPE_SERIALIZE)(val, writer)?;
         }
 
         writer.write_byte(0xff)

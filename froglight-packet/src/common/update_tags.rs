@@ -27,7 +27,7 @@ pub struct TagValue {
     pub identifier: Identifier<'static>,
     /// The values of the tag.
     #[cfg_attr(feature = "facet", facet(mc::variable))]
-    pub values: Vec<i32>,
+    pub values: Vec<u32>,
 }
 
 // -------------------------------------------------------------------------------------------------

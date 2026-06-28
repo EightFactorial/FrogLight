@@ -1,137 +1,72 @@
 //! TODO
 
 use alloc::vec::Vec;
-#[cfg(feature = "std")]
 use core::any::TypeId;
 
-#[cfg(feature = "std")]
-use arc_swap::ArcSwap;
+use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
+use indexmap::IndexMap;
 
-use crate::entity::{EntityBundle, EntityMetadata, GlobalId};
+use crate::{
+    entity::{EntityBundle, EntityMetadata, GlobalEntityId},
+    version::EntityVersion,
+};
 
-/// A thread-safe container for a [`EntityStorage`].
-#[cfg(feature = "std")]
-pub struct GlobalEntityStorage {
-    storage: ArcSwap<EntityStorage>,
-    version_ty: TypeId,
-}
-
-#[cfg(feature = "std")]
-impl GlobalEntityStorage {
-    /// Create a new [`GlobalEntityStorage`] with the given [`EntityStorage`].
-    #[must_use]
-    pub fn new<T: 'static>(storage: EntityStorage) -> Self {
-        Self {
-            storage: ArcSwap::new(alloc::sync::Arc::new(storage)),
-            version_ty: TypeId::of::<T>(),
-        }
-    }
-
-    /// Get the [`TypeId`] of the
-    /// [`Version`](froglight_common::version::Version) this storage belongs to.
-    #[inline]
-    #[must_use]
-    pub const fn version_ty(&self) -> TypeId { self.version_ty }
-}
-
-#[cfg(feature = "std")]
-impl core::ops::Deref for GlobalEntityStorage {
-    type Target = ArcSwap<EntityStorage>;
-
-    fn deref(&self) -> &Self::Target { &self.storage }
-}
-#[cfg(feature = "std")]
-impl core::ops::DerefMut for GlobalEntityStorage {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.storage }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for block data storage.
-#[repr(transparent)]
+/// A container for entity data storage.
 #[derive(Debug, Clone)]
 pub struct EntityStorage {
-    inner: StorageInner,
-}
-
-/// The internal representation of a [`EntityStorage`].
-#[derive(Debug, Clone)]
-enum StorageInner {
-    /// Dynamic storage allocated at runtime.
-    Runtime(Vec<&'static EntityMetadata>),
-    /// Static storage allocated at compile time.
-    Static(&'static [&'static EntityMetadata]),
+    version: TypeId,
+    metadata: IndexMap<Identifier<'static>, &'static EntityMetadata, RandomState>,
 }
 
 impl EntityStorage {
-    /// Create a new static [`EntityStorage`].
+    /// Get the default [`EntityBundle`] for a given [`GlobalEntityId`].
     ///
-    /// # Safety
+    /// # Note
     ///
-    /// The caller must ensure that the provided slice is valid, with one entry
-    /// per [`GlobalId`] in ascending order.
+    /// This is typically used by the registry and world.
     #[must_use]
-    pub const unsafe fn new_static(slice: &'static [&'static EntityMetadata]) -> Self {
-        Self { inner: StorageInner::Static(slice) }
-    }
-
-    /// Create a new runtime-allocated [`EntityStorage`].
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the provided vec is valid, with one entry
-    /// per [`GlobalId`] in ascending order.
-    #[must_use]
-    pub const unsafe fn new_runtime(vec: Vec<&'static EntityMetadata>) -> Self {
-        Self { inner: StorageInner::Runtime(vec) }
-    }
-
-    /// Get the [`Entity`] for a given [`GlobalId`].
-    #[must_use]
-    pub fn get_entity(&self, id: GlobalId) -> Option<EntityBundle> {
-        self.get_metadata(id).map(EntityBundle::new_from)
+    pub fn get_entity_by_id(&self, id: GlobalEntityId) -> Option<EntityBundle> {
+        self.metadata
+            .get_index(id.into_inner() as usize)
+            .map(|(_, meta)| EntityBundle::new_from(meta))
     }
 
     /// Get the [`Entity`] for a given [`Identifier`].
+    ///
+    /// # Note
+    ///
+    /// This is typically used by the registry.
     #[must_use]
     pub fn get_entity_by_identifier(&self, identifier: &Identifier<'_>) -> Option<EntityBundle> {
-        self.to_ref()
-            .iter()
-            .find(|&&meta| meta.identifier() == identifier)
-            .map(|&meta| EntityBundle::new_from(meta))
+        self.metadata.get(identifier).map(|&meta| EntityBundle::new_from(meta))
     }
 
-    /// Get the [`EntityMetadata`] for a given [`GlobalId`].
+    /// Get the [`TypeId`] of the [`Version`] this storage is for.
+    #[inline]
     #[must_use]
-    pub fn get_metadata(&self, id: GlobalId) -> Option<&'static EntityMetadata> {
-        self.to_ref().get(id.into_inner() as usize).copied()
+    pub const fn version_ty(&self) -> TypeId { self.version }
+
+    /// Get the [`IndexMap`] metadata of this [`EntityStorage`].
+    #[inline]
+    #[must_use]
+    pub const fn metadata(
+        &self,
+    ) -> &IndexMap<Identifier<'static>, &'static EntityMetadata, RandomState> {
+        &self.metadata
     }
 
-    /// Get an immutable reference to underlying storage.
+    /// Build a new [`EntityStorage`] for the given [`EntityVersion`].
     #[must_use]
-    pub const fn to_ref(&self) -> &[&'static EntityMetadata] {
-        match self.inner {
-            StorageInner::Runtime(ref vec) => vec.as_slice(),
-            StorageInner::Static(slice) => slice,
+    pub fn build<V: EntityVersion>(metadata: Vec<&'static EntityMetadata>) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for meta in metadata {
+            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
         }
-    }
 
-    /// Get a mutable reference to underlying storage.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
-    #[must_use]
-    pub fn to_mut(&mut self) -> &mut Vec<&'static EntityMetadata> {
-        match self.inner {
-            StorageInner::Runtime(ref mut vec) => vec,
-            StorageInner::Static(slice) => {
-                *self = Self { inner: StorageInner::Runtime(Vec::from(slice)) };
-                match self.inner {
-                    StorageInner::Runtime(ref mut vec) => vec,
-                    StorageInner::Static(_) => unreachable!(),
-                }
-            }
-        }
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
     }
 }
 
@@ -140,56 +75,19 @@ impl EntityStorage {
 /// A macro helper for implementing
 /// [`EntityVersion`](crate::version::EntityVersion) for a given
 /// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
 #[macro_export]
-#[cfg(feature = "std")]
 macro_rules! implement_entities {
-    ($version:ty => $($tt:tt)*) => {
-        $crate::__implement_storage_inner!(@global $version => $($tt)*);
-    };
-}
-
-/// A macro helper for implementing
-/// [`EntityVersion`](crate::version::EntityVersion) for a given
-/// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
-#[macro_export]
-#[cfg(not(feature = "std"))]
-macro_rules! implement_entities {
-    ($version:ty => $($tt:tt)*) => {
-        $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
-    };
-}
-
-/// A hidden internal macro for the [`implement_blocks`] macro.
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __implement_storage_inner {
-    (@global $version:ty => unsafe { $($tt:tt)* }, read: $read:block, write: $write:block ) => {
-        $crate::__implement_storage_inner!(
-            @local {
-                const ENTITY: &'static std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = {
-                    static STATIC: std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = std::sync::LazyLock::new(|| {
-                        $crate::storage::GlobalEntityStorage::new::<$version>(<$version as $crate::version::EntityVersion>::new_entity())
-                    });
-                    &STATIC
-                };
-            },
-            $version => unsafe { $($tt)* },
-            read: $read,
-            write: $write
-        );
-    };
-    (@local {$($constant:tt)*}, $version:ty => unsafe { $($tt:tt)* }, read: $read:block, write: $write:block )  => {
+    ($version:ty => { $($tt:tt)* }, read: $read:block, write: $write:block) => {
         impl $crate::version::EntityVersion for $version {
-            $($constant)*
+            const ENTITY: &'static $crate::version::LazyLock<$crate::version::AtomicArc<$crate::storage::EntityStorage>> = {
+                static STATIC: $crate::version::LazyLock<$crate::version::AtomicArc<$crate::storage::EntityStorage>> = $crate::version::LazyLock::new(|| {
+                    $crate::version::AtomicArc::from(<$version as $crate::version::EntityVersion>::new_entity())
+                });
+                &STATIC
+            };
 
             fn new_entity() -> $crate::storage::EntityStorage {
-               unsafe { $($tt)* }
+               $($tt)*
             }
 
             #[cfg(feature = "facet")]
@@ -198,9 +96,8 @@ macro_rules! __implement_storage_inner {
             ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::template::ReaderError>  = $read;
 
             #[cfg(feature = "facet")]
-            const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
-                &'facet (),
-                &'input $crate::generated::datatype::EntityDataType,
+            const DATATYPE_SERIALIZE: fn(
+                &$crate::generated::datatype::EntityDataType,
                 &mut froglight_facet::facet::template::Writer,
             ) -> Result<(), froglight_facet::facet::template::WriterError> = $write;
         }

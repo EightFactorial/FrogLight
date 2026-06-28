@@ -19,13 +19,15 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+foldhash = { workspace = true }
 froglight-common = { workspace = true }
 froglight-player = { workspace = true }
+froglight-registry-template = { workspace = true }
 glam = { workspace = true }
+indexmap = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_math = { features = ["alloc", "bevy_reflect"], workspace = true, optional = true }
@@ -40,8 +42,6 @@ tracing = { workspace = true, optional = true }
 [features]
 default = ["std"]
 
-# Enable support for atomics
-atomic = []
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_math", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy", "serde"]
 # Enable `facet` support.
@@ -55,11 +55,13 @@ tracing_ext = ["froglight-facet?/tracing", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["bevy_math/nostd-libm", "glam/nostd-libm"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["froglight-registry-template/once_cell"]
 
 # Enable support for the standard library
-std = ["dep:arc-swap", "facet?/std", "froglight-common/std", "froglight-facet?/std", "froglight-player/std", "glam/std", "uuid/std"]
+std = ["facet?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-player/std", "froglight-registry-template/std", "glam/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-common/nightly", "froglight-facet?/nightly", "froglight-player/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-player/nightly", "froglight-registry-template/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

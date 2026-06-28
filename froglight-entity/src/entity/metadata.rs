@@ -12,8 +12,7 @@ use facet::Peek;
 use froglight_common::prelude::Identifier;
 
 use crate::{
-    atomic::MaybeAtomicU32,
-    entity::{EntityAabb, EntityDataSet, GlobalId, entity::EntityType},
+    entity::{EntityAabb, EntityDataSet, GlobalEntityId, entity::EntityType},
     prelude::EntityVersion,
 };
 
@@ -21,8 +20,8 @@ use crate::{
 pub struct EntityMetadata {
     /// The string identifier of the entity.
     identifier: Identifier<'static>,
-    /// The [`GlobalId`] assigned to this entity.
-    global_id: MaybeAtomicU32,
+    /// The [`GlobalEntityId`] assigned to this entity.
+    global_id: GlobalEntityId,
     /// The default [`EntityDataSet`] for this entity type.
     dataset: EntityDataSet<'static>,
 
@@ -53,13 +52,13 @@ impl EntityMetadata {
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     pub const unsafe fn new<E: EntityType<V>, V: EntityVersion>(
         identifier: Identifier<'static>,
+        global_id: GlobalEntityId,
         size: [f32; 2],
         eye_height: f32,
-        global_id: u32,
     ) -> Self {
         Self {
             identifier,
-            global_id: MaybeAtomicU32::new(global_id),
+            global_id,
             dataset: E::DATASET,
 
             aabb: EntityAabb::new(size[0], size[1], eye_height),
@@ -80,9 +79,9 @@ impl EntityMetadata {
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
 
-    /// Get the [`GlobalId`] of this entity type.
+    /// Get the [`GlobalEntityId`] of this entity type.
     #[must_use]
-    pub fn global_id(&self) -> GlobalId { GlobalId::new(self.global_id.get()) }
+    pub fn global_id(&self) -> GlobalEntityId { self.global_id }
 
     /// Get the default [`EntityDataSet`] for this entity type.
     #[must_use]
@@ -94,10 +93,12 @@ impl EntityMetadata {
     pub const fn aabb(&self) -> &EntityAabb { &self.aabb }
 
     /// Returns `true` if this entity is of type `E`.
+    #[inline]
     #[must_use]
     pub fn is_entity<E: 'static>(&self) -> bool { self.entity_ty == TypeId::of::<E>() }
 
     /// Returns `true` if this version is of version `V`.
+    #[inline]
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
 

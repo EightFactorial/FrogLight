@@ -63,8 +63,22 @@ impl RegistryStorage {
         &self.metadata
     }
 
+    /// Get the mutable [`IndexMap`] metadata of this [`RegistryStorage`].
+    #[inline]
+    #[must_use]
+    pub const fn metadata_mut(
+        &mut self,
+    ) -> &mut IndexMap<
+        Identifier<'static>,
+        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
+        RandomState,
+    > {
+        &mut self.metadata
+    }
+
     /// Build a new [`RegistryStorage`] for the given [`RegistryVersion`].
     #[must_use]
+    #[expect(clippy::type_complexity, reason = "Nested `Vec`s")]
     pub fn build<V: RegistryVersion>(
         metadata: Vec<(Identifier<'static>, Vec<(Identifier<'static>, Vec<u32>)>)>,
     ) -> Self {

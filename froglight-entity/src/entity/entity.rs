@@ -16,7 +16,7 @@ use froglight_common::prelude::*;
 #[cfg(feature = "bevy")]
 use crate::bevy::EntityBundleEvent;
 use crate::{
-    entity::{EntityDataSet, GlobalId, metadata::EntityMetadata},
+    entity::{EntityDataSet, GlobalEntityId, metadata::EntityMetadata},
     generated::datatype::EntityDataType,
     prelude::EntityVersion,
 };
@@ -114,7 +114,7 @@ impl EntityBundle {
     /// Get the [`GlobalId`] of this entity type.
     #[inline]
     #[must_use]
-    pub fn global_id(&self) -> GlobalId { self.reference.global_id() }
+    pub fn global_id(&self) -> GlobalEntityId { self.reference.global_id() }
 
     /// Inspect this entity's data using the given function.
     ///

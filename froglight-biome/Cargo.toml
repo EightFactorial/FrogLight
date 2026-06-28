@@ -41,7 +41,7 @@ biome_data = ["dep:facet", "dep:facet-format", "dep:facet-value", "std"]
 once_cell = ["froglight-registry-template/once_cell"]
 
 # Enable support for the standard library
-std = ["facet?/std", "facet-value?/std", "froglight-common/std", "froglight-registry-template/std"]
+std = ["facet?/std", "facet-value?/std", "foldhash/std", "froglight-common/std", "froglight-registry-template/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-registry-template/nightly"]
 
