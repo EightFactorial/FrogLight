@@ -127,15 +127,18 @@ impl BiomeMetadata {
     pub const fn downfall(&self) -> f32 { self.downfall }
 
     /// Get the attributes of this biome.
+    #[inline]
     #[must_use]
     #[cfg(feature = "biome_data")]
     pub fn attributes(&self) -> &BiomeAttributeSet { self.attributes }
 
     /// Returns `true` if this biome is of type `B`.
+    #[inline]
     #[must_use]
     pub fn is_biome<B: 'static>(&self) -> bool { self.biome_ty == TypeId::of::<B>() }
 
     /// Returns `true` if this biome is of version `V`.
+    #[inline]
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
 

@@ -21,7 +21,7 @@ workspace = true
 [dependencies]
 foldhash = { workspace = true }
 froglight-common = { workspace = true }
-froglight-item = { features = ["alloc"], workspace = true }
+froglight-item = { workspace = true }
 indexmap = { workspace = true }
 
 # Optional dependencies

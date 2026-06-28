@@ -63,7 +63,7 @@ tokio = ["dep:async-compat", "dep:tokio", "futures-lite"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-entity/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-player/bevy", "froglight-world/bevy", "futures-lite"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-entity/tracing", "froglight-inventory/tracing", "froglight-item/tracing"]
+tracing = ["dep:tracing", "froglight-entity/tracing", "froglight-inventory/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["froglight-facet/tracing", "tracing"]
 

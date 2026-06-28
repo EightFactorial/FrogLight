@@ -84,7 +84,7 @@ libm = { default-features = false, version = "0.2" }
 memchr = { default-features = false, version = "2.8" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
-quick_cache = { default-features = false, version = "0.6" }
+quick_cache = { default-features = false, version = "0.7" }
 rand = { default-features = false, version = "0.10" }
 regex-lite = { default-features = false, version = "0.1" }
 replace_with = { default-features = false, version = "0.1" }

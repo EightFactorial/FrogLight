@@ -60,14 +60,14 @@ macro_rules! generate {
             }
 
             #[automatically_derived]
-            impl PartialEq<crate::item::Item> for $ident {
+            impl PartialEq<$crate::item::Item> for $ident {
                 #[inline]
                 fn eq(&self, other: &crate::item::Item) -> bool {
                     other.is_item::<$ident>()
                 }
             }
             #[automatically_derived]
-            impl PartialEq<$ident> for crate::item::Item {
+            impl PartialEq<$ident> for $crate::item::Item {
                 #[inline]
                 fn eq(&self, _: &$ident) -> bool {
                     self.is_item::<$ident>()
@@ -76,9 +76,9 @@ macro_rules! generate {
         )*
 
         #[automatically_derived]
-        impl PartialEq<crate::item::Item> for VanillaItem {
+        impl PartialEq<$crate::item::Item> for VanillaItem {
             #[allow(unreachable_patterns, reason = "Nonexhaustive")]
-            fn eq(&self, other: &crate::item::Item) -> bool {
+            fn eq(&self, other: &$crate::item::Item) -> bool {
                 match self {
                     $(
                         VanillaItem::$ident => other.is_item::<$ident>(),
@@ -88,10 +88,10 @@ macro_rules! generate {
             }
         }
         #[automatically_derived]
-        impl PartialEq<VanillaItem> for crate::item::Item {
+        impl PartialEq<VanillaItem> for $crate::item::Item {
             #[inline]
             fn eq(&self, other: &VanillaItem) -> bool {
-                PartialEq::<crate::item::Item>::eq(other, self)
+                PartialEq::<$crate::item::Item>::eq(other, self)
             }
         }
     };
@@ -101,11 +101,11 @@ macro_rules! generate {
         global: $global:literal
     }),*) => {
         $(
-            impl crate::item::ItemType<$version> for $ident {
-                const METADATA: &'static crate::item::ItemMetadata = {
-                    static METADATA: crate::item::ItemMetadata = unsafe { crate::item::ItemMetadata::new::<$ident, $version>(
+            impl $crate::item::ItemType<$version> for $ident {
+                const METADATA: &'static $crate::item::ItemMetadata = {
+                    static METADATA: $crate::item::ItemMetadata = unsafe { $crate::item::ItemMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
-                        $global,
+                        $crate::state::GlobalItemId::new($global),
                         ComponentData::empty()
                     ) };
                     &METADATA
@@ -113,14 +113,18 @@ macro_rules! generate {
             }
         )*
 
-        static ARRAY: &'static [&'static crate::item::ItemMetadata] = &[
-            $(
-                <$ident as crate::item::ItemType<$version>>::METADATA,
-            )*
-        ];
-        crate::implement_items!($version => unsafe {
-            crate::storage::ItemStorage::new_static(ARRAY)
-        });
+        $crate::version::version_implement! {
+            impl $crate::version::ItemVersion => $version {
+                const ITEMS: $crate::storage::ItemStorage;
+                fn new_items() => {
+                    $crate::storage::ItemStorage::build::<Self>(alloc::vec![
+                        $(
+                            <$ident as $crate::item::ItemType<$version>>::METADATA,
+                        )*
+                    ])
+                }
+            }
+        }
     };
 }
 

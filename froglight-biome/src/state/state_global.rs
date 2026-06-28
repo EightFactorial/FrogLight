@@ -10,7 +10,7 @@ use crate::biome::Biome;
 pub struct GlobalBiomeId(u32);
 
 impl GlobalBiomeId {
-    /// Create a new [`GlobalStateId`].
+    /// Create a new [`GlobalBiomeId`].
     #[inline]
     #[must_use]
     pub const fn new(id: u32) -> Self { GlobalBiomeId(id) }
@@ -22,12 +22,15 @@ impl GlobalBiomeId {
 }
 
 impl<T: Into<u32>> From<T> for GlobalBiomeId {
+    #[inline]
     fn from(value: T) -> Self { GlobalBiomeId(value.into()) }
 }
 impl From<Biome> for GlobalBiomeId {
+    #[inline]
     fn from(value: Biome) -> Self { value.global_id() }
 }
 
 impl<T: PartialEq<u32>> PartialEq<T> for GlobalBiomeId {
+    #[inline]
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }

@@ -1,14 +1,13 @@
 #![doc = include_str!("../README.md")]
 #![no_std]
 
-#[cfg(feature = "alloc")]
 extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-pub(crate) mod atomic;
 pub mod generated;
 pub mod item;
+pub mod state;
 pub mod storage;
 pub mod version;
 
@@ -21,6 +20,7 @@ pub mod prelude {
             item::{self, VanillaItem},
         },
         item::{Item, ItemType},
+        state::GlobalItemId,
         version::ItemVersion,
     };
 }

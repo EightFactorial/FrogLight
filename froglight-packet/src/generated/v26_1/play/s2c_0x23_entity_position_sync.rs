@@ -13,7 +13,7 @@ use crate::common::position::EntityPositionRotationData;
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityPositionSyncS2CPacket {
-    #[cfg_attr(feature = "bevy", facet(mc::variable))]
+    #[cfg_attr(feature = "facet", facet(mc::variable))]
     pub entity_id: EntityId,
     pub data: EntityPositionRotationData,
     pub on_ground: bool,

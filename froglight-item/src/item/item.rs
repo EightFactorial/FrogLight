@@ -7,7 +7,8 @@ use core::{
 use froglight_common::prelude::Identifier;
 
 use crate::{
-    item::{ComponentData, ComponentType, GlobalId, ItemMetadata},
+    item::{ComponentData, ComponentType, ItemMetadata},
+    state::GlobalItemId,
     version::ItemVersion,
 };
 
@@ -80,10 +81,10 @@ impl Item {
     #[must_use]
     pub const fn metadata(&self) -> &'static ItemMetadata { self.reference }
 
-    /// Get the [`GlobalId`] of this item.
+    /// Get the [`GlobalItemId`] of this item.
     #[inline]
     #[must_use]
-    pub fn global_id(&self) -> GlobalId { self.reference.global_id() }
+    pub fn global_id(&self) -> GlobalItemId { self.reference.global_id() }
 
     /// Returns `true` if this item is of type `B`.
     #[inline]
@@ -128,7 +129,7 @@ impl Display for Item {
 impl Debug for Item {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Item")
-            .field(self.reference.identifier())
+            .field(self.identifier())
             .field(&self.global_id().into_inner())
             .field(self)
             .finish_non_exhaustive()

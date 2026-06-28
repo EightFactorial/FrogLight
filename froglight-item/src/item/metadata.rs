@@ -6,8 +6,8 @@ use core::{
 use froglight_common::prelude::Identifier;
 
 use crate::{
-    atomic::MaybeAtomicU32,
-    item::{ComponentData, GlobalId, ItemType},
+    item::{ComponentData, ItemType},
+    state::GlobalItemId,
     version::ItemVersion,
 };
 
@@ -15,8 +15,8 @@ use crate::{
 pub struct ItemMetadata {
     /// The string identifier of the item.
     identifier: Identifier<'static>,
-    /// The [`GlobalId`] assigned to this item.
-    global_id: MaybeAtomicU32,
+    /// The [`GlobalItemId`] assigned to this item.
+    global_id: GlobalItemId,
 
     /// The default [`ComponentData`] for this item.
     default_data: ComponentData,
@@ -37,12 +37,12 @@ impl ItemMetadata {
     #[must_use]
     pub const unsafe fn new<I: ItemType<V>, V: ItemVersion>(
         identifier: Identifier<'static>,
-        global_id: u32,
+        global_id: GlobalItemId,
         default_data: ComponentData,
     ) -> Self {
         Self {
             identifier,
-            global_id: MaybeAtomicU32::new(global_id),
+            global_id,
             default_data,
             item_ty: TypeId::of::<I>(),
             version_ty: TypeId::of::<V>(),
@@ -54,18 +54,10 @@ impl ItemMetadata {
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
 
-    /// Get the [`GlobalId`] of this item.
+    /// Get the [`GlobalItemId`] of this item.
+    #[inline]
     #[must_use]
-    pub fn global_id(&self) -> GlobalId { GlobalId::new(self.global_id.get()) }
-
-    /// Set the base [`GlobalId`] of this item.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the new id matches the indices in the
-    /// [`ItemStorage`](crate::storage::ItemStorage) it is used in.
-    #[cfg(feature = "atomic")]
-    pub unsafe fn set_global_id(&self, id: GlobalId) { self.global_id.set_atomic(id.into_inner()); }
+    pub const fn global_id(&self) -> GlobalItemId { self.global_id }
 
     /// Get the default [`ComponentData`] for this item.
     #[inline]
@@ -73,10 +65,12 @@ impl ItemMetadata {
     pub const fn default_data(&self) -> &ComponentData { &self.default_data }
 
     /// Returns `true` if this item is of type `B`.
+    #[inline]
     #[must_use]
     pub fn is_item<I: 'static>(&self) -> bool { self.item_ty == TypeId::of::<I>() }
 
     /// Returns `true` if this item is of version `V`.
+    #[inline]
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
 
