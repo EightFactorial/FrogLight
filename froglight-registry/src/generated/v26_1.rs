@@ -1,7 +1,12 @@
 use froglight_common::prelude::V26_1;
 
-use crate::implement_registry;
+crate::version::version_implement! {
+    impl crate::version::RegistryVersion => V26_1 {
+        const REGISTRY: crate::storage::RegistryStorage;
+        fn new_registry() => {
+            crate::storage::RegistryStorage::build::<Self>(alloc::vec![
 
-implement_registry! {
-    V26_1 => {}
+            ])
+        }
+    }
 }

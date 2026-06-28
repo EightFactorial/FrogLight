@@ -21,7 +21,7 @@ pub struct BiomeStorage {
 }
 
 impl BiomeStorage {
-    /// Get the default [`Biome`] for a given [`GlobalStateId`].
+    /// Get the [`Biome`] for a given [`GlobalStateId`].
     ///
     /// # Note
     ///
@@ -31,7 +31,7 @@ impl BiomeStorage {
         self.metadata.get_index(id.into_inner() as usize).map(|(_, meta)| Biome::new_from(meta))
     }
 
-    /// Get the default [`Biome`] for a given [`Identifier`].
+    /// Get the [`Biome`] for a given [`Identifier`].
     ///
     /// # Note
     ///

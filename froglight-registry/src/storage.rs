@@ -1,553 +1,80 @@
 //! TODO
-#![allow(
-    clippy::match_wildcard_for_single_variants,
-    reason = "Enums have additional variants enabled with the `alloc` feature"
-)]
 
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-#[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
-use std::sync::RwLock;
+use core::any::TypeId;
 
-#[cfg(feature = "async")]
-use async_lock::RwLock;
-#[cfg(feature = "alloc")]
 use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
-#[doc(hidden)]
-pub use froglight_common::identifier::Identifier as __Identifier;
-#[cfg(feature = "alloc")]
 use indexmap::IndexMap;
-#[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-use parking_lot::RwLock;
 
-/// A thread-safe container for a [`RegistrySetStorage`].
-#[repr(transparent)]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-pub struct GlobalRegistrySetStorage {
-    storage: RwLock<RegistrySetStorage>,
-}
+use crate::{registry::RegistryRef, state::GlobalRegistryId, version::RegistryVersion};
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-impl GlobalRegistrySetStorage {
-    /// Create a new [`GlobalRegistrySetStorage`].
-    #[must_use]
-    pub const fn new(storage: RegistrySetStorage) -> Self { Self { storage: RwLock::new(storage) } }
-
-    /// Get a reference to the underlying [`RwLock`].
-    #[inline]
-    #[must_use]
-    pub const fn as_ref(&self) -> &RwLock<RegistrySetStorage> { &self.storage }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, RegistrySetStorage> {
-        self.storage.read_blocking()
-    }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, RegistrySetStorage> {
-        self.storage.read()
-    }
-
-    /// Acquire a read lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, RegistrySetStorage> {
-        self.storage.read().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a read lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, RegistrySetStorage> {
-        self.storage.read().await
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, RegistrySetStorage> {
-        self.storage.write_blocking()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, RegistrySetStorage> {
-        self.storage.write()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, RegistrySetStorage> {
-        self.storage.write().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a write lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, RegistrySetStorage> {
-        self.storage.write().await
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for registry set storage.
-#[repr(transparent)]
-#[derive(Debug, Clone)]
-pub struct RegistrySetStorage {
-    inner: SetStorageInner,
-}
-
-/// The internal representation of a [`RegistrySetStorage`].
-#[derive(Debug, Clone)]
-enum SetStorageInner {
-    /// Dynamic storage allocated at runtime.
-    #[cfg(feature = "alloc")]
-    Runtime(IndexMap<Identifier<'static>, RegistryStorage, RandomState>),
-    /// Static storage allocated at compile time.
-    Static(&'static [(Identifier<'static>, RegistryStorage)]),
-}
-
-impl RegistrySetStorage {
-    /// Create a new static [`RegistrySetStorage`].
-    #[must_use]
-    pub const fn new_static(slice: &'static [(Identifier<'static>, RegistryStorage)]) -> Self {
-        Self { inner: SetStorageInner::Static(slice) }
-    }
-
-    /// Create a new runtime-allocated [`RegistrySetStorage`].
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const fn new_runtime(
-        map: IndexMap<Identifier<'static>, RegistryStorage, RandomState>,
-    ) -> Self {
-        Self { inner: SetStorageInner::Runtime(map) }
-    }
-
-    /// Get the number of registries stored.
-    #[must_use]
-    pub fn len(&self) -> usize {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            SetStorageInner::Runtime(map) => map.len(),
-            SetStorageInner::Static(slice) => slice.len(),
-        }
-    }
-
-    /// Return `true` if there are no registries stored.
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            SetStorageInner::Runtime(map) => map.is_empty(),
-            SetStorageInner::Static(slice) => slice.is_empty(),
-        }
-    }
-
-    /// Get a reference to a [`RegistryStorage`] by its [`Identifier`].
-    #[must_use]
-    pub fn get<T: AsRef<str> + ?Sized>(&self, identifier: &T) -> Option<&RegistryStorage> {
-        let identifier = identifier.as_ref();
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            SetStorageInner::Runtime(map) => map.get(identifier),
-            SetStorageInner::Static(slice) => {
-                slice.iter().find(|(id, _)| id.as_str() == identifier).map(|(_, storage)| storage)
-            }
-        }
-    }
-
-    /// Get a mutable reference to a [`RegistryStorage`] by its [`Identifier`].
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn get_mut<T: AsRef<str> + ?Sized>(
-        &mut self,
-        identifier: &T,
-    ) -> Option<&mut RegistryStorage> {
-        self.to_mut().get_mut(identifier.as_ref())
-    }
-
-    /// Get a mutable reference to a [`RegistryStorage`] by its [`Identifier`],
-    /// or insert a new empty [`RegistryStorage`] if one does not exist.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn get_mut_or_default(&mut self, identifier: Identifier<'static>) -> &mut RegistryStorage {
-        self.to_mut().entry(identifier).or_insert_with(|| RegistryStorage::new_runtime(Vec::new()))
-    }
-
-    /// Insert a new [`RegistryStorage`] with the given [`Identifier`].
-    #[cfg(feature = "alloc")]
-    pub fn insert(&mut self, identifier: Identifier<'static>, storage: RegistryStorage) {
-        self.to_mut().insert(identifier, storage);
-    }
-
-    /// Remove a [`RegistryStorage`] by its [`Identifier`].
-    ///
-    /// Returns the removed [`RegistryStorage`] if it existed.
-    ///
-    /// ## Note
-    ///
-    /// See [`IndexMap::swap_remove`] for more details.
-    #[cfg(feature = "alloc")]
-    pub fn swap_remove(&mut self, identifier: &str) -> Option<RegistryStorage> {
-        self.to_mut().swap_remove(identifier)
-    }
-
-    /// Remove a [`RegistryStorage`] by its [`Identifier`].
-    ///
-    /// Returns the removed [`RegistryStorage`] if it existed.
-    ///
-    /// ## Note
-    ///
-    /// See [`IndexMap::shift_remove`] for more details.
-    #[cfg(feature = "alloc")]
-    pub fn shift_remove(&mut self, identifier: &str) -> Option<RegistryStorage> {
-        self.to_mut().shift_remove(identifier)
-    }
-
-    /// Get a mutable reference to underlying storage.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
-    #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut IndexMap<Identifier<'static>, RegistryStorage, RandomState> {
-        match self.inner {
-            SetStorageInner::Runtime(ref mut map) => map,
-            SetStorageInner::Static(slice) => {
-                let map = slice.iter().cloned().collect();
-                self.inner = SetStorageInner::Runtime(map);
-                match self.inner {
-                    SetStorageInner::Runtime(ref mut map) => map,
-                    _ => unreachable!(),
-                }
-            }
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for registry storage.
-#[repr(transparent)]
+/// A container for registry data storage.
 #[derive(Debug, Clone)]
 pub struct RegistryStorage {
-    inner: StorageInner,
-}
-
-/// The internal representation of a [`RegistryStorage`].
-#[derive(Debug, Clone)]
-enum StorageInner {
-    /// Dynamic storage allocated at runtime.
-    #[cfg(feature = "alloc")]
-    Runtime(Vec<RegistryValue>),
-    /// Static storage allocated at compile time.
-    Static(&'static [RegistryValue]),
+    version: TypeId,
+    metadata: IndexMap<
+        Identifier<'static>,
+        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
+        RandomState,
+    >,
 }
 
 impl RegistryStorage {
-    /// Create a new static [`RegistryStorage`].
-    #[must_use]
-    pub const fn new_static(slice: &'static [RegistryValue]) -> Self {
-        Self { inner: StorageInner::Static(slice) }
-    }
-
-    /// Create a new runtime-allocated [`RegistryStorage`].
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const fn new_runtime(vec: Vec<RegistryValue>) -> Self {
-        Self { inner: StorageInner::Runtime(vec) }
-    }
-
-    /// Get the number of entries stored.
-    #[must_use]
-    pub const fn len(&self) -> usize {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            StorageInner::Runtime(vec) => vec.len(),
-            StorageInner::Static(slice) => slice.len(),
-        }
-    }
-
-    /// Return `true` if there are no entries stored.
-    #[must_use]
-    pub const fn is_empty(&self) -> bool {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            StorageInner::Runtime(vec) => vec.is_empty(),
-            StorageInner::Static(slice) => slice.is_empty(),
-        }
-    }
-
-    /// Get a reference to a [`RegistryValue`] by its registry index.
-    #[must_use]
-    pub const fn get(&self, index: usize) -> Option<&RegistryValue> {
-        if index < self.len() { Some(&self.to_ref()[index]) } else { None }
-    }
-
-    /// Get a mutable reference to a [`RegistryValue`] by its registry index.
+    /// Get the [`Registry`] for a given [`GlobalRegistryId`].
     ///
-    /// If the storage is static, it will be converted into a dynamic storage.
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut RegistryValue> {
-        self.to_mut().get_mut(index)
-    }
-
-    /// Get a reference to a [`RegistryValue`] by its identifier.
-    #[must_use]
-    pub fn get_by_name<T: AsRef<str> + ?Sized>(&self, name: &T) -> Option<&RegistryValue> {
-        let name = name.as_ref();
-        self.to_ref().iter().find(|value| value.key.as_str() == name)
-    }
-
-    /// Get a mutable reference to a [`RegistryValue`] by its identifier.
+    /// # Note
     ///
-    /// If the storage is static, it will be converted into a dynamic storage.
+    /// This is typically used by the registry and world.
     #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn get_mut_by_name<T: AsRef<str> + ?Sized>(
-        &mut self,
-        name: &T,
-    ) -> Option<&mut RegistryValue> {
-        let name = name.as_ref();
-        self.to_mut().iter_mut().find(|value| value.key.as_str() == name)
+    pub fn get_registry_by_id(&self, id: GlobalRegistryId) -> Option<RegistryRef<'_>> {
+        self.metadata
+            .get_index(id.into_inner() as usize)
+            .map(|(identifier, values)| RegistryRef::new(identifier.reborrow(), values))
     }
 
-    /// Get a mutable reference to a [`RegistryValue`] by its identifier,
-    /// or insert a new one and return a mutable reference to it.
+    /// Get the [`Registry`] for a given [`Identifier`].
     ///
+    /// # Note
     ///
-    /// If the storage is static, it will be converted into a dynamic storage.
+    /// This is typically used by the registry.
     #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn get_mut_or_default(&mut self, name: Identifier<'static>) -> &mut RegistryValue {
-        let slice = self.to_ref();
-
-        let mut index = slice.iter().position(|value| value.key.as_str() == name.as_str());
-        if index.is_none() {
-            index = Some(slice.len());
-            self.to_mut().push(RegistryValue::new_runtime(name, Vec::new()));
-        }
-
-        // SAFETY: Index is guaranteed to exist and be within bounds
-        unsafe { self.to_mut().get_mut(index.unwrap_unchecked()).unwrap_unchecked() }
+    pub fn get_registry_by_identifier<'a>(&'a self, identifier: &str) -> Option<RegistryRef<'a>> {
+        self.metadata
+            .get_key_value(identifier)
+            .map(|(identifier, values)| RegistryRef::new(identifier.reborrow(), values))
     }
 
-    /// Get a reference to the underlying slice of identifiers.
-    #[must_use]
-    pub const fn to_ref(&self) -> &[RegistryValue] {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            StorageInner::Runtime(vec) => vec.as_slice(),
-            StorageInner::Static(slice) => slice,
-        }
-    }
-
-    /// Get a mutable reference to underlying storage.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
-    #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut Vec<RegistryValue> {
-        match self.inner {
-            StorageInner::Runtime(ref mut vec) => vec,
-            StorageInner::Static(slice) => {
-                let vec = slice.to_vec();
-                self.inner = StorageInner::Runtime(vec);
-                match self.inner {
-                    StorageInner::Runtime(ref mut vec) => vec,
-                    _ => unreachable!(),
-                }
-            }
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for registry values.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RegistryValue {
-    key: Identifier<'static>,
-    inner: RegistryValueInner,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-enum RegistryValueInner {
-    #[cfg(feature = "alloc")]
-    Runtime(Vec<i32>),
-    Static(&'static [i32]),
-}
-
-impl RegistryValue {
-    /// Create a new static [`RegistryValue`].
-    #[must_use]
-    pub const fn new_static(key: Identifier<'static>, slice: &'static [i32]) -> Self {
-        Self { key, inner: RegistryValueInner::Static(slice) }
-    }
-
-    /// Create a new runtime-allocated [`RegistryValue`].
-    #[must_use]
-    #[cfg(feature = "alloc")]
-    pub const fn new_runtime(key: Identifier<'static>, vec: Vec<i32>) -> Self {
-        Self { key, inner: RegistryValueInner::Runtime(vec) }
-    }
-
-    /// Get the key of this value.
+    /// Get the [`TypeId`] of the [`Version`] this storage is for.
     #[inline]
     #[must_use]
-    pub const fn key(&self) -> &Identifier<'static> { &self.key }
+    pub const fn version_ty(&self) -> TypeId { self.version }
 
-    /// Get a reference to the tag values associated with this value.
+    /// Get the [`IndexMap`] metadata of this [`RegistryStorage`].
+    #[inline]
     #[must_use]
-    pub const fn values(&self) -> &[i32] {
-        match &self.inner {
-            #[cfg(feature = "alloc")]
-            RegistryValueInner::Runtime(vec) => vec.as_slice(),
-            RegistryValueInner::Static(slice) => slice,
-        }
+    pub const fn metadata(
+        &self,
+    ) -> &IndexMap<
+        Identifier<'static>,
+        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
+        RandomState,
+    > {
+        &self.metadata
     }
 
-    /// Get a mutable reference to the tag values associated with this value.
-    ///
-    /// If the storage is static, it will be converted into a dynamic storage.
+    /// Build a new [`RegistryStorage`] for the given [`RegistryVersion`].
     #[must_use]
-    #[cfg(feature = "alloc")]
-    pub fn values_mut(&mut self) -> &mut Vec<i32> {
-        match self.inner {
-            RegistryValueInner::Runtime(ref mut vec) => vec,
-            RegistryValueInner::Static(slice) => {
-                let vec = slice.to_vec();
-                self.inner = RegistryValueInner::Runtime(vec);
-                match self.inner {
-                    RegistryValueInner::Runtime(ref mut vec) => vec,
-                    _ => unreachable!(),
-                }
-            }
+    pub fn build<V: RegistryVersion>(
+        metadata: Vec<(Identifier<'static>, Vec<(Identifier<'static>, Vec<u32>)>)>,
+    ) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for (key, values) in metadata {
+            identifiers.entry(key).insert_entry(values.into_iter().collect());
         }
+
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
     }
-
-    /// Set the tag values associated with this value, replacing any existing
-    /// tags.
-    #[cfg(feature = "alloc")]
-    pub fn set_values(&mut self, tags: Vec<i32>) { self.inner = RegistryValueInner::Runtime(tags); }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A macro helper for implementing
-/// [`RegistryVersion`](crate::version::RegistryVersion) for a given
-/// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
-#[macro_export]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-macro_rules! implement_registry {
-    ($version:ty => { $($tt:tt)* })  => {
-        $crate::__implement_storage_inner!(@global $version => { $($tt)* });
-    };
-}
-
-/// A macro helper for implementing [`RegistryVersion`] for a given
-/// [`Version`](froglight_common::version::Version).
-///
-/// This macro has will determine whether to generate a global storage constant
-/// based on enabled features.
-#[macro_export]
-#[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-macro_rules! implement_registry {
-    ($version:ty => { $($tt:tt)* }) => {
-        $crate::__implement_storage_inner!(@local {}, $version => { $($tt)* });
-    };
-}
-
-/// A hidden internal macro for the [`implement_registry`] macro.
-///
-/// Parses the following syntax:
-/// ```rust,ignore
-/// implement_registry! {
-///     TestVersion => {
-///         "test:example_a" => [
-///             "test:example_a_a",
-///             "test:example_a_b",
-///             "test:example_a_c",
-///         ],
-///         "test:example_b" => [
-///             "test:example_b_a",
-///             "test:example_b_b",
-///         ],
-///         // ...
-///    }
-/// }
-/// ```
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __implement_storage_inner {
-    (@global $version:ty => { $($tt:tt)* } ) => {
-        $crate::__implement_storage_inner!(
-            @local {
-                const REGISTRY: &'static $crate::storage::GlobalRegistrySetStorage = {
-                    static STATIC: $crate::storage::GlobalRegistrySetStorage = $crate::storage::GlobalRegistrySetStorage::new(
-                        $crate::storage::RegistrySetStorage::new_static(ENTRIES)
-                    );
-                    &STATIC
-                };
-            },
-            $version => { $($tt)* }
-        );
-    };
-    (@local {$($constant:tt)*}, $version:ty => { $($tt:tt)* } ) => {
-        #[doc(hidden)]
-        mod __registry_storage_impl {
-            #[allow(unused_imports, reason = "Macro generated code")]
-            use super::*;
-
-            static ENTRIES: &'static [( $crate::storage::__Identifier<'static>, $crate::storage::RegistryStorage )] =
-                $crate::__implement_storage_inner!(@parse { $($tt)* });
-
-            impl $crate::version::RegistryVersion for $version {
-                $($constant)*
-
-                fn new_registry() -> $crate::storage::RegistrySetStorage {
-                    $crate::storage::RegistrySetStorage::new_static(ENTRIES)
-                }
-            }
-        }
-    };
-
-    (@parse { $( $id:expr => [ $( $entry:expr => $values:expr ),* $(,)? ] ),* $(,)? }) => {{
-        &[
-            $(
-                (
-                    $crate::storage::__Identifier::new_static($id),
-                    $crate::storage::RegistryStorage::new_static({
-                        static INNER: &'static [ $crate::storage::RegistryValue ] =
-                        &[
-                            $(
-                                $crate::storage::RegistryValue::new_static(
-                                    $crate::storage::__Identifier::new_static($entry),
-                                    $values,
-                                )
-                            ),*
-                        ];
-                        INNER
-                    })
-                )
-            ),*
-        ]
-    }}
 }

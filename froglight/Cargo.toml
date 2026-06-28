@@ -44,13 +44,11 @@ bevy = ["froglight-internal/bevy"]
 network = ["froglight-internal/network", "std"]
 # Enable `tracing` support.
 tracing = ["froglight-internal/tracing"]
-# Enable extended`tracing` support.
+# Enable extended `tracing` support.
 tracing_ext = ["froglight-internal/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]
-# Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-internal/parking_lot"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["froglight-internal/once_cell"]
 

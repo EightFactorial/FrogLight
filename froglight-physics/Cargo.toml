@@ -50,6 +50,8 @@ serde = ["dep:serde", "froglight-common/serde", "glam/serde"]
 
 # Enable `libm` for `no_std` support.
 libm = ["bevy_transform?/libm", "dep:libm", "froglight-entity/libm", "froglight-math/libm", "glam/nostd-libm"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["froglight-block/once_cell", "froglight-math/once_cell", "froglight-world/once_cell"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-entity/tracing"]
 

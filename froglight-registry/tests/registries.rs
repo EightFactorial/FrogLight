@@ -1,8 +1,7 @@
 //! TODO
-#![no_std]
 
 use froglight_common::prelude::*;
-use froglight_registry::{implement_registry, prelude::*};
+use froglight_registry::{prelude::*, storage::RegistryStorage};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct TestVersion;
@@ -13,97 +12,62 @@ impl Version for TestVersion {
     const RESOURCE_VERSION: u32 = u32::MIN;
 }
 
-implement_registry! {
-    TestVersion => {
-        "test:example_a" => [
-            "test:example_a_a" => &[],
-            "test:example_a_b" => &[],
-            "test:example_a_c" => &[],
-        ],
-        "test:example_b" => [
-            "test:example_b_1" => &[],
-            "test:example_b_2" => &[],
-        ]
+froglight_registry::version::version_implement! {
+    impl RegistryVersion => TestVersion {
+        const REGISTRY: RegistryStorage;
+        fn new_registry() => {
+            RegistryStorage::build::<Self>(vec![
+                (
+                    Identifier::new_static("test:example_a"),
+                    vec![
+                        (Identifier::new_static("test:example_a_a"), vec![]),
+                        (Identifier::new_static("test:example_a_b"), vec![]),
+                        (Identifier::new_static("test:example_a_c"), vec![]),
+                    ]
+                ),
+                (
+                    Identifier::new_static("test:example_b"),
+                    vec![
+                        (Identifier::new_static("test:example_b_0"), vec![]),
+                        (Identifier::new_static("test:example_b_1"), vec![]),
+                    ]
+                ),
+            ])
+        }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 #[test]
-#[allow(unused_mut, reason = "Used if `alloc` feature is enabled")]
-fn entry_a() {
-    let mut storage = TestVersion::new_registry();
-    let registry = storage.get("test:example_a").unwrap();
+fn registry() {
+    let registry = TestVersion::registry();
+    assert_eq!(registry.metadata().len(), 2);
 
-    assert_eq!(registry.len(), 3);
+    // "test:example_a"
 
-    assert!(registry.get_by_name("test:example_a_a").is_some());
-    assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+    let registry_ref = registry.get_registry_by_identifier("test:example_a").unwrap();
+    assert_eq!(registry_ref.identifier(), "test:example_a");
+    assert_eq!(registry_ref.len(), 3);
 
-    assert!(registry.get_by_name("test:example_a_b").is_some());
-    assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
+    assert!(registry_ref.get_by_identifier("test:example_a_a").is_some());
+    assert_eq!(registry_ref.get_by_index(0).unwrap().identifier(), "test:example_a_a");
 
-    assert!(registry.get_by_name("test:example_a_c").is_some());
-    assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
+    assert!(registry_ref.get_by_identifier("test:example_a_b").is_some());
+    assert_eq!(registry_ref.get_by_index(1).unwrap().identifier(), "test:example_a_b");
 
-    #[cfg(feature = "alloc")]
-    {
-        use froglight_registry::storage::RegistryValue;
+    assert!(registry_ref.get_by_identifier("test:example_a_c").is_some());
+    assert_eq!(registry_ref.get_by_index(2).unwrap().identifier(), "test:example_a_c");
 
-        let registry = storage.get_mut("test:example_a").unwrap();
-        registry
-            .to_mut()
-            .push(RegistryValue::new_static(Identifier::new_static("test:example_a_d"), &[]));
+    // "test:example_b"
 
-        assert_eq!(registry.len(), 4);
+    let registry_ref = registry.get_registry_by_identifier("test:example_b").unwrap();
+    assert_eq!(registry_ref.identifier(), "test:example_b");
+    assert_eq!(registry_ref.len(), 2);
 
-        assert!(registry.get_by_name("test:example_a_a").is_some());
-        assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+    assert!(registry_ref.get_by_identifier("test:example_b_0").is_some());
+    assert_eq!(registry_ref.get_by_index(0).unwrap().identifier(), "test:example_b_0");
 
-        assert!(registry.get_by_name("test:example_a_b").is_some());
-        assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
-
-        assert!(registry.get_by_name("test:example_a_c").is_some());
-        assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
-
-        assert!(registry.get_by_name("test:example_a_d").is_some());
-        assert_eq!(registry.get(3).unwrap().key(), "test:example_a_d");
-    }
-}
-
-#[test]
-#[allow(unused_mut, reason = "Used if `alloc` feature is enabled")]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-fn entry_b() {
-    let mut storage = TestVersion::registry().write();
-    let registry = storage.get("test:example_b").unwrap();
-
-    assert_eq!(registry.len(), 2);
-
-    assert!(registry.get_by_name("test:example_b_1").is_some());
-    assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
-
-    assert!(registry.get_by_name("test:example_b_2").is_some());
-    assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
-
-    #[cfg(feature = "alloc")]
-    {
-        use froglight_registry::storage::RegistryValue;
-
-        let registry = storage.get_mut("test:example_b").unwrap();
-        registry
-            .to_mut()
-            .push(RegistryValue::new_static(Identifier::new_static("test:example_b_3"), &[]));
-
-        assert_eq!(registry.len(), 3);
-
-        assert!(registry.get_by_name("test:example_b_1").is_some());
-        assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
-
-        assert!(registry.get_by_name("test:example_b_2").is_some());
-        assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
-
-        assert!(registry.get_by_name("test:example_b_3").is_some());
-        assert_eq!(registry.get(2).unwrap().key(), "test:example_b_3");
-    }
+    assert!(registry_ref.get_by_identifier("test:example_b_1").is_some());
+    assert_eq!(registry_ref.get_by_index(1).unwrap().identifier(), "test:example_b_1");
 }

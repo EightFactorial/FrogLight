@@ -7,21 +7,21 @@ use crate::item::Item;
 /// from [`V26_1`](froglight_common::prelude::V26_1).
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
-pub struct GlobalItemId(u16);
+pub struct GlobalItemId(u32);
 
 impl GlobalItemId {
     /// Create a new [`GlobalItemId`].
     #[inline]
     #[must_use]
-    pub const fn new(id: u16) -> Self { GlobalItemId(id) }
+    pub const fn new(id: u32) -> Self { GlobalItemId(id) }
 
-    /// Get the inner [`u16`] value.
+    /// Get the inner [`u32`] value.
     #[inline]
     #[must_use]
-    pub const fn into_inner(self) -> u16 { self.0 }
+    pub const fn into_inner(self) -> u32 { self.0 }
 }
 
-impl<T: Into<u16>> From<T> for GlobalItemId {
+impl<T: Into<u32>> From<T> for GlobalItemId {
     #[inline]
     fn from(value: T) -> Self { GlobalItemId(value.into()) }
 }
@@ -30,7 +30,7 @@ impl From<Item> for GlobalItemId {
     fn from(value: Item) -> Self { value.global_id() }
 }
 
-impl<T: PartialEq<u16>> PartialEq<T> for GlobalItemId {
+impl<T: PartialEq<u32>> PartialEq<T> for GlobalItemId {
     #[inline]
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }
