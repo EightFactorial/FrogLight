@@ -277,9 +277,11 @@ macro_rules! generate {
 
         $crate::implement_entities!(
             $version => {
-                $crate::storage::EntityStorage::build::<$version>(alloc::vec![
-                    $( <$ident as $crate::entity::EntityType<$version>>::METADATA, )*
-                ])
+                unsafe {
+                    $crate::storage::EntityStorage::build::<$version>(alloc::vec![
+                        $( <$ident as $crate::entity::EntityType<$version>>::METADATA, )*
+                    ])
+                }
             },
             read: { |cursor| {
                 let val = froglight_facet::deserialize::varint::decode_u32_from(cursor)?;

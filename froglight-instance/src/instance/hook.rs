@@ -43,7 +43,7 @@ pub(crate) fn discard_hook<T: InstanceData + Clone>(mut world: DeferredWorld, ct
     // Get the `PartOfInstance` component.
     let Some(instance) = world.get::<PartOfInstance>(ctx.entity) else {
         #[cfg(feature = "tracing")]
-        tracing::warn!(target: "froglight_instance", "Entity {} removed a `{}`, but has no `{}` component!", ctx.entity, T::short_type_path(), T::Relationship::short_type_path());
+        tracing::warn!(target: "froglight_instance", "Entity {} removed a `{}`, but has no `PartOfInstance` component!", ctx.entity, T::short_type_path());
         return;
     };
 

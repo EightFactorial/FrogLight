@@ -41,12 +41,12 @@ bevy_transform = { default-features = false, version = "0.19" }
 bevy_ui = { default-features = false, version = "0.19" }
 
 # Facet Dependencies
-facet = { default-features = false, version = "=0.50.0-rc.4" }
-facet-format = { default-features = false, version = "=0.50.0-rc.4" }
-facet-json = { default-features = false, version = "=0.50.0-rc.4" }
-facet-path = { default-features = false, version = "=0.50.0-rc.4" }
-facet-toml = { default-features = false, version = "=0.50.0-rc.4" }
-facet-value = { default-features = false, version = "=0.50.0-rc.4" }
+facet = { default-features = false, version = "=0.50.0-rc.5" }
+facet-format = { default-features = false, version = "=0.50.0-rc.5" }
+facet-json = { default-features = false, version = "=0.50.0-rc.5" }
+facet-path = { default-features = false, version = "=0.50.0-rc.5" }
+facet-toml = { default-features = false, version = "=0.50.0-rc.5" }
+facet-value = { default-features = false, version = "=0.50.0-rc.5" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.1" }
@@ -123,6 +123,10 @@ panic = "abort"
 codegen-units = 1
 inherits = "release"
 
+[profile.distribution-size]
+inherits = "distribution"
+opt-level = "z"
+
 [workspace]
 default-members = ["froglight"]
 members = [
@@ -153,7 +157,7 @@ members = [
   "froglight-text",
   "froglight-world",
 ]
-resolver = "2"
+resolver = "3"
 
 [workspace.package]
 edition = "2024"

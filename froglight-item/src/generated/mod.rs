@@ -117,11 +117,13 @@ macro_rules! generate {
             impl $crate::version::ItemVersion => $version {
                 const ITEMS: $crate::storage::ItemStorage;
                 fn new_items() => {
-                    $crate::storage::ItemStorage::build::<Self>(alloc::vec![
-                        $(
-                            <$ident as $crate::item::ItemType<$version>>::METADATA,
-                        )*
-                    ])
+                    unsafe {
+                        $crate::storage::ItemStorage::build::<Self>(alloc::vec![
+                            $(
+                                <$ident as $crate::item::ItemType<$version>>::METADATA,
+                            )*
+                        ])
+                    }
                 }
             }
         }

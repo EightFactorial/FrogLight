@@ -21,6 +21,24 @@ pub struct BiomeStorage {
 }
 
 impl BiomeStorage {
+    /// Build a new [`BiomeStorage`] for the given [`BiomeVersion`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that all provided biome metadata has the correct
+    /// global ids for this collection.
+    #[must_use]
+    pub unsafe fn build<V: BiomeVersion>(metadata: Vec<&'static BiomeMetadata>) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for meta in metadata {
+            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+        }
+
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
+    }
+
     /// Get the [`Biome`] for a given [`GlobalStateId`].
     ///
     /// # Note
@@ -55,16 +73,12 @@ impl BiomeStorage {
         &self.metadata
     }
 
-    /// Build a new [`BiomeStorage`] for the given [`BiomeVersion`].
+    /// Get the mutable [`IndexMap`] metadata of this [`BiomeStorage`].
+    #[inline]
     #[must_use]
-    pub fn build<V: BiomeVersion>(metadata: Vec<&'static BiomeMetadata>) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
-
-        for meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
-        }
-
-        Self { version: TypeId::of::<V>(), metadata: identifiers }
+    pub fn metadata_mut(
+        &mut self,
+    ) -> &mut IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState> {
+        &mut self.metadata
     }
 }

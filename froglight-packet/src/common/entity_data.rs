@@ -1,15 +1,14 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
-#[cfg(feature = "std")]
-use froglight_entity::{entity::DataSetSerializer, prelude::EntityVersion};
+use froglight_entity::prelude::{EntityId, EntityUuid};
+#[cfg(feature = "facet")]
 use froglight_entity::{
-    entity::EntityDataSet,
-    prelude::{EntityId, EntityUuid},
+    entity::{DataSetSerializer, EntityDataSet},
+    prelude::EntityVersion,
 };
 #[cfg(feature = "facet")]
-use froglight_facet as mc;
-use froglight_facet::deserialize::DeserializeError;
+use froglight_facet::{self as mc, deserialize::DeserializeError};
 
 use crate::common::{lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
 
@@ -42,6 +41,7 @@ pub struct SetEntityBundle {
     #[cfg_attr(feature = "facet", facet(mc::variable))]
     entity_id: EntityId,
     raw_data: UnsizedBuffer<'static>,
+    #[cfg(feature = "facet")]
     fn_ptr: fn(&[u8]) -> Result<EntityDataSet<'static>, DeserializeError>,
 }
 
@@ -55,7 +55,7 @@ impl PartialEq for SetEntityBundle {
 impl SetEntityBundle {
     /// Create a new [`SetEntityBundle`] with the given entity ID and raw data.
     #[must_use]
-    #[cfg(feature = "std")]
+    #[cfg(feature = "facet")]
     pub const fn new<V: EntityVersion>(
         entity_id: EntityId,
         raw_data: UnsizedBuffer<'static>,
@@ -70,6 +70,7 @@ impl SetEntityBundle {
     /// deserialization function.
     #[inline]
     #[must_use]
+    #[cfg(feature = "facet")]
     pub const fn new_using(
         entity_id: EntityId,
         raw_data: UnsizedBuffer<'static>,
@@ -95,6 +96,7 @@ impl SetEntityBundle {
     ///
     /// Returns an error if the data is invalid.
     #[inline]
+    #[cfg(feature = "facet")]
     pub fn parse(&self) -> Result<EntityDataSet<'static>, DeserializeError> {
         (self.fn_ptr)(self.as_raw_data())
     }

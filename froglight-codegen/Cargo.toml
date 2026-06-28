@@ -29,4 +29,4 @@ papaya = { version = "0.2" }
 reqwest = { features = ["rustls"], workspace = true }
 tokio = { features = ["full"], workspace = true }
 tracing = { workspace = true }
-tracing-subscriber = { features = ["env-filter"], workspace = true }
+tracing-subscriber = { features = ["env-filter", "fmt"], workspace = true }

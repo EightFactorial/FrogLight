@@ -742,7 +742,7 @@ impl BotPlugin {
                             for val in slabs_val.values() {
                                 if let Ok(val) = u16::try_from(*val)
                                     && let Some(block) =
-                                        blocks.get_block_by_id(GlobalBlockId::new(v))
+                                        blocks.get_block_by_id(GlobalBlockId::new(val))
                                 {
                                     trace!(" - {}", block.identifier());
                                 } else {

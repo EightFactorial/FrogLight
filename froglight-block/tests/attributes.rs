@@ -115,13 +115,15 @@ version_implement! {
     impl BlockVersion => TestVersion {
         const BLOCKS: BlockStorage;
         fn new_blocks() => {
-            BlockStorage::build::<TestVersion>(vec![
-                Air::METADATA,
-                Stone::METADATA,
-                Dirt::METADATA,
-                Grass::METADATA,
-                Grass::METADATA,
-            ])
+            unsafe {
+                BlockStorage::build::<TestVersion>(vec![
+                    Air::METADATA,
+                    Stone::METADATA,
+                    Dirt::METADATA,
+                    Grass::METADATA,
+                    Grass::METADATA,
+                ].into_boxed_slice())
+            }
         }
     }
 }

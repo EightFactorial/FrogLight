@@ -20,6 +20,24 @@ pub struct EntityStorage {
 }
 
 impl EntityStorage {
+    /// Build a new [`EntityStorage`] for the given [`EntityVersion`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that all provided entity metadata has the correct
+    /// global ids for this collection.
+    #[must_use]
+    pub unsafe fn build<V: EntityVersion>(metadata: Vec<&'static EntityMetadata>) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for meta in metadata {
+            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+        }
+
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
+    }
+
     /// Get the default [`EntityBundle`] for a given [`GlobalEntityId`].
     ///
     /// # Note
@@ -54,19 +72,6 @@ impl EntityStorage {
         &self,
     ) -> &IndexMap<Identifier<'static>, &'static EntityMetadata, RandomState> {
         &self.metadata
-    }
-
-    /// Build a new [`EntityStorage`] for the given [`EntityVersion`].
-    #[must_use]
-    pub fn build<V: EntityVersion>(metadata: Vec<&'static EntityMetadata>) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
-
-        for meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
-        }
-
-        Self { version: TypeId::of::<V>(), metadata: identifiers }
     }
 }
 

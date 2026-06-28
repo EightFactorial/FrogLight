@@ -150,9 +150,11 @@ macro_rules! generate {
             impl $crate::version::BlockVersion => $version {
                 const BLOCKS: $crate::storage::BlockStorage;
                 fn new_blocks() => {
-                    $crate::storage::BlockStorage::build::<Self>(alloc::vec![
-                        $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
-                    ])
+                    unsafe {
+                        $crate::storage::BlockStorage::build::<Self>(alloc::vec![
+                            $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
+                        ].into_boxed_slice())
+                    }
                 }
             }
         }

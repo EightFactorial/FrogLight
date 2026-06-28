@@ -21,6 +21,24 @@ pub struct ItemStorage {
 }
 
 impl ItemStorage {
+    /// Build a new [`ItemStorage`] for the given [`ItemVersion`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that all provided block metadata has the correct
+    /// global ids for this collection.
+    #[must_use]
+    pub unsafe fn build<V: ItemVersion>(metadata: Vec<&'static ItemMetadata>) -> Self {
+        let mut identifiers =
+            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+
+        for meta in metadata {
+            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+        }
+
+        Self { version: TypeId::of::<V>(), metadata: identifiers }
+    }
+
     /// Get the default [`Item`] for a given [`GlobalItemId`].
     ///
     /// # Note
@@ -53,18 +71,5 @@ impl ItemStorage {
         &self,
     ) -> &IndexMap<Identifier<'static>, &'static ItemMetadata, RandomState> {
         &self.metadata
-    }
-
-    /// Build a new [`ItemStorage`] for the given [`ItemVersion`].
-    #[must_use]
-    pub fn build<V: ItemVersion>(metadata: Vec<&'static ItemMetadata>) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
-
-        for meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
-        }
-
-        Self { version: TypeId::of::<V>(), metadata: identifiers }
     }
 }

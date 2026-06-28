@@ -28,14 +28,14 @@ pub trait PacketVersion: Version {
 pub trait PacketState<V: PacketVersion> {
     /// The packet sent from the server to the client.
     #[cfg(not(feature = "facet"))]
-    type Clientbound: Debug + Clone + Send + Sync;
+    type Clientbound: Debug + Clone + Send + Sync + 'static;
     /// The packet sent from the server to the client.
     #[cfg(feature = "facet")]
     type Clientbound: Debug + Clone + Send + Sync + Facet<'static> + 'static;
 
     /// The packet sent from the client to the server.
     #[cfg(not(feature = "facet"))]
-    type Serverbound: Debug + Clone + Send + Sync;
+    type Serverbound: Debug + Clone + Send + Sync + 'static;
     /// The packet sent from the client to the server.
     #[cfg(feature = "facet")]
     type Serverbound: Debug + Clone + Send + Sync + Facet<'static> + 'static;

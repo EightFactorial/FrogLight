@@ -1,9 +1,7 @@
 //! TODO
 #![no_std]
 
-#[cfg(feature = "alloc")]
 use bitvec::vec::BitVec;
-#[cfg(feature = "alloc")]
 use froglight_world::{
     chunk::{
         Section,
@@ -14,7 +12,6 @@ use froglight_world::{
 };
 
 #[test]
-#[cfg(feature = "alloc")]
 fn chunk() {
     // An empty chunk with no blocks.
     let chunk = NaiveChunk::new_empty_large();
@@ -42,7 +39,6 @@ fn chunk() {
 }
 
 #[test]
-#[cfg(feature = "alloc")]
 fn empty() {
     // An empty section with no blocks.
     let section = unsafe {
