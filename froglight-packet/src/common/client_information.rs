@@ -132,7 +132,11 @@ impl Default for ModelCustomization {
 
 #[cfg(feature = "facet")]
 impl FacetTemplate for ModelCustomization {
-    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+    fn serialize(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+        _protocol: u32,
+    ) -> Result<(), WriterError> {
         let value = item.get::<Self>()?;
 
         let mut byte = 0u8;
@@ -164,6 +168,7 @@ impl FacetTemplate for ModelCustomization {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
+        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let byte = reader.get_array::<1>()?[0];
 

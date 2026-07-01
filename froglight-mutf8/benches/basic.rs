@@ -12,7 +12,7 @@ macro_rules! time {
         for input in &$input {
             let _value = black_box($fn(black_box(input)));
         }
-        println!(" - {}: {:?}", stringify!($fn), start.elapsed());
+        println!(" - {} : {:?}", stringify!($fn), start.elapsed());
     }};
     (@ref $fn:path as $ty:ty => $input:expr) => {{
         let start = Instant::now();
@@ -20,7 +20,7 @@ macro_rules! time {
             let input: &$ty = input.as_ref();
             let _value = black_box($fn(black_box(input)));
         }
-        println!(" - {}: {:?}", stringify!($fn), start.elapsed());
+        println!(" - {} : {:?}", stringify!($fn), start.elapsed());
     }};
 }
 
@@ -66,6 +66,7 @@ fn main() {
 
 /// How many random strings to generate for tests.
 const GENERATE_SIZE: usize = 512_000;
+const STRING_LENGTH: u32 = 512;
 
 /// Generate a set of random strings using a fixed seed.
 fn generate<const ASCII: bool>() -> Vec<String> {
@@ -75,7 +76,7 @@ fn generate<const ASCII: bool>() -> Vec<String> {
     let mut input = Vec::with_capacity(GENERATE_SIZE);
 
     for _ in 0..GENERATE_SIZE {
-        let length = rand.next_u32() % 512;
+        let length = rand.next_u32() % STRING_LENGTH;
         let mut string = String::with_capacity(length as usize);
 
         for _ in 0..length {

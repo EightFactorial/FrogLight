@@ -20,9 +20,10 @@ pub trait DeserializeAsync: Deserialize<'static> {
     fn from_slice_async(
         slice: &[u8],
         variable: bool,
+        protocol: u32,
     ) -> impl Future<Output = Result<Self, DeserializeError>> + '_ {
         async move {
-            <Self as DeserializeAsync>::from_slice_remainder_async(slice, variable)
+            <Self as DeserializeAsync>::from_slice_remainder_async(slice, variable, protocol)
                 .await
                 .map(|(val, _)| val)
         }
@@ -37,6 +38,7 @@ pub trait DeserializeAsync: Deserialize<'static> {
     fn from_slice_remainder_async(
         slice: &[u8],
         variable: bool,
+        protocol: u32,
     ) -> impl Future<Output = Result<(Self, &[u8]), DeserializeError>> + '_;
 }
 
@@ -45,9 +47,12 @@ impl<T: Deserialize<'static>> DeserializeAsync for T {
     async fn from_slice_remainder_async(
         slice: &[u8],
         variable: bool,
+        protocol: u32,
     ) -> Result<(Self, &[u8]), DeserializeError> {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_async(Partial::alloc_owned::<T>()?, variable, &mut cursor).await?;
+        let value =
+            deserialize_async(Partial::alloc_owned::<T>()?, variable, protocol, &mut cursor)
+                .await?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 }
@@ -58,10 +63,11 @@ impl<T: Deserialize<'static>> DeserializeAsync for T {
 async fn deserialize_async(
     partial: Partial<'static, false>,
     variable: bool,
+    protocol: u32,
     reader: &mut Reader<'_>,
 ) -> Result<HeapValue<'static, false>, DeserializeError> {
     // Create and complete the deserializer.
-    let mut core = super::deserialize_owned_core(reader);
+    let mut core = super::deserialize_owned_core(protocol, reader);
     let de = Deserializer::new(partial, variable, &mut core, Some("mc"));
     DeserializerFuture::from_sync(de).await?.build().map_err(DeserializeError::from)
 }

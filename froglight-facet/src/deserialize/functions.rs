@@ -11,8 +11,8 @@ use crate::deserialize::{Deserialize, DeserializeError, future::DeserializeAsync
 ///
 /// TODO
 #[inline(always)]
-pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
-    <T as Deserialize>::from_slice(slice, false)
+pub fn from_slice<T: Facet<'static>>(slice: &[u8], protocol: u32) -> Result<T, DeserializeError> {
+    <T as Deserialize>::from_slice(slice, false, protocol)
 }
 
 /// TODO
@@ -21,8 +21,11 @@ pub fn from_slice<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError
 ///
 /// TODO
 #[inline(always)]
-pub async fn from_slice_async<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
-    <T as DeserializeAsync>::from_slice_async(slice, false).await
+pub async fn from_slice_async<T: Facet<'static>>(
+    slice: &[u8],
+    protocol: u32,
+) -> Result<T, DeserializeError> {
+    <T as DeserializeAsync>::from_slice_async(slice, false, protocol).await
 }
 
 /// TODO
@@ -31,8 +34,11 @@ pub async fn from_slice_async<T: Facet<'static>>(slice: &[u8]) -> Result<T, Dese
 ///
 /// TODO
 #[inline(always)]
-pub fn from_slice_variable<T: Facet<'static>>(slice: &[u8]) -> Result<T, DeserializeError> {
-    <T as Deserialize>::from_slice(slice, true)
+pub fn from_slice_variable<T: Facet<'static>>(
+    slice: &[u8],
+    protocol: u32,
+) -> Result<T, DeserializeError> {
+    <T as Deserialize>::from_slice(slice, true, protocol)
 }
 
 /// TODO
@@ -43,8 +49,9 @@ pub fn from_slice_variable<T: Facet<'static>>(slice: &[u8]) -> Result<T, Deseria
 #[inline(always)]
 pub fn from_slice_remainder<T: Facet<'static>>(
     slice: &[u8],
+    protocol: u32,
 ) -> Result<(T, &[u8]), DeserializeError> {
-    <T as Deserialize>::from_slice_remainder(slice, false)
+    <T as Deserialize>::from_slice_remainder(slice, false, protocol)
 }
 
 /// TODO
@@ -55,8 +62,9 @@ pub fn from_slice_remainder<T: Facet<'static>>(
 #[inline(always)]
 pub async fn from_slice_remainder_async<T: Facet<'static>>(
     slice: &[u8],
+    protocol: u32,
 ) -> Result<(T, &[u8]), DeserializeError> {
-    <T as DeserializeAsync>::from_slice_remainder_async(slice, false).await
+    <T as DeserializeAsync>::from_slice_remainder_async(slice, false, protocol).await
 }
 
 /// TODO
@@ -67,6 +75,7 @@ pub async fn from_slice_remainder_async<T: Facet<'static>>(
 #[inline(always)]
 pub fn from_slice_borrowed<'facet, T: Facet<'facet>>(
     slice: &'facet [u8],
+    protocol: u32,
 ) -> Result<(T, &'facet [u8]), DeserializeError> {
-    <T as Deserialize>::from_slice_borrowed(slice, false)
+    <T as Deserialize>::from_slice_borrowed(slice, false, protocol)
 }

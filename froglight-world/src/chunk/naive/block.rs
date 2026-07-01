@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_block::{block::BlockType, prelude::*, storage::BlockStorage};
+use froglight_block::{prelude::*, storage::BlockStorage};
 
 use crate::{
     chunk::{NaiveChunk, section::SectionPalette},
@@ -11,16 +11,6 @@ use crate::{
 };
 
 impl NaiveChunk {
-    /// Get the [`Block`] at the given position within the chunk.
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub fn get_block<V: BlockVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.get_block_using::<P>(position, &V::blocks())
-    }
-
     /// Get the [`Block`] at the given position within the chunk,
     /// resolving it using the provided [`BlockStorage`].
     ///
@@ -34,19 +24,6 @@ impl NaiveChunk {
     ) -> Option<Block> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
             .and_then(|pos| self.get_block_pos_using::<ChunkBlockPos>(pos, storage))
-    }
-
-    /// Get the [`Block`] at the given position within the chunk.
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub fn get_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
-        &self,
-        position: P,
-    ) -> Option<Block> {
-        self.get_block_pos_using::<P>(position, &V::blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk,
@@ -64,20 +41,6 @@ impl NaiveChunk {
             .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 
-    /// Set the [`Block`] at the given position within the chunk,
-    /// returning the previous [`Block`].
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    pub fn set_block<V: BlockVersion, P: Into<BlockPos>>(
-        &mut self,
-        position: P,
-        block: Block,
-    ) -> Option<Block> {
-        self.set_block_using::<P>(position, block, &V::blocks())
-    }
-
     /// Set the [`Block`] at the given position within the chunk and return the
     /// previous one, resolving it using the provided [`BlockStorage`].
     ///
@@ -91,20 +54,6 @@ impl NaiveChunk {
     ) -> Option<Block> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
             .and_then(|pos| self.set_block_pos_using::<ChunkBlockPos>(pos, block, storage))
-    }
-
-    /// Set the [`Block`] at the given position within the chunk,
-    /// returning the previous [`Block`].
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    pub fn set_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
-        &mut self,
-        position: P,
-        block: Block,
-    ) -> Option<Block> {
-        self.set_block_pos_using::<P>(position, block, &V::blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk and return the
@@ -132,13 +81,6 @@ impl NaiveChunk {
 
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
-    #[must_use]
-    pub fn contains_block<V: BlockVersion>(&self, block: Block) -> bool {
-        self.contains_block_using(block, &V::blocks())
-    }
-
-    /// Returns `true` if the chunk contains at least one block of the same
-    /// type.
     ///
     /// Resolves block types using the provided [`BlockStorage`].
     #[must_use]
@@ -151,13 +93,6 @@ impl NaiveChunk {
     #[must_use]
     pub fn contains_block_exact(&self, block: Block) -> bool {
         self.contains_raw_block(block.global_id().into_inner())
-    }
-
-    /// Returns `true` if the chunk contains at least one block of the same
-    /// type.
-    #[must_use]
-    pub fn contains_block_type<B: BlockType<V>, V: BlockVersion>(&self) -> bool {
-        self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks())
     }
 
     /// Returns `true` if the chunk contains at least one block of the same

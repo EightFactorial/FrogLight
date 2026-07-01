@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dev-dependencies]
-proptest = { workspace = true }
+proptest = { features = ["std"], workspace = true }
 
 [dependencies]
 glam = { workspace = true }

@@ -35,7 +35,11 @@ pub struct PlayerSpawnInfo {
 #[cfg(feature = "facet")]
 #[allow(clippy::cast_sign_loss, reason = "Desired behavior")]
 impl FacetTemplate for PlayerSpawnInfo {
-    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+    fn serialize(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+        _protocol: u32,
+    ) -> Result<(), WriterError> {
         let value = item.get::<Option<u8>>()?;
         let byte = value.unwrap_or(-1i8 as u8);
         writer.write_byte(byte)
@@ -44,6 +48,7 @@ impl FacetTemplate for PlayerSpawnInfo {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
+        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let byte = reader.get_array::<1>()?[0];
         let value = if byte == (-1i8 as u8) { None } else { Some(byte) };

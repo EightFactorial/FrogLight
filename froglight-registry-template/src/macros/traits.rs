@@ -93,7 +93,7 @@ macro_rules! version_subtrait {
 /// impl Version for VersionA {}
 ///
 /// version_implement! {
-///     impl MyTrait for VersionA {
+///     impl MyTrait => VersionA {
 ///         const GLOBAL: u32;
 ///         fn global();
 ///         fn new_value() => {

@@ -33,10 +33,10 @@ pub trait EntityVersion: Version {
     ///
     /// Requires the `facet` feature to be enabled.
     #[cfg(feature = "facet")]
-    const DATATYPE_DESERIALIZE: fn(&mut Reader) -> Result<EntityDataType, ReaderError>;
+    const DATATYPE_DESERIALIZE: fn(u32, &mut Reader) -> Result<EntityDataType, ReaderError>;
     /// This [`Version`]'s serializer for [`EntityDataType`]s
     ///
     /// Requires the `facet` feature to be enabled.
     #[cfg(feature = "facet")]
-    const DATATYPE_SERIALIZE: fn(&EntityDataType, &mut Writer) -> Result<(), WriterError>;
+    const DATATYPE_SERIALIZE: fn(&EntityDataType, u32, &mut Writer) -> Result<(), WriterError>;
 }

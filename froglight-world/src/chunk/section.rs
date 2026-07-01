@@ -232,7 +232,7 @@ impl<T: SectionType> SectionData<T> {
     /// returning the previous value.
     ///
     /// Returns `None` if the index is out of bounds.
-    #[must_use]
+    #[allow(clippy::must_use_candidate, reason = "Not required")]
     pub fn set_index(&self, index: usize, _id: u32) -> Option<u32> {
         if index > usize::from(T::VOLUME) {
             return None;

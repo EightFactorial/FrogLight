@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_biome::{biome::BiomeType, prelude::*, storage::BiomeStorage};
+use froglight_biome::{prelude::*, storage::BiomeStorage};
 
 use crate::{
     chunk::{NaiveChunk, section::SectionPalette},
@@ -11,16 +11,6 @@ use crate::{
 };
 
 impl NaiveChunk {
-    /// Get the [`Biome`] at the given position within the chunk.
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub fn get_biome<V: BiomeVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
-        self.get_biome_using::<P>(position, &V::biomes())
-    }
-
     /// Get the [`Biome`] at the given position within the chunk,
     /// resolving it using the provided [`BiomeStorage`].
     ///
@@ -36,19 +26,6 @@ impl NaiveChunk {
             .and_then(|pos| self.get_biome_pos_using::<ChunkBlockPos>(pos, storage))
     }
 
-    /// Get the [`Biome`] at the given position within the chunk.
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub fn get_biome_pos<V: BiomeVersion, P: Into<ChunkBlockPos>>(
-        &self,
-        position: P,
-    ) -> Option<Biome> {
-        self.get_biome_pos_using::<P>(position, &V::biomes())
-    }
-
     /// Get the [`Biome`] at the given position within the chunk,
     /// resolving it using the provided [`BiomeStorage`].
     ///
@@ -61,21 +38,7 @@ impl NaiveChunk {
         storage: &BiomeStorage,
     ) -> Option<Biome> {
         self.get_raw_biome_pos::<P>(position)
-            .and_then(|id| storage.get_block_by_id(GlobalBiomeId::new(id)))
-    }
-
-    /// Set the [`Biome`] at the given position within the chunk,
-    /// returning the previous [`Biome`].
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    pub fn set_biome<V: BiomeVersion, P: Into<BlockPos>>(
-        &mut self,
-        position: P,
-        biome: Biome,
-    ) -> Option<Biome> {
-        self.set_biome_using::<P>(position, biome, &V::biomes())
+            .and_then(|id| storage.get_biome_by_id(GlobalBiomeId::new(id)))
     }
 
     /// Get the [`Biome`] at the given position within the chunk and return the
@@ -93,20 +56,6 @@ impl NaiveChunk {
             .and_then(|pos| self.set_biome_pos_using::<ChunkBlockPos>(pos, biome, storage))
     }
 
-    /// Set the [`Biome`] at the given position within the chunk,
-    /// returning the previous [`Biome`].
-    ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized by the
-    /// [`Version`](froglight_common::version::Version).
-    pub fn set_biome_pos<V: BiomeVersion, P: Into<ChunkBlockPos>>(
-        &mut self,
-        position: P,
-        biome: Biome,
-    ) -> Option<Biome> {
-        self.set_biome_pos_using::<P>(position, biome, &V::biomes())
-    }
-
     /// Get the [`Biome`] at the given position within the chunk and return the
     /// previous one, resolving it using the provided [`BiomeStorage`].
     ///
@@ -119,7 +68,7 @@ impl NaiveChunk {
         storage: &BiomeStorage,
     ) -> Option<Biome> {
         self.set_raw_biome_pos::<P>(position, biome.global_id().into_inner())
-            .and_then(|id| storage.get_block_by_id(GlobalBiomeId::new(id)))
+            .and_then(|id| storage.get_biome_by_id(GlobalBiomeId::new(id)))
     }
 
     /// Returns `true` if the chunk contains at least one biome of the same
@@ -134,20 +83,13 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one biome of the same
     /// type.
     #[must_use]
-    pub fn contains_biome_type<B: BiomeType<V>, V: BiomeVersion>(&self) -> bool {
-        self.contains_raw_biome(B::METADATA.global_id().into_inner())
-    }
-
-    /// Returns `true` if the chunk contains at least one biome of the same
-    /// type.
-    #[must_use]
     pub fn contains_biome_type_using(&self, biome_type: TypeId, storage: &BiomeStorage) -> bool {
-        let Some((_, meta)) = storage.metadata().iter().find(|(_, b)| b.biome_ty() == biome_type)
-        else {
+        let Some(biome_id) = storage.metadata().iter().find_map(|(_, meta)| {
+            if meta.biome_ty() == biome_type { Some(meta.global_id().into_inner()) } else { None }
+        }) else {
             return false;
         };
 
-        let biome_id = meta.global_id().into_inner();
         self.storage.as_slice().iter().any(|section| match section.biome_data().palette() {
             SectionPalette::Single(id) => *id == biome_id,
             SectionPalette::Vector(vec) => vec.iter().any(|palette_id| {

@@ -14,6 +14,7 @@ pub use metadata::BlockMetadata;
 use crate::{
     attribute::{BlockAttribute, BlockAttributeBundle},
     state::{GlobalStateId, RelativeStateId},
+    storage::BlockStorage,
     version::BlockVersion,
 };
 
@@ -98,9 +99,57 @@ impl Block {
         let base = self.metadata.base_id().into_inner();
         GlobalStateId::new(base + state)
     }
-}
 
-impl Block {
+    /// Attempt to migrate the block to another [`BlockVersion`].
+    ///
+    /// Returns `None` if there is no matching [`BlockType`].
+    #[inline]
+    #[must_use]
+    pub fn using_version<V: BlockVersion>(self) -> Option<Block> {
+        self.using_version_storage(&V::blocks())
+    }
+
+    /// Attempt to migrate the block to another [`Version`]'s [`BlockStorage`].
+    ///
+    /// Equivalent to [`Block::using_version`] but without the generic
+    /// parameter.
+    ///
+    /// Returns `None` if there is no matching [`BlockType`].
+    #[must_use]
+    pub fn using_version_storage(self, blocks: &BlockStorage) -> Option<Block> {
+        // If the `Version` is the same, do nothing.
+        if self.version_ty() == blocks.version_ty() {
+            return Some(self);
+        }
+
+        // Try the block with a matching identifier and type.
+        if let Some(mut block) = blocks.get_block_by_identifier(self.identifier())
+            && self.block_ty() == block.block_ty()
+        {
+            self.apply_attributes(&mut block);
+            return Some(block);
+        }
+
+        // Otherwise, iterate over all blocks for a matching type.
+        blocks.metadata().iter().find_map(|meta| {
+            if self.block_ty() == meta.block_ty() {
+                blocks.get_block_by_identifier(meta.identifier())
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Apply the attributes of the current [`Block`] to another.
+    ///
+    /// If an attribute does not exist, or the value is not valid for the block,
+    /// it will not be applied.
+    pub fn apply_attributes(&self, block: &mut Block) {
+        for (name, value) in self.get_attributes() {
+            block.set_attribute_str(name, value);
+        }
+    }
+
     /// Set the value of an attribute for this block.
     ///
     /// Returns the old value of the attribute if it was set successfully.
@@ -117,28 +166,6 @@ impl Block {
         let (new_state, old_value) = self.metadata.set_attribute_str(self.state, name, value)?;
         self.state = new_state;
         Some(old_value)
-    }
-
-    /// Attempt to convert this block into a [`Block`] of another
-    /// [`Version`](froglight_common::version::Version).
-    ///
-    /// Returns `None` if the blocks are not of the same [`BlockType`].
-    #[must_use]
-    pub fn try_using_metadata(&self, metadata: &'static BlockMetadata) -> Option<Block> {
-        if self.metadata.block_ty() == metadata.block_ty() {
-            if self.metadata.version_ty() == metadata.version_ty() {
-                // Skip the conversion
-                Some(*self)
-            } else {
-                // Convert using the new version's metadata.
-                Some(Block {
-                    state: self.metadata().try_using_metadata(self.state, metadata),
-                    metadata,
-                })
-            }
-        } else {
-            None
-        }
     }
 }
 
@@ -165,7 +192,6 @@ implement_wrapper! {
             #[must_use]
             pub fn version_ty(&self) -> TypeId;
         }
-
 
         [ state => metadata ]: {
             /// Get the value of an attribute for this block.

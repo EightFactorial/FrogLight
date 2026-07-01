@@ -1,13 +1,13 @@
 //! TODO
 
-use alloc::boxed::Box;
 #[cfg(feature = "nightly")]
-use alloc::{alloc::Allocator, vec::Vec};
+use alloc::alloc::Allocator;
+use alloc::{boxed::Box, vec::Vec};
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
-use indexmap::{IndexMap, map::Entry};
+use indexmap::IndexMap;
 
 use crate::{
     block::{Block, BlockMetadata},
@@ -20,10 +20,10 @@ use crate::{
 pub struct BlockStorage {
     version: TypeId,
     identifiers: IndexMap<Identifier<'static>, GlobalStateId, RandomState>,
-    #[cfg(not(feature = "nightly"))]
-    metadata: Box<[&'static BlockMetadata]>,
     #[cfg(feature = "nightly")]
     metadata: Box<[&'static BlockMetadata], &'static (dyn Allocator + Send + Sync)>,
+    #[cfg(not(feature = "nightly"))]
+    metadata: Box<[&'static BlockMetadata]>,
 }
 
 impl BlockStorage {
@@ -33,28 +33,32 @@ impl BlockStorage {
     /// The caller must ensure that all provided block metadata has the correct
     /// global ids for this collection.
     #[must_use]
-    #[expect(clippy::cast_possible_truncation, reason = "There will never be u32::MAX blocks")]
-    pub unsafe fn build<V: BlockVersion>(metadata: Box<[&'static BlockMetadata]>) -> Self {
-        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
-
-        for (index, meta) in metadata.iter().enumerate() {
-            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier().reborrow()) {
-                entry.insert_entry(GlobalStateId::new(index as u32));
+    pub unsafe fn build<V: BlockVersion, Iter: IntoIterator<Item = &'static BlockMetadata>>(
+        iterator: Iter,
+    ) -> Self {
+        // Create the metadata vector.
+        let iterator = iterator.into_iter();
+        let (lower_bound, upper_bound) = iterator.size_hint();
+        let mut metadata = cfg_select! {
+            feature = "nightly" => {
+                Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
+                    upper_bound.unwrap_or(lower_bound),
+                    &alloc::alloc::Global,
+                )
             }
-        }
-
-        #[cfg(feature = "nightly")]
-        let metadata = {
-            let mut realloc = Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
-                metadata.len(),
-                &alloc::alloc::Global,
-            );
-
-            realloc.extend(metadata);
-            realloc.into_boxed_slice()
+            _ => {
+                Vec::with_capacity(iterator.len())
+            }
         };
 
-        Self { version: TypeId::of::<V>(), identifiers, metadata }
+        // Create the identifier map.
+        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
+        for meta in iterator {
+            identifiers.entry(meta.identifier().reborrow()).or_insert(meta.default_id());
+            metadata.push(meta);
+        }
+
+        Self { version: TypeId::of::<V>(), identifiers, metadata: metadata.into_boxed_slice() }
     }
 
     /// Build a new [`BlockStorage`] for the given [`BlockVersion`].
@@ -71,30 +75,31 @@ impl BlockStorage {
     /// global ids for this collection.
     #[must_use]
     #[cfg(feature = "nightly")]
-    #[expect(clippy::cast_possible_truncation, reason = "There will never be u32::MAX blocks")]
-    pub unsafe fn build_using<V: BlockVersion, A: Allocator, A2: Allocator + Send + Sync>(
-        metadata: Box<[&'static BlockMetadata], A>,
-        allocator: &'static A2,
+    pub unsafe fn build_using<
+        V: BlockVersion,
+        Iter: IntoIterator<Item = &'static BlockMetadata>,
+        A: Allocator + Send + Sync,
+    >(
+        iterator: Iter,
+        allocator: &'static A,
     ) -> Self {
-        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
+        // Create the metadata vector with the provided allocator.
+        let iterator = iterator.into_iter();
+        let (lower_bound, upper_bound) = iterator.size_hint();
+        let mut metadata = Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
+            upper_bound.unwrap_or(lower_bound),
+            allocator,
+        );
 
-        for (index, meta) in metadata.iter().enumerate() {
-            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier().reborrow()) {
-                entry.insert_entry(GlobalStateId::new(index as u32));
-            }
+        // Create the identifier map.
+        // TODO: When `IndexMap` supports custom allocators, use it here as well.
+        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
+        for meta in iterator {
+            identifiers.entry(meta.identifier().reborrow()).or_insert(meta.default_id());
+            metadata.push(meta);
         }
 
-        let metadata = {
-            let mut realloc = Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
-                metadata.len(),
-                allocator,
-            );
-
-            realloc.extend(metadata);
-            realloc.into_boxed_slice()
-        };
-
-        Self { version: TypeId::of::<V>(), identifiers, metadata }
+        Self { version: TypeId::of::<V>(), identifiers, metadata: metadata.into_boxed_slice() }
     }
 
     /// Get the default [`Block`] for a given [`GlobalBlockId`].
@@ -118,7 +123,7 @@ impl BlockStorage {
     ///
     /// # Note
     ///
-    /// This is typically used when reading/writing to the world.
+    /// This is typically used by the world.
     #[must_use]
     pub fn get_block_by_state(&self, id: GlobalStateId) -> Option<Block> {
         let metadata = self.metadata.get(id.into_inner() as usize)?;
@@ -142,6 +147,11 @@ impl BlockStorage {
     pub fn get_block_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Block> {
         self.identifiers.get(identifier).and_then(|id| self.get_block_by_state(*id))
     }
+
+    /// Get the [`BlockMetadata`] of this [`BlockStorage`].
+    #[inline]
+    #[must_use]
+    pub const fn metadata(&self) -> &[&'static BlockMetadata] { &self.metadata }
 
     /// Get the [`TypeId`] of the [`Version`] this storage is for.
     #[inline]

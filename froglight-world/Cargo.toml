@@ -20,6 +20,7 @@ workspace = true
 
 [dev-dependencies]
 divan = { workspace = true }
+froglight-biome = { features = ["biome_data"], workspace = true }
 
 [dependencies]
 bitvec = { features = ["alloc"], workspace = true }

@@ -124,6 +124,7 @@ mod tests {
 
     /// Tests for the sine and cosine functions for common angles.
     #[test]
+    #[allow(clippy::unreadable_literal, reason = "Ignore")]
     fn common() {
         use core::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8};
         fn assert(input: f32, expected: f32) {

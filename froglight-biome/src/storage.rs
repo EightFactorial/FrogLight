@@ -45,7 +45,7 @@ impl BiomeStorage {
     ///
     /// This is typically used by the registry and world.
     #[must_use]
-    pub fn get_block_by_id(&self, id: GlobalBiomeId) -> Option<Biome> {
+    pub fn get_biome_by_id(&self, id: GlobalBiomeId) -> Option<Biome> {
         self.metadata.get_index(id.into_inner() as usize).map(|(_, meta)| Biome::new_from(meta))
     }
 

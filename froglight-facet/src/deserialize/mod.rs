@@ -24,12 +24,12 @@ pub trait Deserialize<'facet>: Facet<'facet> + Sized {
     ///
     /// Returns an error if the deserialization fails.
     #[inline]
-    fn from_slice(slice: &[u8], variable: bool) -> Result<Self, DeserializeError>
+    fn from_slice(slice: &[u8], variable: bool, protocol: u32) -> Result<Self, DeserializeError>
     where
         'facet: 'static,
         'static: 'facet,
     {
-        <Self as Deserialize>::from_slice_remainder(slice, variable).map(|(val, _)| val)
+        <Self as Deserialize>::from_slice_remainder(slice, variable, protocol).map(|(val, _)| val)
     }
 
     /// Deserialize a value from the given byte slice,
@@ -41,6 +41,7 @@ pub trait Deserialize<'facet>: Facet<'facet> + Sized {
     fn from_slice_remainder(
         slice: &[u8],
         variable: bool,
+        protocol: u32,
     ) -> Result<(Self, &[u8]), DeserializeError>
     where
         'facet: 'static,
@@ -57,18 +58,24 @@ pub trait Deserialize<'facet>: Facet<'facet> + Sized {
     fn from_slice_borrowed(
         slice: &'facet [u8],
         variable: bool,
+        protocol: u32,
     ) -> Result<(Self, &'facet [u8]), DeserializeError>;
 }
 
 impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
     #[inline]
-    fn from_slice_remainder(slice: &[u8], variable: bool) -> Result<(Self, &[u8]), DeserializeError>
+    fn from_slice_remainder(
+        slice: &[u8],
+        variable: bool,
+        protocol: u32,
+    ) -> Result<(Self, &[u8]), DeserializeError>
     where
         'facet: 'static,
         'static: 'facet,
     {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_owned(Partial::alloc_owned::<T>()?, variable, &mut cursor)?;
+        let value =
+            deserialize_owned(Partial::alloc_owned::<T>()?, variable, protocol, &mut cursor)?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 
@@ -76,9 +83,10 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
     fn from_slice_borrowed(
         slice: &'facet [u8],
         variable: bool,
+        protocol: u32,
     ) -> Result<(Self, &'facet [u8]), DeserializeError> {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_borrowed(Partial::alloc::<T>()?, variable, &mut cursor)?;
+        let value = deserialize_borrowed(Partial::alloc::<T>()?, variable, protocol, &mut cursor)?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 }
@@ -89,10 +97,11 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
 fn deserialize_owned(
     partial: Partial<'static, false>,
     variable: bool,
+    protocol: u32,
     reader: &mut Reader<'_>,
 ) -> Result<HeapValue<'static, false>, DeserializeError> {
     // Create and complete the deserializer.
-    let mut core = deserialize_owned_core(reader);
+    let mut core = deserialize_owned_core(protocol, reader);
     let de = Deserializer::new(partial, variable, &mut core, Some("mc"));
     de.complete()?.build().map_err(DeserializeError::from)
 }
@@ -102,6 +111,7 @@ fn deserialize_owned(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_owned_core(
+    protocol: u32,
     reader: &mut Reader<'_>,
 ) -> impl FnMut(Item<'static, false>) -> Result<Item<'static, false>, ReaderError> {
     move |item: Item<'static, false>| {
@@ -124,7 +134,7 @@ pub fn deserialize_owned_core(
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
-                    return with.deserialize(item, reader).map(Item::Item);
+                    return with.deserialize(item, protocol, reader).map(Item::Item);
                 }
             }
         }
@@ -137,7 +147,7 @@ pub fn deserialize_owned_core(
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {
-                return with.deserialize(item, reader).map(Item::Item);
+                return with.deserialize(item, protocol, reader).map(Item::Item);
             }
         }
 
@@ -151,10 +161,11 @@ pub fn deserialize_owned_core(
 fn deserialize_borrowed<'facet>(
     partial: Partial<'facet, true>,
     variable: bool,
+    protocol: u32,
     reader: &mut Reader<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
     // Create and complete the deserializer.
-    let mut core = deserialize_borrowed_core(reader);
+    let mut core = deserialize_borrowed_core(protocol, reader);
     let de = Deserializer::new(partial, variable, &mut core, Some("mc"));
     de.complete()?.build().map_err(DeserializeError::from)
 }
@@ -165,9 +176,10 @@ fn deserialize_borrowed<'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_borrowed_core<'facet>(
+    protocol: u32,
     reader: &mut Reader<'facet>,
 ) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
-    |item: Item<'facet, true>| {
+    move |item: Item<'facet, true>| {
         #[cfg(feature = "tracing_ext")]
         if let Item::Item(item) = &item {
             tracing::trace!("Deserializing `{}`", item.shape());
@@ -187,7 +199,7 @@ pub fn deserialize_borrowed_core<'facet>(
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
-                    return with.deserialize_borrowed(item, reader).map(Item::Item);
+                    return with.deserialize_borrowed(item, protocol, reader).map(Item::Item);
                 }
             }
         }
@@ -200,7 +212,7 @@ pub fn deserialize_borrowed_core<'facet>(
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {
-                return with.deserialize_borrowed(item, reader).map(Item::Item);
+                return with.deserialize_borrowed(item, protocol, reader).map(Item::Item);
             }
         }
 

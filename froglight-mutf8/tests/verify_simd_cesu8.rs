@@ -17,7 +17,7 @@ fn simd_cesu8_ascii() {
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
 
-        let mstr = mstr.to_utf8().unwrap();
+        let mstr = mstr.to_utf8();
         let cesu8 = simd_cesu8::mutf8::decode(&cesu8).unwrap();
 
         pretty_assertions::assert_str_eq!(mstr, cesu8);
@@ -37,7 +37,7 @@ fn simd_cesu8_utf8() {
             panic!("{}", StrComparison::new(&mstr, &cesu8));
         }
 
-        let mstr = mstr.to_utf8().unwrap();
+        let mstr = mstr.to_utf8();
         let cesu8 = simd_cesu8::mutf8::decode(&cesu8).unwrap();
 
         pretty_assertions::assert_str_eq!(mstr, cesu8);
@@ -48,6 +48,7 @@ fn simd_cesu8_utf8() {
 
 /// How many random strings to generate for tests.
 const GENERATE_SIZE: usize = 512_000;
+const STRING_LENGTH: u32 = 512;
 
 /// Generate a set of random strings using a fixed seed.
 fn generate<const ASCII: bool>() -> Vec<String> {
@@ -57,7 +58,7 @@ fn generate<const ASCII: bool>() -> Vec<String> {
     let mut input = Vec::with_capacity(GENERATE_SIZE);
 
     for _ in 0..GENERATE_SIZE {
-        let length = rand.next_u32() % 512;
+        let length = rand.next_u32() % STRING_LENGTH;
         let mut string = String::with_capacity(length as usize);
 
         for _ in 0..length {

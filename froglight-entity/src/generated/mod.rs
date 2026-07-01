@@ -283,13 +283,13 @@ macro_rules! generate {
                     ])
                 }
             },
-            read: { |cursor| {
+            read: { |protocol, cursor| {
                 let val = froglight_facet::deserialize::varint::decode_u32_from(cursor)?;
 
                 match val {
                     $(
                         $dataid => {
-                            let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining())
+                            let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining(), protocol)
                                 .map_err(froglight_facet::facet::template::ReaderError::other)?;
                             cursor.consume(cursor.remaining().len() - rem.len());
 
@@ -299,12 +299,12 @@ macro_rules! generate {
                     _ => todo!("TODO: Create an error type"),
                 }
             } },
-            write: { |data, buffer| {
+            write: { |data, protocol, buffer| {
                 match data {
                     $(
                         $crate::generated::datatype::EntityDataType::$datatype(value) => {
                             buffer.write_byte($dataid)?;
-                            froglight_facet::to_writer(value, buffer)
+                            froglight_facet::to_writer(value, protocol, buffer)
                                 .map_err(froglight_facet::facet::template::WriterError::other)?;
                         }
                     )*

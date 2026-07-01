@@ -295,13 +295,13 @@ impl Eq for ChunkDataInner {}
 impl PartialEq for ChunkDataInner {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (ChunkDataInner::Chunk(chunk_a), ChunkDataInner::Chunk(chunk_b)) => chunk_a == chunk_b,
+            (ChunkDataInner::Chunk(a), ChunkDataInner::Chunk(b)) => a == b,
             (
-                ChunkDataInner::Versioned { raw_data: raw_a, .. }
-                | ChunkDataInner::Unversioned { raw_data: raw_a, .. },
-                ChunkDataInner::Versioned { raw_data: raw_b, .. }
-                | ChunkDataInner::Unversioned { raw_data: raw_b, .. },
-            ) => raw_a == raw_b,
+                ChunkDataInner::Versioned { raw_data: a, .. }
+                | ChunkDataInner::Unversioned { raw_data: a, .. },
+                ChunkDataInner::Versioned { raw_data: b, .. }
+                | ChunkDataInner::Unversioned { raw_data: b, .. },
+            ) => a == b,
             _ => false,
         }
     }

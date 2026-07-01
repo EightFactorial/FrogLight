@@ -151,7 +151,7 @@ impl MString {
     /// Converts a [`MStr`] to a [`&str`].
     #[must_use]
     pub fn to_utf8(&self) -> Cow<'_, str> {
-        match self.as_mstr().to_utf8() {
+        match self.as_mstr().as_utf8() {
             Ok(str) => Cow::Borrowed(str),
             Err(..) => Cow::Owned(mutf8_to_utf8(self.as_mstr())),
         }
@@ -166,7 +166,7 @@ impl MString {
     /// [`MString`] allocation.
     #[must_use]
     pub fn into_utf8(self) -> String {
-        match self.as_mstr().to_utf8() {
+        match self.as_mstr().as_utf8() {
             // SAFETY: `Ok` means the input was valid UTF-8.
             Ok(..) => unsafe { String::from_utf8_unchecked(self.0) },
             Err(..) => mutf8_to_utf8(self.as_mstr()),

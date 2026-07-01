@@ -97,12 +97,14 @@ macro_rules! implement_entities {
 
             #[cfg(feature = "facet")]
             const DATATYPE_DESERIALIZE: fn(
+                protocol: u32,
                 &mut froglight_facet::facet::template::Reader,
             ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::template::ReaderError>  = $read;
 
             #[cfg(feature = "facet")]
             const DATATYPE_SERIALIZE: fn(
                 &$crate::generated::datatype::EntityDataType,
+                protocol: u32,
                 &mut froglight_facet::facet::template::Writer,
             ) -> Result<(), froglight_facet::facet::template::WriterError> = $write;
         }

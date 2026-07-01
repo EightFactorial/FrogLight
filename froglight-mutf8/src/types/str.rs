@@ -1,7 +1,10 @@
 //! TODO
 
 #[cfg(feature = "alloc")]
-use alloc::{borrow::ToOwned, boxed::Box};
+use alloc::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+};
 use core::{borrow::Borrow, fmt, str::from_utf8 as from_utf8_core};
 
 use simdutf8::basic::from_utf8 as from_utf8_simd;
@@ -93,7 +96,7 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid UTF-8.
-    pub fn to_utf8(&self) -> Result<&str, ()> {
+    pub fn as_utf8(&self) -> Result<&str, ()> {
         if from_utf8_simd(self.as_bytes()).is_ok() {
             Ok(unsafe { str::from_utf8_unchecked(self.as_bytes()) })
         } else {
@@ -185,6 +188,18 @@ impl MStr {
     pub fn to_mstring(&self) -> MString {
         // SAFETY: The bytes are guaranteed to be valid MUTF-8.
         unsafe { MString::from_mutf8_unchecked(self.0.to_vec()) }
+    }
+
+    /// Converts the string slice into a [`String`],
+    /// only reallocating if the MUTF-8 is invalid UTF-8.
+    #[inline]
+    #[must_use]
+    pub fn to_utf8(&self) -> Cow<'_, str> {
+        if let Ok(str) = self.as_utf8() {
+            Cow::Borrowed(str)
+        } else {
+            Cow::Owned(self.to_mstring().into_utf8())
+        }
     }
 
     /// Converts the given boxed [`MStr`] slice to a [`MString`].

@@ -8,7 +8,7 @@ use core::{
 
 use froglight_common::prelude::Identifier;
 
-use crate::{state::GlobalBiomeId, version::BiomeVersion};
+use crate::{state::GlobalBiomeId, storage::BiomeStorage, version::BiomeVersion};
 
 #[cfg(feature = "biome_data")]
 mod attribute;
@@ -50,6 +50,45 @@ impl Biome {
     #[inline]
     #[must_use]
     pub fn global_id(&self) -> GlobalBiomeId { self.metadata.global_id() }
+
+    /// Attempt to migrate the biome to another [`BiomeVersion`].
+    ///
+    /// Returns `None` if there is no matching [`BiomeType`].
+    #[inline]
+    #[must_use]
+    pub fn using_version<V: BiomeVersion>(self) -> Option<Biome> {
+        self.using_version_storage(&V::biomes())
+    }
+
+    /// Attempt to migrate the biome to another [`BiomeVersion`].
+    ///
+    /// Equivalent to [`Biome::using_version`] but without the generic
+    /// parameter.
+    ///
+    /// Returns `None` if there is no matching [`BiomeType`].
+    #[must_use]
+    pub fn using_version_storage(self, biomes: &BiomeStorage) -> Option<Biome> {
+        // If the `Version` is the same, do nothing.
+        if self.version_ty() == biomes.version_ty() {
+            return Some(self);
+        }
+
+        // Try the biome with a matching identifier and type.
+        if let Some(biome) = biomes.get_biome_by_identifier(self.identifier())
+            && self.biome_ty() == biome.biome_ty()
+        {
+            return Some(biome);
+        }
+
+        // Otherwise, iterate over all biomes for a matching type.
+        biomes.metadata().iter().find_map(|(ident, meta)| {
+            if self.biome_ty() == meta.biome_ty() {
+                biomes.get_biome_by_identifier(ident)
+            } else {
+                None
+            }
+        })
+    }
 }
 
 froglight_registry_template::implement_wrapper! {

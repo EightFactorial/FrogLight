@@ -2,13 +2,17 @@
 //! iterating over all blocks.
 #![allow(clippy::large_stack_arrays, reason = "Ignored")]
 
-#[cfg(feature = "froglight-block")]
+#[cfg(any(feature = "froglight-block", feature = "froglight-biome"))]
 use core::any::TypeId;
 
 use bitvec::vec::BitVec;
 use divan::prelude::*;
 #[cfg(feature = "froglight-biome")]
-use froglight_biome::{biome::BiomeMetadata, prelude::*, storage::BiomeStorage};
+use froglight_biome::{
+    biome::{BiomeAttributeSet, BiomeMetadata},
+    prelude::*,
+    storage::BiomeStorage,
+};
 #[cfg(feature = "froglight-block")]
 use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
@@ -311,6 +315,7 @@ impl BiomeType<TestVersion> for Plains {
                 true,
                 0.0,
                 0.0,
+                &BIOME_DATA,
             )
         };
 
@@ -336,6 +341,7 @@ impl BiomeType<TestVersion> for Forest {
                 true,
                 0.0,
                 0.0,
+                &BIOME_DATA,
             )
         };
 
@@ -344,14 +350,20 @@ impl BiomeType<TestVersion> for Forest {
 }
 
 #[cfg(feature = "froglight-biome")]
+static BIOME_DATA: froglight_biome::version::LazyLock<BiomeAttributeSet> =
+    froglight_biome::version::LazyLock::new(BiomeAttributeSet::empty);
+
+#[cfg(feature = "froglight-biome")]
 froglight_biome::version::version_implement! {
     impl BiomeVersion => TestVersion {
         const BIOMES: BiomeStorage;
         fn new_biomes() => {
-            BiomeStorage::build::<Self>(vec![
-                Plains::METADATA,
-                Forest::METADATA,
-            ])
+            unsafe {
+                BiomeStorage::build::<Self>(vec![
+                    Plains::METADATA,
+                    Forest::METADATA,
+                ])
+            }
         }
     }
 }
@@ -369,8 +381,9 @@ fn contains_global_biome_best(b: Bencher) {
         )
     };
 
+    let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type::<Plains, TestVersion>());
+        black_box(global.contains_biome_type_using(TypeId::of::<Plains>(), &biomes));
     });
 }
 
@@ -387,8 +400,9 @@ fn contains_global_biome_worst(b: Bencher) {
         )
     };
 
+    let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type::<Forest, TestVersion>());
+        black_box(global.contains_biome_type_using(TypeId::of::<Forest>(), &biomes));
     });
 }
 
@@ -449,10 +463,12 @@ froglight_block::version::version_implement! {
     impl BlockVersion => TestVersion {
         const BLOCKS: BlockStorage;
         fn new_blocks() => {
-            BlockStorage::build::<Self>(vec![
-                Air::METADATA,
-                Stone::METADATA,
-            ])
+            unsafe {
+                BlockStorage::build::<Self, _>([
+                    Air::METADATA,
+                    Stone::METADATA,
+                ])
+            }
         }
     }
 }
@@ -470,8 +486,9 @@ fn contains_global_block_best(b: Bencher) {
         )
     };
 
+    let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type::<Air, TestVersion>());
+        black_box(global.contains_block_type_using(TypeId::of::<Air>(), &blocks));
     });
 }
 
@@ -488,7 +505,8 @@ fn contains_global_block_worst(b: Bencher) {
         )
     };
 
+    let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type::<Stone, TestVersion>());
+        black_box(global.contains_block_type_using(TypeId::of::<Stone>(), &blocks));
     });
 }

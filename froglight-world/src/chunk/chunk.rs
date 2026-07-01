@@ -6,8 +6,13 @@ use core::{any::TypeId, ops::Range};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-use froglight_biome::{biome::Biome, storage::BiomeStorage, version::BiomeVersion};
-use froglight_block::{block::Block, storage::BlockStorage, version::BlockVersion};
+use froglight_biome::{
+    biome::Biome, prelude::GlobalBiomeId, storage::BiomeStorage, version::BiomeVersion,
+};
+use froglight_block::{
+    block::Block, prelude::GlobalStateId, storage::BlockStorage, version::BlockVersion,
+};
+use froglight_common::prelude::Identifier;
 use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 use smallvec::SmallVec;
 
@@ -16,7 +21,7 @@ use crate::{
     chunk::{Section, storage::ChunkStorage},
     component::ChunkBlockPos,
     prelude::{BlockPos, NaiveChunk},
-    section::{BiomeSection, BlockSection, SectionType},
+    section::{BiomeSection, SectionType},
 };
 
 /// A region of blocks in a world.
@@ -26,7 +31,6 @@ use crate::{
 pub struct Chunk {
     biomes: &'static AtomicArc<BiomeStorage>,
     blocks: &'static AtomicArc<BlockStorage>,
-    version: TypeId,
     naive: NaiveChunk,
 }
 
@@ -35,7 +39,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn new<V: BiomeVersion + BlockVersion>(naive: NaiveChunk) -> Self {
-        Self { biomes: V::BIOMES, blocks: V::BLOCKS, version: TypeId::of::<V>(), naive }
+        Self { biomes: V::BIOMES, blocks: V::BLOCKS, naive }
     }
 
     /// Create a new empty large [`Chunk`].
@@ -144,7 +148,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// position is out of bounds, or if the block is not recognized.
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        if self.version != block.version_ty() {
+        if self.blocks().version_ty() != block.version_ty() {
             return None;
         }
 
@@ -161,7 +165,7 @@ impl Chunk {
         position: P,
         block: Block,
     ) -> Option<Block> {
-        if self.version != block.version_ty() {
+        if self.blocks().version_ty() != block.version_ty() {
             return None;
         }
 
@@ -192,7 +196,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version),
     /// the position is out of bounds, or if the biome is not recognized.
     pub fn set_biome<P: Into<BlockPos>>(&mut self, position: P, biome: Biome) -> Option<Biome> {
-        if self.version != biome.version_ty() {
+        if self.biomes().version_ty() != biome.version_ty() {
             return None;
         }
 
@@ -209,7 +213,7 @@ impl Chunk {
         position: P,
         biome: Biome,
     ) -> Option<Biome> {
-        if self.version != biome.version_ty() {
+        if self.biomes().version_ty() != biome.version_ty() {
             return None;
         }
 
@@ -218,113 +222,255 @@ impl Chunk {
 
     /// Convert this [`Chunk`] into another version.
     ///
-    /// Uses [`Air`](froglight_block::prelude::block::Air) for blocks and
-    /// [`Plains`](froglight_biome::prelude::biome::Plains) for biomes that
-    /// cannot be converted.
-    #[expect(clippy::missing_panics_doc, reason = "Cannot panic")]
+    /// Attempts to use [`Stone`](froglight_block::prelude::block::Stone) for
+    /// blocks and [`Plains`](froglight_biome::prelude::biome::Plains) for
+    /// biomes that cannot be converted.
     pub fn convert_into<V: BiomeVersion + BlockVersion>(&mut self) {
+        self.convert_biomes::<V>();
+        self.convert_blocks::<V>();
+    }
+
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Optimizations")]
+    fn convert_biomes<V: BiomeVersion>(&mut self) {
         // Skip if the chunk is already in the correct version.
-        if self.version == TypeId::of::<V>() {
+        if self.biomes().version_ty() == TypeId::of::<V>() {
             return;
         }
 
-        let new_biomes = V::biomes();
-        let old_biomes = self.biomes.load();
-        let mut biome_cache = SmallVec::<[(u32, u32); 16]>::new();
+        let old = self.biomes.load();
+        let new = V::biomes();
 
-        let mut biome_convert = |old: u32| -> u32 {
-            if let Some((_, new)) = biome_cache.iter().find(|(o, _)| *o == old) {
-                // Use the cached value
-                *new
-            } else if let Some(old_meta) = old_biomes.get_block_by_id(old.into())
-                && let Some(new) = new_biomes.get_biome_by_identifier(old_meta.identifier())
+        // Fallback to `minecraft:plains`, which is usually `0`.
+        let fallback = new
+            .get_biome_by_identifier(&Identifier::new_static("minecraft:plains"))
+            .map_or(0, |biome| biome.global_id().into_inner());
+
+        let mut cache = SmallVec::<[(u32, u32); 15]>::new();
+        let mut convert_id = |id: u32| -> u32 {
+            if let Some((_, cached)) = cache.iter().find(|(cached, _)| id == *cached) {
+                *cached
+            } else if let Some(biome) = old.get_biome_by_id(GlobalBiomeId::new(id))
+                && let Some(biome) = biome.using_version::<V>()
             {
-                // Add the value to the cache and return it
-                biome_cache.push((old, new.global_id().into_inner()));
-                new.global_id().into_inner()
+                cache.push((id, biome.global_id().into_inner()));
+                biome.global_id().into_inner()
             } else {
-                0 // Plains
-            }
-        };
-
-        let new_blocks = V::BLOCKS.load_owned();
-        let old_blocks = self.blocks();
-        let mut block_cache = SmallVec::<[(u32, u32); 16]>::new();
-
-        let mut block_convert = |old: u32| -> u32 {
-            if let Some((_, new)) = block_cache.iter().find(|(o, _)| *o == old) {
-                // Use the cached value
-                *new
-            } else if let Some(old_block) = old_blocks.get_block_by_state(old.into())
-                && let Some(new_block) = new_blocks.get_block_by_identifier(old_block.identifier())
-                && let Some(converted) = old_block.try_using_metadata(new_block.metadata())
-            {
-                // Add the value to the cache and return it
-                block_cache.push((old, converted.global_id().into_inner()));
-                converted.global_id().into_inner()
-            } else {
-                1 // Stone
+                fallback
             }
         };
 
         for section in self.sections_mut() {
             let biome = section.biome_data_mut();
-            match biome.palette() {
-                SectionPalette::Single(old) => {
-                    // SAFETY: Only the palette is being modified
-                    *unsafe { biome.palette_mut() } = SectionPalette::Single(biome_convert(*old));
-                }
-                SectionPalette::Vector(vals) => {
-                    let mut new = SmallVec::with_capacity(vals.len());
-                    for &old in vals {
-                        new.push(biome_convert(old));
-                    }
-                    // SAFETY: Only the palette is being modified
-                    *unsafe { biome.palette_mut() } = SectionPalette::Vector(new);
-                }
-                SectionPalette::Global => {
-                    // Iterate over each biome index and convert it.
-                    for index in (0..BiomeSection::VOLUME).map(usize::from) {
-                        let old = biome.get_index(index).unwrap();
-                        biome.set_index(index, biome_convert(old)).unwrap();
-                    }
-                }
-            }
 
-            let block = section.block_data_mut();
-            match block.palette() {
-                SectionPalette::Single(old) => {
-                    // SAFETY: Only the palette is being modified
-                    *unsafe { block.palette_mut() } = SectionPalette::Single(block_convert(*old));
-                }
-                SectionPalette::Vector(vals) => {
-                    let mut new = SmallVec::with_capacity(vals.len());
-                    for &old in vals {
-                        new.push(block_convert(old));
+            // SAFETY: We guarantee that all biome ids via `convert_id` are valid.
+            unsafe {
+                match biome.palette_mut() {
+                    SectionPalette::Single(biome_id) => {
+                        *biome_id = convert_id(*biome_id);
                     }
-                    // SAFETY: Only the palette is being modified
-                    *unsafe { block.palette_mut() } = SectionPalette::Vector(new);
-                }
-                SectionPalette::Global => {
-                    // Iterate over each block index and convert it.
-                    for index in (0..BlockSection::VOLUME).map(usize::from) {
-                        let old = block.get_index(index).unwrap();
-                        block.set_index(index, block_convert(old)).unwrap();
+                    SectionPalette::Vector(biome_ids) => {
+                        for biome_id in biome_ids {
+                            *biome_id = convert_id(*biome_id);
+                        }
+                    }
+                    SectionPalette::Global => {
+                        // Iterate over each biome index and convert it.
+                        // SAFETY: `index` is always within bounds `0..BiomeSection::VOLUME`.
+                        for index in (0..BiomeSection::VOLUME).map(usize::from) {
+                            let biome_id = biome.get_index(index).unwrap_unchecked();
+                            biome.set_index(index, convert_id(biome_id));
+                        }
                     }
                 }
             }
         }
 
-        // Use the new version's biome and block storage.
+        // Use the new version's biome storage.
         self.biomes = V::BIOMES;
+    }
+
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Optimizations")]
+    fn convert_blocks<V: BlockVersion>(&mut self) {
+        // Skip if the chunk is already in the correct version.
+        if self.blocks().version_ty() == TypeId::of::<V>() {
+            return;
+        }
+
+        let old = self.blocks.load();
+        let new = V::blocks();
+
+        // Fallback to `minecraft:stone`, which is usually `1`.
+        let fallback = new
+            .get_block_by_identifier(&Identifier::new_static("minecraft:stone"))
+            .map_or(1, |biome| biome.global_id().into_inner());
+
+        let mut cache = SmallVec::<[(u32, u32); 15]>::new();
+        let mut convert_id = |id: u32| -> u32 {
+            if let Some((_, cached)) = cache.iter().find(|(cached, _)| id == *cached) {
+                *cached
+            } else if let Some(block) = old.get_block_by_state(GlobalStateId::new(id))
+                && let Some(blocks) = block.using_version::<V>()
+            {
+                cache.push((id, blocks.global_id().into_inner()));
+                blocks.global_id().into_inner()
+            } else {
+                fallback
+            }
+        };
+
+        for section in self.sections_mut() {
+            let biome = section.biome_data_mut();
+
+            // SAFETY: We guarantee that all blockstate ids via `convert_id` are valid.
+            unsafe {
+                match biome.palette_mut() {
+                    SectionPalette::Single(biome_id) => {
+                        *biome_id = convert_id(*biome_id);
+                    }
+                    SectionPalette::Vector(biome_ids) => {
+                        for biome_id in biome_ids {
+                            *biome_id = convert_id(*biome_id);
+                        }
+                    }
+                    SectionPalette::Global => {
+                        // Iterate over each biome index and convert it.
+                        // SAFETY: `index` is always within bounds `0..BiomeSection::VOLUME`.
+                        for index in (0..BiomeSection::VOLUME).map(usize::from) {
+                            let biome_id = biome.get_index(index).unwrap_unchecked();
+                            biome.set_index(index, convert_id(biome_id));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Use the new version's block storage.
         self.blocks = V::BLOCKS;
-        self.version = TypeId::of::<V>();
+    }
+
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Optimizations")]
+    fn eq_biomes(&self, other: &Self) -> bool {
+        if self.sections().len() != other.sections().len() {
+            return false;
+        }
+
+        if self.biomes().version_ty() == other.biomes().version_ty() {
+            // If the versions are the same we can just compare the data directly.
+            self.sections()
+                .iter()
+                .zip(other.sections().iter())
+                .all(|(a, b)| a.biome_data() == b.biome_data())
+        } else {
+            let self_biomes = self.biomes();
+            let other_biomes = other.biomes();
+
+            // Create a closure to compare the biome ids.
+            let compare_ab = |a: u32, b: u32| -> bool {
+                other_biomes
+                    .get_biome_by_id(GlobalBiomeId::new(b))
+                    .and_then(|b| b.using_version_storage(&self_biomes))
+                    .is_some_and(|b| b.global_id() == a)
+            };
+
+            for (a, b) in self.sections().iter().zip(other.sections().iter()) {
+                let a = a.biome_data();
+                let b = b.biome_data();
+
+                // Compare the palettes
+                match (a.palette(), b.palette()) {
+                    (SectionPalette::Single(a), SectionPalette::Single(b)) => {
+                        if !compare_ab(*a, *b) {
+                            return false;
+                        }
+                    }
+                    (SectionPalette::Vector(a), SectionPalette::Vector(b)) => {
+                        for (a, b) in a.iter().zip(b.iter()) {
+                            if !compare_ab(*a, *b) {
+                                return false;
+                            }
+                        }
+                    }
+                    (SectionPalette::Global, SectionPalette::Global) => {}
+                    _ => return false,
+                }
+
+                // Compare the data
+                if a.data() != b.data() {
+                    return false;
+                }
+            }
+
+            true
+        }
+    }
+
+    #[inline(always)]
+    #[expect(clippy::inline_always, reason = "Optimizations")]
+    fn eq_blocks(&self, other: &Self) -> bool {
+        if self.sections().len() != other.sections().len() {
+            return false;
+        }
+
+        if self.blocks().version_ty() == other.blocks().version_ty() {
+            // If the versions are the same we can just compare the data directly.
+            self.sections()
+                .iter()
+                .zip(other.sections().iter())
+                .all(|(a, b)| a.block_data() == b.block_data())
+        } else {
+            let self_blocks = self.blocks();
+            let other_blocks = other.blocks();
+
+            // Create a closure to compare the block ids.
+            let compare_ab = |a: u32, b: u32| -> bool {
+                other_blocks
+                    .get_block_by_state(GlobalStateId::new(b))
+                    .and_then(|b| b.using_version_storage(&self_blocks))
+                    .is_some_and(|b| b.global_id() == a)
+            };
+
+            for (a, b) in self.sections().iter().zip(other.sections().iter()) {
+                // Compare the block and fluid counts
+                if a.block_count() != b.block_count() || a.fluid_count() != b.fluid_count() {
+                    return false;
+                }
+
+                let a = a.block_data();
+                let b = b.block_data();
+
+                // Compare the palettes
+                match (a.palette(), b.palette()) {
+                    (SectionPalette::Single(a), SectionPalette::Single(b)) => {
+                        if !compare_ab(*a, *b) {
+                            return false;
+                        }
+                    }
+                    (SectionPalette::Vector(a), SectionPalette::Vector(b)) => {
+                        for (a, b) in a.iter().zip(b.iter()) {
+                            if !compare_ab(*a, *b) {
+                                return false;
+                            }
+                        }
+                    }
+                    (SectionPalette::Global, SectionPalette::Global) => {}
+                    _ => return false,
+                }
+
+                // Compare the data
+                if a.data() != b.data() {
+                    return false;
+                }
+            }
+
+            true
+        }
     }
 }
 
 impl Eq for Chunk {}
 impl PartialEq for Chunk {
-    fn eq(&self, other: &Self) -> bool {
-        self.version == other.version && self.naive == other.naive
-    }
+    fn eq(&self, other: &Self) -> bool { self.eq_biomes(other) && self.eq_blocks(other) }
 }

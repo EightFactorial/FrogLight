@@ -13,8 +13,8 @@ use crate::serialize::{Serialize, SerializeError, future::SerializeAsync};
 ///
 /// Returns an error if the value cannot be serialized.
 #[inline(always)]
-pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, SerializeError> {
-    <T as Serialize>::to_vec(value)
+pub fn to_vec<T: Serialize<'static>>(value: &T, protocol: u32) -> Result<Vec<u8>, SerializeError> {
+    <T as Serialize>::to_vec(value, protocol)
 }
 
 /// TODO
@@ -25,8 +25,9 @@ pub fn to_vec<T: Serialize<'static>>(value: &T) -> Result<Vec<u8>, SerializeErro
 #[inline(always)]
 pub async fn to_vec_async<T: SerializeAsync<'static>>(
     value: &T,
+    protocol: u32,
 ) -> Result<Vec<u8>, SerializeError> {
-    <T as SerializeAsync>::to_vec_async(value).await
+    <T as SerializeAsync>::to_vec_async(value, protocol).await
 }
 
 /// TODO
@@ -38,9 +39,10 @@ pub async fn to_vec_async<T: SerializeAsync<'static>>(
 #[inline(always)]
 pub fn to_writer<T: Serialize<'static>, W: WriterType>(
     value: &T,
+    protocol: u32,
     writer: &mut W,
 ) -> Result<usize, SerializeError> {
-    <T as Serialize>::to_writer(value, false, Writer::new(writer))
+    <T as Serialize>::to_writer(value, false, protocol, Writer::new(writer))
 }
 
 /// TODO
@@ -52,9 +54,10 @@ pub fn to_writer<T: Serialize<'static>, W: WriterType>(
 #[inline(always)]
 pub async fn to_writer_async<T: SerializeAsync<'static>, W: WriterType>(
     value: &T,
+    protocol: u32,
     writer: &mut W,
 ) -> Result<usize, SerializeError> {
-    <T as SerializeAsync>::to_writer_async(value, false, Writer::new(writer)).await
+    <T as SerializeAsync>::to_writer_async(value, false, protocol, Writer::new(writer)).await
 }
 
 /// Serialize the value to the given [`WriterType`].
@@ -72,7 +75,8 @@ pub async fn to_writer_async<T: SerializeAsync<'static>, W: WriterType>(
 #[inline(always)]
 pub fn to_writer_variable<T: Serialize<'static>, W: WriterType>(
     value: &T,
+    protocol: u32,
     writer: &mut W,
 ) -> Result<usize, SerializeError> {
-    <T as Serialize>::to_writer(value, true, Writer::new(writer))
+    <T as Serialize>::to_writer(value, true, protocol, Writer::new(writer))
 }

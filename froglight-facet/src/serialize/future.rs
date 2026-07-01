@@ -17,7 +17,10 @@ pub trait SerializeAsync<'facet>: Serialize<'facet> {
     /// # Errors
     ///
     /// Returns an error if the serialization fails.
-    fn to_vec_async(value: &Self) -> impl Future<Output = Result<Vec<u8>, SerializeError>>;
+    fn to_vec_async(
+        value: &Self,
+        protocol: u32,
+    ) -> impl Future<Output = Result<Vec<u8>, SerializeError>>;
 
     /// Serialize the value into the given [`Writer`],
     /// returning the number of bytes written.
@@ -28,15 +31,16 @@ pub trait SerializeAsync<'facet>: Serialize<'facet> {
     fn to_writer_async(
         value: &Self,
         variable: bool,
+        protocol: u32,
         writer: Writer<'_>,
     ) -> impl Future<Output = Result<usize, SerializeError>>;
 }
 
 impl<'facet, T: Serialize<'facet> + Facet<'facet>> SerializeAsync<'facet> for T {
     #[inline]
-    async fn to_vec_async(value: &Self) -> Result<Vec<u8>, SerializeError> {
+    async fn to_vec_async(value: &Self, protocol: u32) -> Result<Vec<u8>, SerializeError> {
         let mut buffer = Vec::with_capacity(8); // TODO: Size hint
-        <Self as SerializeAsync>::to_writer_async(value, false, Writer::new(&mut buffer))
+        <Self as SerializeAsync>::to_writer_async(value, false, protocol, Writer::new(&mut buffer))
             .await
             .map(|_| buffer)
     }
@@ -45,9 +49,10 @@ impl<'facet, T: Serialize<'facet> + Facet<'facet>> SerializeAsync<'facet> for T 
     async fn to_writer_async(
         value: &Self,
         variable: bool,
+        protocol: u32,
         writer: Writer<'_>,
     ) -> Result<usize, SerializeError> {
-        serialize_async(Peek::new(value), variable, writer).await
+        serialize_async(Peek::new(value), variable, protocol, writer).await
     }
 }
 
@@ -57,10 +62,11 @@ impl<'facet, T: Serialize<'facet> + Facet<'facet>> SerializeAsync<'facet> for T 
 async fn serialize_async(
     peek: Peek<'_, '_>,
     variable: bool,
+    protocol: u32,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
     // Create and complete the serializer.
-    let mut core = super::serialize_core(&mut writer);
+    let mut core = super::serialize_core(protocol, &mut writer);
     SerializerFuture::from_sync(Serializer::new(peek, variable, &mut core, Some("mc"))).await?;
 
     // Return the number of bytes written.
