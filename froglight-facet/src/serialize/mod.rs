@@ -20,7 +20,7 @@ pub trait Serialize<'facet> {
     /// # Errors
     ///
     /// Returns an error if the serialization fails.
-    fn to_vec(value: &Self, protocol: u32) -> Result<Vec<u8>, SerializeError>;
+    fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError>;
 
     /// Serialize the value into the given [`Writer`],
     /// returning the number of bytes written.
@@ -28,30 +28,24 @@ pub trait Serialize<'facet> {
     /// # Errors
     ///
     /// Returns an error if the serialization fails.
-    fn to_writer(
-        value: &Self,
-        variable: bool,
-        protocol: u32,
-        writer: Writer<'_>,
-    ) -> Result<usize, SerializeError>;
+    fn to_writer(value: &Self, variable: bool, writer: Writer<'_>)
+    -> Result<usize, SerializeError>;
 }
 
 impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
     #[inline]
-    fn to_vec(value: &Self, protocol: u32) -> Result<Vec<u8>, SerializeError> {
+    fn to_vec(value: &Self) -> Result<Vec<u8>, SerializeError> {
         let mut buffer = Vec::with_capacity(8); // TODO: Size hint
-        <Self as Serialize>::to_writer(value, false, protocol, Writer::new(&mut buffer))
-            .map(|_| buffer)
+        <Self as Serialize>::to_writer(value, false, Writer::new(&mut buffer)).map(|_| buffer)
     }
 
     #[inline]
     fn to_writer(
         value: &Self,
         variable: bool,
-        protocol: u32,
         writer: Writer<'_>,
     ) -> Result<usize, SerializeError> {
-        serialize(Peek::new(value), variable, protocol, writer)
+        serialize(Peek::new(value), variable, writer)
     }
 }
 
@@ -61,11 +55,10 @@ impl<'facet, T: Facet<'facet>> Serialize<'facet> for T {
 fn serialize(
     peek: Peek<'_, '_>,
     variable: bool,
-    protocol: u32,
     mut writer: Writer<'_>,
 ) -> Result<usize, SerializeError> {
     // Create and complete the serializer.
-    let mut core = serialize_core(protocol, &mut writer);
+    let mut core = serialize_core(&mut writer);
     Serializer::new(peek, variable, &mut core, Some("mc")).complete()?;
 
     // Return the number of bytes written.
@@ -80,10 +73,9 @@ fn serialize(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn serialize_core<'mem, 'facet>(
-    protocol: u32,
     writer: &mut Writer<'_>,
 ) -> impl FnMut(Item<'mem, 'facet>) -> Result<(), WriterError> {
-    move |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
+    |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         #[cfg(feature = "tracing_ext")]
         if let Item::Item(item) = &item {
             tracing::trace!("Serializing `{}`", item.shape());
@@ -103,7 +95,7 @@ pub fn serialize_core<'mem, 'facet>(
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
-                    return with.serialize(item, protocol, writer);
+                    return with.serialize(item, writer);
                 }
             }
         }
@@ -116,7 +108,7 @@ pub fn serialize_core<'mem, 'facet>(
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {
-                return with.serialize(item, protocol, writer);
+                return with.serialize(item, writer);
             }
         }
 

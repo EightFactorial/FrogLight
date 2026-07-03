@@ -1,14 +1,10 @@
 //! TODO
-#![no_std]
 
 use bitvec::vec::BitVec;
 use froglight_world::{
-    chunk::{
-        Section,
-        section::{SectionData, SectionPalette},
-    },
     component::{ChunkBlockPos, SectionBlockPos},
     prelude::{BlockPos, NaiveChunk},
+    section::{Section, SectionData, SectionPalette},
 };
 
 #[test]

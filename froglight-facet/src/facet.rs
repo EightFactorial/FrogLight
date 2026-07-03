@@ -85,10 +85,9 @@ impl WithFnAttr {
     pub fn serialize(
         &self,
         item: SerializeItem<'_, '_>,
-        protocol: u32,
         writer: &mut Writer<'_>,
     ) -> Result<(), WriterError> {
-        (self.ser)(item, writer, protocol)
+        (self.ser)(item, writer)
     }
 
     /// Deserialize using this attribute's deserialization function.
@@ -105,7 +104,6 @@ impl WithFnAttr {
     pub fn deserialize<'facet, const BORROW: bool>(
         &self,
         item: DeserializeItem<'facet, BORROW>,
-        protocol: u32,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         if BORROW {
@@ -115,7 +113,7 @@ impl WithFnAttr {
             // so partial is already a `DeserializeItem<'facet, true>`.
             let partial: DeserializeItem<'facet, true> = unsafe { core::mem::transmute(item) };
             let partial: DeserializeItem<'facet, BORROW> =
-                unsafe { core::mem::transmute(f(partial, reader, protocol)?) };
+                unsafe { core::mem::transmute(f(partial, reader)?) };
 
             Ok(partial)
         } else {
@@ -125,7 +123,7 @@ impl WithFnAttr {
             // so partial is already a `DeserializeItem<'facet, false>`.
             let partial: DeserializeItem<'facet, false> = unsafe { core::mem::transmute(item) };
             let partial: DeserializeItem<'facet, BORROW> =
-                unsafe { core::mem::transmute(f(partial, reader, protocol)?) };
+                unsafe { core::mem::transmute(f(partial, reader)?) };
 
             Ok(partial)
         }
@@ -150,29 +148,27 @@ impl WithFnAttr {
     pub fn deserialize_borrowed<'facet>(
         &self,
         item: DeserializeItem<'facet, true>,
-        protocol: u32,
         reader: &mut Reader<'facet>,
     ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
         let f = self.de_borrowed.unwrap_or(self.de_owned_borrow);
 
-        f(item, reader, protocol)
+        f(item, reader)
     }
 }
 
 /// A serialization function.
-pub type SerFn = fn(SerializeItem<'_, '_>, &mut Writer<'_>, u32) -> Result<(), WriterError>;
+pub type SerFn = fn(SerializeItem<'_, '_>, &mut Writer<'_>) -> Result<(), WriterError>;
+
 /// A deserialization function.
 pub type DeFn<const BORROW: bool> =
     for<'facet> fn(
         DeserializeItem<'facet, BORROW>,
         &mut Reader<'_>,
-        u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError>;
 /// A borrowed deserialization function.
 pub type DeBorrowFn = for<'facet> fn(
     DeserializeItem<'facet, true>,
     &mut Reader<'facet>,
-    u32,
 ) -> Result<DeserializeItem<'facet, true>, ReaderError>;
 
 // -------------------------------------------------------------------------------------------------
@@ -196,7 +192,6 @@ pub type DeBorrowFn = for<'facet> fn(
 ///     fn serialize(
 ///         item: SerializeItem<'_, '_>,
 ///         writer: &mut Writer<'_>,
-///         _protocol: u32,
 ///     ) -> Result<(), WriterError> {
 ///         let val = item.peek().get::<MyType>().unwrap();
 ///         writer.write_bytes(&val.0.to_le_bytes())
@@ -205,7 +200,6 @@ pub type DeBorrowFn = for<'facet> fn(
 ///     fn deserialize<'facet, const BORROW: bool>(
 ///         item: DeserializeItem<'facet, BORROW>,
 ///         reader: &mut Reader<'_>,
-///         _protocol: u32,
 ///     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
 ///         let val: u32 = u32::from_le_bytes(*reader.get_array()?);
 ///         item.set(MyType(val))
@@ -213,11 +207,11 @@ pub type DeBorrowFn = for<'facet> fn(
 /// }
 ///
 /// // Check that `MyType` was serialized correctly.
-/// let serialized = to_vec(&MyType(42), 0).unwrap();
+/// let serialized = to_vec(&MyType(42)).unwrap();
 /// assert_eq!(serialized, [42, 0, 0, 0]);
 ///
 /// // Check that `MyType` was deserialized correctly.
-/// let deserialized: MyType = from_slice(&serialized, 0).unwrap();
+/// let deserialized: MyType = from_slice(&serialized).unwrap();
 /// assert_eq!(deserialized, MyType(42));
 /// ```
 pub trait FacetTemplate: Sized {
@@ -233,11 +227,7 @@ pub trait FacetTemplate: Sized {
     /// # Errors
     ///
     /// Returns an error if serialization fails.
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError>;
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError>;
 
     /// The deserialization function.
     ///
@@ -254,7 +244,6 @@ pub trait FacetTemplate: Sized {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError>;
 }
 
@@ -281,6 +270,5 @@ pub trait FacetBorrowedTemplate: FacetTemplate {
     fn deserialize_borrowed<'facet>(
         item: DeserializeItem<'facet, true>,
         reader: &mut Reader<'facet>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, true>, ReaderError>;
 }

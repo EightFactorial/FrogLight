@@ -93,11 +93,7 @@ impl BlockPos {
 #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
 #[expect(clippy::cast_possible_wrap, reason = "Expected behavior")]
 impl FacetTemplate for BlockPos {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let value = item.get::<Self>()?;
         for val in value.as_ivec3().to_array() {
             encode_u32_into(val as u32, writer)?;
@@ -109,7 +105,6 @@ impl FacetTemplate for BlockPos {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let [mut x, mut y, mut z] = [0; 3];
         for val in [&mut x, &mut y, &mut z] {

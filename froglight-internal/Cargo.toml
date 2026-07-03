@@ -19,8 +19,8 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-biome = { features = ["biome_data"], workspace = true }
-froglight-block = { workspace = true }
+froglight-biome = { features = ["biome_data", "facet"], workspace = true }
+froglight-block = { features = ["facet"], workspace = true }
 froglight-common = { features = ["facet"], workspace = true }
 froglight-entity = { workspace = true }
 froglight-facet = { workspace = true }

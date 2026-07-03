@@ -1,6 +1,5 @@
 //! TODO
 
-use alloc::vec::Vec;
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
@@ -28,11 +27,11 @@ impl BiomeStorage {
     /// The caller must ensure that all provided biome metadata has the correct
     /// global ids for this collection.
     #[must_use]
-    pub unsafe fn build<V: BiomeVersion>(metadata: Vec<&'static BiomeMetadata>) -> Self {
+    pub unsafe fn build<V: BiomeVersion>(metadata: &[&'static BiomeMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
-        for meta in metadata {
+        for &meta in metadata {
             identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
         }
 

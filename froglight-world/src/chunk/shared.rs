@@ -12,9 +12,16 @@ use crate::chunk::Chunk;
 
 /// A shared region of blocks in a world.
 ///
-/// Useful for sharing chunk data between threads without waiting for locks.
+/// Uses [`AtomicArc`] to allow shared access across threads.
 ///
-/// See [`AtomicArc`] for more information.
+/// # Note
+///
+/// Reading and writing to the chunk can be done at the same time, but all
+/// current reads will not see the changes until the chunk is read again.
+///
+/// Due to how writing to a [`SharedChunk`] works, it is recommended to batch
+/// write operations together where possible. If many writes are performed at
+/// once changes may be lost!
 #[repr(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub struct SharedChunk {
@@ -36,23 +43,10 @@ impl SharedChunk {
     #[must_use]
     pub fn into_inner(self) -> AtomicArc<Chunk> { self.chunk }
 
-    /// Unwrap and return the inner [`Arc<Chunk>`].
-    #[must_use]
-    pub fn into_arc(self) -> Arc<Chunk> { self.chunk.into_owned() }
-
     /// Unwrap and return the inner [`Chunk`], cloning if necessary.
-    #[must_use]
-    pub fn into_chunk(self) -> Chunk { Arc::unwrap_or_clone(self.into_arc()) }
-
-    /// Return a reference to the inner [`AtomicArc<Chunk>`].
     #[inline]
     #[must_use]
-    pub const fn as_arc(&self) -> &AtomicArc<Chunk> { &self.chunk }
-
-    /// Return a mutable reference to the inner [`AtomicArc<Chunk>`].
-    #[inline]
-    #[must_use]
-    pub const fn as_arc_mut(&mut self) -> &mut AtomicArc<Chunk> { &mut self.chunk }
+    pub fn into_chunk(self) -> Chunk { Arc::unwrap_or_clone(self.chunk.into_owned()) }
 }
 
 // -------------------------------------------------------------------------------------------------

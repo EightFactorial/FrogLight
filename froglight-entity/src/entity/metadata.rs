@@ -6,7 +6,7 @@ use core::{
 };
 
 #[cfg(feature = "bevy")]
-use bevy_reflect::PartialReflect;
+use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Peek;
 use froglight_common::prelude::Identifier;
@@ -30,7 +30,7 @@ pub struct EntityMetadata {
 
     #[cfg(feature = "bevy")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
-    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(Box<dyn PartialReflect>)),
+    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(Box<dyn Reflect>)),
     #[cfg(feature = "facet")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
@@ -102,14 +102,10 @@ impl EntityMetadata {
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
 
-    /// Inspect the entity's component data using [`PartialReflect`].
+    /// Inspect the entity's component data using [`Reflect`].
     #[inline]
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(
-        &self,
-        dataset: &EntityDataSet,
-        mut f: impl FnMut(Box<dyn PartialReflect>),
-    ) {
+    pub fn inspect_reflect(&self, dataset: &EntityDataSet, mut f: impl FnMut(Box<dyn Reflect>)) {
         (self.inspect_reflect)(dataset, &mut f);
     }
 

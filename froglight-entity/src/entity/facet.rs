@@ -41,16 +41,12 @@ impl<V: EntityVersion> DataSetSerializer<V> {
 }
 
 impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let ser = item.get::<Self>()?;
         for (id, val) in ser.dataset.to_ref() {
             writer.write_byte(*id)?;
 
-            (V::DATATYPE_SERIALIZE)(val, protocol, writer)?;
+            (V::DATATYPE_SERIALIZE)(val, writer)?;
         }
 
         writer.write_byte(0xff)
@@ -59,7 +55,6 @@ impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let mut list = Vec::new();
         loop {
@@ -71,7 +66,7 @@ impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
                 break;
             }
 
-            list.push((id, (V::DATATYPE_DESERIALIZE)(protocol, reader)?));
+            list.push((id, (V::DATATYPE_DESERIALIZE)(reader)?));
         }
 
         item.set(Self::new(EntityDataSet::new(list)))

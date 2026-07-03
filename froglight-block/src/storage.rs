@@ -33,32 +33,22 @@ impl BlockStorage {
     /// The caller must ensure that all provided block metadata has the correct
     /// global ids for this collection.
     #[must_use]
-    pub unsafe fn build<V: BlockVersion, Iter: IntoIterator<Item = &'static BlockMetadata>>(
-        iterator: Iter,
-    ) -> Self {
-        // Create the metadata vector.
-        let iterator = iterator.into_iter();
-        let (lower_bound, upper_bound) = iterator.size_hint();
-        let mut metadata = cfg_select! {
-            feature = "nightly" => {
-                Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
-                    upper_bound.unwrap_or(lower_bound),
-                    &alloc::alloc::Global,
-                )
-            }
-            _ => {
-                Vec::with_capacity(iterator.len())
-            }
-        };
-
+    pub unsafe fn build<V: BlockVersion>(metadata: Box<[&'static BlockMetadata]>) -> Self {
         // Create the identifier map.
         let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
-        for meta in iterator {
+        for meta in &metadata {
             identifiers.entry(meta.identifier().reborrow()).or_insert(meta.default_id());
-            metadata.push(meta);
         }
 
-        Self { version: TypeId::of::<V>(), identifiers, metadata: metadata.into_boxed_slice() }
+        #[cfg(feature = "nightly")]
+        let metadata = unsafe {
+            use alloc::alloc::Global;
+
+            let (ptr, Global) = Box::into_non_null_with_allocator(metadata);
+            Box::<_, &'static (dyn Allocator + Send + Sync)>::from_non_null_in(ptr, &Global)
+        };
+
+        Self { version: TypeId::of::<V>(), identifiers, metadata }
     }
 
     /// Build a new [`BlockStorage`] for the given [`BlockVersion`].

@@ -43,7 +43,7 @@ fn proxy() {
 
     // Serialize `Bytes`
     let bytes = Bytes(1, 2, 3, 4);
-    let serialized = to_vec(&bytes, 0).unwrap();
+    let serialized = to_vec(&bytes).unwrap();
 
     // Check that `ByteString` was serialized
     let (length, content) = serialized.split_first().unwrap();
@@ -51,6 +51,6 @@ fn proxy() {
     assert_eq!(content, b"1,2,3,4");
 
     // Check that `Bytes` can be deserialized
-    let deserialized: Bytes = from_slice(&serialized, 0).unwrap();
+    let deserialized: Bytes = from_slice(&serialized).unwrap();
     assert_eq!(deserialized, bytes);
 }

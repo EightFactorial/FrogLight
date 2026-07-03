@@ -16,12 +16,11 @@ use froglight_common::prelude::Identifier;
 use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 use smallvec::SmallVec;
 
-use super::section::SectionPalette;
 use crate::{
-    chunk::{Section, storage::ChunkStorage},
     component::ChunkBlockPos,
+    naive::storage::ChunkStorage,
     prelude::{BlockPos, NaiveChunk},
-    section::{BiomeSection, SectionType},
+    section::{BiomeSection, Section, SectionPalette, SectionType},
 };
 
 /// A region of blocks in a world.

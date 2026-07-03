@@ -70,8 +70,6 @@ pub trait NetworkVersion: PacketVersion {
         connection: AsyncConnection<R, C, Self>,
         exit_on_error: bool,
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
-        let protocol = Self::PROTOCOL_ID;
-
         let (connection, channel) = connection.into_parts();
         let (mut reader, mut writer) = connection.into_split();
         let (mut read_buf, mut write_buf_a, mut write_buf_b) =
@@ -99,8 +97,7 @@ pub trait NetworkVersion: PacketVersion {
                         match (packet, *state) {
                             (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
                                 let transition = Self::Handshake::transition_state_to(&packet);
-                                write_packet(&packet, protocol, writer, writer_buf_a, writer_buf_b)
-                                    .await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     #[cfg(feature = "tracing")]
                                     tracing::debug!(target: "froglight_network", "Transitioning connection from `Handshake` to `{transition}`");
@@ -110,8 +107,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Status(packet), PacketStateEnum::Status) => {
                                 let transition = Self::Status::transition_state_to(&packet);
-                                write_packet(&packet, protocol, writer, writer_buf_a, writer_buf_b)
-                                    .await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     #[cfg(feature = "tracing")]
                                     tracing::debug!(target: "froglight_network", "Transitioning connection from `Status` to `{transition}`");
@@ -121,8 +117,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Login(packet), PacketStateEnum::Login) => {
                                 let transition = Self::Login::transition_state_to(&packet);
-                                write_packet(&packet, protocol, writer, writer_buf_a, writer_buf_b)
-                                    .await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     #[cfg(feature = "tracing")]
                                     tracing::debug!(target: "froglight_network", "Transitioning connection from `Login` to `{transition}`");
@@ -132,8 +127,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Config(packet), PacketStateEnum::Config) => {
                                 let transition = Self::Config::transition_state_to(&packet);
-                                write_packet(&packet, protocol, writer, writer_buf_a, writer_buf_b)
-                                    .await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     #[cfg(feature = "tracing")]
                                     tracing::debug!(target: "froglight_network", "Transitioning connection from `Config` to `{transition}`");
@@ -143,8 +137,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Play(packet), PacketStateEnum::Play) => {
                                 let transition = Self::Play::transition_state_to(&packet);
-                                write_packet(&packet, protocol, writer, writer_buf_a, writer_buf_b)
-                                    .await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     #[cfg(feature = "tracing")]
                                     tracing::debug!(target: "froglight_network", "Transitioning connection from `Play` to `{transition}`");
@@ -182,10 +175,9 @@ pub trait NetworkVersion: PacketVersion {
 
                         match state {
                             PacketStateEnum::Handshake => {
-                                let Some(packet) =
-                                    read_packet(protocol, reader, reader_buf, exit_on_error)
-                                        .await?
-                                        .map(VersionPacket::Handshake)
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Handshake)
                                 else {
                                     continue;
                                 };
@@ -200,10 +192,9 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Status => {
-                                let Some(packet) =
-                                    read_packet(protocol, reader, reader_buf, exit_on_error)
-                                        .await?
-                                        .map(VersionPacket::Status)
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Status)
                                 else {
                                     continue;
                                 };
@@ -218,10 +209,9 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Login => {
-                                let Some(packet) =
-                                    read_packet(protocol, reader, reader_buf, exit_on_error)
-                                        .await?
-                                        .map(VersionPacket::Login)
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Login)
                                 else {
                                     continue;
                                 };
@@ -236,10 +226,9 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Config => {
-                                let Some(packet) =
-                                    read_packet(protocol, reader, reader_buf, exit_on_error)
-                                        .await?
-                                        .map(VersionPacket::Config)
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Config)
                                 else {
                                     continue;
                                 };
@@ -254,10 +243,9 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Play => {
-                                let Some(packet) =
-                                    read_packet(protocol, reader, reader_buf, exit_on_error)
-                                        .await?
-                                        .map(VersionPacket::Play)
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Play)
                                 else {
                                     continue;
                                 };
@@ -377,7 +365,6 @@ pub struct ConnectionUpdate {
 ///
 /// Returns an error if reading the packet fails.
 pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
-    protocol: u32,
     reader: &mut DecryptorMut<R, C>,
     buffer: &mut Vec<u8>,
     exit_on_error: bool,
@@ -410,7 +397,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 
     // Deserialize the packet.
     #[allow(unused_variables, reason = "Variables are used if tracing is enabled")]
-    match froglight_facet::from_slice_remainder::<T>(packet, protocol) {
+    match froglight_facet::from_slice_remainder::<T>(packet) {
         Ok((val, rem)) => {
             #[cfg(feature = "tracing_ext")]
             if !rem.is_empty() {
@@ -458,7 +445,6 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 /// Returns an error if writing the packet fails.
 pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     packet: &T,
-    protocol: u32,
     writer: &mut EncryptorMut<R, C>,
     buffer_a: &mut Vec<u8>,
     buffer_b: &mut Vec<u8>,
@@ -467,7 +453,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     buffer_b.clear();
 
     // Serialize the packet.
-    froglight_facet::to_writer(packet, protocol, buffer_a)?;
+    froglight_facet::to_writer(packet, buffer_a)?;
 
     #[cfg(feature = "tracing_ext")]
     tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_a:?}");

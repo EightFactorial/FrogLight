@@ -10,7 +10,7 @@ use froglight_block::prelude::BlockVersion;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
 use froglight_world::{
-    chunk::ParseError,
+    naive::ParseError,
     prelude::{Chunk, NaiveChunk},
 };
 

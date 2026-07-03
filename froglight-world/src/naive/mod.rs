@@ -8,18 +8,18 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
-use crate::{
-    SECTION_HEIGHT,
-    chunk::{Section, storage::ChunkStorage},
-    component::ChunkBlockPos,
-    prelude::*,
-};
+use crate::{SECTION_HEIGHT, component::ChunkBlockPos, prelude::*, section::Section};
 
 #[cfg(feature = "froglight-biome")]
 mod biome;
 #[cfg(feature = "froglight-block")]
 mod block;
+
 pub(super) mod parse;
+pub use parse::ParseError;
+
+pub mod storage;
+use storage::ChunkStorage;
 
 /// A region of blocks in a world.
 ///

@@ -5,12 +5,11 @@ use smallvec::SmallVec;
 
 use crate::{
     SECTION_HEIGHT,
-    chunk::{
-        Section,
-        section::{SectionData, SectionPalette},
-    },
     prelude::*,
-    section::{BiomeSection, BlockSection, SectionPaletteType, SectionType},
+    section::{
+        BiomeSection, BlockSection, Section, SectionData, SectionPalette, SectionPaletteType,
+        SectionType,
+    },
 };
 
 /// An error that can occur when parsing chunk data.

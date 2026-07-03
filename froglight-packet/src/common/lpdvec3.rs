@@ -183,11 +183,7 @@ impl LpDVec3 {
 
 #[cfg(feature = "facet")]
 impl FacetTemplate for LpDVec3 {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         match item.get::<Self>()?.0 {
             LpDVec3Inner::Zero => writer.write_byte(0),
             LpDVec3Inner::Normal { a, b, c } => {
@@ -208,7 +204,6 @@ impl FacetTemplate for LpDVec3 {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let a = reader.get_array::<1>()?[0];
         if a == 0 {

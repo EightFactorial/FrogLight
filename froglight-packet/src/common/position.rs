@@ -172,11 +172,7 @@ impl EntityRelativeFlags {
 
 #[cfg(feature = "facet")]
 impl FacetTemplate for EntityRelativeFlags {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let data = item.get::<Self>()?;
 
         let mut output = 0u32;
@@ -214,7 +210,6 @@ impl FacetTemplate for EntityRelativeFlags {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let data = u32::from_be_bytes(*reader.get_array::<4>()?);
 

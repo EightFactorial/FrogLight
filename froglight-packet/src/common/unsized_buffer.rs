@@ -75,11 +75,7 @@ impl<'a> UnsizedBuffer<'a> {
 
 #[cfg(feature = "facet")]
 impl FacetTemplate for UnsizedBuffer<'_> {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let slice = item.get::<UnsizedBuffer<'_>>()?.as_slice();
 
         writer.write_bytes(slice)
@@ -88,7 +84,6 @@ impl FacetTemplate for UnsizedBuffer<'_> {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let slice = reader.remaining();
         reader.consume(slice.len())?;
@@ -101,7 +96,6 @@ impl FacetBorrowedTemplate for UnsizedBuffer<'_> {
     fn deserialize_borrowed<'facet>(
         item: DeserializeItem<'facet, true>,
         reader: &mut Reader<'facet>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
         let slice = reader.remaining();
         reader.consume(slice.len())?;

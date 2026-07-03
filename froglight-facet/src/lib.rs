@@ -7,6 +7,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+#[doc(hidden)]
 #[cfg(feature = "simd")]
 pub mod simd;
 

@@ -76,8 +76,7 @@ impl<T: Paint> From<Painted<T>> for YansiStyle {
 ///
 /// "hello".green(); // calls `Paint::<&'static str>::green()`.
 /// "hello".strike(); // calls `Paint::<&'static str>::strike()`.
-/// 1.on_red(); // calls `Paint::<i32>::red()`.
-/// 1.blink(); // calls `Paint::<i32>::blink()`.
+/// 1i32.on_red(); // calls `Paint::<i32>::on_red()`.
 /// ```
 ///
 /// ### Further Details

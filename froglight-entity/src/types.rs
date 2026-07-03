@@ -74,11 +74,7 @@ pub struct EntityOptionalVarInt(pub Option<i32>);
 #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
 #[expect(clippy::cast_possible_wrap, reason = "Desired behavior")]
 impl FacetTemplate for EntityOptionalVarInt {
-    fn serialize(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-        _protocol: u32,
-    ) -> Result<(), WriterError> {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let value = item.get::<Self>()?;
         let value = value.0.map_or_default(|v| v + 1) as u32;
         encode_u32_into(value, writer)
@@ -87,7 +83,6 @@ impl FacetTemplate for EntityOptionalVarInt {
     fn deserialize<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
-        _protocol: u32,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let value = decode_u32_from(reader)?;
         let value = value.checked_sub(1).map(|v| v as i32);

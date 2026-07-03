@@ -19,8 +19,7 @@ macro_rules! generate {
             #[derive(Debug, Clone, PartialEq)]
             #[doc = concat!("The ", stringify!($ident), " entity component.")]
             #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
-            #[cfg_attr(feature = "bevy", component(immutable))]
-            #[cfg_attr(feature = "bevy", component(on_insert = super::insert_hook::<$ident>))]
+            #[cfg_attr(feature = "bevy", component(immutable, on_insert = super::insert_hook::<$ident>))]
             #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
             #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident(pub $ty);
@@ -238,11 +237,12 @@ macro_rules! generate {
                         core::any::TypeId::of::<$component>(),
                     )*
                 ];
+
                 const DATASET: $crate::entity::EntityDataSet<'static> = $crate::entity::EntityDataSet::new_slice(&[]);
 
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
-                fn inspect_reflect(dataset: &$crate::entity::EntityDataSet, f: &mut dyn FnMut(alloc::boxed::Box<dyn bevy_reflect::PartialReflect>)) {
+                fn inspect_reflect(dataset: &$crate::entity::EntityDataSet, f: &mut dyn FnMut(alloc::boxed::Box<dyn bevy_reflect::Reflect>)) {
                     f(alloc::boxed::Box::new(Self));
 
                     for (index, data) in dataset.to_ref().iter() {
@@ -277,19 +277,19 @@ macro_rules! generate {
 
         $crate::implement_entities!(
             $version => {
-                unsafe {
-                    $crate::storage::EntityStorage::build::<$version>(alloc::vec![
-                        $( <$ident as $crate::entity::EntityType<$version>>::METADATA, )*
-                    ])
-                }
+                static SLICE: &'static [&'static $crate::entity::EntityMetadata] = &[
+                    $( <$ident as $crate::entity::EntityType<$version>>::METADATA ),*
+                ];
+
+                unsafe { $crate::storage::EntityStorage::build::<$version>(SLICE) }
             },
-            read: { |protocol, cursor| {
+            read: { |cursor| {
                 let val = froglight_facet::deserialize::varint::decode_u32_from(cursor)?;
 
                 match val {
                     $(
                         $dataid => {
-                            let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining(), protocol)
+                            let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining())
                                 .map_err(froglight_facet::facet::template::ReaderError::other)?;
                             cursor.consume(cursor.remaining().len() - rem.len());
 
@@ -299,12 +299,12 @@ macro_rules! generate {
                     _ => todo!("TODO: Create an error type"),
                 }
             } },
-            write: { |data, protocol, buffer| {
+            write: { |data, buffer| {
                 match data {
                     $(
                         $crate::generated::datatype::EntityDataType::$datatype(value) => {
                             buffer.write_byte($dataid)?;
-                            froglight_facet::to_writer(value, protocol, buffer)
+                            froglight_facet::to_writer(value, buffer)
                                 .map_err(froglight_facet::facet::template::WriterError::other)?;
                         }
                     )*

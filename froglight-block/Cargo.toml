@@ -26,10 +26,17 @@ glam = { workspace = true }
 indexmap = { workspace = true }
 variadics_please = { workspace = true }
 
+# Optional dependencies
+facet = { workspace = true, optional = true }
+froglight-facet = { workspace = true, optional = true }
+
 # --- Features ---
 
 [features]
 default = ["std"]
+
+# Enable `facet` support.
+facet = ["dep:facet", "froglight-common/facet", "dep:froglight-facet"]
 
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
@@ -37,9 +44,9 @@ libm = ["glam/nostd-libm"]
 once_cell = ["froglight-registry-template/once_cell"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "froglight-registry-template/std", "glam/std", "indexmap/std"]
+std = ["foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-registry-template/std", "glam/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-registry-template/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-registry-template/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

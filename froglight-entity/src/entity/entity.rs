@@ -8,7 +8,7 @@ use bevy_ecs::{
     reflect::ReflectComponent, world::DeferredWorld,
 };
 #[cfg(feature = "bevy")]
-use bevy_reflect::{PartialReflect, Reflect};
+use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Peek;
 use froglight_common::prelude::*;
@@ -120,7 +120,7 @@ impl EntityBundle {
     ///
     /// Requires the `bevy` feature to be enabled.
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(&self, f: impl FnMut(Box<dyn PartialReflect>)) {
+    pub fn inspect_reflect(&self, f: impl FnMut(Box<dyn Reflect>)) {
         self.reference.inspect_reflect(&self.dataset, f);
     }
 
@@ -203,7 +203,7 @@ pub trait EntityType<V: EntityVersion>: 'static {
     ///
     /// Requires the `bevy` feature to be enabled.
     #[cfg(feature = "bevy")]
-    fn inspect_reflect(dataset: &EntityDataSet, f: &mut dyn FnMut(Box<dyn PartialReflect>));
+    fn inspect_reflect(dataset: &EntityDataSet, f: &mut dyn FnMut(Box<dyn Reflect>));
 
     /// Inspect this entity's data using the given function.
     ///

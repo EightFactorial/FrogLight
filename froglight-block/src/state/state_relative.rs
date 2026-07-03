@@ -1,6 +1,12 @@
 //! TODO
 
-use crate::block::Block;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
+
+use crate::{
+    block::Block,
+    prelude::{BlockType, BlockVersion},
+};
 
 /// A unique identifier for a block state,
 /// relative to all other states of the same block in the same version.
@@ -20,6 +26,8 @@ use crate::block::Block;
 /// place.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(transparent, mc::variable_inner))]
 pub struct RelativeStateId(u16);
 
 impl RelativeStateId {
@@ -27,6 +35,15 @@ impl RelativeStateId {
     #[inline]
     #[must_use]
     pub const fn new(id: u16) -> Self { RelativeStateId(id) }
+
+    /// Try to create a [`Block`] using this [`RelativeStateId`].
+    ///
+    /// See [`Block::try_new_from`] for more information.
+    #[inline]
+    #[must_use]
+    pub fn try_as_block<B: BlockType<V>, V: BlockVersion>(self) -> Option<Block> {
+        Block::try_new_from::<B, V>(self)
+    }
 
     /// Get the inner [`u16`] value.
     #[inline]

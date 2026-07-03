@@ -1,4 +1,6 @@
 //! TODO
+#![allow(clippy::std_instead_of_alloc, reason = "Example")]
+#![allow(clippy::std_instead_of_core, reason = "Example")]
 
 use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
@@ -45,10 +47,10 @@ fn default_plugins() -> PluginGroupBuilder {
     use bevy::log::LogPlugin;
     use tracing_subscriber::fmt::Layer;
 
-    let mut log = LogPlugin::default();
-    log.fmt_layer = |_| Some(Box::new(Layer::default().with_ansi_sanitization(false)));
-
-    DefaultPlugins.set(log)
+    DefaultPlugins.set(LogPlugin {
+        fmt_layer: |_| Some(Box::new(Layer::default().with_ansi_sanitization(false))),
+        ..LogPlugin::default()
+    })
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -130,6 +132,9 @@ impl BotPlugin {
     /// Handle reading/writing all messages for the bot.
     ///
     /// Run every frame during [`Update`].
+    #[allow(clippy::too_many_lines, reason = "Example")]
+    #[allow(clippy::match_same_arms, reason = "Example")]
+    #[allow(clippy::cast_possible_truncation, reason = "Example")]
     fn message_handler(
         bot: Single<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
@@ -156,11 +161,11 @@ impl BotPlugin {
                             PartOfInstance::new(bot.id()),
                             data.entity_id,
                             data.entity_uuid,
-                            Transform::from_translation(Vec3::new(
+                            Position::new_xyz(
                                 data.position_x as f32,
                                 data.position_y as f32,
                                 data.position_z as f32,
-                            )),
+                            ),
                             Velocity::new(data.velocity.as_vec3a()),
                         ));
 
@@ -248,10 +253,10 @@ impl BotPlugin {
                     // ClientboundPlayEvent::DisguisedChat() => todo!(),
                     // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
                     // ClientboundPlayEvent::EntityEvent() => todo!(),
-                    ClientboundPlayEvent::EntityPosition(entity_id, data, on_ground) => {
+                    ClientboundPlayEvent::EntityPosition(entity_id, data, _on_ground) => {
                         let entity_id = *entity_id;
                         let data = *data;
-                        let _on_ground = *on_ground;
+                        // let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
@@ -457,7 +462,7 @@ impl BotPlugin {
                                                 );
                                             }
                                         }
-                                    })
+                                    });
                                 });
 
                                 entity.despawn();
@@ -570,11 +575,11 @@ impl BotPlugin {
                     // ClientboundPlayEvent::TabList() => todo!(),
                     // ClientboundPlayEvent::TagQuery() => todo!(),
                     // ClientboundPlayEvent::TakeItemEntity() => todo!(),
-                    ClientboundPlayEvent::TeleportEntity(id, data, flags, on_ground) => {
+                    ClientboundPlayEvent::TeleportEntity(id, data, flags, _on_ground) => {
                         let id = *id;
                         let data = *data;
                         let flags = *flags;
-                        let _on_ground = *on_ground;
+                        // let on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };

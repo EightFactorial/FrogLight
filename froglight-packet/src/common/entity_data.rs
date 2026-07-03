@@ -61,7 +61,7 @@ impl SetEntityBundle {
         raw_data: UnsizedBuffer<'static>,
     ) -> Self {
         Self::new_using(entity_id, raw_data, |slice| {
-            froglight_facet::from_slice::<DataSetSerializer<V>>(slice, V::PROTOCOL_ID)
+            froglight_facet::from_slice::<DataSetSerializer<V>>(slice)
                 .map(DataSetSerializer::into_inner)
         })
     }

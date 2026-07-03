@@ -1,6 +1,5 @@
 //! TODO
 
-use alloc::vec::Vec;
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
@@ -27,11 +26,11 @@ impl EntityStorage {
     /// The caller must ensure that all provided entity metadata has the correct
     /// global ids for this collection.
     #[must_use]
-    pub unsafe fn build<V: EntityVersion>(metadata: Vec<&'static EntityMetadata>) -> Self {
+    pub unsafe fn build<V: EntityVersion>(metadata: &[&'static EntityMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
-        for meta in metadata {
+        for &meta in metadata {
             identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
         }
 
@@ -97,14 +96,12 @@ macro_rules! implement_entities {
 
             #[cfg(feature = "facet")]
             const DATATYPE_DESERIALIZE: fn(
-                protocol: u32,
                 &mut froglight_facet::facet::template::Reader,
             ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::template::ReaderError>  = $read;
 
             #[cfg(feature = "facet")]
             const DATATYPE_SERIALIZE: fn(
                 &$crate::generated::datatype::EntityDataType,
-                protocol: u32,
                 &mut froglight_facet::facet::template::Writer,
             ) -> Result<(), froglight_facet::facet::template::WriterError> = $write;
         }

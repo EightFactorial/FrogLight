@@ -154,7 +154,7 @@ macro_rules! generate {
                         $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
                     ];
 
-                    unsafe { $crate::storage::BlockStorage::build::<Self, _>(SLICE.iter().copied()) }
+                    unsafe { $crate::storage::BlockStorage::build::<Self>(alloc::vec::Vec::from(SLICE).into_boxed_slice()) }
                 }
             }
         }

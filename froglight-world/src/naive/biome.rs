@@ -4,11 +4,7 @@ use core::any::TypeId;
 
 use froglight_biome::{prelude::*, storage::BiomeStorage};
 
-use crate::{
-    chunk::{NaiveChunk, section::SectionPalette},
-    component::ChunkBlockPos,
-    prelude::*,
-};
+use crate::{component::ChunkBlockPos, prelude::*, section::SectionPalette};
 
 impl NaiveChunk {
     /// Get the [`Biome`] at the given position within the chunk,
@@ -73,8 +69,6 @@ impl NaiveChunk {
 
     /// Returns `true` if the chunk contains at least one biome of the same
     /// type.
-    ///
-    /// Resolves biome types using the provided [`BiomeStorage`].
     #[must_use]
     pub fn contains_biome(&self, biome: Biome) -> bool {
         self.contains_raw_biome(biome.global_id().into_inner())
@@ -83,7 +77,7 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one biome of the same
     /// type.
     #[must_use]
-    pub fn contains_biome_type_using(&self, biome_type: TypeId, storage: &BiomeStorage) -> bool {
+    pub fn contains_biome_type(&self, biome_type: TypeId, storage: &BiomeStorage) -> bool {
         let Some(biome_id) = storage.metadata().iter().find_map(|(_, meta)| {
             if meta.biome_ty() == biome_type { Some(meta.global_id().into_inner()) } else { None }
         }) else {

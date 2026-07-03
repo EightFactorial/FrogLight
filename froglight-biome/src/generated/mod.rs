@@ -229,13 +229,11 @@ macro_rules! generate {
             impl $crate::version::BiomeVersion => $version {
                 const BIOMES: $crate::storage::BiomeStorage;
                 fn new_biomes() => {
-                    unsafe {
-                        $crate::storage::BiomeStorage::build::<Self>(alloc::vec![
-                            $(
-                                <$ident as crate::biome::BiomeType<$version>>::METADATA,
-                            )*
-                        ])
-                    }
+                    static SLICE: &'static [&'static $crate::biome::BiomeMetadata] = &[
+                        $(<$ident as crate::biome::BiomeType<$version>>::METADATA),*
+                    ];
+
+                    unsafe { $crate::storage::BiomeStorage::build::<Self>(SLICE) }
                 }
             }
         }

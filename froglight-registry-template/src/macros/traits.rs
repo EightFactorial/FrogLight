@@ -77,7 +77,9 @@ macro_rules! version_subtrait {
 /// # Example
 ///
 /// ```rust
+/// use std::sync::Arc;
 /// use froglight_registry_template::{version_subtrait, version_implement};
+/// use froglight_registry_template::types::{LazyLock, AtomicArc, ArcBorrow};
 ///
 /// pub trait Version {}
 ///
@@ -95,10 +97,7 @@ macro_rules! version_subtrait {
 /// version_implement! {
 ///     impl MyTrait => VersionA {
 ///         const GLOBAL: u32;
-///         fn global();
-///         fn new_value() => {
-///             42
-///         }
+///         fn new_value() => { 42 }
 ///     }
 /// }
 ///
@@ -108,20 +107,17 @@ macro_rules! version_subtrait {
 /// impl Version for VersionB {}
 ///
 /// impl MyTrait for VersionB {
-///     const GLOBAL: &'static froglight_registry_template::types::LazyLock<u32> = {
-///         static STATIC: froglight_registry_template::types::LazyLock<u32> =
-///             froglight_registry_template::types::LazyLock::new(<VersionB as MyTrait>::new_value);
+///     const GLOBAL: &'static LazyLock<AtomicArc<u32>> = {
+///         static STATIC: LazyLock<AtomicArc<u32>> = LazyLock::new(|| AtomicArc::from(<VersionB as MyTrait>::new_value()));
 ///         &STATIC
 ///     };
 ///
 ///     #[inline]
 ///     #[must_use]
-///     fn global() -> &'static u32 { <VersionB as MyTrait>::GLOBAL }
+///     fn global() -> ArcBorrow<u32> { <VersionB as MyTrait>::GLOBAL.load() }
 ///
 ///    #[must_use]
-///     fn new_value() -> u32 {
-///         42
-///     }
+///     fn new_value() -> u32 { 42 }
 /// }
 #[macro_export]
 macro_rules! version_implement {

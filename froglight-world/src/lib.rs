@@ -1,4 +1,5 @@
 #![cfg_attr(feature = "nightly", feature(alloc_slice_into_array))]
+#![cfg_attr(feature = "nightly", feature(allocator_api))]
 #![doc = include_str!("../README.md")]
 #![no_std]
 
@@ -8,6 +9,7 @@ extern crate alloc;
 pub mod bevy;
 pub mod chunk;
 pub mod component;
+pub mod naive;
 pub mod section;
 
 /// The length of a chunk.
@@ -30,7 +32,7 @@ pub mod prelude {
     #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
     pub use crate::chunk::{Chunk, SharedChunk};
     pub use crate::{
-        chunk::NaiveChunk,
         component::{BlockPos, ChunkPos},
+        naive::NaiveChunk,
     };
 }

@@ -4,11 +4,7 @@ use core::any::TypeId;
 
 use froglight_block::{prelude::*, storage::BlockStorage};
 
-use crate::{
-    chunk::{NaiveChunk, section::SectionPalette},
-    component::ChunkBlockPos,
-    prelude::*,
-};
+use crate::{component::ChunkBlockPos, naive::NaiveChunk, prelude::*, section::SectionPalette};
 
 impl NaiveChunk {
     /// Get the [`Block`] at the given position within the chunk,
@@ -79,15 +75,6 @@ impl NaiveChunk {
             .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 
-    /// Returns `true` if the chunk contains at least one block of the same
-    /// type.
-    ///
-    /// Resolves block types using the provided [`BlockStorage`].
-    #[must_use]
-    pub fn contains_block_using(&self, block: Block, storage: &BlockStorage) -> bool {
-        self.contains_block_type_using(block.block_ty(), storage)
-    }
-
     /// Returns `true` if the chunk contains at least one block of the exact
     /// same type and state.
     #[must_use]
@@ -97,8 +84,10 @@ impl NaiveChunk {
 
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
+    ///
+    /// Resolves block types using the provided [`BlockStorage`].
     #[must_use]
-    pub fn contains_block_type_using(&self, block_type: TypeId, storage: &BlockStorage) -> bool {
+    pub fn contains_block_type(&self, block_type: TypeId, storage: &BlockStorage) -> bool {
         // Closure to check if a block id matches the desired block type.
         let matches = |id: u32| {
             storage

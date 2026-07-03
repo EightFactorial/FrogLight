@@ -5,11 +5,10 @@ use core::{marker::PhantomData, ops::Range};
 use bitvec::{field::BitField, order::Msb0, slice::BitSlice, vec::BitVec};
 use smallvec::SmallVec;
 
-use crate::{
-    SECTION_HEIGHT, SECTION_WIDTH,
-    component::SectionBlockPos,
-    section::{BiomeSection, BlockSection, SectionType},
-};
+mod traits;
+pub use traits::*;
+
+use crate::{SECTION_HEIGHT, SECTION_WIDTH, component::SectionBlockPos};
 
 /// A piece of a chunk.
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -21,6 +20,14 @@ pub struct Section {
 }
 
 impl Section {
+    /// An empty [`Section`].
+    pub const EMPTY: Self = Self {
+        block_count: 0,
+        fluid_count: 0,
+        blocks: SectionData::EMPTY,
+        biomes: SectionData::EMPTY,
+    };
+
     /// Create a new [`Section`] without performing any validation.
     ///
     /// # Safety
@@ -140,6 +147,14 @@ pub struct SectionData<T: SectionType> {
 }
 
 impl<T: SectionType> SectionData<T> {
+    /// An empty [`SectionData`].
+    pub const EMPTY: Self = Self {
+        bits: 0,
+        palette: SectionPalette::Single(0),
+        data: BitVec::EMPTY,
+        _phantom: PhantomData,
+    };
+
     /// Create a new [`SectionData`] without performing any validation.
     ///
     /// # Safety

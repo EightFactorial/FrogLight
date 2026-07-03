@@ -1,8 +1,8 @@
 #![allow(clippy::unreadable_literal, reason = "Generated code")]
+#![allow(clippy::wildcard_imports, reason = "Generated code")]
 
 use froglight_common::version::V26_2;
 
-#[expect(clippy::wildcard_imports, reason = "Generated code")]
 use crate::{
     generated::{component::*, entity::*},
     types::*,

@@ -1,4 +1,9 @@
-use crate::biome::Biome;
+//! TODO
+
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
+
+use crate::{biome::Biome, prelude::BiomeVersion};
 
 /// A unique identifier for a biome,
 /// relative to all other biomes in the same version.
@@ -7,6 +12,8 @@ use crate::biome::Biome;
 /// from [`V26_1`](froglight_common::prelude::V26_1).
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(transparent, mc::variable_inner))]
 pub struct GlobalBiomeId(u32);
 
 impl GlobalBiomeId {
@@ -14,6 +21,15 @@ impl GlobalBiomeId {
     #[inline]
     #[must_use]
     pub const fn new(id: u32) -> Self { GlobalBiomeId(id) }
+
+    /// Try to convert this [`GlobalBiomeId`] into a [`Biome`].
+    ///
+    /// See [`BlockStorage::get_biome_by_id`](crate::storage::BiomeStorage::get_biome_by_id).
+    #[inline]
+    #[must_use]
+    pub fn try_into_block<V: BiomeVersion>(self) -> Option<Biome> {
+        V::biomes().get_biome_by_id(self)
+    }
 
     /// Get the inner [`u32`] value.
     #[inline]

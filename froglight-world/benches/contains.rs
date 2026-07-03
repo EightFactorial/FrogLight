@@ -17,10 +17,12 @@ use froglight_biome::{
 use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
-use froglight_world::chunk::{
-    NaiveChunk,
+use froglight_world::{
+    naive::{
+        NaiveChunk,
+        storage::{ArrayChunkStorage, ChunkStorage},
+    },
     section::{Section, SectionData, SectionPalette},
-    storage::{ArrayChunkStorage, ChunkStorage},
 };
 use smallvec::SmallVec;
 
@@ -359,7 +361,7 @@ froglight_biome::version::version_implement! {
         const BIOMES: BiomeStorage;
         fn new_biomes() => {
             unsafe {
-                BiomeStorage::build::<Self>(vec![
+                BiomeStorage::build::<Self>(&[
                     Plains::METADATA,
                     Forest::METADATA,
                 ])
@@ -383,7 +385,7 @@ fn contains_global_biome_best(b: Bencher) {
 
     let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type_using(TypeId::of::<Plains>(), &biomes));
+        black_box(global.contains_biome_type(TypeId::of::<Plains>(), &biomes));
     });
 }
 
@@ -402,7 +404,7 @@ fn contains_global_biome_worst(b: Bencher) {
 
     let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type_using(TypeId::of::<Forest>(), &biomes));
+        black_box(global.contains_biome_type(TypeId::of::<Forest>(), &biomes));
     });
 }
 
@@ -464,10 +466,10 @@ froglight_block::version::version_implement! {
         const BLOCKS: BlockStorage;
         fn new_blocks() => {
             unsafe {
-                BlockStorage::build::<Self, _>([
+                BlockStorage::build::<Self>(Box::new([
                     Air::METADATA,
                     Stone::METADATA,
-                ])
+                ]))
             }
         }
     }
@@ -488,7 +490,7 @@ fn contains_global_block_best(b: Bencher) {
 
     let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type_using(TypeId::of::<Air>(), &blocks));
+        black_box(global.contains_block_type(TypeId::of::<Air>(), &blocks));
     });
 }
 
@@ -507,6 +509,6 @@ fn contains_global_block_worst(b: Bencher) {
 
     let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type_using(TypeId::of::<Stone>(), &blocks));
+        black_box(global.contains_block_type(TypeId::of::<Stone>(), &blocks));
     });
 }

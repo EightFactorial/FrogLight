@@ -1,6 +1,9 @@
 //! TODO
 
-use crate::block::Block;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
+
+use crate::{block::Block, prelude::BlockVersion};
 
 /// A unique identifier for a block type id,
 /// relative to all other blocks in the same version.
@@ -12,6 +15,8 @@ use crate::block::Block;
 /// like stair orientation, *will* equal each other.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(transparent, mc::variable_inner))]
 pub struct GlobalBlockId(u16);
 
 impl GlobalBlockId {
@@ -19,6 +24,15 @@ impl GlobalBlockId {
     #[inline]
     #[must_use]
     pub const fn new(id: u16) -> Self { GlobalBlockId(id) }
+
+    /// Try to convert this [`GlobalBlockId`] into a [`Block`].
+    ///
+    /// See [`BlockStorage::get_block_by_id`](crate::storage::BlockStorage::get_block_by_id).
+    #[inline]
+    #[must_use]
+    pub fn try_into_block<V: BlockVersion>(self) -> Option<Block> {
+        V::blocks().get_block_by_id(self)
+    }
 
     /// Get the inner [`u16`] value.
     #[inline]
