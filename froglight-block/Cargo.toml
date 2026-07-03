@@ -18,6 +18,10 @@ workspace = true
 
 # --- Dependencies ---
 
+[dev-dependencies]
+criterion = { features = ["default", "html_reports"], workspace = true }
+rand = { features = ["default"], workspace = true }
+
 [dependencies]
 foldhash = { workspace = true }
 froglight-common = { workspace = true }
@@ -29,6 +33,17 @@ variadics_please = { workspace = true }
 # Optional dependencies
 facet = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
+
+# --- Tests/Benchmarks ---
+
+[[bench]]
+name = "block"
+required-features = ["std", "v26_1"]
+harness = false
+
+[[test]]
+name = "attributes"
+required-features = ["std"]
 
 # --- Features ---
 

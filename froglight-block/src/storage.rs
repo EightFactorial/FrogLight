@@ -1,8 +1,8 @@
 //! TODO
 
+use alloc::boxed::Box;
 #[cfg(feature = "nightly")]
-use alloc::alloc::Allocator;
-use alloc::{boxed::Box, vec::Vec};
+use alloc::{alloc::Allocator, vec::Vec};
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
