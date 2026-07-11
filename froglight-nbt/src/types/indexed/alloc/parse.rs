@@ -62,27 +62,30 @@ fn parse_nbt(
     let mut counter = 1;
     let mut queue = VecDeque::with_capacity(1);
 
+    // Get the number of bytes read.
+    let mut length = cursor.pos();
     // Add the root compound to the queue
     queue.push_back((cursor, true));
 
     // Process the queue until it's empty
-    while let Some((cursor, named)) = queue.pop_front() {
+    while let Some((mut cursor, named)) = queue.pop_front() {
         if named {
-            parse_item::<true>(cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
+            parse_item::<true>(&mut cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
         } else {
-            parse_item::<false>(cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
+            parse_item::<false>(&mut cursor, &mut entries, &mut indexes, &mut counter, &mut queue)?;
         }
+
+        // Use the furthest position reached.
+        length = length.max(cursor.pos());
     }
 
-    // TODO: Shrink to exact size.
-    let length = root.len();
     Ok((length, name, entries, indexes))
 }
 
 #[inline]
 #[allow(clippy::too_many_lines, reason = "Handles both compounds and lists")]
 fn parse_item<'data, const NAMED: bool>(
-    mut cursor: Cursor<'data>,
+    cursor: &mut Cursor<'data>,
     entries: &mut Vec<EntryIndex>,
     ranges: &mut Vec<Range<usize>>,
 
@@ -98,55 +101,55 @@ fn parse_item<'data, const NAMED: bool>(
                 break;
             }
 
-            let name = read_string(&mut cursor)?;
+            let name = read_string(cursor)?;
 
             match tag {
                 BYTE => {
-                    let value = read_byte(&mut cursor)?;
+                    let value = read_byte(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Byte(value)));
                 }
                 SHORT => {
-                    let value = read_short(&mut cursor)?;
+                    let value = read_short(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Short(value)));
                 }
                 INT => {
-                    let value = read_int(&mut cursor)?;
+                    let value = read_int(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Int(value)));
                 }
                 LONG => {
-                    let value = read_long(&mut cursor)?;
+                    let value = read_long(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Long(value)));
                 }
                 FLOAT => {
-                    let value = read_float(&mut cursor)?;
+                    let value = read_float(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Float(value)));
                 }
                 DOUBLE => {
-                    let value = read_double(&mut cursor)?;
+                    let value = read_double(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Double(value)));
                 }
                 BYTE_ARRAY => {
-                    let value = read_byte_array(&mut cursor)?;
+                    let value = read_byte_array(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::ByteArray(value)));
                 }
                 STRING => {
-                    let value = read_string(&mut cursor)?;
+                    let value = read_string(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::String(value)));
                 }
                 LIST => {
-                    let value = read_list(&mut cursor, counter, queue)?;
+                    let value = read_list(cursor, counter, queue)?;
                     entries.push(EntryIndex::new(name, ValueIndex::List(value)));
                 }
                 COMPOUND => {
-                    let value = read_compound(&mut cursor, counter, queue)?;
+                    let value = read_compound(cursor, counter, queue)?;
                     entries.push(EntryIndex::new(name, ValueIndex::Compound(value)));
                 }
                 INT_ARRAY => {
-                    let value = read_int_array(&mut cursor)?;
+                    let value = read_int_array(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::IntArray(value)));
                 }
                 LONG_ARRAY => {
-                    let value = read_long_array(&mut cursor)?;
+                    let value = read_long_array(cursor)?;
                     entries.push(EntryIndex::new(name, ValueIndex::LongArray(value)));
                 }
                 _ => return Err(()),
@@ -163,46 +166,46 @@ fn parse_item<'data, const NAMED: bool>(
             match tag {
                 // Primitive types are calculated from the list's index, so skip them.
                 BYTE => {
-                    read_byte(&mut cursor)?;
+                    read_byte(cursor)?;
                 }
                 SHORT => {
-                    read_short(&mut cursor)?;
+                    read_short(cursor)?;
                 }
                 INT => {
-                    read_int(&mut cursor)?;
+                    read_int(cursor)?;
                 }
                 LONG => {
-                    read_long(&mut cursor)?;
+                    read_long(cursor)?;
                 }
                 FLOAT => {
-                    read_float(&mut cursor)?;
+                    read_float(cursor)?;
                 }
                 DOUBLE => {
-                    read_double(&mut cursor)?;
+                    read_double(cursor)?;
                 }
 
                 BYTE_ARRAY => {
-                    let value = read_byte_array(&mut cursor)?;
+                    let value = read_byte_array(cursor)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::ByteArray(value)));
                 }
                 STRING => {
-                    let value = read_string(&mut cursor)?;
+                    let value = read_string(cursor)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::String(value)));
                 }
                 COMPOUND => {
-                    let value = read_compound(&mut cursor, counter, queue)?;
+                    let value = read_compound(cursor, counter, queue)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::Compound(value)));
                 }
                 LIST => {
-                    let value = read_list(&mut cursor, counter, queue)?;
+                    let value = read_list(cursor, counter, queue)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::List(value)));
                 }
                 INT_ARRAY => {
-                    let value = read_int_array(&mut cursor)?;
+                    let value = read_int_array(cursor)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::IntArray(value)));
                 }
                 LONG_ARRAY => {
-                    let value = read_long_array(&mut cursor)?;
+                    let value = read_long_array(cursor)?;
                     entries.push(EntryIndex::new(NAME, ValueIndex::LongArray(value)));
                 }
                 _ => return Err(()),

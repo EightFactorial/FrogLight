@@ -7,7 +7,7 @@ mod future;
 pub use future::SerializerFuture;
 
 pub(crate) mod item;
-pub use item::{Item, SerializeItem};
+pub use item::{Item, ItemType, SerializeItem};
 
 pub(crate) mod logic;
 pub use logic::Serializer;

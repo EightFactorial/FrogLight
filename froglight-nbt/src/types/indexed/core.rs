@@ -1,6 +1,10 @@
 //! TODO
 
-use core::ops::Deref;
+use core::{fmt::Debug, hash::Hash, ops::Deref};
+
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::facet::{WithFnAttr, template::*};
 
 use crate::types::indexed::index::EntryIndex;
 
@@ -8,7 +12,7 @@ use crate::types::indexed::index::EntryIndex;
 ///
 /// If the `alloc` feature is enabled,
 /// [`BorrowedCore`] is provided as the default implementation.
-pub trait IndexCore<A: NbtAccess> {
+pub trait IndexCore<A: NbtAccess>: Eq {
     /// Get a reference to the root NBT data slice.
     #[must_use]
     fn root(&self) -> &[u8];
@@ -53,6 +57,74 @@ pub trait IndexCore<A: NbtAccess> {
     unsafe fn entry_range_mut(&mut self, index: usize) -> &mut [EntryIndex]
     where
         A: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>;
+
+    /// The [`WithFnAttr`] for this named NBT using this [`IndexCore`].
+    #[cfg(feature = "facet")]
+    const WITH_NAMED: WithFnAttr = WithFnAttr::using(
+        Self::serialize_named,
+        Self::deserialize_named::<false>,
+        Self::deserialize_named::<true>,
+    );
+
+    /// The [`WithFnAttr`] for this unnamed NBT using this [`IndexCore`].
+    #[cfg(feature = "facet")]
+    const WITH_UNNAMED: WithFnAttr = WithFnAttr::using(
+        Self::serialize_unnamed,
+        Self::deserialize_unnamed::<false>,
+        Self::deserialize_unnamed::<true>,
+    );
+
+    /// A facet deserializer for this [`IndexCore`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the NBT cannot be read.
+    #[cfg(feature = "facet")]
+    fn deserialize_named<'facet, const BORROW: bool>(
+        _item: DeserializeItem<'facet, BORROW>,
+        _reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        Err(ReaderError::from_string("This `IndexedNbt::IndexCore` does not support Facet!".into()))
+    }
+
+    /// A facet serializer for this [`IndexCore`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the NBT cannot be written.
+    #[cfg(feature = "facet")]
+    fn serialize_named(
+        _item: SerializeItem<'_, '_>,
+        _writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        Err(WriterError::from_string("This `IndexedNbt::IndexCore` does not support Facet!".into()))
+    }
+
+    /// A facet deserializer for this [`IndexCore`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the NBT cannot be read.
+    #[cfg(feature = "facet")]
+    fn deserialize_unnamed<'facet, const BORROW: bool>(
+        _item: DeserializeItem<'facet, BORROW>,
+        _reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        Err(ReaderError::from_string("This `IndexedNbt::IndexCore` does not support Facet!".into()))
+    }
+
+    /// A facet serializer for this [`IndexCore`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the NBT cannot be written.
+    #[cfg(feature = "facet")]
+    fn serialize_unnamed(
+        _item: SerializeItem<'_, '_>,
+        _writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        Err(WriterError::from_string("This `IndexedNbt::IndexCore` does not support Facet!".into()))
+    }
 }
 
 impl<T: IndexCore<Mut> + ?Sized> IndexCore<Ref> for T {
@@ -96,7 +168,7 @@ impl<T: IndexCore<Mut> + ?Sized> IndexCore<Ref> for T {
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for either [`Ref`] or [`Mut`] access.
-pub trait NbtAccess: sealed::Sealed + 'static {
+pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'static {
     /// The type of slice that NBT data is accessed through.
     type SLICE<'data>: Deref<Target = [u8]> + 'data;
     /// The type of reference that the core is accessed through.

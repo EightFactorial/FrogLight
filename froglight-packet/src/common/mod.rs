@@ -8,6 +8,7 @@ pub mod known_packs;
 pub mod login;
 pub mod lpdvec3;
 pub mod position;
+pub mod registry;
 pub mod spawn_info;
 pub mod unsized_buffer;
 pub mod update_tags;

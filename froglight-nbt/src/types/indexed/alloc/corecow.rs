@@ -3,13 +3,17 @@
 use alloc::{borrow::Cow, vec::Vec};
 use core::{marker::PhantomData, range::Range};
 
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::facet::template::*;
+
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
     index::EntryIndex,
 };
 
 /// An [`IndexCore`] for Copy-On-Write NBT data.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CowCore<'data, A: NbtAccess> {
     root: Cow<'data, [u8]>,
     entries: Vec<EntryIndex>,
@@ -103,6 +107,58 @@ impl IndexCore<Ref> for CowCore<'_, Ref> {
     {
         unreachable!("Cannot get mutable access with `Ref`!")
     }
+
+    #[cfg(feature = "facet")]
+    fn deserialize_named<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = IndexedNbt::new_named_ref(reader.remaining())
+            .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;
+
+        reader.consume(nbt.as_slice().len())?;
+        item.set::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>(nbt.into_owned_ref())
+    }
+
+    #[cfg(feature = "facet")]
+    fn deserialize_unnamed<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = IndexedNbt::new_unnamed_ref(reader.remaining())
+            .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;
+
+        reader.consume(nbt.as_slice().len())?;
+        item.set::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>(nbt.into_owned_ref())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_unnamed(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_named(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
 }
 
 impl IndexCore<Mut> for CowCore<'_, Mut> {
@@ -145,5 +201,57 @@ impl IndexCore<Mut> for CowCore<'_, Mut> {
             let range = self.ranges.get_unchecked(index);
             self.entries.as_mut_slice().get_unchecked_mut(*range)
         }
+    }
+
+    #[cfg(feature = "facet")]
+    fn deserialize_named<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = IndexedNbt::new_named_ref(reader.remaining())
+            .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;
+
+        reader.consume(nbt.as_slice().len())?;
+        item.set::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>(nbt.into_owned_mut())
+    }
+
+    #[cfg(feature = "facet")]
+    fn deserialize_unnamed<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = IndexedNbt::new_unnamed_ref(reader.remaining())
+            .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;
+
+        reader.consume(nbt.as_slice().len())?;
+        item.set::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>(nbt.into_owned_mut())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_unnamed(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_named(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
     }
 }

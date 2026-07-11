@@ -29,6 +29,7 @@ use froglight::{
             client_information::ClientInformation,
             handshake::{ConnectionIntent, HandshakeContent},
             login::LoginHelloContent,
+            registry::RegistryDataEntry,
         },
     },
     prelude::*,
@@ -698,8 +699,20 @@ impl BotPlugin {
                             ServerboundConfigEvent::Pong(*id),
                         ));
                     }
-                    ClientboundConfigEvent::RegistryData(identifier, _) => {
+                    // TODO: Parse this elsewhere and receive it via `RegistryData` events.
+                    ClientboundConfigEvent::RegistryData(identifier, entries) => {
                         info!("Received RegistryData: \"{identifier}\"");
+
+                        for RegistryDataEntry { identifier, nbt } in entries {
+                            if let Some(nbt) = nbt {
+                                debug!(" - \"{identifier}\":");
+                                for entry in &nbt.as_compound() {
+                                    debug!("   - \"{}\": <hidden>", entry.name().get());
+                                }
+                            } else {
+                                debug!(" - \"{identifier}\": <empty>");
+                            }
+                        }
                     }
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
@@ -735,30 +748,8 @@ impl BotPlugin {
                             let storage = metadata.entry(identifier.clone()).or_default();
 
                             for tag in tags.clone() {
-                                debug!(" - {}", tag.identifier);
+                                debug!(" - \"{}\"", tag.identifier);
                                 storage.entry(tag.identifier).insert_entry(tag.values.clone());
-                            }
-                        }
-
-                        // As an example, trace log the "minecraft:slabs" tag.
-                        if let Some(block_reg) =
-                            registry.get_registry_by_identifier("minecraft:block")
-                            && let Some(slabs_val) = block_reg.get_by_identifier("minecraft:slabs")
-                        {
-                            let blocks = Version::blocks();
-                            trace!(
-                                "Example UpdateTags: \"minecraft:block\" -> \"minecraft:slabs\""
-                            );
-
-                            for val in slabs_val.values() {
-                                if let Ok(val) = u16::try_from(*val)
-                                    && let Some(block) =
-                                        blocks.get_block_by_id(GlobalBlockId::new(val))
-                                {
-                                    trace!(" - {}", block.identifier());
-                                } else {
-                                    error!("Failed to get metadata for block with ID {val}!");
-                                }
                             }
                         }
 

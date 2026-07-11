@@ -25,6 +25,9 @@ use reference::IndexedReference;
 pub mod types;
 
 /// An indexed NBT structure for borrowed NBT data.
+#[derive(Clone, PartialEq)]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(opaque))]
 pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     core: C,
     name: Option<Index<MStr>>,
@@ -160,6 +163,21 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
             IndexedNbt::<Ref, alloc::CowCore<'static, Ref>>::new_core(core, self.name)
         }
     }
+
+    /// Take ownership of the underlying NBT data,
+    /// returning a new [`IndexedNbt`] with an owned core.
+    #[must_use]
+    pub fn into_owned_mut(self) -> IndexedNbt<'static, Mut, alloc::CowCore<'static, Mut>> {
+        // SAFETY: `self.core` is valid for the lifetime of `self`.
+        unsafe {
+            let core = alloc::CowCore::new(
+                self.core.root().to_vec().into(),
+                self.core.entries,
+                self.core.ranges,
+            );
+            IndexedNbt::<Mut, alloc::CowCore<'static, Mut>>::new_core(core, self.name)
+        }
+    }
 }
 
 impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
@@ -181,6 +199,21 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     #[inline]
     pub fn new_named_mut(data: &'data mut [u8]) -> Result<Self, ()> {
         alloc::parse::parse_nbt_mut(data, true)
+    }
+
+    /// Take ownership of the underlying NBT data,
+    /// returning a new [`IndexedNbt`] with an owned core.
+    #[must_use]
+    pub fn into_owned_ref(self) -> IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
+        // SAFETY: `self.core` is valid for the lifetime of `self`.
+        unsafe {
+            let core = alloc::CowCore::new(
+                self.core.root.to_vec().into(),
+                self.core.entries,
+                self.core.ranges,
+            );
+            IndexedNbt::<Ref, alloc::CowCore<'static, Ref>>::new_core(core, self.name)
+        }
     }
 
     /// Take ownership of the underlying NBT data,

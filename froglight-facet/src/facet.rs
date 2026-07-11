@@ -10,8 +10,9 @@ pub mod template {
     //! Re-exports of everything needed for implementing [`FacetTemplate`].
 
     pub use froglight_facet_iter::{
-        Reader, ReaderError, Writer, WriterError, deserialize::DeserializeItem,
-        serialize::SerializeItem,
+        Reader, ReaderError, Writer, WriterError,
+        deserialize::{DeserializeDesc, DeserializeItem},
+        serialize::{ItemType as SerializeItemType, SerializeItem},
     };
 
     pub use crate::facet::{FacetBorrowedTemplate, FacetTemplate};

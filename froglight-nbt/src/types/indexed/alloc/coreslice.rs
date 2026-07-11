@@ -3,17 +3,21 @@
 use alloc::vec::Vec;
 use core::range::Range;
 
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::facet::template::*;
+
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
     index::EntryIndex,
 };
 
 /// An [`IndexCore`] for borrowed NBT data.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct SliceCore<'data, A: NbtAccess> {
-    pub(super) root: A::SLICE<'data>,
-    pub(super) entries: Vec<EntryIndex>,
-    pub(super) ranges: Vec<Range<usize>>,
+    pub(crate) root: A::SLICE<'data>,
+    pub(crate) entries: Vec<EntryIndex>,
+    pub(crate) ranges: Vec<Range<usize>>,
 }
 
 impl<'data, A: NbtAccess> SliceCore<'data, A> {
@@ -73,6 +77,30 @@ impl IndexCore<Ref> for SliceCore<'_, Ref> {
     {
         unreachable!("Cannot get mutable access with `Ref`!")
     }
+
+    #[cfg(feature = "facet")]
+    fn serialize_unnamed(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_named(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
 }
 
 impl IndexCore<Mut> for SliceCore<'_, Mut> {
@@ -115,5 +143,29 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
             let range = self.ranges.get_unchecked(index);
             self.entries.as_mut_slice().get_unchecked_mut(*range)
         }
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_unnamed(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+
+    #[cfg(feature = "facet")]
+    fn serialize_named(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
     }
 }

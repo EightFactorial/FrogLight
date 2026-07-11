@@ -33,6 +33,7 @@ froglight-entity = { features = ["facet", "std"], workspace = true }
 froglight-facet = { features = ["std"], workspace = true }
 froglight-inventory = { features = ["std"], workspace = true }
 froglight-item = { features = ["froglight-block", "std"], workspace = true }
+froglight-nbt = { features = ["std"], workspace = true }
 froglight-packet = { features = ["facet", "std"], workspace = true }
 froglight-player = { features = ["facet", "std"], workspace = true }
 froglight-registry = { features = ["std"], workspace = true }

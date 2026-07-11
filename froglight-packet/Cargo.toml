@@ -24,6 +24,7 @@ froglight-biome = { workspace = true }
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
+froglight-nbt = { workspace = true }
 froglight-player = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 glam = { workspace = true }
@@ -47,7 +48,7 @@ default = ["std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy", "froglight-player/bevy", "froglight-world/bevy", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet", "froglight-common/facet", "froglight-entity/facet", "dep:froglight-facet", "froglight-player/facet", "froglight-world/facet"]
+facet = ["dep:facet", "froglight-common/facet", "froglight-entity/facet", "dep:froglight-facet", "froglight-nbt/facet", "froglight-player/facet", "froglight-world/facet"]
 # Enable `serde` support.
 serde = ["dep:serde", "froglight-common/serde", "froglight-player/serde", "froglight-world/serde", "indexmap/serde", "uuid/serde"]
 # Enable `tracing` support.
@@ -59,9 +60,9 @@ tracing_ext = ["froglight-facet/tracing", "tracing"]
 libm = ["dep:libm", "froglight-block/libm", "froglight-entity/libm", "froglight-world/libm", "glam/nostd-libm"]
 
 # Enable support for the standard library
-std = ["facet?/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-facet?/std", "froglight-player/std", "froglight-world/std", "indexmap/std", "tracing?/std", "uuid/std"]
+std = ["facet?/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-facet?/std", "froglight-nbt/std", "froglight-player/std", "froglight-world/std", "indexmap/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-facet?/nightly", "froglight-player/nightly", "froglight-world/nightly", "foldhash/nightly"]
+nightly = ["froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-facet?/nightly", "froglight-nbt/nightly", "froglight-player/nightly", "froglight-world/nightly", "foldhash/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

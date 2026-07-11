@@ -14,6 +14,7 @@ use froglight_packet::common::{
     login::{LoginHelloContent, PlayLoginContent},
     lpdvec3::LpDVec3,
     position::{EntityPositionRotationData, EntityPositionUpdateData, EntityRelativeFlags},
+    registry::RegistryDataEntry,
     unsized_buffer::UnsizedBuffer,
     update_tags::TagMap,
 };
@@ -319,7 +320,7 @@ pub enum ClientboundConfigEvent {
     KeepAlive(u64),
     KnownResourcePacks(Vec<KnownResourcePack>),
     Ping(u32),
-    RegistryData(Identifier<'static>, UnsizedBuffer<'static>),
+    RegistryData(Identifier<'static>, Vec<RegistryDataEntry>),
     ResetChat,
     ResourcePackPop(),
     ResourcePackPush(),
