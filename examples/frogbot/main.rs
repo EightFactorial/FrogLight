@@ -259,7 +259,10 @@ impl BotPlugin {
                         // let _on_ground = *on_ground;
 
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                            let Some(instance) = entity.get::<SessionInstance>() else {
+                                error!("Received EntityPosition but bot doesn't have a SessionInstance!");
+                                return
+                            };
                             let Some(target) = instance.query_id(&entity_id) else {
                                 error!(
                                     "Received EntityPosition for unknown EntityId {}!",
@@ -268,7 +271,12 @@ impl BotPlugin {
                                 return;
                             };
 
-                            let mut entity = entity.into_world_mut().entity_mut(target);
+                            let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
+                                error!(
+                                    "Received EntityPosition for Entity {target} that doesn't exist!"
+                                );
+                                return;
+                            };
                             trace!("Moving Entity {target} ({})", entity_id.0);
 
                             if let Some(mut position) = entity.get_mut::<Position>() {
@@ -322,18 +330,19 @@ impl BotPlugin {
                         // TODO: Get the `height_max` and `height_min` from the server.
                         // Currently panics if the bot logs into other dimensions.
 
-                        // Prepare the bot's `SessionInstance` for tracking entities
-                        let mut commands = commands.entity(bot.id());
-                        commands.insert((
+                        // Insert the bot's initial components.
+                        let profile = bot.get::<PlayerProfile>().unwrap();
+                        commands.entity(bot.id()).insert((
+                            login.player_id,
+                            EntityUuid::new(*profile.uuid()),
                             SessionInstance::new(login.spawn_info.dimension.clone()),
-                            // SessionInstanceChunks::new(320, -64),
                             PartOfInstance::new(bot.id()),
                             EntityBundle::new::<entity::Player, Version>(),
+                            Position::ZERO,
+                            Rotation::IDENTITY,
+                            Velocity::ZERO,
+                            Acceleration::ZERO,
                         ));
-
-                        // Add the bot's `EntityId` and `EntityUuid`
-                        let profile = bot.get::<PlayerProfile>().unwrap();
-                        commands.insert((login.player_id, EntityUuid::new(*profile.uuid())));
                     }
                     // ClientboundPlayEvent::MapItemData() => todo!(),
                     // ClientboundPlayEvent::MerchantOffers() => todo!(),
@@ -353,7 +362,13 @@ impl BotPlugin {
                                 return;
                             };
 
-                            let mut entity = entity.into_world_mut().entity_mut(target);
+                            let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target)
+                            else {
+                                error!(
+                                    "Received MoveEntity for Entity {target} that doesn't exist!"
+                                );
+                                return;
+                            };
                             trace!("Moving Entity {target} ({})", data.entity_id.0);
 
                             if let Some(delta) = data.delta
@@ -414,7 +429,7 @@ impl BotPlugin {
                                 data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
                             } else {
                                 error!(
-                                    "Received TeleportEntity for Player without Transform, Velocity, or OnGround!"
+                                    "Received TeleportEntity for Player without Position, Rotation, or Velocity!"
                                 );
                             }
                         });
@@ -428,48 +443,29 @@ impl BotPlugin {
                     // ClientboundPlayEvent::RecipeBookRemove() => todo!(),
                     // ClientboundPlayEvent::RecipeBookSettings() => todo!(),
                     ClientboundPlayEvent::RemoveEntities(entities) => {
-                        let Some(instance) = bot.get::<SessionInstance>() else {
-                            error!(
-                                "Received RemoveEntities but bot doesn't have a SessionInstance!"
-                            );
-                            continue;
-                        };
+                        let removed = entities.clone();
+                        let bot_id = bot.id();
 
-                        for entity_id in entities {
-                            if let Some(entity) = instance.query_id(entity_id) {
-                                debug!("Despawning Entity {entity} ({})", entity_id.0);
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
 
-                                let mut entity = commands.entity(entity);
+                            let Ok(bot) = entities.get(bot_id) else { return };
+                            let Some(instance) = bot.get::<SessionInstance>() else {
+                                error!(
+                                    "Received RemoveEntities but bot doesn't have a SessionInstance!"
+                                );
+                                return;
+                            };
 
-                                // Debug log the entity's components before despawning it.
-                                entity.queue(|mut entity: EntityWorldMut| {
-                                    let entity_id = entity.id();
-                                    entity.world_scope(|world| {
-                                        // Get the type registry
-                                        let registry = world.resource::<AppTypeRegistry>().clone();
-                                        let registry = registry.read();
-
-                                        // Iterate over the entity's components
-                                        trace!("Despawning Entity {entity_id} with:");
-                                        for component in world.inspect_entity(entity_id).unwrap() {
-                                            if let Some(info) =
-                                                registry.get_type_info(component.type_id().unwrap())
-                                            {
-                                                // Log the component's type
-                                                trace!(
-                                                    "    - {}",
-                                                    info.type_path_table().short_path()
-                                                );
-                                            }
-                                        }
-                                    });
-                                });
-
-                                entity.despawn();
-                            } else {
-                                error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
+                            for entity_id in removed {
+                                if let Some(entity) = instance.query_id(&entity_id) {
+                                    debug!("Despawning Entity {entity} ({})", entity_id.0);
+                                    commands.entity(entity).despawn();
+                                } else {
+                                    error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
+                                }
                             }
-                        }
+                        });
                     }
                     // ClientboundPlayEvent::RemoveMobEffect() => todo!(),
                     // ClientboundPlayEvent::ResetScore() => todo!(),
@@ -502,7 +498,12 @@ impl BotPlugin {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
-                                let mut entity = entity.into_world_mut().entity_mut(target);
+                                let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
+                                    error!(
+                                        "Received SetEntityData for Entity {target} that doesn't exist!"
+                                    );
+                                    return;
+                                };
 
                                 if let Some(bundle) = entity.get::<EntityBundle>().cloned()
                                     && let Ok(bundle) = bundle.with_dataset(dataset)
@@ -585,7 +586,12 @@ impl BotPlugin {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
-                                let mut entity = entity.into_world_mut().entity_mut(target);
+                                let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
+                                    error!(
+                                        "Received TeleportEntity for Entity {target} that doesn't exist!"
+                                    );
+                                    return;
+                                };
 
                                 if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
                                     &mut Position,

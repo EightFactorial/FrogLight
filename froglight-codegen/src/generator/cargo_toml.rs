@@ -24,7 +24,8 @@ const CRATES: &[(&str, &[&str])] = &[
             "froglight-registry/",
         ],
     ),
-    ("froglight-entity", &["froglight-common/"]),
+    ("froglight-entity", &["froglight-common/", "froglight-inventory/"]),
+    ("froglight-inventory", &["froglight-common/", "froglight-item/"]),
     ("froglight-item", &["froglight-common/"]),
     (
         "froglight-network",

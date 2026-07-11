@@ -25,6 +25,22 @@ pub enum Item<'facet, const BORROW: bool> {
     Item(DeserializeItem<'facet, BORROW>),
 }
 
+impl StackItem {
+    /// Get the name of the variant of this [`StackItem`].
+    #[must_use]
+    #[allow(dead_code, reason = "Used for tracing")]
+    pub(super) const fn variant_name(&self) -> &'static str {
+        match self {
+            StackItem::Item(_) => "Item",
+            StackItem::Fields(..) => "Fields",
+            StackItem::Seq(..) => "Seq",
+            StackItem::Map(..) => "Map",
+            StackItem::Set(..) => "Set",
+            StackItem::Other(_) => "Other",
+        }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A description of a deserialization item.

@@ -18,6 +18,12 @@ use core::{
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 use facet::Facet;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{
+    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
+    serialize::varint::encode_u32_into,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -27,6 +33,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet))]
+#[cfg_attr(feature = "facet", facet(opaque, mc::with = Identifier::WITH_BORROW))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -231,6 +238,49 @@ impl Identifier<'_> {
     #[must_use]
     pub const unsafe fn new_owned_unchecked(s: String) -> Identifier<'static> {
         Identifier { inner: Cow::Owned(s) }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "facet")]
+impl FacetTemplate for Identifier<'_> {
+    #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let item = item.get::<Identifier<'_>>()?;
+        encode_u32_into(item.as_str().len() as u32, writer)?;
+        writer.write_bytes(item.as_str().as_bytes())
+    }
+
+    #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let len = decode_u32_from(reader)?;
+
+        let content = reader.get(len as usize)?;
+        let content = str::from_utf8(content).map_err(ReaderError::other)?;
+        let content = Identifier::try_new_owned(content).map_err(ReaderError::other)?;
+
+        item.set(content)
+    }
+}
+
+#[cfg(feature = "facet")]
+impl FacetBorrowedTemplate for Identifier<'_> {
+    #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
+    fn deserialize_borrowed<'facet>(
+        item: DeserializeItem<'facet, true>,
+        reader: &mut Reader<'facet>,
+    ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
+        let len = decode_u32_from(reader)?;
+
+        let content = reader.get(len as usize)?;
+        let content = str::from_utf8(content).map_err(ReaderError::other)?;
+        let content = Identifier::try_new(content).map_err(ReaderError::other)?;
+
+        item.set(content)
     }
 }
 

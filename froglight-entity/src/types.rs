@@ -11,7 +11,7 @@ use froglight_facet::{
     self as mc, deserialize::varint::decode_u32_from, facet::template::*,
     serialize::varint::encode_u32_into,
 };
-use glam::IVec3;
+use glam::{IVec3, Vec3, Vec3A};
 
 /// A variable-length [`i32`].
 #[repr(transparent)]
@@ -93,25 +93,29 @@ impl FacetTemplate for EntityOptionalVarInt {
 impl Deref for EntityOptionalVarInt {
     type Target = Option<i32>;
 
+    #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 impl DerefMut for EntityOptionalVarInt {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 impl From<Option<i32>> for EntityOptionalVarInt {
+    #[inline]
     fn from(value: Option<i32>) -> Self { Self(value) }
 }
 impl From<EntityOptionalVarInt> for Option<i32> {
+    #[inline]
     fn from(value: EntityOptionalVarInt) -> Self { value.0 }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// An entity's position.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityVec3 {
     /// The `X` coordinate.
@@ -120,6 +124,36 @@ pub struct EntityVec3 {
     pub y: f32,
     /// The `Z` coordinate.
     pub z: f32,
+}
+
+impl EntityVec3 {
+    /// Create a new [`EntityVec3`] from the given coordinates.
+    #[inline]
+    #[must_use]
+    pub const fn new(x: f32, y: f32, z: f32) -> Self { Self { x, y, z } }
+
+    /// Create a new [`EntityVec3`] from the given [`Vec3`].
+    #[inline]
+    #[must_use]
+    pub const fn new_vec3(vec: Vec3) -> Self { Self::new(vec.x, vec.y, vec.z) }
+
+    /// Create a new [`EntityVec3`] from the given [`Vec3A`].
+    #[inline]
+    #[must_use]
+    pub const fn new_vec3a(vec: Vec3A) -> Self {
+        let [x, y, z] = vec.to_array();
+        Self::new(x, y, z)
+    }
+
+    /// Get this [`EntityVec3`] as a [`Vec3`].
+    #[inline]
+    #[must_use]
+    pub const fn as_vec3(self) -> Vec3 { Vec3::new(self.x, self.y, self.z) }
+
+    /// Get this [`EntityVec3`] as a [`Vec3A`].
+    #[inline]
+    #[must_use]
+    pub const fn as_vec3a(self) -> Vec3A { Vec3A::new(self.x, self.y, self.z) }
 }
 
 /// An entity's dimension and position.
@@ -258,6 +292,7 @@ pub enum EntityDirection {
 /// An entity's villager data.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityVillagerData {
     /// The villager's type.
@@ -277,22 +312,27 @@ pub struct EntityVillagerData {
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityBlockState(#[cfg_attr(feature = "facet", facet(mc::variable))] pub u32);
 
 impl Deref for EntityBlockState {
     type Target = u32;
 
+    #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 impl DerefMut for EntityBlockState {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
 impl From<u32> for EntityBlockState {
+    #[inline]
     fn from(value: u32) -> Self { Self(value) }
 }
 impl From<EntityBlockState> for u32 {
+    #[inline]
     fn from(value: EntityBlockState) -> Self { value.0 }
 }
 

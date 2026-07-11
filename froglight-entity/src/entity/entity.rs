@@ -1,11 +1,13 @@
 #[cfg(feature = "bevy")]
-use alloc::{borrow::Cow, boxed::Box, string::String};
+use alloc::{borrow::Cow, boxed::Box};
 use core::any::TypeId;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{
-    component::Component, lifecycle::HookContext, reflect::ReflectCommandExt,
-    reflect::ReflectComponent, world::DeferredWorld,
+    component::Component,
+    lifecycle::HookContext,
+    reflect::{ReflectCommandExt, ReflectComponent},
+    world::{DeferredWorld, EntityWorldMut},
 };
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
@@ -24,7 +26,7 @@ use crate::{
 /// A bundle of data and metadata for an entity.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_discard = Self::replace_hook))]
+#[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_discard = Self::discard_hook))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq, Component))]
 pub struct EntityBundle {
     dataset: EntityDataSet<'static>,
@@ -172,18 +174,22 @@ impl EntityBundle {
         commands.trigger(EntityBundleEvent::new);
     }
 
-    fn replace_hook(mut world: DeferredWorld, ctx: HookContext) {
+    fn discard_hook(mut world: DeferredWorld, ctx: HookContext) {
         let (entities, mut commands) = world.entities_and_commands();
         let Ok(entity) = entities.get(ctx.entity) else { return };
 
         let bundle = entity.get::<Self>().unwrap();
 
         #[cfg(feature = "tracing")]
-        tracing::trace!(target: "froglight_entity", "Removing EntityBundle \"{}\" from Entity {}", bundle.identifier(), ctx.entity);
+        tracing::trace!(target: "froglight_entity", "Discarding EntityBundle \"{}\" from Entity {}", bundle.identifier(), ctx.entity);
 
         let mut commands = commands.entity(ctx.entity);
         bundle.inspect_reflect(|c| {
-            commands.remove_reflect(Cow::Owned(String::from(c.reflect_type_path())));
+            commands.queue_silenced(move |mut entity: EntityWorldMut<'_>| {
+                if entity.contains_type_id(c.type_id()) {
+                    entity.remove_reflect(Cow::<'static, str>::Owned(c.reflect_type_path().into()));
+                }
+            });
         });
     }
 }

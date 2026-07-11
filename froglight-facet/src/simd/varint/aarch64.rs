@@ -191,32 +191,13 @@ fn decode_inline<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
 #[must_use]
 #[inline(always)]
 unsafe fn decode_small<T: VarIntType>(bytes: T::Encoded) -> (T, u8) {
-    let input = T::array_to_u64(bytes);
+    let buffer = Simd::<u8, 5>::load_or_default(bytes.as_ref());
+    let (buffer, bytes) = super::fallback::unmark_bytes(buffer);
 
-    // Use the MSBs to determine how many bytes there are.
-    let bits = 64u32.saturating_sub((input & 0x0000_0080_8080_8080).leading_zeros());
-    #[expect(clippy::cast_possible_truncation, reason = "<= 64")]
-    let bytes = ((bits / 8) + 1) as u8;
+    let shift = Simd::from_array([0, 7, 14, 21, 28]);
+    let value = (buffer.cast::<u32>() << shift).reduce_or();
 
-    // Build the value from each group of 7 bits.
-    let mut value = input & 0x0000_0000_0000_007f;
-
-    if T::MAX_BYTES >= 2 && bytes >= 2 {
-        value |= (input & 0x0000_0000_0000_7f00) >> 1;
-    }
-    if T::MAX_BYTES >= 3 && bytes >= 3 {
-        value |= (input & 0x0000_0000_007f_0000) >> 2;
-    }
-    if T::MAX_BYTES >= 5 {
-        if bytes >= 4 {
-            value |= (input & 0x0000_0000_7f00_0000) >> 3;
-        }
-        if bytes >= 5 {
-            value |= (input & 0x0000_007f_0000_0000) >> 4;
-        }
-    }
-
-    (T::from_u64(value.to_le()), bytes)
+    (T::from_u32(value.to_le()), bytes.max(1))
 }
 
 /// Decode [`u64`]s and [`u128`]s using SIMD.

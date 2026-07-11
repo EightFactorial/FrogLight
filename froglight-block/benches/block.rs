@@ -1,6 +1,7 @@
 //! TODO
+#![allow(clippy::cast_possible_truncation, reason = "Ignored")]
 
-use std::hint::black_box;
+use core::hint::black_box;
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use froglight_block::prelude::*;

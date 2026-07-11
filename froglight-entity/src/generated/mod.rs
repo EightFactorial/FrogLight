@@ -290,13 +290,39 @@ macro_rules! generate {
                     $(
                         $dataid => {
                             let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining())
-                                .map_err(froglight_facet::facet::template::ReaderError::other)?;
+                                .map_err(|err| froglight_facet::facet::template::ReaderError::from_string(
+                                    alloc::format!("Failed to decode `{}` entity data: {err}", stringify!($datatype))
+                                ))?;
                             cursor.consume(cursor.remaining().len() - rem.len());
+
+                            #[cfg(feature = "tracing_ext")]
+                            tracing::trace!(target: "froglight_entity", "Decoded `{}` entity data: {value:?}", stringify!($datatype));
 
                             Ok($crate::generated::datatype::EntityDataType::$datatype(value))
                         }
                     )*
-                    _ => todo!("TODO: Create an error type"),
+                    _ => {
+                        /// Find the maximum at compile time.
+                        const MAX: usize = {
+                            let array = [$($dataid),*];
+                            let mut max = 0;
+
+                            let mut index = 0;
+                            while index < array.len() {
+                                let value = array[index];
+                                if value > max {
+                                    max = value;
+                                }
+                                index += 1;
+                            }
+
+                            max
+                        };
+
+                        Err(froglight_facet::facet::template::ReaderError::from_string(
+                            alloc::format!("Unknown entity datatype id `{val}`, expected id between `0` and `{MAX}`",
+                        )))
+                    },
                 }
             } },
             write: { |data, buffer| {
@@ -308,7 +334,7 @@ macro_rules! generate {
                                 .map_err(froglight_facet::facet::template::WriterError::other)?;
                         }
                     )*
-                    _ => todo!("TODO: Create an error type"),
+                    _ => Err(froglight_facet::facet::template::WriterError::from_string("Unknown entity data type".into()))?,
                 }
 
                 Ok(())

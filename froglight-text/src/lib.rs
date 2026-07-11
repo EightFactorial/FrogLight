@@ -7,6 +7,7 @@ extern crate std;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
+pub mod text;
 pub mod yansi;
 
 pub mod prelude {

@@ -155,10 +155,17 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
         core: &mut C,
     ) -> Result<Self, DeserializeError> {
         while let Some(item) = self.stack.pop() {
+            #[cfg(feature = "tracing_ext")]
+            if matches!(item, StackItem::Item(..)) {
+                tracing::debug!(target: "froglight_facet_iter::deserialize", "Deserializing `{}`", self.partial.shape());
+            } else {
+                tracing::trace!(target: "froglight_facet_iter::deserialize", "Processing `{}` ({})", self.partial.shape(), item.variant_name());
+            }
+
             match item {
                 StackItem::Item(desc) => {
                     let item = Item::Item(DeserializeItem::new(self.partial, desc));
-                    let Item::Item(item) = (core)(item)? else { todo!() };
+                    let Item::Item(item) = core(item)? else { todo!() };
                     self.partial = item.into_inner().0;
 
                     if self.partial.frame_count() > self.start {
@@ -190,12 +197,14 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     self.partial = self.partial.begin_nth_field(len - fields.len() - 1)?;
                 }
 
-                StackItem::Seq(len, end_prev, variable) => {
-                    if end_prev {
+                StackItem::Seq(len, _end_prev, variable) => {
+                    while !matches!(self.partial.shape().def, Def::List(..) | Def::Slice(..)) {
                         self.partial = self.partial.end()?;
                     }
 
-                    if len != 0 {
+                    if len == 0 {
+                        self.partial = self.partial.end()?;
+                    } else {
                         // Get the next item in the sequence.
 
                         self.stack.push(StackItem::Seq(len - 1, true, variable));
@@ -204,33 +213,35 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     }
                 }
 
-                StackItem::Map(len, end_prev, is_value, variable) => {
-                    if end_prev {
+                StackItem::Map(len, _end_prev, is_value, variable) => {
+                    while !matches!(self.partial.shape().def, Def::Map(..)) {
                         self.partial = self.partial.end()?;
                     }
 
-                    if len != 0 {
-                        if is_value {
-                            // `true` means the next item is a value
+                    if len == 0 {
+                        self.partial = self.partial.end()?;
+                    } else if is_value {
+                        // `true` means the item is a value
 
-                            self.stack.push(StackItem::Map(len - 1, true, true, variable));
-                            self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                            self.partial = self.partial.begin_value()?;
-                        } else {
-                            // `false` means the next item is a key
+                        self.stack.push(StackItem::Map(len - 1, true, false, variable)); // Next item is a key
+                        self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        self.partial = self.partial.begin_value()?;
+                    } else {
+                        // `false` means the item is a key
 
-                            self.stack.push(StackItem::Map(len, true, false, variable));
-                            self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
-                            self.partial = self.partial.begin_key()?;
-                        }
+                        self.stack.push(StackItem::Map(len, true, true, variable)); // Next item is a value
+                        self.stack.push(StackItem::Other(DeserializeDesc::new(variable, None)));
+                        self.partial = self.partial.begin_key()?;
                     }
                 }
-                StackItem::Set(len, end_prev, variable) => {
-                    if end_prev {
+                StackItem::Set(len, _end_prev, variable) => {
+                    while !matches!(self.partial.shape().def, Def::Set(..)) {
                         self.partial = self.partial.end()?;
                     }
 
-                    if len != 0 {
+                    if len == 0 {
+                        self.partial = self.partial.end()?;
+                    } else {
                         // Get the next item in the set.
 
                         self.stack.push(StackItem::Set(len - 1, true, variable));
@@ -240,9 +251,6 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 }
 
                 StackItem::Other(desc) => {
-                    #[cfg(feature = "tracing_ext")]
-                    tracing::trace!(target: "froglight_facet_iter::deserialize", "Looking at `{}`", self.partial.shape());
-
                     self = self.handle_other(desc, core)?;
                 }
             }
@@ -286,6 +294,9 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
 
             // If the type has a custom deserializer, treat it as a value.
             if with {
+                #[cfg(feature = "tracing_ext")]
+                tracing::trace!(target: "froglight_facet_iter::deserialize", "Using custom deserializer for `{}`", self.partial.shape());
+
                 self.stack.push(StackItem::Item(desc));
                 return Ok(self);
             }
@@ -297,10 +308,14 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 self.partial.begin_custom_deserialization_from_shape_with_format(Some("mc"))?;
 
             if has_proxy {
+                #[cfg(feature = "tracing_ext")]
+                tracing::trace!(target: "froglight_facet_iter::deserialize", "Using `{}` as a proxy", proxy_partial.shape());
+
                 // Deserialize the proxied type.
                 self.partial =
                     Deserializer::new(proxy_partial, desc.is_variable(), core, self.namespace)
                         .complete()?;
+
                 return Ok(self);
             }
 
@@ -345,6 +360,15 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
 
             Def::List(..) | Def::Slice(..) => {
+                // Specialize for `Vec<u8>`, `Vec<u32>`, and `Vec<u64>`.
+                if self.partial.shape().is_type::<alloc::vec::Vec<u8>>()
+                    || self.partial.shape().is_type::<alloc::vec::Vec<u32>>()
+                    || self.partial.shape().is_type::<alloc::vec::Vec<u64>>()
+                {
+                    self.stack.push(StackItem::Item(desc));
+                    return Ok(self);
+                }
+
                 let Item::Size(len) = core(Item::Size(0))? else { todo!() };
                 self.partial = self.partial.init_list_with_capacity(len as usize)?;
 
@@ -367,6 +391,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     0 => {
                         // Set `None`
                         self.partial = self.partial.set_default()?;
+                        self.partial = self.partial.end()?;
                         Ok(self)
                     }
                     1 => {
@@ -375,7 +400,8 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                         self.stack.push(StackItem::Other(desc));
                         Ok(self)
                     }
-                    _ => todo!("Invalid ID `{variant}` for `Option`"),
+                    #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
+                    inv => Err(ReaderError::InvalidBool(inv as u8))?,
                 }
             }
             Def::Result(..) => {
@@ -463,8 +489,12 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     self.partial = self.partial.select_variant(i64::from(discriminant as i32))?;
                 }
 
-                // Push the fields to the stack.
                 let variant = self.partial.selected_variant().unwrap();
+
+                #[cfg(feature = "tracing_ext")]
+                tracing::debug!(target: "froglight_facet_iter::deserialize", "Deserializing `{}::{}`", self.partial.shape(), variant.effective_name());
+
+                // Push the fields to the stack.
                 self.stack.push(StackItem::Fields(
                     variant.data.fields.len(),
                     variant.data.fields,

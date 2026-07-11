@@ -105,11 +105,6 @@ pub fn deserialize_owned_core(
     reader: &mut Reader<'_>,
 ) -> impl FnMut(Item<'static, false>) -> Result<Item<'static, false>, ReaderError> {
     |item: Item<'static, false>| {
-        #[cfg(feature = "tracing_ext")]
-        if let Item::Item(item) = &item {
-            tracing::trace!("Deserializing `{}`", item.shape());
-        }
-
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -168,11 +163,6 @@ pub fn deserialize_borrowed_core<'facet>(
     reader: &mut Reader<'facet>,
 ) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
     |item: Item<'facet, true>| {
-        #[cfg(feature = "tracing_ext")]
-        if let Item::Item(item) = &item {
-            tracing::trace!("Deserializing `{}`", item.shape());
-        }
-
         let item = match item {
             Item::Item(item) => item,
             Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
@@ -301,6 +291,39 @@ fn deserialize_value<'facet, const BORROW: bool>(
         } else {
             item.set(Cow::<'_, str>::Owned(String::from(str)))
         };
+    }
+
+    // Handle `Vec<u8>`.
+    if item.is_type::<alloc::vec::Vec<u8>>() {
+        let length = varint::decode_u32_from(reader)? as usize;
+        let bytes = reader.get(length)?;
+        return item.set(bytes.to_vec());
+    }
+    // Handle `Vec<u32>`.
+    if item.is_type::<alloc::vec::Vec<u32>>() {
+        let length = varint::decode_u32_from(reader)? as usize;
+        let mut vec = alloc::vec::Vec::with_capacity(length);
+        for _ in 0..length {
+            if item.is_variable() {
+                vec.push(varint::decode_u32_from(reader)?);
+            } else {
+                vec.push(u32::from_be_bytes(*reader.get_array()?));
+            }
+        }
+        return item.set(vec);
+    }
+    // Handle `Vec<u64>`.
+    if item.is_type::<alloc::vec::Vec<u64>>() {
+        let length = varint::decode_u32_from(reader)? as usize;
+        let mut vec = alloc::vec::Vec::with_capacity(length);
+        for _ in 0..length {
+            if item.is_variable() {
+                vec.push(varint::decode_u64_from(reader)?);
+            } else {
+                vec.push(u64::from_be_bytes(*reader.get_array()?));
+            }
+        }
+        return item.set(vec);
     }
 
     // Handle `Uuid`.

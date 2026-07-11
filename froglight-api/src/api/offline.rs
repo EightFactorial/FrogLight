@@ -51,9 +51,9 @@ impl Offline {
         let uuid = *profile.uuid();
         let username = profile.username();
 
-        let uuid_endpoint = Self::UUID_ENDPOINT.read().unwrap();
-        let username_endpoint = Self::USERNAME_ENDPOINT.read().unwrap();
-        let profile_endpoint = Self::PROFILE_ENDPOINT.read().unwrap();
+        let mut uuid_endpoint = Self::UUID_ENDPOINT.write().unwrap();
+        let mut username_endpoint = Self::USERNAME_ENDPOINT.write().unwrap();
+        let mut profile_endpoint = Self::PROFILE_ENDPOINT.write().unwrap();
 
         if uuid_endpoint.contains_key(username)
             || username_endpoint.contains_key(&uuid)
@@ -61,13 +61,8 @@ impl Offline {
         {
             Err(profile)
         } else {
-            let mut uuid_endpoint = Self::UUID_ENDPOINT.write().unwrap();
             uuid_endpoint.insert(username.clone(), uuid);
-
-            let mut username_endpoint = Self::USERNAME_ENDPOINT.write().unwrap();
             username_endpoint.insert(uuid, username.clone());
-
-            let mut profile_endpoint = Self::PROFILE_ENDPOINT.write().unwrap();
             profile_endpoint.insert(uuid, profile);
 
             Ok(())

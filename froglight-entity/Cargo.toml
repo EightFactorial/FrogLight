@@ -21,6 +21,7 @@ workspace = true
 [dependencies]
 foldhash = { workspace = true }
 froglight-common = { workspace = true }
+froglight-inventory = { workspace = true }
 froglight-player = { workspace = true }
 froglight-registry-template = { workspace = true }
 glam = { workspace = true }
@@ -43,28 +44,28 @@ tracing = { workspace = true, optional = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_math", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy", "serde"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_math", "dep:bevy_reflect", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-player/bevy", "serde"]
 # Enable `facet` support.
 facet = ["dep:facet", "froglight-common/facet", "dep:froglight-facet", "froglight-player/facet"]
 # Enable `serde` support.
 serde = ["dep:serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-player/tracing"]
+tracing = ["dep:tracing", "froglight-inventory/tracing", "froglight-player/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["froglight-facet?/tracing", "tracing"]
+tracing_ext = ["froglight-facet?/tracing", "froglight-inventory/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["bevy_math/nostd-libm", "glam/nostd-libm"]
 # Enable `once_cell` for `no_std` support.
-once_cell = ["froglight-registry-template/once_cell"]
+once_cell = ["froglight-inventory/once_cell", "froglight-registry-template/once_cell"]
 
 # Enable support for the standard library
-std = ["facet?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-player/std", "froglight-registry-template/std", "glam/std", "indexmap/std", "uuid/std"]
+std = ["facet?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-inventory/std", "froglight-player/std", "froglight-registry-template/std", "glam/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-player/nightly", "froglight-registry-template/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-inventory/nightly", "froglight-player/nightly", "froglight-registry-template/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
 
-v26_1 = ["froglight-common/v26_1"]
-v26_2 = ["froglight-common/v26_2"]
+v26_1 = ["froglight-common/v26_1", "froglight-inventory/v26_1"]
+v26_2 = ["froglight-common/v26_2", "froglight-inventory/v26_2"]

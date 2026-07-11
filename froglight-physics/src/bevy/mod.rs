@@ -67,7 +67,7 @@ impl PhysicsPlugin {
 
                     // Insert `Velocity` and `Acceleration`
                     // (overwrites `Velocity` and `Acceleration` to zero)
-                    commands.insert((Velocity::default(), Acceleration::default()));
+                    commands.insert((Velocity::ZERO, Acceleration::ZERO));
                 } else {
                     #[cfg(feature = "tracing")]
                     tracing::error!(target: "froglight_physics", "Failed to add Collider to Entity {entity_id}, missing EntityBundle component?");

@@ -47,15 +47,15 @@ impl SessionInstance {
         }
     }
 
-    /// Create a [`u64`] seed from `bytes[index..index+8]`.
+    /// Create a [`u64`] seed from `bytes[index..index+7]`.
     #[must_use]
-    const fn create_seed(mut index: usize, bytes: &[u8]) -> u64 {
-        let max = index + 8;
+    const fn create_seed(index: usize, bytes: &[u8]) -> u64 {
         let mut array = [0u8; 8];
+        let mut i = 0;
 
-        while index < max && index < bytes.len() {
-            array[index] = bytes[index];
-            index += 1;
+        while i < 8 && i + index < bytes.len() {
+            array[i] = bytes[i + index];
+            i += 1;
         }
 
         u64::from_le_bytes(array)

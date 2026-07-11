@@ -79,11 +79,19 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
     fn process(&mut self) -> Result<(), SerializeError> {
         while let Some(item) = self.stack.pop() {
             match item.ty() {
-                // Process the item into values.
-                ItemType::Other => self.handle_other(item)?,
                 // Pass the value to the `core` function.
                 ItemType::Value => {
+                    #[cfg(feature = "tracing_ext")]
+                    tracing::debug!(target: "froglight_facet_iter::serialize", "Serializing `{}`", item.shape());
+
                     return (self.core)(Item::Item(item)).map_err(SerializeError::from);
+                }
+                // Process the item into values.
+                ItemType::Other => {
+                    #[cfg(feature = "tracing_ext")]
+                    tracing::trace!(target: "froglight_facet_iter::serialize", "Processing `{}`", item.shape());
+
+                    self.handle_other(item)?;
                 }
             }
         }
@@ -124,6 +132,9 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
 
             // If the type has a custom serializer, treat it as a value.
             if with {
+                #[cfg(feature = "tracing_ext")]
+                tracing::trace!(target: "froglight_facet_iter::serialize", "Using custom serializer for `{}`", item.shape());
+
                 self.stack.push(item.with_ty(ItemType::Value));
                 return Ok(());
             }
@@ -153,6 +164,9 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
         item: &SerializeItem<'mem, 'facet>,
     ) -> Result<Option<()>, SerializeError> {
         let Some(proxy) = item.shape().effective_proxy(self.namespace) else { return Ok(None) };
+
+        #[cfg(feature = "tracing_ext")]
+        tracing::trace!(target: "froglight_facet_iter::serialize", "Using `{}` as a proxy", proxy.shape);
 
         let proxy_shape = proxy.shape;
         let proxy_layout = proxy_shape.layout.sized_layout().map_err(|_| SerializeError)?;
@@ -408,6 +422,9 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                 } else {
                     false
                 };
+
+                #[cfg(feature = "tracing_ext")]
+                tracing::debug!(target: "froglight_facet_iter::serialize", "Serializing `{}::{}`", enum_.shape(), enum_.variant_name_active().unwrap());
 
                 // Serialize the discriminant of the enum.
                 #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
