@@ -329,7 +329,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
     // Handle `Uuid`.
     if item.is_type::<uuid::Uuid>() {
         let bytes = reader.get_array::<16>()?;
-        return item.set(uuid::Uuid::from_bytes_le(*bytes));
+        return item.set(uuid::Uuid::from_bytes(*bytes));
     }
 
     todo!("Unsupported type: `{}`", item.shape().type_name());

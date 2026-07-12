@@ -3,10 +3,15 @@
 use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
 use core::{
     borrow::{Borrow, BorrowMut},
+    convert::Infallible,
     fmt,
     ops::{Add, AddAssign, Deref, DerefMut},
     str::FromStr,
 };
+
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 
 use crate::prelude::MStr;
 
@@ -16,7 +21,8 @@ use crate::prelude::MStr;
 /// but uses MUTF-8 instead of UTF-8.
 #[repr(transparent)]
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(opaque, mc::with = MString::WITH))]
 pub struct MString(Vec<u8>);
 
 impl fmt::Debug for MString {
@@ -388,15 +394,61 @@ impl<'a> From<Cow<'a, MStr>> for MString {
 }
 
 impl FromStr for MString {
-    type Err = ();
+    type Err = Infallible;
 
     #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match MStr::from_utf8(s) {
-            // SAFETY: `Ok` means the input was valid MUTF-8.
-            Ok(..) => Ok(unsafe { Self::from_mutf8_unchecked(s.as_bytes().into()) }),
-            Err(err) => Err(err),
+        match MString::from_utf8(s) {
+            Cow::Borrowed(b) => Ok(b.to_mstring()),
+            Cow::Owned(s) => Ok(s),
         }
+    }
+}
+
+impl From<String> for MString {
+    #[inline]
+    fn from(value: String) -> Self { MString::from_utf8_owned(value) }
+}
+impl From<&String> for MString {
+    fn from(value: &String) -> Self {
+        match MString::from_utf8(value) {
+            Cow::Borrowed(b) => b.to_mstring(),
+            Cow::Owned(s) => s,
+        }
+    }
+}
+
+impl From<MString> for String {
+    #[inline]
+    fn from(value: MString) -> Self { value.into_utf8() }
+}
+impl From<&MString> for String {
+    #[inline]
+    fn from(value: &MString) -> Self { value.clone().into_utf8() }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "facet")]
+#[expect(clippy::cast_possible_truncation, reason = "Ignored")]
+impl FacetTemplate for MString {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let item = item.get::<Self>()?;
+        encode_u32_into(item.as_bytes().len() as u32, writer)?;
+        writer.write_bytes(item.as_bytes())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let len = decode_u32_from(reader)? as usize;
+        let content = reader.get(len)?;
+
+        let value = MString::from_mutf8(content.into())
+            .map_err(|()| ReaderError::from_string("Invalid MUTF-8 String".into()))?;
+
+        item.set(value)
     }
 }
 

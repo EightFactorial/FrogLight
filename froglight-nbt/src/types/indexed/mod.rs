@@ -2,6 +2,8 @@
 #![expect(clippy::result_unit_err, reason = "WIP")]
 
 use ::core::marker::PhantomData;
+#[cfg(feature = "froglight-facet")]
+use froglight_facet::facet::WithFnAttr;
 use froglight_mutf8::prelude::MStr;
 
 pub mod alloc;
@@ -35,6 +37,19 @@ pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
+    /// A [`WithFnAttr`] for reading named NBT.
+    ///
+    /// See [`FacetTemplate`](froglight_facet::facet::FacetTemplate) for how
+    /// this is used.
+    #[cfg(feature = "froglight-facet")]
+    pub const WITH_NAMED: WithFnAttr = C::WITH_NAMED;
+    /// A [`WithFnAttr`] for reading unnamed NBT.
+    ///
+    /// See [`FacetTemplate`](froglight_facet::facet::FacetTemplate) for how
+    /// this is used.
+    #[cfg(feature = "froglight-facet")]
+    pub const WITH_UNNAMED: WithFnAttr = C::WITH_UNNAMED;
+
     /// Create a new [`IndexedNbt`] from the given [`IndexCore`].
     ///
     /// # Safety
@@ -133,6 +148,29 @@ impl<'data, A: NbtAccess, C: IndexCore<Mut> + IndexCore<A> + 'data> IndexedNbt<'
 // -------------------------------------------------------------------------------------------------
 
 impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
+    /// Create a new empty NBT structure.
+    #[inline]
+    #[must_use]
+    pub fn empty_slice() -> Self {
+        use ::core::range::Range;
+
+        use crate::types::indexed::index::{EntryIndex, ValueIndex};
+
+        unsafe {
+            IndexedNbt::new_core(
+                alloc::SliceCore::new(
+                    [10, 0, 0].as_slice(),
+                    ::alloc::vec![EntryIndex::new(
+                        Index::new(0),
+                        ValueIndex::Compound(Index::new(0))
+                    )],
+                    ::alloc::vec![Range { start: 0, end: 0 }],
+                ),
+                None,
+            )
+        }
+    }
+
     /// Parse an unnamed NBT structure from the given byte slice.
     ///
     /// # Errors
@@ -223,6 +261,46 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
         // SAFETY: `self.core` is valid for the lifetime of `self`.
         unsafe {
             let core = alloc::CowCore::from_slice_mut(self.core).into_owned();
+            IndexedNbt::<Mut, alloc::CowCore<'static, Mut>>::new_core(core, self.name)
+        }
+    }
+}
+
+impl IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
+    /// Create a new empty NBT structure.
+    #[inline]
+    #[must_use]
+    pub fn empty_cow() -> Self {
+        use ::core::range::Range;
+
+        use crate::types::indexed::index::{EntryIndex, ValueIndex};
+
+        unsafe {
+            IndexedNbt::new_core(
+                alloc::CowCore::new(
+                    ::alloc::borrow::Cow::Borrowed([10, 0, 0].as_slice()),
+                    ::alloc::vec![EntryIndex::new(
+                        Index::new(0),
+                        ValueIndex::Compound(Index::new(0))
+                    )],
+                    ::alloc::vec![Range { start: 0, end: 0 }],
+                ),
+                None,
+            )
+        }
+    }
+
+    /// Convert this NBT structure into a mutable version.
+    #[inline]
+    #[must_use]
+    pub fn into_mut(self) -> IndexedNbt<'static, Mut, alloc::CowCore<'static, Mut>> {
+        // SAFETY: `self.core` is valid for the lifetime of `self`.
+        unsafe {
+            let core = alloc::CowCore::new(
+                self.core.root.into_owned().into(),
+                self.core.entries,
+                self.core.ranges,
+            );
             IndexedNbt::<Mut, alloc::CowCore<'static, Mut>>::new_core(core, self.name)
         }
     }

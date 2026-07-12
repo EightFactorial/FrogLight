@@ -83,6 +83,6 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedEntry<'data, Mut, C> {
     #[must_use]
     pub fn value_mut(&mut self) -> IndexedValue<'_, Mut, C> {
         // SAFETY: `IndexedEntry` ensures this is safe.
-        unsafe { IndexedValue::<Mut, C>::new(&mut self.core, self.index.value()) }
+        unsafe { IndexedValue::<Mut, C>::new(self.core, self.index.value()) }
     }
 }

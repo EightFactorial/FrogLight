@@ -15,7 +15,11 @@ pub mod template {
         serialize::{ItemType as SerializeItemType, SerializeItem},
     };
 
-    pub use crate::facet::{FacetBorrowedTemplate, FacetTemplate};
+    pub use crate::{
+        deserialize::varint::{decode_u32_from, decode_u64_from},
+        facet::{FacetBorrowedTemplate, FacetTemplate},
+        serialize::varint::{encode_u32_into, encode_u64_into},
+    };
 }
 
 facet::define_attr_grammar! {

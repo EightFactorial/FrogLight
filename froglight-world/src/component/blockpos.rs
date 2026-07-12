@@ -9,10 +9,7 @@ use core::ops::{Add, Div, Mul, Sub};
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{
-    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
-    serialize::varint::encode_u32_into,
-};
+use froglight_facet::{self as mc, facet::template::*};
 use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

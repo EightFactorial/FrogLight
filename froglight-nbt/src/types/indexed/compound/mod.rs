@@ -107,7 +107,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedCompound<'data, Mut, C> {
             if key == entry_key.get() {
                 // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
                 let value = entry.value();
-                return Some(unsafe { IndexedValue::<Mut, C>::new(&mut self.core, value) });
+                return Some(unsafe { IndexedValue::<Mut, C>::new(self.core, value) });
             }
         }
         None
@@ -118,7 +118,16 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedCompound<'data, Mut, C> {
     pub fn get_index_mut(&mut self, index: usize) -> Option<IndexedEntry<'_, Mut, C>> {
         self.entries().get(index).copied().map(|entry| {
             // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
-            unsafe { IndexedEntry::<Mut, C>::new(&mut self.core, entry) }
+            unsafe { IndexedEntry::<Mut, C>::new(self.core, entry) }
         })
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'a, A: NbtAccess, C: IndexCore<A>> Clone for IndexedCompound<'a, A, C>
+where
+    A::CORE<'a, C>: Clone,
+{
+    fn clone(&self) -> Self { Self { core: self.core.clone(), index: self.index } }
 }

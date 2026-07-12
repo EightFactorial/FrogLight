@@ -13,7 +13,7 @@ pub(super) mod parse;
 use super::{IndexedNbt, Mut, Ref};
 
 /// A type alias for an [`IndexedNbt`] with a [`SliceCore`] core.
-pub type IndexedNbtSlice<'a, A = Ref> = IndexedNbt<'a, A, SliceCore<'a, A>>;
+pub type IndexedNbtSlice<'a> = IndexedNbt<'a, Ref, SliceCore<'a, Ref>>;
 
 /// A type alias for an [`IndexedNbt`] with a [`CowCore`] core.
-pub type IndexedNbtCow<'a, A = Mut> = IndexedNbt<'a, A, CowCore<'a, A>>;
+pub type IndexedNbtCow<'a> = IndexedNbt<'a, Mut, CowCore<'a, Mut>>;

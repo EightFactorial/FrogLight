@@ -15,7 +15,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
-        registry::{RegistryRef, RegistryValueRef},
+        registry::{NbtRef, NbtValueRef, TagRef, TagValueRef},
         state::GlobalRegistryId,
         version::RegistryVersion,
     };

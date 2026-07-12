@@ -3,7 +3,7 @@
 use alloc::{borrow::Cow, vec::Vec};
 use core::{marker::PhantomData, range::Range};
 
-#[cfg(feature = "facet")]
+#[cfg(feature = "froglight-facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::facet::template::*;
 
@@ -15,9 +15,9 @@ use crate::types::indexed::{
 /// An [`IndexCore`] for Copy-On-Write NBT data.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CowCore<'data, A: NbtAccess> {
-    root: Cow<'data, [u8]>,
-    entries: Vec<EntryIndex>,
-    ranges: Vec<Range<usize>>,
+    pub(crate) root: Cow<'data, [u8]>,
+    pub(crate) entries: Vec<EntryIndex>,
+    pub(crate) ranges: Vec<Range<usize>>,
     _phantom: PhantomData<A>,
 }
 
@@ -108,7 +108,7 @@ impl IndexCore<Ref> for CowCore<'_, Ref> {
         unreachable!("Cannot get mutable access with `Ref`!")
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_named<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
@@ -122,7 +122,7 @@ impl IndexCore<Ref> for CowCore<'_, Ref> {
         item.set::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>(nbt.into_owned_ref())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_unnamed<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
@@ -136,7 +136,7 @@ impl IndexCore<Ref> for CowCore<'_, Ref> {
         item.set::<IndexedNbt<'_, Ref, CowCore<'_, Ref>>>(nbt.into_owned_ref())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -148,7 +148,7 @@ impl IndexCore<Ref> for CowCore<'_, Ref> {
         writer.write_bytes(nbt.as_slice())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_named(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -203,7 +203,7 @@ impl IndexCore<Mut> for CowCore<'_, Mut> {
         }
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_named<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
@@ -217,7 +217,7 @@ impl IndexCore<Mut> for CowCore<'_, Mut> {
         item.set::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>(nbt.into_owned_mut())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_unnamed<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
@@ -231,7 +231,7 @@ impl IndexCore<Mut> for CowCore<'_, Mut> {
         item.set::<IndexedNbt<'_, Mut, CowCore<'_, Mut>>>(nbt.into_owned_mut())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -243,7 +243,7 @@ impl IndexCore<Mut> for CowCore<'_, Mut> {
         writer.write_bytes(nbt.as_slice())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_named(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,

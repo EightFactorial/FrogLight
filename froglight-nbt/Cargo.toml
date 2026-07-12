@@ -25,6 +25,7 @@ rand = { workspace = true }
 [dependencies]
 froglight-mutf8 = { features = ["alloc"], workspace = true }
 uuid = { workspace = true }
+smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
 # Optional dependencies
 facet = { features = ["alloc", "reflect", "uuid"], workspace = true, optional = true }

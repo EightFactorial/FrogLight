@@ -19,6 +19,7 @@ pub(crate) mod reflect;
 #[reflect(opaque, Debug, Clone, PartialEq, Component)]
 pub struct SessionInstance {
     world: Identifier<'static>,
+    height_max_min: (u32, i32),
 
     entity_id: HashMap<EntityId, Entity, FixedState>,
     entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
@@ -28,7 +29,7 @@ pub struct SessionInstance {
 impl SessionInstance {
     /// Create a new, empty [`SessionInstance`].
     #[must_use]
-    pub const fn new(world: Identifier<'static>) -> Self {
+    pub const fn new(world: Identifier<'static>, height_max: u32, height_min: i32) -> Self {
         let bytes = world.as_str().as_bytes();
         let mut seed_a = Self::create_seed(0, bytes);
         let mut seed_b = Self::create_seed(2, bytes);
@@ -41,6 +42,7 @@ impl SessionInstance {
 
         Self {
             world,
+            height_max_min: (height_max, height_min),
             entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
             entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
             chunk_pos: HashMap::with_hasher(FixedState::with_seed(seed_c)),
@@ -65,6 +67,16 @@ impl SessionInstance {
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.world }
+
+    /// Get the maximum height of the world.
+    #[inline]
+    #[must_use]
+    pub const fn height_max(&self) -> u32 { self.height_max_min.0 }
+
+    /// Get the minimum height of the world.
+    #[inline]
+    #[must_use]
+    pub const fn height_min(&self) -> i32 { self.height_max_min.1 }
 
     /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
     #[inline]

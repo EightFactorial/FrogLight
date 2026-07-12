@@ -50,10 +50,7 @@ impl PlayerProfile {
     /// Creates a new [`PlayerProfile`] for an offline player with the given
     /// [`Username`].
     #[must_use]
-    pub fn new_offline(username: Username) -> Self {
-        let uuid = username.uuid_offline();
-        Self::new(uuid, username)
-    }
+    pub fn new_offline(username: Username) -> Self { Self::new(username.uuid_offline(), username) }
 
     /// Get a reference to the player's real [`Username`].
     #[inline]

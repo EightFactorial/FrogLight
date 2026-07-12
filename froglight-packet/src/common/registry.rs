@@ -8,11 +8,6 @@ use froglight_common::prelude::Identifier;
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::{self as mc, facet::template::*};
 use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
-#[cfg(feature = "facet")]
-use froglight_nbt::types::indexed::{
-    alloc::CowCore,
-    core::{IndexCore, Mut},
-};
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
@@ -32,7 +27,7 @@ impl FacetTemplate for RegistryDataEntry {
             writer.write_byte(1)?;
 
             let inner = SerializeItem::new(Peek::new(nbt), SerializeItemType::Value, false);
-            <CowCore<'_, Mut> as IndexCore<Mut>>::serialize_unnamed(inner, writer)
+            IndexedNbtCow::WITH_UNNAMED.serialize(inner, writer)
         } else {
             writer.write_byte(0)
         }
@@ -48,7 +43,7 @@ impl FacetTemplate for RegistryDataEntry {
                 partial = partial.begin_some()?;
 
                 let mut item = DeserializeItem::new(partial, DeserializeDesc::new(false, None));
-                item = <CowCore<'_, Mut> as IndexCore<Mut>>::deserialize_unnamed(item, reader)?;
+                item = IndexedNbtCow::WITH_UNNAMED.deserialize(item, reader)?;
 
                 Ok(item.into_inner().0)
             }),

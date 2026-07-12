@@ -30,6 +30,7 @@ simdutf8 = { workspace = true }
 
 # Optional dependencies
 facet = { workspace = true, optional = true }
+froglight-facet = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
@@ -64,7 +65,7 @@ required-features = ["std", "simd", "nightly"]
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["alloc", "dep:facet"]
+facet = ["alloc", "dep:facet", "dep:froglight-facet"]
 # Enable support for SIMD optimizations.
 simd = ["nightly"]
 # Force the use of the generic fallback SIMD implementation.
@@ -77,6 +78,6 @@ tracing = ["dep:tracing"]
 # Enable support for a global allocator
 alloc = ["facet?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "facet?/std", "simdutf8/std", "tracing?/std"]
+std = ["alloc", "facet?/std", "froglight-facet?/std", "simdutf8/std", "tracing?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["simdutf8/aarch64_neon_prefetch"]
+nightly = ["froglight-facet?/nightly", "simdutf8/aarch64_neon_prefetch"]

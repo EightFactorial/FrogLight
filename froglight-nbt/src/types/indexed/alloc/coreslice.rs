@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 use core::range::Range;
 
-#[cfg(feature = "facet")]
+#[cfg(feature = "froglight-facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::facet::template::*;
 
@@ -78,7 +78,7 @@ impl IndexCore<Ref> for SliceCore<'_, Ref> {
         unreachable!("Cannot get mutable access with `Ref`!")
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -90,7 +90,7 @@ impl IndexCore<Ref> for SliceCore<'_, Ref> {
         writer.write_bytes(nbt.as_slice())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_named(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -145,7 +145,7 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
         }
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,
@@ -157,7 +157,7 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
         writer.write_bytes(nbt.as_slice())
     }
 
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_named(
         item: SerializeItem<'_, '_>,
         writer: &mut Writer<'_>,

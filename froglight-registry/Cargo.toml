@@ -21,6 +21,7 @@ workspace = true
 [dependencies]
 foldhash = { workspace = true }
 froglight-common = { workspace = true }
+froglight-nbt = { workspace = true }
 froglight-registry-template = { workspace = true }
 indexmap = { workspace = true }
 
@@ -38,9 +39,9 @@ once_cell = ["froglight-registry-template/once_cell"]
 parking_lot = ["dep:parking_lot"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "froglight-registry-template/std", "indexmap/std"]
+std = ["foldhash/std", "froglight-common/std", "froglight-nbt/std", "froglight-registry-template/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-registry-template/nightly", "parking_lot?/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-nbt/nightly", "froglight-registry-template/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

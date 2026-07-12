@@ -137,7 +137,7 @@ macro_rules! create_fns {
                 #[doc = concat!("Return a mutable reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $ident(&mut self) -> Option<IndexedReference<'_, $ty, Mut>> {
                     if let ValueIndex::$variant(value) = self.index {
-                        let root = <C as IndexCore<Mut>>::root_mut(&mut self.core);
+                        let root = <C as IndexCore<Mut>>::root_mut( self.core);
                         Some(unsafe { IndexedReference::<$ty, Mut>::new(root, value) })
                     } else {
                         None
@@ -204,7 +204,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
     /// [`IndexedCompound`], else else `None`.
     pub fn as_compound_mut(&mut self) -> Option<IndexedCompound<'_, Mut, C>> {
         if let ValueIndex::Compound(value) = self.index {
-            Some(unsafe { IndexedCompound::<Mut, C>::new(&mut self.core, value.value()) })
+            Some(unsafe { IndexedCompound::<Mut, C>::new(self.core, value.value()) })
         } else {
             None
         }

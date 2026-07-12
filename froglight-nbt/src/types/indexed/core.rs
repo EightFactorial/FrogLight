@@ -2,7 +2,7 @@
 
 use core::{fmt::Debug, hash::Hash, ops::Deref};
 
-#[cfg(feature = "facet")]
+#[cfg(feature = "froglight-facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::facet::{WithFnAttr, template::*};
 
@@ -59,7 +59,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
         A: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>;
 
     /// The [`WithFnAttr`] for this named NBT using this [`IndexCore`].
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     const WITH_NAMED: WithFnAttr = WithFnAttr::using(
         Self::serialize_named,
         Self::deserialize_named::<false>,
@@ -67,7 +67,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     );
 
     /// The [`WithFnAttr`] for this unnamed NBT using this [`IndexCore`].
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     const WITH_UNNAMED: WithFnAttr = WithFnAttr::using(
         Self::serialize_unnamed,
         Self::deserialize_unnamed::<false>,
@@ -79,7 +79,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     /// # Errors
     ///
     /// Returns an error if the NBT cannot be read.
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_named<'facet, const BORROW: bool>(
         _item: DeserializeItem<'facet, BORROW>,
         _reader: &mut Reader<'_>,
@@ -92,7 +92,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     /// # Errors
     ///
     /// Returns an error if the NBT cannot be written.
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_named(
         _item: SerializeItem<'_, '_>,
         _writer: &mut Writer<'_>,
@@ -105,7 +105,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     /// # Errors
     ///
     /// Returns an error if the NBT cannot be read.
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn deserialize_unnamed<'facet, const BORROW: bool>(
         _item: DeserializeItem<'facet, BORROW>,
         _reader: &mut Reader<'_>,
@@ -118,7 +118,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     /// # Errors
     ///
     /// Returns an error if the NBT cannot be written.
-    #[cfg(feature = "facet")]
+    #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         _item: SerializeItem<'_, '_>,
         _writer: &mut Writer<'_>,
@@ -127,7 +127,7 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     }
 }
 
-impl<T: IndexCore<Mut> + ?Sized> IndexCore<Ref> for T {
+impl<T: IndexCore<Mut>> IndexCore<Ref> for T {
     #[inline]
     fn root(&self) -> &[u8] { self.root() }
 

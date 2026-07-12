@@ -4,15 +4,15 @@ use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
 use indexmap::IndexMap;
 
-/// A reference to a [`Registry`] and it's associated values.
+/// A reference to a [`Tag`] and it's associated values.
 #[derive(Debug, Clone)]
-pub struct RegistryRef<'a> {
+pub struct TagRef<'a> {
     identifier: Identifier<'a>,
     values: &'a IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
 }
 
-impl<'a> RegistryRef<'a> {
-    /// Create a new [`RegistryRef`].
+impl<'a> TagRef<'a> {
+    /// Create a new [`TagRef`].
     #[inline]
     #[must_use]
     pub const fn new(
@@ -22,37 +22,37 @@ impl<'a> RegistryRef<'a> {
         Self { identifier, values }
     }
 
-    /// Get the [`Identifier`] of this [`RegistryRef`].
+    /// Get the [`Identifier`] of this [`TagRef`].
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'a> { &self.identifier }
 
-    /// Returns the number of values in this [`RegistryRef`].
+    /// Returns the number of values in this [`TagRef`].
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize { self.values.len() }
 
-    /// Returns `true` if this [`RegistryRef`] contains no values.
+    /// Returns `true` if this [`TagRef`] contains no values.
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.values.is_empty() }
 
-    /// Get a [`RegistryValueRef`] by it's [`Identifier`].
+    /// Get a [`TagValueRef`] by it's [`Identifier`].
     #[inline]
     #[must_use]
-    pub fn get_by_identifier(&self, identifier: &str) -> Option<RegistryValueRef<'a>> {
-        self.values.get_key_value(identifier).map(|(identifier, values)| {
-            RegistryValueRef::new(identifier.reborrow(), values.as_slice())
-        })
+    pub fn get_by_identifier(&self, identifier: &str) -> Option<TagValueRef<'a>> {
+        self.values
+            .get_key_value(identifier)
+            .map(|(identifier, values)| TagValueRef::new(identifier.reborrow(), values.as_slice()))
     }
 
-    /// Get a [`RegistryValueRef`] by it's index.
+    /// Get a [`TagValueRef`] by it's index.
     #[inline]
     #[must_use]
-    pub fn get_by_index(&self, index: usize) -> Option<RegistryValueRef<'a>> {
-        self.values.get_index(index).map(|(identifier, values)| {
-            RegistryValueRef::new(identifier.reborrow(), values.as_slice())
-        })
+    pub fn get_by_index(&self, index: usize) -> Option<TagValueRef<'a>> {
+        self.values
+            .get_index(index)
+            .map(|(identifier, values)| TagValueRef::new(identifier.reborrow(), values.as_slice()))
     }
 }
 
@@ -60,25 +60,25 @@ impl<'a> RegistryRef<'a> {
 
 /// An [`Identifier`] and it's associated values.
 #[derive(Debug, Clone)]
-pub struct RegistryValueRef<'a> {
+pub struct TagValueRef<'a> {
     identifier: Identifier<'a>,
     values: &'a [u32],
 }
 
-impl<'a> RegistryValueRef<'a> {
-    /// Create a new [`RegistryValueRef`].
+impl<'a> TagValueRef<'a> {
+    /// Create a new [`TagValueRef`].
     #[inline]
     #[must_use]
     pub const fn new(identifier: Identifier<'a>, values: &'a [u32]) -> Self {
         Self { identifier, values }
     }
 
-    /// Get the [`Identifier`] of this [`RegistryValue`].
+    /// Get the [`Identifier`] of this [`TagValue`].
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'a> { &self.identifier }
 
-    /// Get the [`u32`] values of this [`RegistryValue`].
+    /// Get the [`u32`] values of this [`TagValue`].
     #[inline]
     #[must_use]
     pub const fn values(&self) -> &'a [u32] { self.values }

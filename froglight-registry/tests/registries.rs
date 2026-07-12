@@ -42,7 +42,7 @@ froglight_registry::version::version_implement! {
 #[test]
 fn registry() {
     let registry = TestVersion::registry();
-    assert_eq!(registry.metadata().len(), 2);
+    assert_eq!(registry.tagdata().len(), 2);
 
     // "test:example_a"
 

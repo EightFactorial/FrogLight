@@ -13,10 +13,7 @@ use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use facet::Facet;
 #[cfg(feature = "facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{
-    self as mc, deserialize::varint::decode_u32_from, facet::template::*,
-    serialize::varint::encode_u32_into,
-};
+use froglight_facet::{self as mc, facet::template::*};
 use glam::{DVec3, Vec3, Vec3A};
 
 /// A variable-length [`DVec3`]

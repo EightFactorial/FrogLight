@@ -328,15 +328,53 @@ impl BotPlugin {
                             login.spawn_info.dimension
                         );
 
-                        // TODO: Get the `height_max` and `height_min` from the server.
-                        // Currently panics if the bot logs into other dimensions.
+                        // Get the "minecraft:dimension_type" registry
+                        let registry = Version::registry();
+                        let dimensions = registry.get_nbt_by_identifier("minecraft:dimension_type");
+
+                        // Get the dimension's "min_y" and "logical_height" values.
+                        #[expect(clippy::cast_possible_wrap, reason = "Desired")]
+                        let (height_max, height_min) = if let Some(dimensions) = dimensions
+                            && let Some(dim) =
+                                dimensions.get_by_identifier(&login.spawn_info.dimension)
+                        {
+                            let min_y =
+                                dim.get("min_y").and_then(|v| v.as_int().map(|i| i.get() as i32));
+                            let height =
+                                dim.get("logical_height").and_then(|v| v.as_int().map(|i| i.get()));
+
+                            let (Some(min_y), Some(height)) = (min_y, height) else {
+                                panic!("Failed to get dimension size?!")
+                            };
+                            let height = height
+                                .checked_add_signed(min_y)
+                                .expect("Dimension size overflowed?!");
+
+                            info!(
+                                "Dimension \"{}\" has min_y=\"{min_y}\" and height=\"{height}\"!",
+                                login.spawn_info.dimension
+                            );
+
+                            (height, min_y)
+                        } else {
+                            error!(
+                                "Failed to get dimension \"{}\" from registry, using default \"minecraft:overworld\" values!",
+                                login.spawn_info.dimension
+                            );
+
+                            (320, -64)
+                        };
 
                         // Insert the bot's initial components.
                         let profile = bot.get::<PlayerProfile>().unwrap();
                         commands.entity(bot.id()).insert((
                             login.player_id,
                             EntityUuid::new(*profile.uuid()),
-                            SessionInstance::new(login.spawn_info.dimension.clone()),
+                            SessionInstance::new(
+                                login.spawn_info.dimension.clone(),
+                                height_max,
+                                height_min,
+                            ),
                             PartOfInstance::new(bot.id()),
                             EntityBundle::new::<entity::Player, Version>(),
                             Position::ZERO,
@@ -699,12 +737,16 @@ impl BotPlugin {
                             ServerboundConfigEvent::Pong(*id),
                         ));
                     }
-                    // TODO: Parse this elsewhere and receive it via `RegistryData` events.
                     ClientboundConfigEvent::RegistryData(identifier, entries) => {
                         info!("Received RegistryData: \"{identifier}\"");
 
-                        for RegistryDataEntry { identifier, nbt } in entries {
-                            if let Some(nbt) = nbt {
+                        // Clone the current `REGISTRY`.
+                        let mut registry = Arc::unwrap_or_clone(Version::REGISTRY.load_owned());
+                        let metadata = registry.nbtdata_mut();
+
+                        let storage = metadata.entry(identifier.clone()).or_default();
+                        for RegistryDataEntry { identifier, nbt } in entries.clone() {
+                            if let Some(nbt) = &nbt {
                                 debug!(" - \"{identifier}\":");
                                 for entry in &nbt.as_compound() {
                                     debug!("   - \"{}\": <hidden>", entry.name().get());
@@ -712,7 +754,14 @@ impl BotPlugin {
                             } else {
                                 debug!(" - \"{identifier}\": <empty>");
                             }
+
+                            storage.entry(identifier).insert_entry(
+                                nbt.unwrap_or_else(|| IndexedNbt::empty_cow().into_mut()),
+                            );
                         }
+
+                        // Replace the `REGISTRY` with the updated one.
+                        Version::REGISTRY.store(Arc::new(registry));
                     }
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
@@ -740,7 +789,7 @@ impl BotPlugin {
                     ClientboundConfigEvent::UpdateTags(tags) => {
                         // Clone the current `REGISTRY`.
                         let mut registry = Arc::unwrap_or_clone(Version::REGISTRY.load_owned());
-                        let metadata = registry.metadata_mut();
+                        let metadata = registry.tagdata_mut();
 
                         // Update the metadata with the new tags.
                         for (identifier, tags) in &tags.0 {
