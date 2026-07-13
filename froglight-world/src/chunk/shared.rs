@@ -19,9 +19,9 @@ use crate::chunk::Chunk;
 /// Reading and writing to the chunk can be done at the same time, but all
 /// current reads will not see the changes until the chunk is read again.
 ///
-/// Due to how writing to a [`SharedChunk`] works, it is recommended to batch
-/// write operations together where possible. If many writes are performed at
-/// once changes may be lost!
+/// Due to how writing to a [`SharedChunk`] can cause race conditions, it is
+/// recommended to batch write operations together where possible. If many
+/// writes are performed at once changes may be lost!
 #[repr(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub struct SharedChunk {
@@ -37,6 +37,14 @@ impl SharedChunk {
     #[inline]
     #[must_use]
     pub const fn new_from(chunk: AtomicArc<Chunk>) -> Self { Self { chunk } }
+
+    /// Clone the inner [`Arc`] and return it.
+    ///
+    /// This should be used when you want to send the [`Chunk`] to another
+    /// thread.
+    #[inline]
+    #[must_use]
+    pub fn load(&self) -> Arc<Chunk> { self.chunk.load_owned() }
 
     /// Return the inner [`AtomicArc<Chunk>`].
     #[inline]
@@ -71,7 +79,7 @@ impl BorrowMut<AtomicArc<Chunk>> for SharedChunk {
 
 impl Clone for SharedChunk {
     #[inline]
-    fn clone(&self) -> Self { Self::new_from(AtomicArc::new(self.load().clone())) }
+    fn clone(&self) -> Self { Self::new_from(AtomicArc::new(self.load_owned())) }
 }
 
 impl Deref for SharedChunk {

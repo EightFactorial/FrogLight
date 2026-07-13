@@ -170,14 +170,20 @@ impl BotPlugin {
                             Velocity::new(data.velocity.as_vec3a()),
                         ));
 
-                        let entities = Version::entities();
-                        if let Some(bundle) = entities.get_entity_by_id(data.entity_type.into()) {
+                        if let Some(bundle) =
+                            Version::entities().get_entity_by_id(data.entity_type.into())
+                        {
+                            info!(
+                                "Spawning Entity {} ({}) as \"{}\"",
+                                entity.id(),
+                                data.entity_id.0,
+                                bundle.identifier(),
+                            );
+
                             entity.insert(bundle);
                         } else {
                             error!("Unknown Entity Type {:?}!", data.entity_type);
                         }
-
-                        debug!("Spawning Entity {} ({})", entity.id(), data.entity_id.0);
                     }
                     // ClientboundPlayEvent::Animate() => todo!(),
                     // ClientboundPlayEvent::AwardStats() => todo!(),
@@ -190,11 +196,12 @@ impl BotPlugin {
                     ClientboundPlayEvent::BundleDelimiter => {}
                     // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
                     // ClientboundPlayEvent::ChatSuggestions() => todo!(),
+                    #[expect(clippy::cast_precision_loss, reason = "Required")]
                     ClientboundPlayEvent::ChunkBatchFinished(size) => {
                         debug!("Received ChunkBatchFinished: {size} chunks");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
-                            ServerboundPlayEvent::ChunkBatchReceived(8.0),
+                            ServerboundPlayEvent::ChunkBatchReceived((*size) as f32),
                         ));
                     }
                     ClientboundPlayEvent::ChunkBatchStart => {
@@ -204,27 +211,39 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
                     // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    ClientboundPlayEvent::ChunkWithLight(_chunk_pos, _chunk_data, _) => {
-                        // match chunk_data.as_chunk::<Version>(Some((
-                        //     instance.height_max(),
-                        //     instance.height_min(),
-                        // ))) {
-                        //     Ok(chunk) => {
-                        //         let entity = commands.spawn((
-                        //             PartOfInstance::new(bot.id()),
-                        //             SharedChunk::new(chunk),
-                        //             *chunk_pos,
-                        //         ));
+                    ClientboundPlayEvent::ChunkWithLight(chunk_pos, chunk_data, _) => {
+                        let chunk_pos = *chunk_pos;
+                        let chunk_data = chunk_data.clone();
 
-                        //         debug!(
-                        //             "Spawning Chunk as Entity {} ({}, {})",
-                        //             entity.id(),
-                        //             chunk_pos.x(),
-                        //             chunk_pos.z()
-                        //         );
-                        //     }
-                        //     Err(err) => error!("Failed to convert chunk data:
-                        // {err:?}"), }
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            let bot_id = entity.id();
+                            let Some(instance) = entity.get::<SessionInstance>() else {
+                                error!("Received ChunkWithLight but bot doesn't have a SessionInstance!");
+                                return
+                            };
+
+                            match chunk_data.as_chunk::<Version>(Some((
+                                instance.height_max(),
+                                instance.height_min(),
+                            ))) {
+                                Ok(chunk) => {
+                                    let world = entity.into_world_mut();
+                                    let chunk = world.spawn((
+                                        PartOfInstance::new(bot_id),
+                                        SharedChunk::new(chunk),
+                                        chunk_pos,
+                                    ));
+
+                                    debug!(
+                                        "Spawning Chunk as Entity {} ({}, {})",
+                                        chunk.id(),
+                                        chunk_pos.x(),
+                                        chunk_pos.z()
+                                    );
+                                }
+                                Err(err) => error!("Failed to convert chunk data: {err:?}"),
+                            }
+                        });
                     }
                     // ClientboundPlayEvent::ClearDialog => todo!(),
                     // ClientboundPlayEvent::ClearTitles() => todo!(),
@@ -485,7 +504,7 @@ impl BotPlugin {
                         let removed = entities.clone();
                         let bot_id = bot.id();
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
 
                             let Ok(bot) = entities.get(bot_id) else { return };
@@ -498,7 +517,10 @@ impl BotPlugin {
 
                             for entity_id in removed {
                                 if let Some(entity) = instance.query_id(&entity_id) {
-                                    debug!("Despawning Entity {entity} ({})", entity_id.0);
+                                    let Ok(entity_ref) = entities.get(entity) else { continue };
+                                    let identifier = entity_ref.get::<EntityBundle>().map_or("<unknown>", |bundle| bundle.identifier().as_str());
+                                    info!("Despawning Entity {entity} ({}) as \"{identifier}\"", entity_id.0);
+
                                     commands.entity(entity).despawn();
                                 } else {
                                     error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);

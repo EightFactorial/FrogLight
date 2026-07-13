@@ -16,23 +16,26 @@ froglight_registry::version::version_implement! {
     impl RegistryVersion => TestVersion {
         const REGISTRY: RegistryStorage;
         fn new_registry() => {
-            RegistryStorage::build::<Self>(vec![
-                (
-                    Identifier::new_static("test:example_a"),
-                    vec![
-                        (Identifier::new_static("test:example_a_a"), vec![]),
-                        (Identifier::new_static("test:example_a_b"), vec![]),
-                        (Identifier::new_static("test:example_a_c"), vec![]),
-                    ]
-                ),
-                (
-                    Identifier::new_static("test:example_b"),
-                    vec![
-                        (Identifier::new_static("test:example_b_0"), vec![]),
-                        (Identifier::new_static("test:example_b_1"), vec![]),
-                    ]
-                ),
-            ])
+            RegistryStorage::build::<Self>(
+                vec![
+                    (
+                        Identifier::new_static("test:example_a"),
+                        vec![
+                            (Identifier::new_static("test:example_a_a"), vec![]),
+                            (Identifier::new_static("test:example_a_b"), vec![]),
+                            (Identifier::new_static("test:example_a_c"), vec![]),
+                        ]
+                    ),
+                    (
+                        Identifier::new_static("test:example_b"),
+                        vec![
+                            (Identifier::new_static("test:example_b_0"), vec![]),
+                            (Identifier::new_static("test:example_b_1"), vec![]),
+                        ]
+                    ),
+                ],
+                vec![]
+            )
         }
     }
 }

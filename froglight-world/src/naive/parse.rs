@@ -218,18 +218,21 @@ impl<T: SectionType> SectionData<T> {
             SectionPaletteType::Global => SectionPalette::Global,
         };
 
+        // Get the number of `u64`s
         let length =
             if bits == 0 { 0 } else { u32::from(T::VOLUME).div_ceil(u64::BITS / u32::from(bits)) };
-        let mut vec = Vec::<u64>::with_capacity(length as usize);
-        for _ in 0..length {
-            let Some((val, remainder)) = input.split_first_chunk() else { todo!() };
-            vec.push(u64::from_ne_bytes(*val));
-            input = remainder;
-        }
+        let length = length as usize;
+
+        // Take the `u64`s from the input
+        let (longs, _) = input.as_chunks::<8>();
+        let Some(longs) = longs.get(..length) else { todo!() };
+
+        let longs: Vec<_> = longs.iter().map(|b| u64::from_ne_bytes(*b)).collect();
+        input = &input[length * 8..];
 
         // SAFETY: Input was parsed and is valid
         unsafe {
-            Ok((Self::new_unchecked(usize::from(bits), palette, BitVec::from_vec(vec)), input))
+            Ok((Self::new_unchecked(usize::from(bits), palette, BitVec::from_vec(longs)), input))
         }
     }
 }
