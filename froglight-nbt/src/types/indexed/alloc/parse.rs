@@ -51,7 +51,6 @@ fn parse_nbt(
     let mut indexes = Vec::new();
 
     // All NBT starts with a compound tag
-    tracing::trace!("PEEK: {:?}", cursor.peek_remaining()?);
     if !matches!(cursor.next()?, COMPOUND) {
         return Err(());
     }
@@ -541,6 +540,7 @@ impl<'a> Cursor<'a> {
 
     /// Read the remaining bytes without advancing the cursor.
     #[inline]
+    #[allow(unused, reason = "Debug code")]
     fn peek_remaining(&self) -> Result<&'a [u8], ()> { self.data.get(self.position..).ok_or(()) }
 
     /// Read the next byte from the cursor.

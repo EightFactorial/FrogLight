@@ -3,6 +3,8 @@
 use core::{fmt::Debug, hash::Hash, ops::Deref};
 
 #[cfg(feature = "froglight-facet")]
+use facet::Partial;
+#[cfg(feature = "froglight-facet")]
 #[allow(clippy::wildcard_imports, reason = "Readability")]
 use froglight_facet::facet::{WithFnAttr, template::*};
 
@@ -85,19 +87,19 @@ pub trait IndexCore<A: NbtAccess>: Eq {
         },
         |mut item, reader| {
             if let [0, ..] = reader.remaining() {
-                item = item.scoped(|partial| partial.set_default())?;
+                item = item.scoped(Partial::set_default)?;
                 Ok(item)
             } else {
-                item = item.scoped(|partial| partial.begin_some())?;
+                item = item.scoped(Partial::begin_some)?;
                 (Self::WITH_UNNAMED.de_owned)(item, reader)
             }
         },
         |mut item, reader| {
             if let [0, ..] = reader.remaining() {
-                item = item.scoped(|partial| partial.set_default())?;
+                item = item.scoped(Partial::set_default)?;
                 Ok(item)
             } else {
-                item = item.scoped(|partial| partial.begin_some())?;
+                item = item.scoped(Partial::begin_some)?;
                 (Self::WITH_UNNAMED.de_owned_borrow)(item, reader)
             }
         },
