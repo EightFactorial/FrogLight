@@ -39,7 +39,7 @@ impl Biome {
     /// Get the string identifier of this biome.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { self.metadata.identifier() }
+    pub const fn identifier(&self) -> Identifier<'static> { self.metadata.identifier().reborrow() }
 
     /// Get the [`BiomeMetadata`] of this biome.
     #[inline]
@@ -74,7 +74,7 @@ impl Biome {
         }
 
         // Try the biome with a matching identifier and type.
-        if let Some(biome) = biomes.get_biome_by_identifier(self.identifier())
+        if let Some(biome) = biomes.get_biome_by_identifier(&self.identifier())
             && self.biome_ty() == biome.biome_ty()
         {
             return Some(biome);
@@ -170,13 +170,13 @@ impl PartialOrd for Biome {
 }
 
 impl Display for Biome {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(self.identifier(), f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(&self.identifier(), f) }
 }
 
 impl Debug for Biome {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Biome")
-            .field(self.identifier())
+            .field(&self.identifier())
             .field(&self.global_id().into_inner())
             .finish_non_exhaustive()
     }

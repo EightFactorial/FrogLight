@@ -12,5 +12,11 @@ pub mod types;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::types::{indexed::IndexedNbt, structured::Nbt};
+    pub use crate::types::{
+        indexed::{
+            IndexedNbt,
+            entry::{IndexedEntry, IndexedValue},
+        },
+        structured::Nbt,
+    };
 }

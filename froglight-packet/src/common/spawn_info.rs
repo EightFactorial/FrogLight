@@ -45,7 +45,7 @@ impl FacetTemplate for PlayerSpawnInfo {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let byte = reader.get_array::<1>()?[0];
+        let byte = reader.get_byte()?;
         let value = if byte == (-1i8 as u8) { None } else { Some(byte) };
         item.set(value)
     }

@@ -9,9 +9,6 @@ use froglight_facet::facet::{WithFnAttr, template::*};
 use crate::types::indexed::index::EntryIndex;
 
 /// A trait for an index of NBT entries.
-///
-/// If the `alloc` feature is enabled,
-/// [`BorrowedCore`] is provided as the default implementation.
 pub trait IndexCore<A: NbtAccess>: Eq {
     /// Get a reference to the root NBT data slice.
     #[must_use]
@@ -173,6 +170,12 @@ pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'stat
     type SLICE<'data>: Deref<Target = [u8]> + 'data;
     /// The type of reference that the core is accessed through.
     type CORE<'a, C: ?Sized + 'a>: Deref<Target = C> + Sized + 'a;
+
+    /// Convert [`Self::CORE`] into a reference.
+    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C;
+
+    /// Convert [`Self::SLICE`] into a reference.
+    fn into_ref(slice: Self::SLICE<'_>) -> &[u8];
 }
 
 /// A marker type for read-only access.
@@ -182,6 +185,10 @@ pub struct Ref;
 impl NbtAccess for Ref {
     type CORE<'a, C: ?Sized + 'a> = &'a C;
     type SLICE<'data> = &'data [u8];
+
+    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
+
+    fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
 }
 
 /// A marker type for mutable access.
@@ -191,6 +198,10 @@ pub struct Mut;
 impl NbtAccess for Mut {
     type CORE<'a, C: ?Sized + 'a> = &'a mut C;
     type SLICE<'data> = &'data mut [u8];
+
+    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
+
+    fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
 }
 
 // -------------------------------------------------------------------------------------------------

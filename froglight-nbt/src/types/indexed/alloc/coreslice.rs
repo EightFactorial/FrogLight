@@ -21,7 +21,7 @@ pub struct SliceCore<'data, A: NbtAccess> {
 }
 
 impl<'data, A: NbtAccess> SliceCore<'data, A> {
-    /// Create a new [`BorrowedCore`] with the given NBT slice, entries, and
+    /// Create a new [`SliceCore`] with the given NBT slice, entries, and
     /// ranges.
     ///
     /// # Safety

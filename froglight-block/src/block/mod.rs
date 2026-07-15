@@ -73,7 +73,7 @@ impl Block {
 
     /// Get the string identifier of this block.
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { self.metadata.identifier() }
+    pub const fn identifier(&self) -> Identifier<'static> { self.metadata.identifier().reborrow() }
 
     /// Get the [`BlockMetadata`] of this block.
     #[inline]
@@ -95,8 +95,8 @@ impl Block {
     /// This is only useful for comparing blocks of the same version.
     #[must_use]
     pub fn global_id(&self) -> GlobalStateId {
-        let state = u32::from(self.state.into_inner());
         let base = self.metadata.base_id().into_inner();
+        let state = u32::from(self.state.into_inner());
         GlobalStateId::new(base + state)
     }
 
@@ -123,7 +123,7 @@ impl Block {
         }
 
         // Try the block with a matching identifier and type.
-        if let Some(mut block) = blocks.get_block_by_identifier(self.identifier())
+        if let Some(mut block) = blocks.get_block_by_identifier(&self.identifier())
             && self.block_ty() == block.block_ty()
         {
             self.apply_attributes(&mut block);
@@ -266,14 +266,14 @@ impl PartialOrd for Block {
 impl fmt::Display for Block {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        <Identifier as fmt::Display>::fmt(self.identifier(), f)
+        <Identifier as fmt::Display>::fmt(&self.identifier(), f)
     }
 }
 
 impl fmt::Debug for Block {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Block")
-            .field(self.identifier())
+            .field(&self.identifier())
             .field(&self.global_id().into_inner())
             .finish_non_exhaustive()
     }

@@ -74,7 +74,7 @@ impl Item {
     /// Get the string identifier of this item.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { self.reference.identifier() }
+    pub const fn identifier(&self) -> Identifier<'static> { self.reference.identifier().reborrow() }
 
     /// Get the [`ItemMetadata`] of this item.
     #[inline]
@@ -123,13 +123,13 @@ impl PartialOrd for Item {
 }
 
 impl Display for Item {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(self.identifier(), f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(&self.identifier(), f) }
 }
 
 impl Debug for Item {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Item")
-            .field(self.identifier())
+            .field(&self.identifier())
             .field(&self.global_id().into_inner())
             .field(self)
             .finish_non_exhaustive()

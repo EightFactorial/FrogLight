@@ -6,7 +6,7 @@ use crate::types::indexed::{
     entry::IndexedValue,
     index::{Index, ValueIndex},
     list::{IndexedList, IndexedValueList},
-    reference::{IndexedReference, IndexedValueReference},
+    reference::{IndexableValue, IndexedReference, IndexedValueReference},
     types::IndexedListType,
 };
 
@@ -114,12 +114,12 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
 // -------------------------------------------------------------------------------------------------
 
 macro_rules! create_fns {
-    (@ref $($ident:ident: $ty:ty => $variant:ident),*) => {
+    (@ref $($as_ident:ident $(& $into_ident:ident)?: $ty:ty => $variant:ident),*) => {
         impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValue<'data, A, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $ident(&self) -> Option<IndexedReference<'_, $ty, Ref>> {
+                pub fn $as_ident(&self) -> Option<IndexedReference<'_, $ty, Ref>> {
                     if let ValueIndex::$variant(value) = self.index {
                         let root = <C as IndexCore<A>>::root(&self.core);
                         Some(unsafe { IndexedReference::<$ty, Ref>::new(root, value) })
@@ -127,6 +127,20 @@ macro_rules! create_fns {
                         None
                     }
                 }
+
+                $(
+                    #[inline]
+                    #[must_use]
+                    #[doc = concat!("Return the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
+                    pub fn $into_ident(self) -> Option<<$ty as IndexableValue>::Value<'data>> {
+                        if let ValueIndex::$variant(value) = self.index {
+                            let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                            Some(unsafe { IndexedReference::<$ty, Ref>::new(root, value) }.into_value())
+                        } else {
+                            None
+                        }
+                    }
+                )?
             )*
         }
     };
@@ -137,7 +151,7 @@ macro_rules! create_fns {
                 #[doc = concat!("Return a mutable reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $ident(&mut self) -> Option<IndexedReference<'_, $ty, Mut>> {
                     if let ValueIndex::$variant(value) = self.index {
-                        let root = <C as IndexCore<Mut>>::root_mut( self.core);
+                        let root = <C as IndexCore<Mut>>::root_mut(self.core);
                         Some(unsafe { IndexedReference::<$ty, Mut>::new(root, value) })
                     } else {
                         None
@@ -150,16 +164,16 @@ macro_rules! create_fns {
 
 create_fns! {
     @ref
-    as_byte: u8 => Byte,
-    as_short: u16 => Short,
-    as_int: u32 => Int,
-    as_long: u64 => Long,
-    as_float: f32 => Float,
-    as_double: f64 => Double,
-    as_byte_array: [u8] => ByteArray,
-    as_string: MStr => String,
-    as_int_array: [u32] => IntArray,
-    as_long_array: [u64] => LongArray
+    as_byte & into_byte: u8 => Byte,
+    as_short & into_short: u16 => Short,
+    as_int & into_int: u32 => Int,
+    as_long & into_long: u64 => Long,
+    as_float & into_float: f32 => Float,
+    as_double & into_double: f64 => Double,
+    as_byte_array & into_byte_array: [u8] => ByteArray,
+    as_string & into_string: MStr => String,
+    as_int_array & into_int_array: [u32] => IntArray,
+    as_long_array & into_long_array: [u64] => LongArray
 }
 create_fns! {
     @mut
@@ -180,6 +194,7 @@ create_fns! {
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {
     /// Return a reference to the stored value if it is of type
     /// [`IndexedCompound`], else else `None`.
+    #[must_use]
     pub fn as_compound(&self) -> Option<IndexedCompound<'_, Ref, C>> {
         if let ValueIndex::Compound(value) = self.index {
             Some(unsafe { IndexedCompound::<Ref, C>::new(&self.core, value.value()) })
@@ -190,6 +205,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
 
     /// Return a reference to the stored value if it is of type
     /// [`IndexedValueList`], else else `None`.
+    #[must_use]
     pub fn as_list(&self) -> Option<IndexedValueList<'_, Ref, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list(&self.core, index))

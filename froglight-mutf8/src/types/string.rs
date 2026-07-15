@@ -74,7 +74,7 @@ impl MString {
     /// If you need a [`&MStr`](MStr) instead of a [`MString`], consider
     /// [`MStr::from_mutf8`].
     ///
-    /// The inverse of this method is [`into_bytes`].
+    /// The inverse of this method is [`MString::into_bytes`].
     ///
     /// # Errors
     ///
@@ -89,7 +89,7 @@ impl MString {
     /// Converts a slice of bytes to a string, including invalid characters.
     ///
     /// During this conversion, `from_mutf8_lossy()` will replace any invalid
-    /// UTF-8 sequences with [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD], which
+    /// UTF-8 sequences with `U+FFFD REPLACEMENT CHARACTER`, which
     /// looks like this: �
     #[must_use]
     pub fn from_mutf8_lossy(v: &[u8]) -> Cow<'_, MStr> {
@@ -138,7 +138,7 @@ impl MString {
 
     /// Converts a [`String`] to a [`MString`].
     ///
-    /// If you need a [`&MStr`] instead of a [`MString`], consider
+    /// If you need a [`MStr`] instead of a [`MString`], consider
     /// [`MStr::from_utf8`].
     ///
     /// See [`from_utf8`](Self::from_utf8) for more details.

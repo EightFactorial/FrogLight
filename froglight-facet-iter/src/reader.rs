@@ -44,6 +44,21 @@ impl<'a> Reader<'a> {
         }
     }
 
+    /// Get the next byte from the reader.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the reader doesn't have any bytes remaining.
+    pub fn get_byte(&mut self) -> Result<u8, ReaderError> {
+        if let Some((&byte, remaining)) = self.remaining.split_first() {
+            self.position += 1;
+            self.remaining = remaining;
+            Ok(byte)
+        } else {
+            Err(ReaderError::EndOfInput(1))
+        }
+    }
+
     /// Get the next `N` bytes from the reader.
     ///
     /// # Errors

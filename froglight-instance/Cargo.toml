@@ -27,6 +27,7 @@ froglight-biome = { workspace = true }
 froglight-block = { workspace = true }
 froglight-common = { features = ["bevy"], workspace = true }
 froglight-entity = { features = ["bevy"], workspace = true }
+froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-world = { features = ["bevy", "froglight-biome", "froglight-block"], workspace = true }
 hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true }
 
@@ -42,6 +43,6 @@ default = ["std"]
 tracing = ["dep:tracing", "froglight-entity/tracing"]
 
 # Enable support for the standard library
-std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-world/std", "tracing?/std"]
+std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "foldhash/std", "froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-item/std", "froglight-world/std", "tracing?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-world/nightly", "hashbrown/nightly"]
+nightly = ["foldhash/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-item/nightly", "froglight-world/nightly", "hashbrown/nightly"]

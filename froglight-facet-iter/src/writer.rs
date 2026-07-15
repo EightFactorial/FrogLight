@@ -8,14 +8,14 @@ use facet::ReflectError;
 /// A `no_std`-compatible writer.
 pub struct Writer<'a> {
     position: usize,
-    inner: &'a mut dyn WriterType,
+    inner: &'a mut (dyn WriterType + 'a),
 }
 
 impl<'a> Writer<'a> {
     /// Create a new [`Writer`] for the given slice.
     #[inline]
     #[must_use]
-    pub const fn new<T: WriterType>(inner: &'a mut T) -> Self { Self { position: 0, inner } }
+    pub const fn new<T: WriterType + 'a>(inner: &'a mut T) -> Self { Self { position: 0, inner } }
 
     /// Get the "position" of the writer,
     /// or the number of bytes written so far.
@@ -111,11 +111,13 @@ impl WriterType for [u8] {
 
 #[cfg(not(feature = "std"))]
 impl WriterType for alloc::vec::Vec<u8> {
+    #[inline]
     fn write_byte(&mut self, _: usize, byte: u8) -> Result<(), WriterError> {
         self.push(byte);
         Ok(())
     }
 
+    #[inline]
     fn write_bytes(&mut self, _: usize, bytes: &[u8]) -> Result<(), WriterError> {
         self.extend_from_slice(bytes);
         Ok(())
@@ -124,10 +126,12 @@ impl WriterType for alloc::vec::Vec<u8> {
 
 #[cfg(feature = "std")]
 impl<T: std::io::Write> WriterType for T {
+    #[inline]
     fn write_byte(&mut self, _: usize, byte: u8) -> Result<(), WriterError> {
         std::io::Write::write_all(self, core::array::from_ref(&byte)).map_err(WriterError::IO)
     }
 
+    #[inline]
     fn write_bytes(&mut self, _: usize, bytes: &[u8]) -> Result<(), WriterError> {
         std::io::Write::write_all(self, bytes).map_err(WriterError::IO)
     }

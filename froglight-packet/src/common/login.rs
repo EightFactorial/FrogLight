@@ -38,8 +38,9 @@ impl LoginHelloContent {
     pub const fn new(username: Username, uuid: Uuid) -> Self { Self { username, uuid } }
 
     /// Create a new [`LoginHelloContent`] from a [`PlayerProfile`].
+    #[inline]
     #[must_use]
-    pub fn new_from_profile(profile: &PlayerProfile) -> Self {
+    pub fn from_profile(profile: &PlayerProfile) -> Self {
         Self::new(profile.username().clone(), *profile.uuid())
     }
 

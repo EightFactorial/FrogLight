@@ -37,7 +37,7 @@ impl FacetTemplate for RegistryDataEntry {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        match reader.get_array::<1>()?[0] {
+        match reader.get_byte()? {
             0 => item.set::<Option<IndexedNbtCow<'facet>>>(None),
             1 => item.scoped(|mut partial| {
                 partial = partial.begin_some()?;

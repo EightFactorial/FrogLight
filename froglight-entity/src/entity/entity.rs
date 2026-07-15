@@ -106,7 +106,7 @@ impl EntityBundle {
     /// Get the string identifier of this entity.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { self.reference.identifier() }
+    pub const fn identifier(&self) -> Identifier<'static> { self.reference.identifier().reborrow() }
 
     /// Get the [`EntityMetadata`] of this entity.
     #[inline]

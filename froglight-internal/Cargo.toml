@@ -19,22 +19,22 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-biome = { features = ["biome_data", "facet"], workspace = true }
-froglight-block = { features = ["facet"], workspace = true }
-froglight-common = { features = ["facet"], workspace = true }
+froglight-biome = { features = ["biome_data"], workspace = true }
+froglight-block = { workspace = true }
+froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
 froglight-facet = { workspace = true }
 froglight-inventory = { workspace = true }
 froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-math = { workspace = true }
-froglight-mutf8 = { features = ["facet"], workspace = true }
+froglight-mutf8 = { workspace = true }
 froglight-nbt = { features = ["froglight-facet"], workspace = true }
 froglight-packet = { workspace = true }
 froglight-physics = { workspace = true }
 froglight-player = { workspace = true }
 froglight-registry = { workspace = true }
-froglight-snbt = { features = ["facet", "nbt"], workspace = true }
-froglight-text = { features = ["facet", "nbt"], workspace = true }
+froglight-snbt = { features = ["nbt"], workspace = true }
+froglight-text = { features = ["nbt"], workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
 # Optional dependencies

@@ -19,10 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-foldhash = { workspace = true, optional = true }
-froglight-common = { workspace = true }
 hazarc = { workspace = true }
-indexmap = { workspace = true }
 
 # Optional dependencies
 once_cell = { features = ["critical-section"], workspace = true, optional = true }
@@ -36,6 +33,6 @@ default = ["std"]
 once_cell = ["dep:once_cell"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "hazarc/default-domain", "indexmap/std", "once_cell?/std"]
+std = ["hazarc/default-domain", "once_cell?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly"]
+nightly = []

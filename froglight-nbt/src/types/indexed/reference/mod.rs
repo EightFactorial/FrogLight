@@ -29,16 +29,25 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'data, T,
     }
 
     /// Get the value held by this reference.
+    #[inline]
     #[must_use]
     pub fn get(&self) -> T::Value<'_> {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::get(self.slice.as_ref(), self.index) }
     }
+
+    /// Convert this reference into the value it holds.
+    #[inline]
+    #[must_use]
+    pub fn into_value(self) -> T::Value<'data> {
+        // SAFETY: `IndexedReference` guarantees that this is safe
+        unsafe { T::get(A::into_ref(self.slice), self.index) }
+    }
 }
 
-impl<T: IndexableValueMut + ?Sized> IndexedReference<'_, T, Mut> {
+impl<'data, T: IndexableValueMut + ?Sized> IndexedReference<'data, T, Mut> {
     /// Set the value held by this reference.
-    pub fn set(&mut self, value: T::Value<'_>) {
+    pub fn set(&mut self, value: T::Value<'data>) {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::set(self.slice, self.index, value) }
     }
@@ -50,8 +59,9 @@ impl<T: IndexableValueMut + ?Sized> IndexedReference<'_, T, Mut> {
 ///
 /// # Safety
 ///
-/// The implementer must ensure that [`INDEX_IS_ENTRY_RANGE`] is correct,
-/// otherwise it will cause incorrect and undefined behavior.
+/// The implementer must ensure that
+/// [`INDEX_IS_ENTRY_RANGE`](IndexableValue::LIST_INDEX_IS_ENTRY_RANGE) is
+/// correct, otherwise it will cause incorrect and undefined behavior.
 pub unsafe trait IndexableValue: sealed::Sealed {
     /// The type of value that is accessed via an [`Index`].
     type Value<'data>: Sized;

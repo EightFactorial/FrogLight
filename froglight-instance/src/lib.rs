@@ -14,5 +14,6 @@ pub mod prelude {
     pub use crate::{
         instance::SessionInstance,
         query::{InInstance, OnInstance},
+        relationship::PartOfInstance,
     };
 }

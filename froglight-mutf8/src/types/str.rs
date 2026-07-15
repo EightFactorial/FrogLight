@@ -190,7 +190,7 @@ impl MStr {
         unsafe { MString::from_mutf8_unchecked(self.0.to_vec()) }
     }
 
-    /// Converts the string slice into a [`String`],
+    /// Converts the string slice into a [`String`](alloc::string::String),
     /// only reallocating if the MUTF-8 is invalid UTF-8.
     #[inline]
     #[must_use]

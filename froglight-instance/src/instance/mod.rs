@@ -3,8 +3,15 @@
 use bevy_ecs::{component::Component, entity::Entity, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 use foldhash::fast::FixedState;
+use froglight_biome::{storage::BiomeStorage, version::BiomeVersion};
+use froglight_block::{storage::BlockStorage, version::BlockVersion};
 use froglight_common::prelude::Identifier;
-use froglight_entity::prelude::{EntityId, EntityUuid};
+use froglight_entity::{
+    prelude::{EntityId, EntityUuid},
+    storage::EntityStorage,
+    version::{AtomicArc, EntityVersion},
+};
+use froglight_item::{storage::ItemStorage, version::ItemVersion};
 use froglight_world::prelude::ChunkPos;
 use hashbrown::{HashMap, hash_map::Values};
 
@@ -15,11 +22,16 @@ pub(crate) mod reflect;
 /// An instance of a session.
 ///
 /// Tracks information about which entities belong to the session and more.
-#[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
-#[reflect(opaque, Debug, Clone, PartialEq, Component)]
+#[derive(Debug, Clone, Component, Reflect)]
+#[reflect(opaque, Debug, Clone, Component)]
 pub struct SessionInstance {
-    world: Identifier<'static>,
+    dimension: Identifier<'static>,
     height_max_min: (u32, i32),
+
+    biomes: &'static AtomicArc<BiomeStorage>,
+    blocks: &'static AtomicArc<BlockStorage>,
+    entities: &'static AtomicArc<EntityStorage>,
+    items: &'static AtomicArc<ItemStorage>,
 
     entity_id: HashMap<EntityId, Entity, FixedState>,
     entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
@@ -29,20 +41,30 @@ pub struct SessionInstance {
 impl SessionInstance {
     /// Create a new, empty [`SessionInstance`].
     #[must_use]
-    pub const fn new(world: Identifier<'static>, height_max: u32, height_min: i32) -> Self {
-        let bytes = world.as_str().as_bytes();
+    pub fn new<V: BiomeVersion + BlockVersion + EntityVersion + ItemVersion>(
+        dimension: Identifier<'static>,
+        height_max: u32,
+        height_min: i32,
+    ) -> Self {
+        let bytes = dimension.as_str().as_bytes();
         let mut seed_a = Self::create_seed(0, bytes);
         let mut seed_b = Self::create_seed(2, bytes);
         let mut seed_c = Self::create_seed(4, bytes);
 
         // Fiddle with the seeds a bit.
-        seed_a ^= seed_b.rotate_left(8);
-        seed_b ^= seed_a.rotate_left(18);
-        seed_c ^= seed_b.rotate_left(32);
+        seed_a ^= seed_c.rotate_left(8);
+        seed_b ^= seed_a.rotate_left(9);
+        seed_c ^= seed_b.rotate_left(10);
 
         Self {
-            world,
+            dimension,
             height_max_min: (height_max, height_min),
+
+            biomes: V::BIOMES,
+            blocks: V::BLOCKS,
+            entities: V::ENTITY,
+            items: V::ITEMS,
+
             entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
             entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
             chunk_pos: HashMap::with_hasher(FixedState::with_seed(seed_c)),
@@ -63,10 +85,10 @@ impl SessionInstance {
         u64::from_le_bytes(array)
     }
 
-    /// Get the [`Identifier`] of the [`SessionInstance`].
+    /// Get the dimension's [`Identifier`].
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.world }
+    pub const fn dimension(&self) -> Identifier<'_> { self.dimension.reborrow() }
 
     /// Get the maximum height of the world.
     #[inline]
@@ -77,6 +99,26 @@ impl SessionInstance {
     #[inline]
     #[must_use]
     pub const fn height_min(&self) -> i32 { self.height_max_min.1 }
+
+    /// Get the [`BiomeStorage`] for this [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub const fn biomes(&self) -> &'static AtomicArc<BiomeStorage> { self.biomes }
+
+    /// Get the [`BlockStorage`] for this [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub const fn blocks(&self) -> &'static AtomicArc<BlockStorage> { self.blocks }
+
+    /// Get the [`EntityStorage`] for this [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub const fn entities(&self) -> &'static AtomicArc<EntityStorage> { self.entities }
+
+    /// Get the [`ItemStorage`] for this [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub const fn items(&self) -> &'static AtomicArc<ItemStorage> { self.items }
 
     /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
     #[inline]

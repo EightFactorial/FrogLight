@@ -42,15 +42,15 @@ impl Rotation {
     #[must_use]
     pub const fn yaw(&self) -> f32 { self.0.to_array()[0] }
 
-    /// Get a mutable reference to the `yaw` component.
-    #[inline]
-    #[must_use]
-    pub fn yaw_mut(&mut self) -> &mut f32 { &mut self.0.x }
-
     /// Get the `pitch` component.
     #[inline]
     #[must_use]
     pub const fn pitch(&self) -> f32 { self.0.to_array()[1] }
+
+    /// Get a mutable reference to the `yaw` component.
+    #[inline]
+    #[must_use]
+    pub fn yaw_mut(&mut self) -> &mut f32 { &mut self.0.x }
 
     /// Get a mutable reference to the `pitch` component.
     #[inline]

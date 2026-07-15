@@ -58,7 +58,7 @@ impl<V: EntityVersion> FacetTemplate for DataSetSerializer<V> {
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let mut list = Vec::new();
         loop {
-            let id = reader.get_array::<1>()?[0];
+            let id = reader.get_byte()?;
             #[cfg(feature = "tracing_ext")]
             tracing::trace!(target: "froglight_entity::entity", "EntityDataPos: {id:?}");
 

@@ -115,16 +115,23 @@ impl LpDVec3 {
         if val.is_nan() { 0.0 } else { val.clamp(-1.7179869183E10, 1.7179869183E10) }
     }
 
+    /// Round up a [`f64`] to the nearest [`i64`].
+    #[inline]
+    #[must_use]
     const fn ceil_long(val: f64) -> i64 {
         let long = val as i64;
         if val > long as f64 { long + 1 } else { long }
     }
 
     /// Pack a [`f64`] into a [`u64`].
+    #[inline]
+    #[must_use]
     #[cfg(feature = "std")]
     const fn pack(val: f64) -> u64 { f64::round((val * 0.5 + 0.5) * 32766.) as u64 }
 
     /// Pack a [`f64`] into a [`u64`].
+    #[inline]
+    #[must_use]
     #[cfg(all(not(feature = "std"), feature = "libm"))]
     fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
 
@@ -202,12 +209,12 @@ impl FacetTemplate for LpDVec3 {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let a = reader.get_array::<1>()?[0];
+        let a = reader.get_byte()?;
         if a == 0 {
             return item.set(Self(LpDVec3Inner::Zero));
         }
 
-        let b = reader.get_array::<1>()?[0];
+        let b = reader.get_byte()?;
         let c = u32::from_be_bytes(*reader.get_array::<4>()?);
 
         if a & 4 == 4 {
@@ -219,15 +226,6 @@ impl FacetTemplate for LpDVec3 {
     }
 }
 
-impl From<DVec3> for LpDVec3 {
-    #[inline]
-    fn from(value: DVec3) -> Self { LpDVec3::new(value) }
-}
-impl From<LpDVec3> for DVec3 {
-    #[inline]
-    fn from(value: LpDVec3) -> Self { value.as_dvec3() }
-}
-
 impl From<Vec3> for LpDVec3 {
     #[inline]
     fn from(value: Vec3) -> Self { LpDVec3::new(value.as_dvec3()) }
@@ -235,4 +233,22 @@ impl From<Vec3> for LpDVec3 {
 impl From<LpDVec3> for Vec3 {
     #[inline]
     fn from(value: LpDVec3) -> Self { value.as_vec3() }
+}
+
+impl From<Vec3A> for LpDVec3 {
+    #[inline]
+    fn from(value: Vec3A) -> Self { LpDVec3::new(value.as_dvec3()) }
+}
+impl From<LpDVec3> for Vec3A {
+    #[inline]
+    fn from(value: LpDVec3) -> Self { value.as_vec3a() }
+}
+
+impl From<DVec3> for LpDVec3 {
+    #[inline]
+    fn from(value: DVec3) -> Self { LpDVec3::new(value) }
+}
+impl From<LpDVec3> for DVec3 {
+    #[inline]
+    fn from(value: LpDVec3) -> Self { value.as_dvec3() }
 }

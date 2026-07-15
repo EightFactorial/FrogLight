@@ -15,7 +15,6 @@ use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
         api::api::{ClientApi, Offline},
-        instance::relationship::PartOfInstance,
         network::{
             bevy::ClientDespawn,
             connection::FuturesLite,
@@ -111,7 +110,7 @@ impl BotPlugin {
 
         // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<Version>(ADDRESS, ConnectionIntent::Login);
-        let login = LoginHelloContent::new_from_profile(&profile);
+        let login = LoginHelloContent::from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
         let mut entity = world.spawn((api, profile, connection));
@@ -135,7 +134,7 @@ impl BotPlugin {
     /// Run every frame during [`Update`].
     #[allow(clippy::too_many_lines, reason = "Example")]
     #[allow(clippy::match_same_arms, reason = "Example")]
-    #[allow(clippy::cast_possible_truncation, reason = "Example")]
+    #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
     fn message_handler(
         bot: Single<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
@@ -358,9 +357,8 @@ impl BotPlugin {
                                 dimensions.get_by_identifier(&login.spawn_info.dimension)
                         {
                             let min_y =
-                                dim.get("min_y").and_then(|v| v.as_int().map(|i| i.get() as i32));
-                            let height =
-                                dim.get("logical_height").and_then(|v| v.as_int().map(|i| i.get()));
+                                dim.get("min_y").and_then(|v| v.into_int().map(|i| i as i32));
+                            let height = dim.get("logical_height").and_then(IndexedValue::into_int);
 
                             let (Some(min_y), Some(height)) = (min_y, height) else {
                                 panic!("Failed to get dimension size?!")
@@ -389,7 +387,7 @@ impl BotPlugin {
                         commands.entity(bot.id()).insert((
                             login.player_id,
                             EntityUuid::new(*profile.uuid()),
-                            SessionInstance::new(
+                            SessionInstance::new::<Version>(
                                 login.spawn_info.dimension.clone(),
                                 height_max,
                                 height_min,
@@ -518,7 +516,7 @@ impl BotPlugin {
                             for entity_id in removed {
                                 if let Some(entity) = instance.query_id(&entity_id) {
                                     let Ok(entity_ref) = entities.get(entity) else { continue };
-                                    let identifier = entity_ref.get::<EntityBundle>().map_or("<unknown>", |bundle| bundle.identifier().as_str());
+                                    let identifier = entity_ref.get::<EntityBundle>().map_or(String::from("<unknown>"), |bundle| bundle.identifier().to_string());
                                     info!("Despawning Entity {entity} ({}) as \"{identifier}\"", entity_id.0);
 
                                     commands.entity(entity).despawn();

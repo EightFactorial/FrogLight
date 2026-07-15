@@ -40,52 +40,31 @@ impl RegistryDomain {
     fn domain() -> &'static RegistryDomainFns {
         DOMAIN.get().expect("RegistryDomain not initialized!")
     }
-
-    // ---------------------------------------------------------------------------------------------
-
-    /// See [`Domain::static_list`].
-    fn static_list() -> &'static DomainList<RegistryDomain> { (Self::domain().static_list_fn)() }
-
-    /// See [`Domain::set_thread_local_node`].
-    unsafe fn set_thread_local_node(node: Option<DomainNodeRef<RegistryDomain>>) {
-        unsafe { (Self::domain().set_thread_local_node_fn)(node) }
-    }
-
-    /// See [`Domain::get_thread_local_node`].
-    fn get_thread_local_node() -> Option<DomainNodeRef<RegistryDomain>> {
-        (Self::domain().get_thread_local_node_fn)()
-    }
-
-    /// See [`Domain::get_or_acquire_thread_local_node`].
-    fn get_or_acquire_thread_local_node() -> DomainNodeRef<RegistryDomain> {
-        (Self::domain().get_or_acquire_thread_local_node_fn)()
-    }
-
-    /// See [`Domain::release_thread_local_node`].
-    fn release_thread_local_node() { (Self::domain().release_thread_local_node_fn)() }
 }
 
 unsafe impl Domain for RegistryDomain {
     const BORROW_SLOT_COUNT: usize = 8;
 
     #[inline]
-    fn static_list() -> &'static DomainList<Self> { Self::static_list() }
+    fn static_list() -> &'static DomainList<Self> { (Self::domain().static_list_fn)() }
 
     #[inline]
-    fn get_thread_local_node() -> Option<DomainNodeRef<Self>> { Self::get_thread_local_node() }
+    fn get_thread_local_node() -> Option<DomainNodeRef<Self>> {
+        (Self::domain().get_thread_local_node_fn)()
+    }
 
     #[inline]
     unsafe fn set_thread_local_node(node: Option<DomainNodeRef<Self>>) {
-        unsafe { Self::set_thread_local_node(node) }
+        unsafe { (Self::domain().set_thread_local_node_fn)(node) }
     }
 
     #[inline]
     fn get_or_acquire_thread_local_node() -> DomainNodeRef<Self> {
-        Self::get_or_acquire_thread_local_node()
+        (Self::domain().get_or_acquire_thread_local_node_fn)()
     }
 
     #[inline]
-    fn release_thread_local_node() { Self::release_thread_local_node() }
+    fn release_thread_local_node() { (Self::domain().release_thread_local_node_fn)() }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -128,7 +107,6 @@ pub unsafe trait CustomDomain: Domain {
     /// See [`Domain::get_thread_local_node`].
     fn get_thread_local_node() -> Option<DomainNodeRef<RegistryDomain>>;
     /// See [`Domain::set_thread_local_node`].
-    #[expect(clippy::missing_safety_doc, reason = "See `Domain`")]
     unsafe fn set_thread_local_node(node: Option<DomainNodeRef<RegistryDomain>>);
     /// See [`Domain::get_or_acquire_thread_local_node`].
     fn get_or_acquire_thread_local_node() -> DomainNodeRef<RegistryDomain>;

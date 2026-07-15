@@ -52,7 +52,7 @@ impl<'data, A: NbtAccess> CowCore<'data, A> {
 }
 
 impl<'data> CowCore<'data, Ref> {
-    /// Create a new [`CowCore`] from the given [`SliceCore`].
+    /// Create a new [`CowCore`] from the given [`SliceCore`](super::SliceCore).
     #[inline]
     #[must_use]
     pub fn from_slice_ref(core: super::SliceCore<'data, Ref>) -> Self {
@@ -60,7 +60,7 @@ impl<'data> CowCore<'data, Ref> {
     }
 }
 impl<'data> CowCore<'data, Mut> {
-    /// Create a new [`CowCore`] from the given [`SliceCore`].
+    /// Create a new [`CowCore`] from the given [`SliceCore`](super::SliceCore).
     #[inline]
     #[must_use]
     pub fn from_slice_mut(core: super::SliceCore<'data, Mut>) -> Self {
