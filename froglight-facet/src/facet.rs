@@ -52,10 +52,14 @@ facet::define_attr_grammar! {
 #[derive(Debug, Clone, Copy, Facet)]
 #[facet(opaque)]
 pub struct WithFnAttr {
-    ser: SerFn,
-    de_owned: DeFn<false>,
-    de_owned_borrow: DeFn<true>,
-    de_borrowed: Option<DeBorrowFn>,
+    /// The serialization function.
+    pub ser: SerFn,
+    /// The deserialization function for owned data.
+    pub de_owned: DeFn<false>,
+    /// The deserialization function for borrowed into owned data.
+    pub de_owned_borrow: DeFn<true>,
+    /// The deserialization function for borrowed data.
+    pub de_borrowed: Option<DeBorrowFn>,
 }
 
 impl WithFnAttr {

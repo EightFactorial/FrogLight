@@ -3,7 +3,10 @@
     reason = "Triggered by deriving `Facet` and `Deserialize`"
 )]
 
-use core::ops::{Add, Div, Mul, Sub};
+use core::{
+    fmt,
+    ops::{Add, Div, Mul, Sub},
+};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
@@ -117,6 +120,16 @@ impl FacetTemplate for BlockPos {
 impl<T: Into<IVec3>> From<T> for BlockPos {
     #[inline]
     fn from(value: T) -> Self { BlockPos::new(value.into()) }
+}
+
+impl fmt::Display for BlockPos {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BlockPos")
+            .field("x", &self.x())
+            .field("y", &self.y())
+            .field("z", &self.z())
+            .finish()
+    }
 }
 
 impl Add<BlockPos> for BlockPos {

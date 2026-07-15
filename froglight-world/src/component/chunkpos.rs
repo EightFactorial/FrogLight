@@ -9,6 +9,9 @@ use core::ops::{Add, Div, Mul, Sub};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::{self as mc, facet::template::*};
 use glam::IVec2;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -17,7 +20,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", component(immutable))]
-#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(opaque, mc::with = ChunkPos::WITH))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
@@ -120,4 +124,38 @@ impl Div<i32> for ChunkPos {
 
     #[inline]
     fn div(self, rhs: i32) -> Self::Output { ChunkPos::new(self.0 / rhs) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[expect(clippy::cast_sign_loss, reason = "Desired")]
+#[expect(clippy::cast_possible_wrap, reason = "Desired")]
+impl FacetTemplate for ChunkPos {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<Self>()?;
+        if item.is_variable() {
+            encode_u32_into(value.x() as u32, writer)?;
+            encode_u32_into(value.z() as u32, writer)?;
+        } else {
+            writer.write_bytes(&value.x().to_be_bytes())?;
+            writer.write_bytes(&value.z().to_be_bytes())?;
+        }
+        Ok(())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let x: i32;
+        let z: i32;
+        if item.is_variable() {
+            x = decode_u32_from(reader)? as i32;
+            z = decode_u32_from(reader)? as i32;
+        } else {
+            x = i32::from_be_bytes(*reader.read_array()?);
+            z = i32::from_be_bytes(*reader.read_array()?);
+        }
+        item.set(ChunkPos::new_xz(x, z))
+    }
 }

@@ -1,8 +1,18 @@
+#![allow(
+    clippy::unsafe_derive_deserialize,
+    reason = "Triggered by deriving `Facet` and `Deserialize`"
+)]
+
+use core::fmt;
+
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy_reflect::Reflect;
+#[cfg(feature = "facet")]
+use froglight_facet::facet::WithFnAttr;
+#[cfg(feature = "facet")]
+#[allow(clippy::wildcard_imports, reason = "Readability")]
+use froglight_facet::facet::template::*;
 use glam::U8Vec2;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 
 use crate::{
     CHUNK_LENGTH, CHUNK_WIDTH, SECTION_HEIGHT, component::SectionBlockPos, prelude::BlockPos,
@@ -15,8 +25,7 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 pub struct ChunkBlockPos(U8Vec2, u16);
 
 impl ChunkBlockPos {
@@ -100,5 +109,50 @@ impl ChunkBlockPos {
                 position.y() as u16 + total_height as u16,
             ))
         }
+    }
+}
+
+impl fmt::Display for ChunkBlockPos {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ChunkBlockPos")
+            .field("x", &self.x())
+            .field("y", &self.y())
+            .field("z", &self.z())
+            .finish()
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "facet")]
+impl ChunkBlockPos {
+    /// A [`WithFnAttr`] for serializing and deserializing packed
+    /// [`ChunkBlockPos`].
+    ///
+    /// See [`FacetTemplate`] for more information.
+    pub const WITH_PACKED: WithFnAttr = WithFnAttr::template::<Packed>();
+}
+
+#[cfg(feature = "facet")]
+struct Packed;
+
+#[cfg(feature = "facet")]
+impl FacetTemplate for Packed {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let value = item.get::<ChunkBlockPos>()?;
+        let packed_xz = ((value.x() & 15) << 4) | (value.z() & 15);
+        writer.write_byte(packed_xz)?;
+        writer.write_bytes(&value.y().to_be_bytes())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let packed_xz = reader.read_byte()?;
+        let x = packed_xz >> 4;
+        let z = packed_xz & 15;
+        let y = u16::from_be_bytes(*reader.read_array()?);
+        item.set(ChunkBlockPos::new_xyz(x, y, z))
     }
 }

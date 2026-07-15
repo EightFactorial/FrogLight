@@ -51,6 +51,7 @@ fn parse_nbt(
     let mut indexes = Vec::new();
 
     // All NBT starts with a compound tag
+    tracing::trace!("PEEK: {:?}", cursor.peek_remaining()?);
     if !matches!(cursor.next()?, COMPOUND) {
         return Err(());
     }
@@ -97,6 +98,10 @@ fn parse_item<'data, const NAMED: bool>(
     if NAMED {
         loop {
             let tag = cursor.next()?;
+
+            #[cfg(feature = "tracing_ext")]
+            tracing::trace!(target = "froglight_nbt::parse", "Parsing tag {tag}");
+
             if tag == END {
                 break;
             }
@@ -154,6 +159,13 @@ fn parse_item<'data, const NAMED: bool>(
                 }
                 _ => return Err(()),
             }
+
+            #[cfg(feature = "tracing_ext")]
+            tracing::debug!(
+                target = "froglight_nbt::parse",
+                "Parsed Entry {:?}",
+                entries.last().unwrap()
+            );
         }
     } else {
         /// An empty, placeholder name for unnamed entries.
@@ -161,6 +173,12 @@ fn parse_item<'data, const NAMED: bool>(
 
         let tag = cursor.next()?;
         let length = u32::from_be_bytes(cursor.next_arr::<4>()?);
+
+        #[cfg(feature = "tracing_ext")]
+        tracing::trace!(
+            target = "froglight_nbt::parse",
+            "Parsing list of tag {tag} with length {length}"
+        );
 
         for _ in 0..length {
             match tag {
@@ -210,10 +228,20 @@ fn parse_item<'data, const NAMED: bool>(
                 }
                 _ => return Err(()),
             }
+
+            #[cfg(feature = "tracing_ext")]
+            tracing::debug!(
+                target = "froglight_nbt::parse",
+                "Parsed Entry {:?}",
+                entries.last().unwrap()
+            );
         }
     }
 
     ranges.push(Range { start, end: entries.len() });
+
+    #[cfg(feature = "tracing_ext")]
+    tracing::debug!(target = "froglight_nbt::parse", "Parsed Range {:?}", ranges.last().unwrap());
 
     Ok(())
 }
@@ -510,6 +538,10 @@ impl<'a> Cursor<'a> {
     /// Read the next byte without advancing the cursor.
     #[inline]
     fn peek(&self) -> Result<u8, ()> { self.data.get(self.position).copied().ok_or(()) }
+
+    /// Read the remaining bytes without advancing the cursor.
+    #[inline]
+    fn peek_remaining(&self) -> Result<&'a [u8], ()> { self.data.get(self.position..).ok_or(()) }
 
     /// Read the next byte from the cursor.
     #[inline]

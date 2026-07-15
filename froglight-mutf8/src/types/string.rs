@@ -443,7 +443,7 @@ impl FacetTemplate for MString {
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let len = decode_u32_from(reader)? as usize;
-        let content = reader.get(len)?;
+        let content = reader.read(len)?;
 
         let value = MString::from_mutf8(content.into())
             .map_err(|()| ReaderError::from_string("Invalid MUTF-8 String".into()))?;

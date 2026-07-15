@@ -1,9 +1,17 @@
 //! This file is auto-generated. Disable this by adding a `manual` tag.
-//! 
-//! @generated packet for "minecraft:rotate_head"
+//!
+//! @manual packet for "minecraft:rotate_head"
+
+use froglight_entity::prelude::EntityId;
+#[cfg(feature = "facet")]
+use froglight_facet as mc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct RotateHeadS2CPacket;
+pub struct RotateHeadS2CPacket {
+    #[cfg_attr(feature = "facet", facet(mc::variable))]
+    pub entity_id: EntityId,
+    pub yaw: u8,
+}

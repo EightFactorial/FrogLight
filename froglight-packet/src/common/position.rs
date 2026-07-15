@@ -211,7 +211,7 @@ impl FacetTemplate for EntityRelativeFlags {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let data = u32::from_be_bytes(*reader.get_array::<4>()?);
+        let data = u32::from_be_bytes(*reader.read_array::<4>()?);
 
         item.set(Self {
             x: data & 0b0000_0000_0001 != 0,

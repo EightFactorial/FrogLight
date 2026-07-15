@@ -3,7 +3,7 @@
 
 use ::core::marker::PhantomData;
 #[cfg(feature = "froglight-facet")]
-use froglight_facet::facet::WithFnAttr;
+use froglight_facet::{self as mc, facet::WithFnAttr};
 use froglight_mutf8::prelude::MStr;
 
 pub mod alloc;
@@ -29,7 +29,7 @@ pub mod types;
 /// An indexed NBT structure for borrowed NBT data.
 #[derive(Clone, PartialEq)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-#[cfg_attr(feature = "facet", facet(opaque))]
+#[cfg_attr(feature = "facet", facet(opaque, mc::with = Self::WITH_UNNAMED))]
 pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     core: C,
     name: Option<Index<MStr>>,
@@ -43,6 +43,12 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedNbt<'data, A, C> {
     /// this is used.
     #[cfg(feature = "froglight-facet")]
     pub const WITH_NAMED: WithFnAttr = C::WITH_NAMED;
+    /// A [`WithFnAttr`] for reading optional unnamed NBT.
+    ///
+    /// See [`FacetTemplate`](froglight_facet::facet::FacetTemplate) for how
+    /// this is used.
+    #[cfg(feature = "froglight-facet")]
+    pub const WITH_OPT_UNNAMED: WithFnAttr = C::WITH_OPT_UNNAMED;
     /// A [`WithFnAttr`] for reading unnamed NBT.
     ///
     /// See [`FacetTemplate`](froglight_facet::facet::FacetTemplate) for how

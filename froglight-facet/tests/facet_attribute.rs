@@ -70,7 +70,7 @@ fn template() {
             item: DeserializeItem<'facet, BORROW>,
             reader: &mut Reader<'_>,
         ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-            let val = u32::from_le_bytes(*reader.get_array()?);
+            let val = u32::from_le_bytes(*reader.read_array()?);
             item.set(Templated(val))
         }
     }
@@ -104,7 +104,7 @@ fn template_field() {
             item: DeserializeItem<'facet, BORROW>,
             reader: &mut Reader<'_>,
         ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-            let val = u32::from_le_bytes(*reader.get_array()?);
+            let val = u32::from_le_bytes(*reader.read_array()?);
             item.set(val)
         }
     }

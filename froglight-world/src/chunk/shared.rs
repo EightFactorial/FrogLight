@@ -1,12 +1,8 @@
 use alloc::sync::Arc;
-use core::{
-    borrow::{Borrow, BorrowMut},
-    ops::{Deref, DerefMut},
-};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::component::Component;
-use froglight_registry_template::types::AtomicArc;
+use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 
 use crate::chunk::Chunk;
 
@@ -16,12 +12,8 @@ use crate::chunk::Chunk;
 ///
 /// # Note
 ///
-/// Reading and writing to the chunk can be done at the same time, but all
-/// current reads will not see the changes until the chunk is read again.
-///
-/// Due to how writing to a [`SharedChunk`] can cause race conditions, it is
-/// recommended to batch write operations together where possible. If many
-/// writes are performed at once changes may be lost!
+/// You should write to the [`Chunk`] as little/fast as possible to prevent
+/// blocking read operations!
 #[repr(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub struct SharedChunk {
@@ -31,20 +23,67 @@ pub struct SharedChunk {
 impl SharedChunk {
     /// Create a  [`SharedChunk`] from a [`Chunk`].
     #[must_use]
-    pub fn new(chunk: Chunk) -> Self { Self { chunk: AtomicArc::from(chunk) } }
+    pub fn new(chunk: Chunk) -> Self { Self::new_arc(Arc::new(chunk)) }
 
     /// Create a [`SharedChunk`] from an existing [`AtomicArc<Chunk>`].
     #[inline]
     #[must_use]
-    pub const fn new_from(chunk: AtomicArc<Chunk>) -> Self { Self { chunk } }
+    pub fn new_arc(chunk: Arc<Chunk>) -> Self { Self { chunk: AtomicArc::new(chunk) } }
+
+    /// Get a reference to the inner [`Arc`] without cloning it.
+    ///
+    /// There are a limited number of free borrow slots and so this should not
+    /// be used for long-term storage.
+    ///
+    /// Consider using [`SharedChunk::load_owned`] instead.
+    #[inline]
+    pub fn load(&self) -> ArcBorrow<Chunk> { self.chunk.load() }
 
     /// Clone the inner [`Arc`] and return it.
     ///
-    /// This should be used when you want to send the [`Chunk`] to another
-    /// thread.
+    /// This should be used when you want to store or send read-only access to
+    /// the [`Chunk`] to another thread.
+    ///
+    /// For example, mesh generation or physics calculations.
     #[inline]
     #[must_use]
-    pub fn load(&self) -> Arc<Chunk> { self.chunk.load_owned() }
+    pub fn load_owned(&self) -> Arc<Chunk> { self.chunk.load_owned() }
+
+    /// Replace the existing [`Chunk`] immediately.
+    ///
+    /// # Note
+    ///
+    /// This will fully replace the inner shared [`Chunk`]. Existing threads
+    /// will continue to use the old [`Chunk`], while new threads will use
+    /// the new [`Chunk`].
+    ///
+    /// This is identical to [`SharedChunk::store_arc`].
+    #[inline]
+    pub fn store(&mut self, chunk: Chunk) { self.store_arc(Arc::new(chunk)); }
+
+    /// Replace the existing [`Arc<Chunk>`] immediately.
+    ///
+    /// # Note
+    ///
+    /// This will fully replace the inner shared [`Chunk`]. Existing threads
+    /// will continue to use the old [`Chunk`], while new threads will use
+    /// the new [`Chunk`].
+    ///
+    /// This is identical to [`SharedChunk::store`].
+    #[inline]
+    pub fn store_arc(&mut self, chunk: Arc<Chunk>) { self.chunk.store(chunk); }
+
+    /// Clone and return the inner [`Chunk`].
+    ///
+    /// # Note
+    ///
+    /// This should only be used when you need to modify the [`Chunk`].
+    ///
+    /// If you only need read-only access, use [`SharedChunk::load_owned`]
+    /// instead.
+    #[inline]
+    #[must_use]
+    pub fn clone_chunk(&self) -> Chunk { Arc::as_ref(&self.load()).clone() }
 
     /// Return the inner [`AtomicArc<Chunk>`].
     #[inline]
@@ -68,36 +107,16 @@ impl AsMut<AtomicArc<Chunk>> for SharedChunk {
     fn as_mut(&mut self) -> &mut AtomicArc<Chunk> { &mut self.chunk }
 }
 
-impl Borrow<AtomicArc<Chunk>> for SharedChunk {
-    #[inline]
-    fn borrow(&self) -> &AtomicArc<Chunk> { &self.chunk }
-}
-impl BorrowMut<AtomicArc<Chunk>> for SharedChunk {
-    #[inline]
-    fn borrow_mut(&mut self) -> &mut AtomicArc<Chunk> { &mut self.chunk }
-}
-
 impl Clone for SharedChunk {
     #[inline]
-    fn clone(&self) -> Self { Self::new_from(AtomicArc::new(self.load_owned())) }
-}
-
-impl Deref for SharedChunk {
-    type Target = AtomicArc<Chunk>;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target { &self.chunk }
-}
-impl DerefMut for SharedChunk {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.chunk }
+    fn clone(&self) -> Self { Self::new_arc(self.load_owned()) }
 }
 
 impl<T: Into<Chunk>> From<T> for SharedChunk {
     #[inline]
     fn from(chunk: T) -> Self { Self::new(chunk.into()) }
 }
-impl From<AtomicArc<Chunk>> for SharedChunk {
+impl From<Arc<Chunk>> for SharedChunk {
     #[inline]
-    fn from(chunk: AtomicArc<Chunk>) -> Self { Self::new_from(chunk) }
+    fn from(chunk: Arc<Chunk>) -> Self { Self::new_arc(chunk) }
 }

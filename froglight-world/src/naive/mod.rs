@@ -1,7 +1,7 @@
 //! TODO
 
 use alloc::vec::Vec;
-use core::ops::Range;
+use core::{fmt, ops::Range};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
@@ -252,5 +252,11 @@ impl NaiveChunk {
     #[must_use]
     pub fn contains_raw_biome(&self, biome_id: u32) -> bool {
         self.storage.as_slice().iter().any(|section| section.contains_raw_biome(biome_id))
+    }
+}
+
+impl fmt::Debug for NaiveChunk {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("NaiveChunk").finish_non_exhaustive()
     }
 }

@@ -195,12 +195,12 @@ impl BotPlugin {
                     ClientboundPlayEvent::BundleDelimiter => {}
                     // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
                     // ClientboundPlayEvent::ChatSuggestions() => todo!(),
-                    #[expect(clippy::cast_precision_loss, reason = "Required")]
                     ClientboundPlayEvent::ChunkBatchFinished(size) => {
                         debug!("Received ChunkBatchFinished: {size} chunks");
+
                         writer.write(ServerboundMessage::new(
                             bot.id(),
-                            ServerboundPlayEvent::ChunkBatchReceived((*size) as f32),
+                            ServerboundPlayEvent::ChunkBatchReceived(16.0),
                         ));
                     }
                     ClientboundPlayEvent::ChunkBatchStart => {
@@ -221,26 +221,42 @@ impl BotPlugin {
                                 return
                             };
 
-                            match chunk_data.as_chunk::<Version>(Some((
+                            let chunk_id = instance.query_chunk(&chunk_pos);
+                            let chunk = match chunk_data.try_parse::<Version>(
                                 instance.height_max(),
                                 instance.height_min(),
-                            ))) {
-                                Ok(chunk) => {
-                                    let world = entity.into_world_mut();
-                                    let chunk = world.spawn((
-                                        PartOfInstance::new(bot_id),
-                                        SharedChunk::new(chunk),
-                                        chunk_pos,
-                                    ));
-
-                                    debug!(
-                                        "Spawning Chunk as Entity {} ({}, {})",
-                                        chunk.id(),
-                                        chunk_pos.x(),
-                                        chunk_pos.z()
-                                    );
+                            ) {
+                                Ok(chunk) => chunk,
+                                Err(err) => {
+                                    error!("Failed to parse Chunk: {err:?}");
+                                    return;
                                 }
-                                Err(err) => error!("Failed to convert chunk data: {err:?}"),
+                            };
+
+                            let world = entity.into_world_mut();
+
+                            if let Some(chunk_id) = chunk_id
+                                && let Some(mut shared) =  world.get_mut::<SharedChunk>(chunk_id) {
+                                shared.store(chunk);
+
+                                info!(
+                                    "Updating Chunk Entity {chunk_id} ({}, {})",
+                                    chunk_pos.x(),
+                                    chunk_pos.z()
+                                );
+                            } else {
+                                let chunk = world.spawn((
+                                    PartOfInstance::new(bot_id),
+                                    SharedChunk::new(chunk),
+                                    chunk_pos,
+                                ));
+
+                                info!(
+                                    "Spawning Chunk Entity {} ({}, {})",
+                                    chunk.id(),
+                                    chunk_pos.x(),
+                                    chunk_pos.z()
+                                );
                             }
                         });
                     }
@@ -321,7 +337,40 @@ impl BotPlugin {
                         });
                     }
                     // ClientboundPlayEvent::Explode() => todo!(),
-                    // ClientboundPlayEvent::ForgetChunk() => todo!(),
+                    ClientboundPlayEvent::ForgetChunk(chunkpos) => {
+                        let chunkpos = *chunkpos;
+
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            let Some(instance) = entity.get::<SessionInstance>() else {
+                                error!("Received ForgetChunk but bot doesn't have a SessionInstance!");
+                                return;
+                            };
+
+                            let Some(chunk_id) = instance.query_chunk(&chunkpos) else {
+                                warn!(
+                                    "Received ForgetChunk for unknown Chunk Position ({}, {})!",
+                                    chunkpos.x(),
+                                    chunkpos.z()
+                                );
+                                return;
+                            };
+
+                            let Ok(world) = entity.into_world_mut().get_entity_mut(chunk_id) else {
+                                error!(
+                                    "Received ForgetChunk for Chunk Entity {chunk_id} that doesn't exist!"
+                                );
+                                return;
+                            };
+
+                            info!(
+                                "Despawning Chunk Entity {chunk_id} ({}, {})",
+                                chunkpos.x(),
+                                chunkpos.z()
+                            );
+
+                            world.despawn();
+                        });
+                    }
                     // ClientboundPlayEvent::GameEvent() => todo!(),
                     // ClientboundPlayEvent::GameRule() => todo!(),
                     // ClientboundPlayEvent::GameTestHighlight() => todo!(),
@@ -330,6 +379,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::InitializeBorder() => todo!(),
                     ClientboundPlayEvent::KeepAlive(id) => {
                         info!("Received KeepAlive: {id}");
+
                         writer.write(ServerboundMessage::new(
                             bot.id(),
                             ServerboundPlayEvent::KeepAlive(*id),

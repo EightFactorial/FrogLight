@@ -209,13 +209,13 @@ impl FacetTemplate for LpDVec3 {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let a = reader.get_byte()?;
+        let a = reader.read_byte()?;
         if a == 0 {
             return item.set(Self(LpDVec3Inner::Zero));
         }
 
-        let b = reader.get_byte()?;
-        let c = u32::from_be_bytes(*reader.get_array::<4>()?);
+        let b = reader.read_byte()?;
+        let c = u32::from_be_bytes(*reader.read_array::<4>()?);
 
         if a & 4 == 4 {
             let d = decode_u32_from(reader)?;

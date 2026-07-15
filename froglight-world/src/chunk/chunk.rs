@@ -1,6 +1,6 @@
 //! TODO
 
-use core::{any::TypeId, ops::Range};
+use core::{any::TypeId, fmt, ops::Range};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
@@ -27,6 +27,8 @@ use crate::{
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(feature = "facet", facet(opaque))]
 pub struct Chunk {
     biomes: &'static AtomicArc<BiomeStorage>,
     blocks: &'static AtomicArc<BlockStorage>,
@@ -466,6 +468,12 @@ impl Chunk {
 
             true
         }
+    }
+}
+
+impl fmt::Debug for Chunk {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Chunk").finish_non_exhaustive()
     }
 }
 

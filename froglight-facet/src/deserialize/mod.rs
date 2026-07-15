@@ -197,7 +197,7 @@ pub fn deserialize_borrowed_core<'facet>(
         // Handle borrowed strings.
         if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() || item.is_type::<&str>() {
             let length = varint::decode_u32_from(reader)? as usize;
-            let bytes = reader.get(length)?;
+            let bytes = reader.read(length)?;
 
             let str = simdutf8::compat::from_utf8(bytes).map_err(|err| {
                 ReaderError::from_string(alloc::format!("Invalid UTF-8 string: {err}"))
@@ -233,7 +233,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
                     return if $item.is_variable() {
                         item.set::<$ty>(varint::$fn(reader)?)
                     } else {
-                        item.set::<$ty>(<$ty>::from_be_bytes(*reader.get_array()?))
+                        item.set::<$ty>(<$ty>::from_be_bytes(*reader.read_array()?))
                     }
                 }
             )*
@@ -245,7 +245,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
                         #[expect(clippy::cast_possible_wrap, reason = "Desired behavior")]
                         item.set::<$ty>(varint::$fn(reader)? as $ty)
                     } else {
-                        item.set::<$ty>(<$ty>::from_be_bytes(*reader.get_array()?))
+                        item.set::<$ty>(<$ty>::from_be_bytes(*reader.read_array()?))
                     }
                 }
             )*
@@ -259,7 +259,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
 
     // Handle booleans.
     if item.is_type::<bool>() {
-        return match reader.get_array::<1>()? {
+        return match reader.read_array::<1>()? {
             [0] => item.set(false),
             [1] => item.set(true),
             [unk] => Err(ReaderError::InvalidBool(*unk))?,
@@ -272,15 +272,15 @@ fn deserialize_value<'facet, const BORROW: bool>(
 
     // Handle floating-point types.
     if item.is_type::<f32>() {
-        return item.set(f32::from_be_bytes(*reader.get_array()?));
+        return item.set(f32::from_be_bytes(*reader.read_array()?));
     } else if item.is_type::<f64>() {
-        return item.set(f64::from_be_bytes(*reader.get_array()?));
+        return item.set(f64::from_be_bytes(*reader.read_array()?));
     }
 
     // Handle strings.
     if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() {
         let length = varint::decode_u32_from(reader)? as usize;
-        let bytes = reader.get(length)?;
+        let bytes = reader.read(length)?;
 
         let str = simdutf8::compat::from_utf8(bytes).map_err(|err| {
             ReaderError::from_string(alloc::format!("Invalid UTF-8 string: {err}"))
@@ -296,7 +296,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
     // Handle `Vec<u8>`.
     if item.is_type::<alloc::vec::Vec<u8>>() {
         let length = varint::decode_u32_from(reader)? as usize;
-        let bytes = reader.get(length)?;
+        let bytes = reader.read(length)?;
         return item.set(bytes.to_vec());
     }
     // Handle `Vec<u32>`.
@@ -307,7 +307,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
             if item.is_variable() {
                 vec.push(varint::decode_u32_from(reader)?);
             } else {
-                vec.push(u32::from_be_bytes(*reader.get_array()?));
+                vec.push(u32::from_be_bytes(*reader.read_array()?));
             }
         }
         return item.set(vec);
@@ -320,7 +320,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
             if item.is_variable() {
                 vec.push(varint::decode_u64_from(reader)?);
             } else {
-                vec.push(u64::from_be_bytes(*reader.get_array()?));
+                vec.push(u64::from_be_bytes(*reader.read_array()?));
             }
         }
         return item.set(vec);
@@ -328,7 +328,7 @@ fn deserialize_value<'facet, const BORROW: bool>(
 
     // Handle `Uuid`.
     if item.is_type::<uuid::Uuid>() {
-        let bytes = reader.get_array::<16>()?;
+        let bytes = reader.read_array::<16>()?;
         return item.set(uuid::Uuid::from_bytes(*bytes));
     }
 

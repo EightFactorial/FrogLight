@@ -71,6 +71,38 @@ pub trait IndexCore<A: NbtAccess>: Eq {
         Self::deserialize_unnamed::<true>,
     );
 
+    /// The [`WithFnAttr`] for optional unnamed NBT using this [`IndexCore`].
+    #[cfg(feature = "froglight-facet")]
+    const WITH_OPT_UNNAMED: WithFnAttr = WithFnAttr::using(
+        |item, writer| {
+            let option = item.peek().into_option()?;
+            if let Some(inner) = option.value() {
+                let item = SerializeItem::new(inner, SerializeItemType::Value, false);
+                (Self::WITH_UNNAMED.ser)(item, writer)
+            } else {
+                writer.write_byte(0)
+            }
+        },
+        |mut item, reader| {
+            if let [0, ..] = reader.remaining() {
+                item = item.scoped(|partial| partial.set_default())?;
+                Ok(item)
+            } else {
+                item = item.scoped(|partial| partial.begin_some())?;
+                (Self::WITH_UNNAMED.de_owned)(item, reader)
+            }
+        },
+        |mut item, reader| {
+            if let [0, ..] = reader.remaining() {
+                item = item.scoped(|partial| partial.set_default())?;
+                Ok(item)
+            } else {
+                item = item.scoped(|partial| partial.begin_some())?;
+                (Self::WITH_UNNAMED.de_owned_borrow)(item, reader)
+            }
+        },
+    );
+
     /// A facet deserializer for this [`IndexCore`].
     ///
     /// # Errors

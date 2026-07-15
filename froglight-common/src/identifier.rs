@@ -256,7 +256,7 @@ impl FacetTemplate for Identifier<'_> {
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
         let len = decode_u32_from(reader)?;
 
-        let content = reader.get(len as usize)?;
+        let content = reader.read(len as usize)?;
         let content = str::from_utf8(content).map_err(ReaderError::other)?;
         let content = Identifier::try_new_owned(content).map_err(ReaderError::other)?;
 
@@ -273,7 +273,7 @@ impl FacetBorrowedTemplate for Identifier<'_> {
     ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
         let len = decode_u32_from(reader)?;
 
-        let content = reader.get(len as usize)?;
+        let content = reader.read(len as usize)?;
         let content = str::from_utf8(content).map_err(ReaderError::other)?;
         let content = Identifier::try_new(content).map_err(ReaderError::other)?;
 

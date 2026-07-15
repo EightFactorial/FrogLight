@@ -4,7 +4,7 @@
 
 use froglight_common::version::V26_2;
 use froglight_packet::{
-    common::{chunk_data::ChunkData, entity_data::SetEntityBundle},
+    common::entity_data::SetEntityBundle,
     generated::v26_2::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -36,7 +36,7 @@ use froglight_packet::{
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
             DisconnectS2CPacket as PlayDisconnectS2CPacket, EntityPositionSyncS2CPacket,
-            KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
+            ForgetLevelChunkS2CPacket, KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
             KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LevelChunkWithLightS2CPacket,
             LoginS2CPacket, MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket,
             MoveEntityRotS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
@@ -46,6 +46,7 @@ use froglight_packet::{
             TeleportEntityS2CPacket,
         },
     },
+    prelude::packet::v26_2::play::LightUpdateS2CPacket,
     version::{Clientbound, Serverbound, VersionPacket},
 };
 use froglight_world::prelude::ChunkPos;
@@ -269,12 +270,12 @@ impl EventVersion for V26_2 {
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::ChunkWithLight(pos, chunk, light) => {
+                ClientboundPlayEvent::ChunkWithLight(pos, chunk_data, light_data) => {
                     let packet = LevelChunkWithLightS2CPacket {
                         chunk_x: pos.x(),
                         chunk_z: pos.z(),
-                        chunk_data: chunk.as_raw::<Self>(),
-                        light_data: light,
+                        chunk_data,
+                        light_data,
                     };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelChunkWithLight(
                         packet,
@@ -389,8 +390,8 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::Explode(packet))))
                 }
-                ClientboundPlayEvent::ForgetChunk() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::ForgetChunk(chunkpos) => {
+                    let packet = ForgetLevelChunkS2CPacket(chunkpos);
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::ForgetLevelChunk(packet))))
                 }
                 ClientboundPlayEvent::GameEvent() => {
@@ -431,8 +432,12 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelParticles(packet))))
                 }
-                ClientboundPlayEvent::LightUpdate() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::LightUpdate(chunkpos, light_data) => {
+                    let packet = LightUpdateS2CPacket {
+                        chunk_x: chunkpos.x(),
+                        chunk_z: chunkpos.z(),
+                        light_data,
+                    };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LightUpdate(packet))))
                 }
                 ClientboundPlayEvent::Login(content) => {
@@ -1063,9 +1068,9 @@ impl EventVersion for V26_2 {
                 PlayClientboundPackets::Explode(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Explode())))
                 }
-                PlayClientboundPackets::ForgetLevelChunk(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ForgetChunk())))
-                }
+                PlayClientboundPackets::ForgetLevelChunk(packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::ForgetChunk(packet.0)),
+                )),
                 PlayClientboundPackets::GameEvent(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::GameEvent())))
                 }
@@ -1090,7 +1095,7 @@ impl EventVersion for V26_2 {
                 PlayClientboundPackets::LevelChunkWithLight(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight(
                         ChunkPos::new_xz(packet.chunk_x, packet.chunk_z),
-                        ChunkData::new_versioned::<Self>(packet.chunk_data),
+                        packet.chunk_data,
                         packet.light_data,
                     ))))
                 }
@@ -1100,8 +1105,11 @@ impl EventVersion for V26_2 {
                 PlayClientboundPackets::LevelParticles(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LevelParticles())))
                 }
-                PlayClientboundPackets::LightUpdate(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LightUpdate())))
+                PlayClientboundPackets::LightUpdate(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LightUpdate(
+                        ChunkPos::new_xz(packet.chunk_x, packet.chunk_z),
+                        packet.light_data,
+                    ))))
                 }
                 PlayClientboundPackets::Login(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Login(packet.0))))

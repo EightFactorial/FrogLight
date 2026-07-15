@@ -33,7 +33,7 @@ impl<'a> Reader<'a> {
     /// # Errors
     ///
     /// Returns an error if the reader doesn't have enough bytes remaining.
-    pub fn get(&mut self, len: usize) -> Result<&'a [u8], ReaderError> {
+    pub fn read(&mut self, len: usize) -> Result<&'a [u8], ReaderError> {
         if self.remaining.len() < len {
             Err(ReaderError::EndOfInput(len - self.remaining.len()))
         } else {
@@ -49,7 +49,7 @@ impl<'a> Reader<'a> {
     /// # Errors
     ///
     /// Returns an error if the reader doesn't have any bytes remaining.
-    pub fn get_byte(&mut self) -> Result<u8, ReaderError> {
+    pub fn read_byte(&mut self) -> Result<u8, ReaderError> {
         if let Some((&byte, remaining)) = self.remaining.split_first() {
             self.position += 1;
             self.remaining = remaining;
@@ -64,7 +64,7 @@ impl<'a> Reader<'a> {
     /// # Errors
     ///
     /// Returns an error if the reader doesn't have enough bytes remaining.
-    pub fn get_array<const N: usize>(&mut self) -> Result<&'a [u8; N], ReaderError> {
+    pub fn read_array<const N: usize>(&mut self) -> Result<&'a [u8; N], ReaderError> {
         if let Some((result, remaining)) = self.remaining.split_first_chunk::<N>() {
             self.position += N;
             self.remaining = remaining;

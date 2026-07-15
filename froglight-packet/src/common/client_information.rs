@@ -165,7 +165,7 @@ impl FacetTemplate for ModelCustomization {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let byte = reader.get_byte()?;
+        let byte = reader.read_byte()?;
 
         item.set(Self {
             cape: byte & 0b0000_0001 != 0,
