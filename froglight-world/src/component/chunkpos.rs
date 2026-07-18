@@ -62,6 +62,17 @@ impl<T: Into<IVec2>> From<T> for ChunkPos {
     fn from(value: T) -> Self { ChunkPos::new(value.into()) }
 }
 
+impl PartialOrd for ChunkPos {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> { Some(self.cmp(other)) }
+}
+impl Ord for ChunkPos {
+    #[inline]
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.x().cmp(&other.x()).then(self.z().cmp(&other.z()))
+    }
+}
+
 impl Add<ChunkPos> for ChunkPos {
     type Output = ChunkPos;
 

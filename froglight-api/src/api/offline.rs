@@ -1,9 +1,8 @@
-use std::sync::RwLock;
-
 use async_trait::async_trait;
 use foldhash::fast::FixedState;
 use froglight_player::{profile::PlayerProfile, username::Username};
 use indexmap::IndexMap;
+use parking_lot::RwLock;
 use uuid::Uuid;
 
 use crate::{
@@ -46,14 +45,13 @@ impl Offline {
     ///
     /// Returns the given profile if one with a matching UUID or username
     /// already exists.
-    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub fn insert_profile(profile: PlayerProfile) -> Result<(), PlayerProfile> {
         let uuid = *profile.uuid();
         let username = profile.username();
 
-        let mut uuid_endpoint = Self::UUID_ENDPOINT.write().unwrap();
-        let mut username_endpoint = Self::USERNAME_ENDPOINT.write().unwrap();
-        let mut profile_endpoint = Self::PROFILE_ENDPOINT.write().unwrap();
+        let mut uuid_endpoint = Self::UUID_ENDPOINT.upgradable_read();
+        let mut username_endpoint = Self::USERNAME_ENDPOINT.upgradable_read();
+        let mut profile_endpoint = Self::PROFILE_ENDPOINT.upgradable_read();
 
         if uuid_endpoint.contains_key(username)
             || username_endpoint.contains_key(&uuid)
@@ -61,9 +59,9 @@ impl Offline {
         {
             Err(profile)
         } else {
-            uuid_endpoint.insert(username.clone(), uuid);
-            username_endpoint.insert(uuid, username.clone());
-            profile_endpoint.insert(uuid, profile);
+            uuid_endpoint.with_upgraded(|e| e.insert(username.clone(), uuid));
+            username_endpoint.with_upgraded(|e| e.insert(uuid, username.clone()));
+            profile_endpoint.with_upgraded(|e| e.insert(uuid, profile));
 
             Ok(())
         }
@@ -71,38 +69,34 @@ impl Offline {
 
     /// Get a [`PlayerProfile`] from the [`Offline`] API's internal storage.
     #[must_use]
-    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub fn get_uuid(uuid: Uuid) -> Option<PlayerProfile> {
-        Self::PROFILE_ENDPOINT.read().unwrap().get(&uuid).cloned()
+        Self::PROFILE_ENDPOINT.read().get(&uuid).cloned()
     }
 
     /// Get a [`PlayerProfile`] from the [`Offline`] API's internal storage.
     #[must_use]
-    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub fn get_username(username: &str) -> Option<PlayerProfile> {
-        let uuid = *Self::UUID_ENDPOINT.read().unwrap().get(username)?;
-        Self::PROFILE_ENDPOINT.read().unwrap().get(&uuid).cloned()
+        let uuid = *Self::UUID_ENDPOINT.read().get(username)?;
+        Self::PROFILE_ENDPOINT.read().get(&uuid).cloned()
     }
 
     /// Remove a [`PlayerProfile`] from the [`Offline`] API's internal storage.
     ///
     /// Returns the removed [`PlayerProfile`] if it existed.
-    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub fn remove_uuid(uuid: Uuid) -> Option<PlayerProfile> {
-        let profile = Self::PROFILE_ENDPOINT.write().unwrap().shift_remove(&uuid)?;
-        Self::USERNAME_ENDPOINT.write().unwrap().shift_remove(&uuid);
-        Self::UUID_ENDPOINT.write().unwrap().shift_remove(profile.username());
+        let profile = Self::PROFILE_ENDPOINT.write().shift_remove(&uuid)?;
+        Self::USERNAME_ENDPOINT.write().shift_remove(&uuid);
+        Self::UUID_ENDPOINT.write().shift_remove(profile.username());
         Some(profile)
     }
 
     /// Remove a [`PlayerProfile`] from the [`Offline`] API's internal storage.
     ///
     /// Returns the removed [`PlayerProfile`] if it existed.
-    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub fn remove_username(username: &str) -> Option<PlayerProfile> {
-        let uuid = *Self::UUID_ENDPOINT.read().unwrap().get(username)?;
-        let profile = Self::PROFILE_ENDPOINT.write().unwrap().shift_remove(&uuid)?;
-        Self::USERNAME_ENDPOINT.write().unwrap().shift_remove(&uuid);
+        let uuid = *Self::UUID_ENDPOINT.read().get(username)?;
+        let profile = Self::PROFILE_ENDPOINT.write().shift_remove(&uuid)?;
+        Self::USERNAME_ENDPOINT.write().shift_remove(&uuid);
         Some(profile)
     }
 }

@@ -75,7 +75,6 @@ blocking = { default-features = false, version = "1.6" }
 futures-lite = { default-features = false, version = "^2.0" }
 glam = { default-features = false, version = "=0.32" }
 hashbrown = { default-features = false, version = "0.17" }
-hazarc = { default-features = false, version = "0.2" }
 hickory-resolver = { default-features = false, version = "0.26" }
 indexmap = { default-features = false, version = "2.14" }
 lexical = { default-features = false, version = "7.0" }
@@ -96,7 +95,7 @@ socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "^1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.3" }
-uuid = { default-features = false, version = "1.23" }
+uuid = { default-features = false, version = "1.24" }
 variadics_please = { default-features = false, version = "2.0" }
 yansi = { default-features = false, version = "1.0" }
 

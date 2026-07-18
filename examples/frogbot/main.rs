@@ -2,10 +2,7 @@
 #![allow(clippy::std_instead_of_alloc, reason = "Example")]
 #![allow(clippy::std_instead_of_core, reason = "Example")]
 
-use std::{
-    net::{IpAddr, Ipv4Addr, SocketAddr},
-    sync::Arc,
-};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
 use bevy::{
@@ -397,7 +394,7 @@ impl BotPlugin {
                         );
 
                         // Get the "minecraft:dimension_type" registry
-                        let registry = Version::registry();
+                        let registry = Version::registry().read();
                         let dimensions = registry.get_nbt_by_identifier("minecraft:dimension_type");
 
                         // Get the dimension's "min_y" and "logical_height" values.
@@ -810,9 +807,9 @@ impl BotPlugin {
                     ClientboundConfigEvent::RegistryData(identifier, entries) => {
                         info!("Received RegistryData: \"{identifier}\"");
 
-                        // Clone the current `REGISTRY`.
-                        let mut registry = Arc::unwrap_or_clone(Version::REGISTRY.load_owned());
-                        let metadata = registry.nbtdata_mut();
+                        // Write to the current registry.
+                        let mut registry = Version::registry().write();
+                        let metadata = registry.nbt_mut();
 
                         let storage = metadata.entry(identifier.clone()).or_default();
                         for RegistryDataEntry { identifier, nbt } in entries.clone() {
@@ -825,13 +822,8 @@ impl BotPlugin {
                                 debug!(" - \"{identifier}\": <empty>");
                             }
 
-                            storage.entry(identifier).insert_entry(
-                                nbt.unwrap_or_else(|| IndexedNbt::empty_cow().into_mut()),
-                            );
+                            storage.entry(identifier).insert_entry(nbt.unwrap_or_default());
                         }
-
-                        // Replace the `REGISTRY` with the updated one.
-                        Version::REGISTRY.store(Arc::new(registry));
                     }
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
@@ -857,9 +849,9 @@ impl BotPlugin {
                         commands.write_message(AppExit::error());
                     }
                     ClientboundConfigEvent::UpdateTags(tags) => {
-                        // Clone the current `REGISTRY`.
-                        let mut registry = Arc::unwrap_or_clone(Version::REGISTRY.load_owned());
-                        let metadata = registry.tagdata_mut();
+                        // Write to the current registry.
+                        let mut registry = Version::registry().write();
+                        let metadata = registry.tags_mut();
 
                         // Update the metadata with the new tags.
                         for (identifier, tags) in &tags.0 {
@@ -871,9 +863,6 @@ impl BotPlugin {
                                 storage.entry(tag.identifier).insert_entry(tag.values.clone());
                             }
                         }
-
-                        // Replace the `REGISTRY` with the updated one.
-                        Version::REGISTRY.store(Arc::new(registry));
                     }
                     other => warn!("Unhandled Event: {other:?}"),
                 },

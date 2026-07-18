@@ -9,7 +9,7 @@ use froglight_common::prelude::Identifier;
 use froglight_entity::{
     prelude::{EntityId, EntityUuid},
     storage::EntityStorage,
-    version::{AtomicArc, EntityVersion},
+    version::EntityVersion,
 };
 use froglight_item::{storage::ItemStorage, version::ItemVersion};
 use froglight_world::prelude::ChunkPos;
@@ -28,10 +28,10 @@ pub struct SessionInstance {
     dimension: Identifier<'static>,
     height_max_min: (u32, i32),
 
-    biomes: &'static AtomicArc<BiomeStorage>,
-    blocks: &'static AtomicArc<BlockStorage>,
-    entities: &'static AtomicArc<EntityStorage>,
-    items: &'static AtomicArc<ItemStorage>,
+    biomes: &'static BiomeStorage,
+    blocks: &'static BlockStorage,
+    entities: &'static EntityStorage,
+    items: &'static ItemStorage,
 
     entity_id: HashMap<EntityId, Entity, FixedState>,
     entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
@@ -60,10 +60,10 @@ impl SessionInstance {
             dimension,
             height_max_min: (height_max, height_min),
 
-            biomes: V::BIOMES,
-            blocks: V::BLOCKS,
-            entities: V::ENTITY,
-            items: V::ITEMS,
+            biomes: V::biomes(),
+            blocks: V::blocks(),
+            entities: V::entities(),
+            items: V::items(),
 
             entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
             entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
@@ -103,22 +103,22 @@ impl SessionInstance {
     /// Get the [`BiomeStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn biomes(&self) -> &'static AtomicArc<BiomeStorage> { self.biomes }
+    pub const fn version_biomes(&self) -> &'static BiomeStorage { self.biomes }
 
     /// Get the [`BlockStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn blocks(&self) -> &'static AtomicArc<BlockStorage> { self.blocks }
+    pub const fn version_blocks(&self) -> &'static BlockStorage { self.blocks }
 
     /// Get the [`EntityStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn entities(&self) -> &'static AtomicArc<EntityStorage> { self.entities }
+    pub const fn version_entities(&self) -> &'static EntityStorage { self.entities }
 
     /// Get the [`ItemStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn items(&self) -> &'static AtomicArc<ItemStorage> { self.items }
+    pub const fn version_items(&self) -> &'static ItemStorage { self.items }
 
     /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
     #[inline]

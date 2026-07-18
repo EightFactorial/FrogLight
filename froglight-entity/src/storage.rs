@@ -83,10 +83,8 @@ impl EntityStorage {
 macro_rules! implement_entities {
     ($version:ty => { $($tt:tt)* }, read: $read:block, write: $write:block) => {
         impl $crate::version::EntityVersion for $version {
-            const ENTITY: &'static $crate::version::LazyLock<$crate::version::AtomicArc<$crate::storage::EntityStorage>> = {
-                static STATIC: $crate::version::LazyLock<$crate::version::AtomicArc<$crate::storage::EntityStorage>> = $crate::version::LazyLock::new(|| {
-                    $crate::version::AtomicArc::from(<$version as $crate::version::EntityVersion>::new_entity())
-                });
+            const ENTITY: &'static $crate::version::OnceLock<$crate::storage::EntityStorage> = {
+                static STATIC: $crate::version::OnceLock<$crate::storage::EntityStorage> = $crate::version::OnceLock::new();
                 &STATIC
             };
 

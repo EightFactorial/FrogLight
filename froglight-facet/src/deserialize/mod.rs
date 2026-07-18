@@ -1,9 +1,6 @@
 //! TODO
 
-use alloc::{
-    borrow::Cow::{self, Borrowed},
-    string::String,
-};
+use alloc::{borrow::Cow, string::String, vec::Vec};
 
 use facet::{Facet, HeapValue, Partial};
 pub use froglight_facet_iter::deserialize::DeserializeError;
@@ -195,7 +192,7 @@ pub fn deserialize_borrowed_core<'facet>(
         }
 
         // Handle borrowed strings.
-        if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() || item.is_type::<&str>() {
+        if item.is_type::<&str>() || item.is_type::<Cow<str>>() {
             let length = varint::decode_u32_from(reader)? as usize;
             let bytes = reader.read(length)?;
 
@@ -205,10 +202,20 @@ pub fn deserialize_borrowed_core<'facet>(
 
             return if item.is_type::<&str>() {
                 item.set(str).map(Item::Item)
-            } else if item.is_type::<Cow<'_, str>>() {
-                item.set(Borrowed(str)).map(Item::Item)
             } else {
-                item.set(String::from(str)).map(Item::Item)
+                item.set(Cow::Borrowed(str)).map(Item::Item)
+            };
+        }
+
+        // Handle borrowed slices.
+        if item.is_type::<Cow<[u8]>>() || item.is_type::<&[u8]>() {
+            let length = varint::decode_u32_from(reader)? as usize;
+            let bytes = reader.read(length)?;
+
+            return if item.is_type::<&[u8]>() {
+                item.set(bytes).map(Item::Item)
+            } else {
+                item.set(Cow::Borrowed(bytes)).map(Item::Item)
             };
         }
 
@@ -222,6 +229,7 @@ pub fn deserialize_borrowed_core<'facet>(
 /// [`deserialize_borrowed`], separated out for readability.
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
+#[allow(clippy::too_many_lines, reason = "Ignored")]
 fn deserialize_value<'facet, const BORROW: bool>(
     item: DeserializeItem<'facet, BORROW>,
     reader: &mut Reader<'_>,
@@ -259,10 +267,10 @@ fn deserialize_value<'facet, const BORROW: bool>(
 
     // Handle booleans.
     if item.is_type::<bool>() {
-        return match reader.read_array::<1>()? {
-            [0] => item.set(false),
-            [1] => item.set(true),
-            [unk] => Err(ReaderError::InvalidBool(*unk))?,
+        return match reader.read_byte()? {
+            0 => item.set(false),
+            1 => item.set(true),
+            unk => Err(ReaderError::InvalidBool(unk))?,
         };
     }
 
@@ -277,8 +285,8 @@ fn deserialize_value<'facet, const BORROW: bool>(
         return item.set(f64::from_be_bytes(*reader.read_array()?));
     }
 
-    // Handle strings.
-    if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() {
+    // Handle strings and string-like types.
+    if item.is_type::<String>() || item.is_type::<Cow<str>>() {
         let length = varint::decode_u32_from(reader)? as usize;
         let bytes = reader.read(length)?;
 
@@ -286,23 +294,31 @@ fn deserialize_value<'facet, const BORROW: bool>(
             ReaderError::from_string(alloc::format!("Invalid UTF-8 string: {err}"))
         })?;
 
-        return if item.is_type::<String>() {
-            item.set(String::from(str))
-        } else {
-            item.set(Cow::<'_, str>::Owned(String::from(str)))
-        };
+        if item.is_type::<String>() {
+            return item.set(String::from(str));
+        } else if item.is_type::<Cow<str>>() {
+            return item.set(Cow::<str>::Owned(String::from(str)));
+        }
+
+        unreachable!("All types should have been handled")
     }
 
-    // Handle `Vec<u8>`.
-    if item.is_type::<alloc::vec::Vec<u8>>() {
+    // Handle `Vec<u8>` and `Cow<[u8]>`
+    if item.is_type::<Vec<u8>>() || item.is_type::<Cow<[u8]>>() {
         let length = varint::decode_u32_from(reader)? as usize;
         let bytes = reader.read(length)?;
-        return item.set(bytes.to_vec());
+
+        return if item.is_type::<Vec<u8>>() {
+            item.set(bytes.to_vec())
+        } else {
+            item.set(Cow::<[u8]>::Owned(bytes.to_vec()))
+        };
     }
-    // Handle `Vec<u32>`.
-    if item.is_type::<alloc::vec::Vec<u32>>() {
+    // Handle `Vec<u32>` and `Cow<[u32]>`
+    if item.is_type::<Vec<u32>>() || item.is_type::<Cow<[u32]>>() {
         let length = varint::decode_u32_from(reader)? as usize;
-        let mut vec = alloc::vec::Vec::with_capacity(length);
+
+        let mut vec = Vec::with_capacity(length);
         for _ in 0..length {
             if item.is_variable() {
                 vec.push(varint::decode_u32_from(reader)?);
@@ -310,12 +326,18 @@ fn deserialize_value<'facet, const BORROW: bool>(
                 vec.push(u32::from_be_bytes(*reader.read_array()?));
             }
         }
-        return item.set(vec);
+
+        return if item.is_type::<Vec<u32>>() {
+            item.set(vec)
+        } else {
+            item.set(Cow::<[u32]>::Owned(vec))
+        };
     }
-    // Handle `Vec<u64>`.
-    if item.is_type::<alloc::vec::Vec<u64>>() {
+    // Handle `Vec<u64>` and `Cow<[u64]>`
+    if item.is_type::<Vec<u64>>() || item.is_type::<Cow<[u64]>>() {
         let length = varint::decode_u32_from(reader)? as usize;
-        let mut vec = alloc::vec::Vec::with_capacity(length);
+
+        let mut vec = Vec::with_capacity(length);
         for _ in 0..length {
             if item.is_variable() {
                 vec.push(varint::decode_u64_from(reader)?);
@@ -323,7 +345,12 @@ fn deserialize_value<'facet, const BORROW: bool>(
                 vec.push(u64::from_be_bytes(*reader.read_array()?));
             }
         }
-        return item.set(vec);
+
+        return if item.is_type::<Vec<u64>>() {
+            item.set(vec)
+        } else {
+            item.set(Cow::<[u64]>::Owned(vec))
+        };
     }
 
     // Handle `Uuid`.

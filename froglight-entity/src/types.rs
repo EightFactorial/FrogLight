@@ -73,7 +73,7 @@ pub struct EntityOptionalVarInt(pub Option<i32>);
 impl FacetTemplate for EntityOptionalVarInt {
     fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let value = item.get::<Self>()?;
-        let value = value.0.map_or_default(|v| v + 1) as u32;
+        let value = value.0.map_or(0, |v| v + 1) as u32;
         encode_u32_into(value, writer)
     }
 

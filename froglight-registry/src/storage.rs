@@ -87,7 +87,7 @@ impl RegistryStorage {
     /// Get the [`IndexMap`] of tag data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn tagdata(
+    pub const fn tags(
         &self,
     ) -> &IndexMap<
         Identifier<'static>,
@@ -100,7 +100,7 @@ impl RegistryStorage {
     /// Get the mutable [`IndexMap`] of tag data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn tagdata_mut(
+    pub const fn tags_mut(
         &mut self,
     ) -> &mut IndexMap<
         Identifier<'static>,
@@ -113,7 +113,7 @@ impl RegistryStorage {
     /// Get the [`IndexMap`] of NBT data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn nbtdata(
+    pub const fn nbt(
         &self,
     ) -> &IndexMap<
         Identifier<'static>,
@@ -126,7 +126,7 @@ impl RegistryStorage {
     /// Get the mutable [`IndexMap`] of NBT data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn nbtdata_mut(
+    pub const fn nbt_mut(
         &mut self,
     ) -> &mut IndexMap<
         Identifier<'static>,

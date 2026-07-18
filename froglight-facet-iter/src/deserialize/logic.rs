@@ -303,9 +303,9 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
         }
 
         // If the type has a proxy, deserialize the proxy type instead.
-        if self.partial.shape().effective_proxy(Some("mc")).is_some() {
+        if self.partial.shape().effective_proxy(self.namespace).is_some() {
             let (proxy_partial, has_proxy) =
-                self.partial.begin_custom_deserialization_from_shape_with_format(Some("mc"))?;
+                self.partial.begin_custom_deserialization_from_shape_with_format(self.namespace)?;
 
             if has_proxy {
                 #[cfg(feature = "tracing_ext")]
@@ -381,8 +381,6 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 self.stack.push(StackItem::Seq(def.n, false, desc.is_variable()));
                 Ok(self)
             }
-
-            Def::NdArray(..) => todo!(),
 
             Def::Option(..) => {
                 let Item::Size(variant) = (core)(Item::Size(0))? else { todo!() };

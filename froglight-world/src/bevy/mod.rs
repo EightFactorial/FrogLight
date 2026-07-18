@@ -4,7 +4,7 @@ use bevy_app::{App, Plugin};
 
 use crate::{
     component::{ChunkBlockPos, DimensionPos},
-    prelude::{BlockPos, ChunkPos},
+    prelude::*,
 };
 
 /// A [`Plugin`] that ...
@@ -17,5 +17,10 @@ impl Plugin for WorldPlugin {
             .register_type::<ChunkPos>()
             .register_type::<ChunkBlockPos>()
             .register_type::<DimensionPos>();
+
+        #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+        {
+            app.register_type::<Chunk>().register_type::<SharedChunk>();
+        }
     }
 }

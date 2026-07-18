@@ -210,7 +210,7 @@ pub type DeBorrowFn = for<'facet> fn(
 ///         item: DeserializeItem<'facet, BORROW>,
 ///         reader: &mut Reader<'_>,
 ///     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-///         let val: u32 = u32::from_le_bytes(*reader.get_array()?);
+///         let val: u32 = u32::from_le_bytes(*reader.read_array()?);
 ///         item.set(MyType(val))
 ///     }
 /// }

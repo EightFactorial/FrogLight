@@ -3,7 +3,7 @@
 use froglight_common::prelude::*;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::template::{Reader, ReaderError, Writer, WriterError};
-pub use froglight_registry_template::types::{ArcBorrow, AtomicArc, LazyLock};
+pub use froglight_registry_template::types::OnceLock;
 
 #[cfg(feature = "facet")]
 use crate::generated::datatype::EntityDataType;
@@ -12,11 +12,11 @@ use crate::storage::EntityStorage;
 /// A [`Version`]'s associated entity data.
 pub trait EntityVersion: Version {
     /// The [`EntityStorage`] for this [`Version`].
-    const ENTITY: &'static LazyLock<AtomicArc<EntityStorage>>;
+    const ENTITY: &'static OnceLock<EntityStorage>;
 
     /// Get the [`EntityStorage`] for this [`Version`].
     #[inline]
-    fn entities() -> ArcBorrow<EntityStorage> { Self::ENTITY.load() }
+    fn entities() -> &'static EntityStorage { Self::ENTITY.get_or_init(Self::new_entity) }
 
     /// Create a new [`EntityStorage`] for this [`Version`].
     ///

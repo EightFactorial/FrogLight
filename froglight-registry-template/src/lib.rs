@@ -7,5 +7,4 @@ extern crate std;
 
 mod macros;
 
-pub mod domain;
 pub mod types;

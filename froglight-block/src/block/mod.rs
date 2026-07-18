@@ -106,7 +106,7 @@ impl Block {
     #[inline]
     #[must_use]
     pub fn using_version<V: BlockVersion>(self) -> Option<Block> {
-        self.using_version_storage(&V::blocks())
+        self.using_version_storage(V::blocks())
     }
 
     /// Attempt to migrate the block to another [`Version`]'s [`BlockStorage`].

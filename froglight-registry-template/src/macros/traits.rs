@@ -20,12 +20,12 @@
 ///
 /// pub trait MyTraitExpanded: Version {
 ///     /// The [`u32`] for this [`Version`].
-///     const GLOBAL: &'static froglight_registry_template::types::LazyLock<u32>;
+///     const GLOBAL: &'static froglight_registry_template::types::OnceLock<u32>;
 ///
 ///     /// Get the [`u32`] for this [`Version`].
 ///     #[inline]
 ///     #[must_use]
-///     fn global() -> &'static u32 { Self::GLOBAL }
+///     fn global() -> &'static u32 { Self::GLOBAL.get_or_init(Self::new_value) }
 ///
 ///     /// Create a new [`u32`] for this [`Version`].
 ///     ///
@@ -52,12 +52,12 @@ macro_rules! version_subtrait {
         #[doc = concat!("A [`", stringify!($const_ty), "`] for a [`Version`].")]
         pub trait $name: $($trait +)* Version {
             #[doc = concat!("The [`", stringify!($const_ty), "`] for this [`Version`].")]
-            const $const: &'static $crate::types::LazyLock<$crate::types::AtomicArc<$const_ty>>;
+            const $const: &'static $crate::types::OnceLock<$const_ty>;
 
             #[inline]
             #[must_use]
             #[doc = concat!("Get the [`", stringify!($const_ty), "`] for this [`Version`].")]
-            fn $const_fn() -> $crate::types::ArcBorrow<$const_ty> { Self::$const.load() }
+            fn $const_fn() -> &'static $const_ty { Self::$const.get_or_init(Self::$new_fn) }
 
             #[must_use]
             #[doc = concat!("Create a new [`", stringify!($const_ty), "`] for this [`Version`].")]
@@ -79,7 +79,7 @@ macro_rules! version_subtrait {
 /// ```rust
 /// use std::sync::Arc;
 /// use froglight_registry_template::{version_subtrait, version_implement};
-/// use froglight_registry_template::types::{LazyLock, AtomicArc, ArcBorrow};
+/// use froglight_registry_template::types::OnceLock;
 ///
 /// pub trait Version {}
 ///
@@ -107,14 +107,14 @@ macro_rules! version_subtrait {
 /// impl Version for VersionB {}
 ///
 /// impl MyTrait for VersionB {
-///     const GLOBAL: &'static LazyLock<AtomicArc<u32>> = {
-///         static STATIC: LazyLock<AtomicArc<u32>> = LazyLock::new(|| AtomicArc::from(<VersionB as MyTrait>::new_value()));
+///     const GLOBAL: &'static OnceLock<u32> = {
+///         static STATIC: OnceLock<u32> = OnceLock::new();
 ///         &STATIC
 ///     };
 ///
 ///     #[inline]
 ///     #[must_use]
-///     fn global() -> ArcBorrow<u32> { <VersionB as MyTrait>::GLOBAL.load() }
+///     fn global() -> &'static u32 { <VersionB as MyTrait>::GLOBAL.get_or_init(Self::new_value) }
 ///
 ///    #[must_use]
 ///     fn new_value() -> u32 { 42 }
@@ -128,9 +128,8 @@ macro_rules! version_implement {
         }
     ) => {
         impl $name for $version {
-            const $const: &'static $crate::types::LazyLock<$crate::types::AtomicArc<$const_ty>> = {
-                static STATIC: $crate::types::LazyLock<$crate::types::AtomicArc<$const_ty>> =
-                    $crate::types::LazyLock::new(|| $crate::types::AtomicArc::from(<$version as $name>::$new_fn()));
+            const $const: &'static $crate::types::OnceLock<$const_ty> = {
+                static STATIC: $crate::types::OnceLock<$const_ty> = $crate::types::OnceLock::new();
                 &STATIC
             };
 

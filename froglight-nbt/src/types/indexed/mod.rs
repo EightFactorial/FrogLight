@@ -27,9 +27,14 @@ use reference::IndexedReference;
 pub mod types;
 
 /// An indexed NBT structure for borrowed NBT data.
+///
+/// # Note
+///
+/// If the `froglight-facet` feature is enabled, by default the
+/// [`IndexedNbt::WITH_UNNAMED`] ser/de functions will be used.
 #[derive(Clone, PartialEq)]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
-#[cfg_attr(feature = "facet", facet(opaque, mc::with = Self::WITH_UNNAMED))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
+#[cfg_attr(feature = "froglight-facet", facet(mc::with = Self::WITH_UNNAMED))]
 pub struct IndexedNbt<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     core: C,
     name: Option<Index<MStr>>,
@@ -165,7 +170,7 @@ impl<'data> IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
         unsafe {
             IndexedNbt::new_core(
                 alloc::SliceCore::new(
-                    [10, 0, 0].as_slice(),
+                    [10, 0, 0, 0].as_slice(),
                     ::alloc::vec![EntryIndex::new(
                         Index::new(0),
                         ValueIndex::Compound(Index::new(0))
@@ -272,7 +277,10 @@ impl<'data> IndexedNbt<'data, Mut, alloc::SliceCore<'data, Mut>> {
     }
 }
 
-impl IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
+impl<'data, A: NbtAccess> IndexedNbt<'data, A, alloc::CowCore<'data, A>>
+where
+    alloc::CowCore<'data, A>: IndexCore<A> + 'data,
+{
     /// Create a new empty NBT structure.
     #[inline]
     #[must_use]
@@ -284,7 +292,7 @@ impl IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
         unsafe {
             IndexedNbt::new_core(
                 alloc::CowCore::new(
-                    ::alloc::borrow::Cow::Borrowed([10, 0, 0].as_slice()),
+                    ::alloc::borrow::Cow::Borrowed([10, 0, 0, 0].as_slice()),
                     ::alloc::vec![EntryIndex::new(
                         Index::new(0),
                         ValueIndex::Compound(Index::new(0))
@@ -299,7 +307,7 @@ impl IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
     /// Convert this NBT structure into a mutable version.
     #[inline]
     #[must_use]
-    pub fn into_mut(self) -> IndexedNbt<'static, Mut, alloc::CowCore<'static, Mut>> {
+    pub fn into_owned_mut(self) -> IndexedNbt<'static, Mut, alloc::CowCore<'static, Mut>> {
         // SAFETY: `self.core` is valid for the lifetime of `self`.
         unsafe {
             let core = alloc::CowCore::new(
@@ -310,4 +318,19 @@ impl IndexedNbt<'static, Ref, alloc::CowCore<'static, Ref>> {
             IndexedNbt::<Mut, alloc::CowCore<'static, Mut>>::new_core(core, self.name)
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<'data> Default for IndexedNbt<'data, Ref, alloc::SliceCore<'data, Ref>> {
+    #[inline]
+    fn default() -> Self { Self::empty_slice() }
+}
+
+impl<'data, A: NbtAccess> Default for IndexedNbt<'data, A, alloc::CowCore<'data, A>>
+where
+    alloc::CowCore<'data, A>: IndexCore<A> + 'data,
+{
+    #[inline]
+    fn default() -> Self { Self::empty_cow() }
 }

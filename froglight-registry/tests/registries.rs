@@ -1,7 +1,11 @@
 //! TODO
 
 use froglight_common::prelude::*;
-use froglight_registry::{prelude::*, storage::RegistryStorage};
+use froglight_registry::{
+    prelude::*,
+    storage::RegistryStorage,
+    version::{LazyLock, RwLock},
+};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct TestVersion;
@@ -12,31 +16,34 @@ impl Version for TestVersion {
     const RESOURCE_VERSION: u32 = u32::MIN;
 }
 
-froglight_registry::version::version_implement! {
-    impl RegistryVersion => TestVersion {
-        const REGISTRY: RegistryStorage;
-        fn new_registry() => {
-            RegistryStorage::build::<Self>(
-                vec![
-                    (
-                        Identifier::new_static("test:example_a"),
-                        vec![
-                            (Identifier::new_static("test:example_a_a"), vec![]),
-                            (Identifier::new_static("test:example_a_b"), vec![]),
-                            (Identifier::new_static("test:example_a_c"), vec![]),
-                        ]
-                    ),
-                    (
-                        Identifier::new_static("test:example_b"),
-                        vec![
-                            (Identifier::new_static("test:example_b_0"), vec![]),
-                            (Identifier::new_static("test:example_b_1"), vec![]),
-                        ]
-                    ),
-                ],
-                vec![]
-            )
-        }
+impl RegistryVersion for TestVersion {
+    const REGISTRY: &'static LazyLock<RwLock<RegistryStorage>> = {
+        static STATIC: LazyLock<RwLock<RegistryStorage>> =
+            LazyLock::new(|| RwLock::new(TestVersion::new_registry()));
+        &STATIC
+    };
+
+    fn new_registry() -> RegistryStorage {
+        RegistryStorage::build::<Self>(
+            vec![
+                (
+                    Identifier::new_static("test:example_a"),
+                    vec![
+                        (Identifier::new_static("test:example_a_a"), vec![]),
+                        (Identifier::new_static("test:example_a_b"), vec![]),
+                        (Identifier::new_static("test:example_a_c"), vec![]),
+                    ],
+                ),
+                (
+                    Identifier::new_static("test:example_b"),
+                    vec![
+                        (Identifier::new_static("test:example_b_0"), vec![]),
+                        (Identifier::new_static("test:example_b_1"), vec![]),
+                    ],
+                ),
+            ],
+            vec![],
+        )
     }
 }
 
@@ -44,8 +51,8 @@ froglight_registry::version::version_implement! {
 
 #[test]
 fn registry() {
-    let registry = TestVersion::registry();
-    assert_eq!(registry.tagdata().len(), 2);
+    let registry = TestVersion::registry().read();
+    assert_eq!(registry.tags().len(), 2);
 
     // "test:example_a"
 

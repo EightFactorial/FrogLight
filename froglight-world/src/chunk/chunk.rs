@@ -13,7 +13,6 @@ use froglight_block::{
     block::Block, prelude::GlobalStateId, storage::BlockStorage, version::BlockVersion,
 };
 use froglight_common::prelude::Identifier;
-use froglight_registry_template::types::{ArcBorrow, AtomicArc};
 use smallvec::SmallVec;
 
 use crate::{
@@ -27,11 +26,10 @@ use crate::{
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
-#[cfg_attr(feature = "facet", facet(opaque))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 pub struct Chunk {
-    biomes: &'static AtomicArc<BiomeStorage>,
-    blocks: &'static AtomicArc<BlockStorage>,
+    biomes: &'static BiomeStorage,
+    blocks: &'static BlockStorage,
     naive: NaiveChunk,
 }
 
@@ -40,7 +38,7 @@ impl Chunk {
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn new<V: BiomeVersion + BlockVersion>(naive: NaiveChunk) -> Self {
-        Self { biomes: V::BIOMES, blocks: V::BLOCKS, naive }
+        Self { biomes: V::biomes(), blocks: V::blocks(), naive }
     }
 
     /// Create a new empty large [`Chunk`].
@@ -63,11 +61,13 @@ impl Chunk {
 
     /// Get the [`BiomeStorage`] used by this chunk.
     #[inline]
-    pub fn biomes(&self) -> ArcBorrow<BiomeStorage> { self.biomes.load() }
+    #[must_use]
+    pub const fn biomes(&self) -> &'static BiomeStorage { self.biomes }
 
     /// Get the [`BlockStorage`] used by this chunk.
     #[inline]
-    pub fn blocks(&self) -> ArcBorrow<BlockStorage> { self.blocks.load() }
+    #[must_use]
+    pub const fn blocks(&self) -> &'static BlockStorage { self.blocks }
 
     /// Get a reference to the inner [`NaiveChunk`] of this chunk.
     #[inline]
@@ -127,40 +127,34 @@ impl Chunk {
 
     /// Get the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Block`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn get_block<P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_using::<P>(position, &self.blocks())
+        self.naive.get_block_using::<P>(position, self.blocks())
     }
 
     /// Get the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the block is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Block`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn get_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_pos_using::<P>(position, &self.blocks())
+        self.naive.get_block_pos_using::<P>(position, self.blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the [`Block`] is from another
-    /// [`Version`](froglight_common::version::Version),
-    /// position is out of bounds, or if the block is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Block`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        if self.blocks().version_ty() != block.version_ty() {
-            return None;
-        }
-
-        self.naive.set_block_using::<P>(position, block, &self.blocks())
+        self.naive.set_block_using::<P>(position, block, self.blocks())
     }
 
     /// Set the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the [`Block`] is from another
-    /// [`Version`](froglight_common::version::Version),
-    /// the position is out of bounds, or if the block is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Block`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     pub fn set_block_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
@@ -170,45 +164,39 @@ impl Chunk {
             return None;
         }
 
-        self.naive.set_block_pos_using::<P>(position, block, &self.blocks())
+        self.naive.set_block_pos_using::<P>(position, block, self.blocks())
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Biome`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn get_biome<P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_using::<P>(position, &self.biomes())
+        self.naive.get_biome_using::<P>(position, self.biomes())
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds,
-    /// or if the biome is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Biome`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     #[must_use]
     pub fn get_biome_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_pos_using::<P>(position, &self.biomes())
+        self.naive.get_biome_pos_using::<P>(position, self.biomes())
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the [`Biome`] is from another
-    /// [`Version`](froglight_common::version::Version),
-    /// the position is out of bounds, or if the biome is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Biome`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     pub fn set_biome<P: Into<BlockPos>>(&mut self, position: P, biome: Biome) -> Option<Biome> {
-        if self.biomes().version_ty() != biome.version_ty() {
-            return None;
-        }
-
-        self.naive.set_biome_using::<P>(position, biome, &self.biomes())
+        self.naive.set_biome_using::<P>(position, biome, self.biomes())
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the [`Biome`] is from another
-    /// [`Version`](froglight_common::version::Version),
-    /// the position is out of bounds, or if the biome is not recognized.
+    /// Returns `None` if the position is out of bounds, or if the [`Biome`]
+    /// does not exist in this [`Version`](froglight_common::version::Version).
     pub fn set_biome_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
@@ -218,7 +206,7 @@ impl Chunk {
             return None;
         }
 
-        self.naive.set_biome_pos_using::<P>(position, biome, &self.biomes.load())
+        self.naive.set_biome_pos_using::<P>(position, biome, self.biomes)
     }
 
     /// Convert this [`Chunk`] into another version.
@@ -239,7 +227,7 @@ impl Chunk {
             return;
         }
 
-        let old = self.biomes.load();
+        let old = self.biomes;
         let new = V::biomes();
 
         // Fallback to `minecraft:plains`, which is usually `0`.
@@ -288,7 +276,7 @@ impl Chunk {
         }
 
         // Use the new version's biome storage.
-        self.biomes = V::BIOMES;
+        self.biomes = new;
     }
 
     #[inline(always)]
@@ -299,7 +287,7 @@ impl Chunk {
             return;
         }
 
-        let old = self.blocks.load();
+        let old = self.blocks;
         let new = V::blocks();
 
         // Fallback to `minecraft:stone`, which is usually `1`.
@@ -348,7 +336,7 @@ impl Chunk {
         }
 
         // Use the new version's block storage.
-        self.blocks = V::BLOCKS;
+        self.blocks = new;
     }
 
     #[inline(always)]
@@ -372,7 +360,7 @@ impl Chunk {
             let compare_ab = |a: u32, b: u32| -> bool {
                 other_biomes
                     .get_biome_by_id(GlobalBiomeId::new(b))
-                    .and_then(|b| b.using_version_storage(&self_biomes))
+                    .and_then(|b| b.using_version_storage(self_biomes))
                     .is_some_and(|b| b.global_id() == a)
             };
 
@@ -429,7 +417,7 @@ impl Chunk {
             let compare_ab = |a: u32, b: u32| -> bool {
                 other_blocks
                     .get_block_by_state(GlobalStateId::new(b))
-                    .and_then(|b| b.using_version_storage(&self_blocks))
+                    .and_then(|b| b.using_version_storage(self_blocks))
                     .is_some_and(|b| b.global_id() == a)
             };
 

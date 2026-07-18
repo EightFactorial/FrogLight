@@ -57,7 +57,7 @@ impl Biome {
     #[inline]
     #[must_use]
     pub fn using_version<V: BiomeVersion>(self) -> Option<Biome> {
-        self.using_version_storage(&V::biomes())
+        self.using_version_storage(V::biomes())
     }
 
     /// Attempt to migrate the biome to another [`BiomeVersion`].

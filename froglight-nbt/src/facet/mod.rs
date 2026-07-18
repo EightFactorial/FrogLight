@@ -43,34 +43,34 @@ pub fn deserialize_owned_core(
         if let Some(field) = cache.iter().rev().find_map(|c| c.get(field.name)) {
             match field.as_value() {
                 IndexedValueReference::Byte(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::Short(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::Int(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::Long(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::Float(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::Double(v) => {
-                    return item.set(v.get()).map(Item::Item);
+                    return item.set(v.into_value()).map(Item::Item);
                 }
                 IndexedValueReference::ByteArray(v) => {
-                    return item.set(v.get().to_vec()).map(Item::Item);
+                    return item.set(v.into_value().to_vec()).map(Item::Item);
                 }
                 IndexedValueReference::String(v) => {
-                    return item.set(v.get().to_utf8().into_owned()).map(Item::Item);
+                    return item.set(v.into_value().to_utf8().into_owned()).map(Item::Item);
                 }
                 IndexedValueReference::IntArray(v) => {
-                    return item.set(v.get().to_vec()).map(Item::Item);
+                    return item.set(v.into_value().to_vec()).map(Item::Item);
                 }
                 IndexedValueReference::LongArray(v) => {
-                    return item.set(v.get().to_vec()).map(Item::Item);
+                    return item.set(v.into_value().to_vec()).map(Item::Item);
                 }
                 IndexedValueReference::List(_v) => todo!(),
                 IndexedValueReference::Compound(_v) => todo!(),

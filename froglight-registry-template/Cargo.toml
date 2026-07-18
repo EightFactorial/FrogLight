@@ -19,10 +19,10 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-hazarc = { workspace = true }
+parking_lot = { workspace = true }
 
 # Optional dependencies
-once_cell = { features = ["critical-section"], workspace = true, optional = true }
+once_cell = { features = ["critical-section", "parking_lot"], workspace = true, optional = true }
 
 # --- Features ---
 
@@ -33,6 +33,6 @@ default = ["std"]
 once_cell = ["dep:once_cell"]
 
 # Enable support for the standard library
-std = ["hazarc/default-domain", "once_cell?/std"]
+std = ["once_cell?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = []
+nightly = ["parking_lot/nightly"]

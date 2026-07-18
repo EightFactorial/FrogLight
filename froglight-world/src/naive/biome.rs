@@ -63,7 +63,8 @@ impl NaiveChunk {
         biome: Biome,
         storage: &BiomeStorage,
     ) -> Option<Biome> {
-        self.set_raw_biome_pos::<P>(position, biome.global_id().into_inner())
+        let biome_id = biome.using_version_storage(storage)?.global_id().into_inner();
+        self.set_raw_biome_pos::<P>(position, biome_id)
             .and_then(|id| storage.get_biome_by_id(GlobalBiomeId::new(id)))
     }
 

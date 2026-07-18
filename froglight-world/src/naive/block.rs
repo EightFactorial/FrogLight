@@ -71,7 +71,9 @@ impl NaiveChunk {
                 .get_block_by_state(GlobalStateId::new(id))
                 .is_some_and(|block| block.is_liquid())
         };
-        self.set_raw_block_pos::<P>(position, block.global_id().into_inner(), is_air, is_fluid)
+
+        let block_id = block.using_version_storage(storage)?.global_id().into_inner();
+        self.set_raw_block_pos::<P>(position, block_id, is_air, is_fluid)
             .and_then(|id| storage.get_block_by_state(GlobalStateId::new(id)))
     }
 

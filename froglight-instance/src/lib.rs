@@ -6,6 +6,7 @@ extern crate alloc;
 pub mod instance;
 pub mod plugin;
 pub mod query;
+pub mod queue;
 pub mod relationship;
 
 pub mod prelude {
@@ -14,6 +15,7 @@ pub mod prelude {
     pub use crate::{
         instance::SessionInstance,
         query::{InInstance, OnInstance},
+        queue::BlockEditQueue,
         relationship::PartOfInstance,
     };
 }
