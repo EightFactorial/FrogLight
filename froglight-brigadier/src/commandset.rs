@@ -152,7 +152,7 @@ impl fmt::Display for CommandExecuteError<'_> {
 #[allow(clippy::type_complexity, reason = "dyn Fn trait")]
 struct CommandInfo {
     runner: &'static (
-                 dyn Fn(Entity, &str, &mut World) -> Result<(), CommandExecuteError<'static>>
+                 dyn for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), CommandExecuteError<'a>>
                      + Send
                      + Sync
              ),
@@ -165,20 +165,21 @@ impl CommandInfo {
         data: B::BundleData,
         system: SystemId<GameCommandCtx<B>, ()>,
     ) -> Self {
-        Self {
-            runner: Box::leak(Box::new(
-                move |entity: Entity, arguments: &str, world: &mut World| {
-                    // Parse the `BundleData` from the command.
-                    let input = B::bundle_from_string(arguments, &data)
-                        .map_err(|err| CommandExecuteError::Parse(err.into_owned()))?;
+        #[expect(clippy::type_complexity, reason = "Required...")]
+        let runner: Box<
+            dyn for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), CommandExecuteError<'a>>
+                + Send
+                + Sync,
+        > = Box::new(move |entity: Entity, arguments: &str, world: &mut World| {
+            // Parse the `BundleData` from the command.
+            let input =
+                B::bundle_from_string(arguments, &data).map_err(CommandExecuteError::Parse)?;
 
-                    // Run the system with the Entity and `BundleData` as input.
-                    world
-                        .run_system_with(system, (entity, input))
-                        .map_err(CommandExecuteError::execute)
-                },
-            )),
-        }
+            // Run the system with the Entity and `BundleData` as input.
+            world.run_system_with(system, (entity, input)).map_err(CommandExecuteError::execute)
+        });
+
+        Self { runner: Box::leak(runner) }
     }
 
     /// Run this command.

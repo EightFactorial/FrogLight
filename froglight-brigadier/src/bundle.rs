@@ -18,7 +18,7 @@ pub trait ArgumentBundle: Sized + 'static {
     /// Returns an error if the input string could not be parsed.
     fn bundle_from_string<'a>(
         input: &'a str,
-        data: &'a Self::BundleData,
+        data: &Self::BundleData,
     ) -> Result<Self, ArgumentParseError<'a>>;
 }
 
@@ -28,7 +28,7 @@ impl ArgumentBundle for () {
     type BundleData = ();
 
     #[inline]
-    fn bundle_from_string<'a>(input: &'a str, (): &'a ()) -> Result<Self, ArgumentParseError<'a>> {
+    fn bundle_from_string<'a>(input: &'a str, (): &()) -> Result<Self, ArgumentParseError<'a>> {
         if input.is_empty() {
             Ok(())
         } else {
@@ -43,7 +43,7 @@ impl<T: ArgumentParser> ArgumentBundle for T {
     #[inline]
     fn bundle_from_string<'a>(
         input: &'a str,
-        data: &'a Self::BundleData,
+        data: &Self::BundleData,
     ) -> Result<Self, ArgumentParseError<'a>> {
         #[cfg(feature = "tracing")]
         tracing::trace!(target: "froglight_brigadier", "Parsing Argument 0: {input:?}");
@@ -61,7 +61,7 @@ macro_rules! impl_argument_bundle {
         impl<$($T: ArgumentParser),*> ArgumentBundle for ($($T),*) {
             type BundleData = ($(<$T as ArgumentParser>::Data),*);
 
-            fn bundle_from_string<'a >(mut input: &'a str, data: &'a Self::BundleData) -> Result<Self, ArgumentParseError<'a>> {
+            fn bundle_from_string<'a >(mut input: &'a str, data: &Self::BundleData) -> Result<Self, ArgumentParseError<'a>> {
                 $(
                     #[cfg(feature = "tracing")]
                     tracing::trace!(target: "froglight_brigadier", "Parsing Argument {}: {input:?}", $n);
