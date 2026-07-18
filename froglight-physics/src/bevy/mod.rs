@@ -96,7 +96,7 @@ impl PhysicsPlugin {
         mut query: Query<(Entity, &Collider, &mut CollidingWith)>,
         mut collisions: ResMut<EntityCollisions>,
     ) {
-        let mut iter = query.iter_combinations_mut();
+        let mut iter = query.iter_combinations_mut::<2>();
 
         while let Some(
             [

@@ -25,7 +25,7 @@ pub struct EntityPositionUpdateData {
     /// A position delta.
     pub delta: Option<PositionDelta>,
     /// A `y` and `x` rotation.
-    pub yaw_pitch: Option<(i8, i8)>,
+    pub rotation: Option<RotationSteps>,
     /// Whether the entity is on the ground.
     pub on_ground: bool,
 }
@@ -35,7 +35,7 @@ impl From<MoveEntityPosS2CPacket> for EntityPositionUpdateData {
         Self {
             entity_id: value.entity_id,
             delta: Some(value.delta),
-            yaw_pitch: None,
+            rotation: None,
             on_ground: value.on_ground,
         }
     }
@@ -45,7 +45,7 @@ impl From<MoveEntityPosRotS2CPacket> for EntityPositionUpdateData {
         Self {
             entity_id: value.entity_id,
             delta: Some(value.delta),
-            yaw_pitch: Some((value.yaw, value.pitch)),
+            rotation: Some(RotationSteps::new_steps(value.yaw, value.pitch)),
             on_ground: value.on_ground,
         }
     }
@@ -55,7 +55,7 @@ impl From<MoveEntityRotS2CPacket> for EntityPositionUpdateData {
         Self {
             entity_id: value.entity_id,
             delta: None,
-            yaw_pitch: Some((value.yaw, value.pitch)),
+            rotation: Some(RotationSteps::new_steps(value.yaw, value.pitch)),
             on_ground: value.on_ground,
         }
     }
@@ -211,7 +211,7 @@ impl FacetTemplate for EntityRelativeFlags {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        let data = u32::from_be_bytes(*reader.read_array::<4>()?);
+        let data = u32::from_be_bytes(*reader.read_array()?);
 
         item.set(Self {
             x: data & 0b0000_0000_0001 != 0,
@@ -298,5 +298,59 @@ impl PositionDelta {
             vec.y + (self.1 as f64 / Self::DELTA_CONV),
             vec.z + (self.2 as f64 / Self::DELTA_CONV),
         )
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A rotation value, stored as yaw and pitch step values.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "facet", derive(Facet))]
+pub struct RotationSteps(i8, i8);
+
+impl RotationSteps {
+    /// Create a new [`RotationValue`] from the given yaw and pitch in steps.
+    #[inline]
+    #[must_use]
+    pub const fn new_steps(yaw: i8, pitch: i8) -> Self { Self(yaw, pitch) }
+
+    /// Create a new [`RotationValue`] from the given yaw and pitch in degrees.
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, reason = "Expected")]
+    pub const fn new_degrees(yaw: f32, pitch: f32) -> Self {
+        let yaw = ((yaw.clamp(0., 360.) / 360.) * 256.) as i8;
+        let pitch = ((pitch.clamp(0., 360.) / 360.) * 256.) as i8;
+        Self(yaw, pitch)
+    }
+
+    /// Create a new [`RotationValue`] from the given yaw and pitch in radians.
+    #[inline]
+    #[must_use]
+    pub const fn new_radians(yaw: f32, pitch: f32) -> Self {
+        Self::new_degrees(yaw.to_degrees(), pitch.to_degrees())
+    }
+
+    /// Get the yaw and pitch in steps.
+    #[inline]
+    #[must_use]
+    pub const fn into_steps(self) -> (i8, i8) { (self.0, self.1) }
+
+    /// Get the yaw and pitch in degrees.
+    #[must_use]
+    #[expect(clippy::cast_precision_loss, reason = "Expected")]
+    pub const fn into_degrees(self) -> (f32, f32) {
+        let yaw = (self.0 as i32 * 360) as f32 / 256.;
+        let pitch = (self.1 as i32 * 360) as f32 / 256.;
+        (yaw, pitch)
+    }
+
+    /// Get the yaw and pitch in radians.
+    #[inline]
+    #[must_use]
+    pub const fn into_radians(self) -> (f32, f32) {
+        let (yaw, pitch) = self.into_degrees();
+        (yaw.to_radians(), pitch.to_radians())
     }
 }

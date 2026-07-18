@@ -30,6 +30,11 @@ impl Acceleration {
     #[must_use]
     pub const fn new(vec: Vec3A) -> Self { Self(vec) }
 
+    /// Create a new [`Acceleration`] from a [`Vec3`].
+    #[inline]
+    #[must_use]
+    pub const fn new_vec3(vec: Vec3) -> Self { Self::new(Vec3A::new(vec.x, vec.y, vec.z)) }
+
     /// Create a new [`Acceleration`] from its components.
     #[inline]
     #[must_use]

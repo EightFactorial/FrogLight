@@ -2,7 +2,7 @@
 
 use bevy_app::prelude::*;
 
-use crate::set::GameCommandSet;
+use crate::commandset::GameCommandSet;
 
 /// A [`Plugin`] that...
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]

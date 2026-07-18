@@ -37,34 +37,44 @@ impl Rotation {
         Self(Vec3A::new(yaw, pitch, 0.0))
     }
 
-    /// Get the `yaw` component.
+    /// Get the `yaw` component in degrees.
     #[inline]
     #[must_use]
     pub const fn yaw(&self) -> f32 { self.0.to_array()[0] }
 
-    /// Get the `pitch` component.
+    /// Get the `yaw` component in radians.
+    #[inline]
+    #[must_use]
+    pub const fn yaw_rad(&self) -> f32 { self.yaw().to_radians() }
+
+    /// Get the `pitch` component in degrees.
     #[inline]
     #[must_use]
     pub const fn pitch(&self) -> f32 { self.0.to_array()[1] }
 
-    /// Get a mutable reference to the `yaw` component.
+    /// Get the `pitch` component in radians.
+    #[inline]
+    #[must_use]
+    pub const fn pitch_rad(&self) -> f32 { self.pitch().to_radians() }
+
+    /// Get a mutable reference to the `yaw` component in degrees.
     #[inline]
     #[must_use]
     pub fn yaw_mut(&mut self) -> &mut f32 { &mut self.0.x }
 
-    /// Get a mutable reference to the `pitch` component.
+    /// Get a mutable reference to the `pitch` component in degrees.
     #[inline]
     #[must_use]
     pub fn pitch_mut(&mut self) -> &mut f32 { &mut self.0.y }
 
     /// Get the underlying [`Vec3A`] of this [`Rotation`].
     ///
-    /// # Note
+    /// Stored as `[yaw, pitch, 0.0]`.
+    ///
+    /// # Warning
     ///
     /// This is *not* a vector!
     /// It is just being stored in a [`Vec3A`] for performance.
-    ///
-    /// Stored as `[yaw, pitch, 0.0]`.
     #[inline]
     #[must_use]
     pub const fn as_vec3a(&mut self) -> &mut Vec3A { &mut self.0 }

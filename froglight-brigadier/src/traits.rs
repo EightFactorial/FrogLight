@@ -3,12 +3,11 @@
 use alloc::{borrow::Cow, string::String};
 
 use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
+use bevy_ecs::{error::ErrorContext, prelude::*};
 
 use crate::{
     bundle::ArgumentBundle,
     prelude::{GameCommandCtx, GameCommandSet},
-    set::ParseOrExecuteError,
 };
 
 /// A extension trait adding [`App::add_game_command`] and
@@ -66,13 +65,30 @@ impl AppGameCommand for App {
 /// An extension trait for [`Commands`] that adds [`Commands::game_command`].
 pub trait CommandsGameCommand {
     /// Queue a game command to be executed by the given entity.
-    fn game_command(&mut self, entity: Entity, command: impl AsRef<str>) -> &mut Self;
+    #[inline]
+    fn game_command(&mut self, entity: Entity, command: impl AsRef<str>) -> &mut Self {
+        self.game_command_with_handler(entity, command, default_error_handler)
+    }
+
+    /// Queue a game command to be executed by the given entity,
+    /// with a custom error handler.
+    fn game_command_with_handler(
+        &mut self,
+        entity: Entity,
+        command: impl AsRef<str>,
+        error_handler: fn(BevyError, ErrorContext),
+    ) -> &mut Self;
 }
 
 impl CommandsGameCommand for Commands<'_, '_> {
     #[inline]
-    fn game_command(&mut self, entity: Entity, command: impl AsRef<str>) -> &mut Self {
-        self.entity(entity).game_command(command);
+    fn game_command_with_handler(
+        &mut self,
+        entity: Entity,
+        command: impl AsRef<str>,
+        error_handler: fn(BevyError, ErrorContext),
+    ) -> &mut Self {
+        self.entity(entity).game_command_with_handler(command, error_handler);
         self
     }
 }
@@ -81,25 +97,66 @@ impl CommandsGameCommand for Commands<'_, '_> {
 /// [`EntityCommands::game_command`].
 pub trait EntityCommandsGameCommand {
     /// Queue a game command to be executed by the entity.
-    fn game_command(&mut self, command: impl AsRef<str>) -> &mut Self;
+    #[inline]
+    fn game_command(&mut self, command: impl AsRef<str>) -> &mut Self {
+        self.game_command_with_handler(command, default_error_handler)
+    }
+
+    /// Queue a game command to be executed by the entity,
+    /// with a custom error handler.
+    fn game_command_with_handler(
+        &mut self,
+        command: impl AsRef<str>,
+        error_handler: fn(BevyError, ErrorContext),
+    ) -> &mut Self;
 }
 
 impl EntityCommandsGameCommand for EntityCommands<'_> {
-    fn game_command(&mut self, command: impl AsRef<str>) -> &mut Self {
+    fn game_command_with_handler(
+        &mut self,
+        command: impl AsRef<str>,
+        error_handler: fn(BevyError, ErrorContext),
+    ) -> &mut Self {
         let command = String::from(command.as_ref());
-        self.queue(move |entity: EntityWorldMut| {
-            let entity_id = entity.id();
-            let world = entity.into_world_mut();
 
-            // Ensure the `GameCommandSet` is exists.
-            world.init_resource::<GameCommandSet>();
-            // Execute the command.
-            world.resource_scope::<GameCommandSet, _>(|world, commands| {
-                commands
-                    .execute(entity_id, &command, world)
-                    .map_err(ParseOrExecuteError::into_owned)
-            })
-        });
+        self.queue_handled(
+            move |entity: EntityWorldMut| {
+                let entity_id = entity.id();
+                let world = entity.into_world_mut();
+
+                // Split the command from it's arguments.
+                let (command, arguments) =
+                    command.trim_start().split_once(' ').unwrap_or((&command, ""));
+
+                // Execute the command.
+                let result = world.try_resource_scope::<GameCommandSet, _>(|world, commands| {
+                    commands.execute(entity_id, command, arguments, world)
+                });
+
+                match result {
+                    None | Some(Ok(())) => Ok(()),
+                    Some(Err(err)) => {
+                        Err(alloc::format!("Command \"{command}\" failed, {err}").into_boxed_str())
+                    }
+                }
+            },
+            error_handler,
+        );
         self
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// The default error handler for game commands.
+#[allow(unused_variables, reason = "Used if \"tracing\" is enabled")]
+pub fn default_error_handler(err: BevyError, ctx: ErrorContext) {
+    #[cfg(feature = "tracing")]
+    {
+        if tracing::enabled!(target: "froglight_brigadier", tracing::Level::DEBUG) {
+            tracing::error!(target: "froglight_brigadier", "{ctx}: {err}");
+        } else {
+            tracing::error!(target: "froglight_brigadier", "{err}");
+        }
     }
 }

@@ -458,7 +458,7 @@ impl EventVersion for V26_2 {
                 }
                 ClientboundPlayEvent::MoveEntityPos(data)
                 | ClientboundPlayEvent::MoveEntityPosRot(data)
-                | ClientboundPlayEvent::MoveEntityRot(data) => match (data.delta, data.yaw_pitch) {
+                | ClientboundPlayEvent::MoveEntityRot(data) => match (data.delta, data.rotation) {
                     (Some(delta), None) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityPos(MoveEntityPosS2CPacket {
                             delta,
@@ -466,20 +466,20 @@ impl EventVersion for V26_2 {
                             on_ground: data.on_ground,
                         }),
                     ))),
-                    (Some(delta), Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
+                    (Some(delta), Some(rot)) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityPosRot(MoveEntityPosRotS2CPacket {
                             delta,
                             entity_id: data.entity_id,
-                            yaw: y_rot,
-                            pitch: x_rot,
+                            yaw: rot.into_steps().0,
+                            pitch: rot.into_steps().1,
                             on_ground: data.on_ground,
                         }),
                     ))),
-                    (None, Some((y_rot, x_rot))) => Ok(Some(VersionPacket::Play(
+                    (None, Some(rot)) => Ok(Some(VersionPacket::Play(
                         PlayClientboundPackets::MoveEntityRot(MoveEntityRotS2CPacket {
                             entity_id: data.entity_id,
-                            yaw: y_rot,
-                            pitch: x_rot,
+                            yaw: rot.into_steps().0,
+                            pitch: rot.into_steps().1,
                             on_ground: data.on_ground,
                         }),
                     ))),

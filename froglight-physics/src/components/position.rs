@@ -11,9 +11,6 @@ use glam::{Vec3, Vec3A};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "bevy")]
-use crate::components::Rotation;
-
 /// A position.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -21,7 +18,7 @@ use crate::components::Rotation;
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", require(Rotation, PrevPosition))]
+#[cfg_attr(feature = "bevy", require(PrevPosition))]
 pub struct Position(Vec3A);
 
 impl Position {
@@ -33,6 +30,11 @@ impl Position {
     #[must_use]
     pub const fn new(vec: Vec3A) -> Self { Self(vec) }
 
+    /// Create a new [`Position`] from a [`Vec3`].
+    #[inline]
+    #[must_use]
+    pub const fn new_vec3(vec: Vec3) -> Self { Self::new(Vec3A::new(vec.x, vec.y, vec.z)) }
+
     /// Create a new [`Position`] from its components.
     #[inline]
     #[must_use]
@@ -41,7 +43,10 @@ impl Position {
     /// Convert this [`Position`] into a [`Vec3`].
     #[inline]
     #[must_use]
-    pub fn to_vec3(self) -> Vec3 { self.0.to_vec3() }
+    pub const fn to_vec3(self) -> Vec3 {
+        let [x, y, z] = self.0.to_array();
+        Vec3::new(x, y, z)
+    }
 
     /// Convert this [`Position`] into a [`Vec3A`].
     #[inline]

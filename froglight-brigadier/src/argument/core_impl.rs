@@ -8,13 +8,12 @@ use super::{ArgumentParseError, ArgumentParser};
 impl ArgumentParser for bool {
     type Data = ();
 
-    fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError> {
-        if let Some(rest) = input.strip_prefix("true") {
-            Ok((true, rest))
-        } else if let Some(rest) = input.strip_prefix("false") {
-            Ok((false, rest))
-        } else {
-            Err(ArgumentParseError::InputMismatch)
+    fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
+        let (input, remainder) = input.split_once(' ').unwrap_or((input, ""));
+        match input {
+            "true" => Ok((true, remainder)),
+            "false" => Ok((false, remainder)),
+            _ => Err(ArgumentParseError::InputMismatch),
         }
     }
 }
@@ -26,9 +25,10 @@ macro_rules! impl_integer {
         $(
             impl ArgumentParser for $ty {
                 type Data = ();
-                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError> {
-                    match lexical::parse_partial::<$ty, _>(input) {
-                        Ok((value, length)) => Ok((value, &input[length..])),
+                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
+                    let (input, remainder) = input.split_once(' ').unwrap_or((input, ""));
+                    match lexical::parse::<$ty, _>(input) {
+                        Ok(value) => Ok((value, remainder)),
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
                         #[cfg(feature = "std")]
                         Err(err) => Err(ArgumentParseError::other(err)),
@@ -43,10 +43,11 @@ macro_rules! impl_integer {
         $(
             impl ArgumentParser for $ty {
                 type Data = ();
-                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError> {
-                    match lexical::parse_partial::<$inner, _>(input) {
-                        Ok((value, length)) => match <$ty>::new(value) {
-                            Some(value) => Ok((value, &input[length..])),
+                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
+                    let (input, remainder) = input.split_once(' ').unwrap_or((input, ""));
+                    match lexical::parse::<$inner, _>(input) {
+                        Ok(value) => match <$ty>::new(value) {
+                            Some(value) => Ok((value, remainder)),
                             None => Err(ArgumentParseError::InputInvalid),
                         },
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
@@ -74,9 +75,10 @@ macro_rules! impl_float {
         $(
             impl ArgumentParser for $ty {
                 type Data = ();
-                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError> {
-                    match lexical::parse_partial::<$ty, _>(input) {
-                        Ok((value, length)) => Ok((value, &input[length..])),
+                fn parse<'a>(input: &'a str, (): &()) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
+                    let (input, remainder) = input.split_once(' ').unwrap_or((input, ""));
+                    match lexical::parse::<$ty, &str>(input) {
+                        Ok(value) => Ok((value, remainder)),
                         Err(lexical::Error::InvalidDigit(_)) => Err(ArgumentParseError::InputMismatch),
                         #[cfg(feature = "std")]
                         Err(err) => Err(ArgumentParseError::other(err)),
@@ -96,11 +98,17 @@ impl_float!(f32, f64);
 impl<T: ArgumentParser> ArgumentParser for Option<T> {
     type Data = T::Data;
 
-    fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError> {
-        match T::parse(input, data) {
-            Ok((value, remaining)) => Ok((Some(value), remaining)),
-            Err(ArgumentParseError::InputMismatch) => Ok((None, input)),
-            Err(err) => Err(err),
+    fn parse<'a>(
+        input: &'a str,
+        data: &Self::Data,
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
+        if input.is_empty() {
+            Ok((None, input))
+        } else {
+            match T::parse(input, data) {
+                Ok((value, rest)) => Ok((Some(value), rest)),
+                Err(err) => Err(err),
+            }
         }
     }
 }
@@ -114,7 +122,7 @@ impl<T: ArgumentParser, const N: usize> ArgumentParser for [T; N] {
     fn parse<'a>(
         mut input: &'a str,
         data: &T::Data,
-    ) -> Result<(Self, &'a str), ArgumentParseError> {
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
         let mut result = alloc::vec::Vec::with_capacity(N);
         for _ in 0..N {
             let (value, rest) = T::parse(input, data)?;
@@ -129,7 +137,7 @@ impl<T: ArgumentParser, const N: usize> ArgumentParser for [T; N] {
     fn parse<'a>(
         mut input: &'a str,
         data: &T::Data,
-    ) -> Result<(Self, &'a str), ArgumentParseError> {
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
         core::array::try_from_fn(|_| {
             let (value, rest) = T::parse(input, data)?;
             input = rest;

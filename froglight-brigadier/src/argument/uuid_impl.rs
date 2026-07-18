@@ -7,7 +7,10 @@ impl ArgumentParser for Uuid {
     type Data = UuidType;
 
     #[inline]
-    fn parse<'a>(input: &'a str, data: &UuidType) -> Result<(Self, &'a str), ArgumentParseError> {
+    fn parse<'a>(
+        input: &'a str,
+        data: &UuidType,
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
         match data {
             UuidType::Hyphenated => todo!("TODO: Hyphenated UUIDs"),
             UuidType::Simple => todo!("TODO: Simple UUIDs"),

@@ -7,7 +7,10 @@ use super::{ArgumentParseError, ArgumentParser};
 impl ArgumentParser for String {
     type Data = StringType;
 
-    fn parse<'a>(input: &'a str, data: &StringType) -> Result<(Self, &'a str), ArgumentParseError> {
+    fn parse<'a>(
+        input: &'a str,
+        data: &StringType,
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
         match data {
             StringType::Default if input.starts_with('"') => todo!("Quoted Strings"),
             StringType::Default | StringType::Word => {
@@ -23,7 +26,10 @@ impl ArgumentParser for Cow<'static, str> {
     type Data = StringType;
 
     #[inline]
-    fn parse<'a>(input: &'a str, data: &StringType) -> Result<(Self, &'a str), ArgumentParseError> {
+    fn parse<'a>(
+        input: &'a str,
+        data: &StringType,
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
         String::parse(input, data).map(|(s, rest)| (Cow::Owned(s), rest))
     }
 }

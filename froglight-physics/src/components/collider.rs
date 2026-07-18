@@ -13,7 +13,7 @@ use glam::Vec3A;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "bevy")]
-use crate::components::Position;
+use crate::components::{Position, Rotation};
 
 /// An entity collider.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -21,7 +21,7 @@ use crate::components::Position;
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", require(Position, PrevCollider))]
+#[cfg_attr(feature = "bevy", require(Position, Rotation, PrevCollider))]
 pub struct Collider {
     /// The minimum corner of this [`Collider`].
     pub min: Vec3A,
@@ -56,14 +56,14 @@ impl Collider {
     #[must_use]
     pub fn center(&self) -> Vec3A { self.min.midpoint(self.max) }
 
-    /// Get the 'canonical' center of this [`Collider`],
+    /// Get the "canonical" center of this [`Collider`],
     /// or the entity's center at it's foot position.
     ///
-    /// This is the position used when the server and client communicate an
-    /// entity's position.
+    /// This is used when the server and client communicate an entity's
+    /// position.
     #[inline]
     #[must_use]
-    pub fn canonical_center(&self) -> Vec3A { self.center().with_y(self.min.y) }
+    pub fn center_canonical(&self) -> Vec3A { self.center().with_y(self.min.y) }
 
     /// Get the size of this [`Collider`].
     #[inline]

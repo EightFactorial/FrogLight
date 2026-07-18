@@ -36,6 +36,7 @@ impl<T> SystemInput for GameCommandCtx<T> {
     type Inner<'i> = (Entity, T);
     type Param<'i> = GameCommandCtx<T>;
 
+    #[inline]
     fn wrap(this: Self::Inner<'_>) -> Self::Param<'_> { GameCommandCtx::new(this.0, this.1) }
 }
 

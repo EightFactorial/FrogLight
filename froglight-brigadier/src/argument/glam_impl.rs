@@ -1,6 +1,6 @@
 use glam::{
     BVec2, BVec3, BVec4, DVec2, DVec3, DVec4, IVec2, IVec3, IVec4, UVec2, UVec3, UVec4, Vec2, Vec3,
-    Vec4,
+    Vec3A, Vec4,
 };
 
 use super::{ArgumentParseError, ArgumentParser};
@@ -10,7 +10,7 @@ macro_rules! impl_glam {
         $(
             impl ArgumentParser for $ty {
                 type Data = <$inner as ArgumentParser>::Data;
-                fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError> {
+                fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError<'a>> {
                     <[$inner; $n] as ArgumentParser>::parse(input, data).map(|(arr, rest)| (Self::from(arr), rest))
                 }
             }
@@ -30,6 +30,7 @@ impl_glam!(
     (IVec4: [i32; 4]),
     (Vec2: [f32; 2]),
     (Vec3: [f32; 3]),
+    (Vec3A: [f32; 3]),
     (Vec4: [f32; 4]),
     (DVec2: [f64; 2]),
     (DVec3: [f64; 3]),

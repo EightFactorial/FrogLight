@@ -475,15 +475,16 @@ impl BotPlugin {
                             trace!("Moving Entity {target} ({})", data.entity_id.0);
 
                             if let Some(delta) = data.delta
-                                && let Some(mut transform) = entity.get_mut::<Transform>()
+                                && let Some(mut position) = entity.get_mut::<Position>()
                             {
-                                transform.translation = delta.add_to_vec(transform.translation);
+                                *position =
+                                    Position::new_vec3(delta.add_to_vec(position.to_vec3()));
                             }
 
-                            if let Some((_y_rot, _x_rot)) = data.yaw_pitch
-                                && let Some(_transform) = entity.get_mut::<Transform>()
+                            if let Some(angle) = data.rotation
+                                && let Some(mut rotation) = entity.get_mut::<Rotation>()
                             {
-                                // TODO: Yaw/Pitch
+                                (*rotation.yaw_mut(), *rotation.pitch_mut()) = angle.into_degrees();
                             }
 
                             // if let Some(mut on_ground) =

@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::boxed::Box;
+use alloc::{borrow::Cow, boxed::Box};
 use core::{
     error::Error,
     fmt::{self, Display},
@@ -29,19 +29,24 @@ pub trait ArgumentParser: Sized + 'static {
     /// # Errors
     ///
     /// Returns an error if the input string could not be parsed.
-    fn parse<'a>(input: &'a str, data: &Self::Data) -> Result<(Self, &'a str), ArgumentParseError>;
+    fn parse<'a>(
+        input: &'a str,
+        data: &Self::Data,
+    ) -> Result<(Self, &'a str), ArgumentParseError<'a>>;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// An error that can occur when parsing an argument from a string.
 #[derive(Debug)]
-pub enum ArgumentParseError {
+pub enum ArgumentParseError<'a> {
     /// The input did not match the expected format.
     InputMismatch,
     /// The input did not meet required constraints
     /// (e.g. a number was out of range).
     InputInvalid,
+    /// The input contained extra data after the last argument.
+    ExtraInput(Cow<'a, str>),
 
     /// Some other unknown error occurred.
     Unknown,
@@ -49,15 +54,30 @@ pub enum ArgumentParseError {
     Other(Box<dyn Error + Send + Sync>),
 }
 
-impl ArgumentParseError {
+impl ArgumentParseError<'_> {
     /// Create a new [`ArgumentParseError`] from any error.
     #[inline]
     #[must_use]
     pub fn other<E: Error + Send + Sync + 'static>(err: E) -> Self { Self::Other(Box::new(err)) }
+
+    /// Take ownership of the error,
+    /// converting any borrowed data into owned data.
+    #[must_use]
+    pub fn into_owned(self) -> ArgumentParseError<'static> {
+        use ArgumentParseError::*;
+
+        match self {
+            InputMismatch => InputMismatch,
+            InputInvalid => InputInvalid,
+            ExtraInput(input) => ExtraInput(Cow::Owned(input.into_owned())),
+            Unknown => Unknown,
+            Other(err) => Other(err),
+        }
+    }
 }
 
-impl Error for ArgumentParseError {}
-impl Display for ArgumentParseError {
+impl Error for ArgumentParseError<'_> {}
+impl Display for ArgumentParseError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ArgumentParseError::InputMismatch => {
@@ -65,6 +85,9 @@ impl Display for ArgumentParseError {
             }
             ArgumentParseError::InputInvalid => {
                 write!(f, "input did not meet required constraints")
+            }
+            ArgumentParseError::ExtraInput(input) => {
+                write!(f, "input contained extra data: \"{input}\"")
             }
             ArgumentParseError::Unknown => {
                 write!(f, "an unknown error occurred")
