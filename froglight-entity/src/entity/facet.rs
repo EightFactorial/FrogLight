@@ -2,7 +2,7 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 use facet::Facet;
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 
 use crate::{entity::EntityDataSet, version::EntityVersion};
 

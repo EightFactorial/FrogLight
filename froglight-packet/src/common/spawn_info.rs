@@ -7,7 +7,7 @@ use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 use froglight_world::component::DimensionPos;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

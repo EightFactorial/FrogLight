@@ -10,7 +10,7 @@ use core::{
 };
 
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 
 use crate::prelude::MStr;
 

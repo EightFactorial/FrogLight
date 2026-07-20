@@ -5,7 +5,7 @@
 use facet::Peek;
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
 
 #[derive(Debug, Clone, PartialEq)]

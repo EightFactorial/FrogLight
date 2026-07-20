@@ -9,7 +9,7 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 
 /// A buffer of bytes that has no length prefix.
 ///

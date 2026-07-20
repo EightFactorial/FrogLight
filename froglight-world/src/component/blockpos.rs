@@ -11,7 +11,7 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

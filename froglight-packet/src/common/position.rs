@@ -6,7 +6,7 @@ use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 use glam::{DVec3, Vec3, Vec3A};
 
 use crate::generated::v26_1::play::{

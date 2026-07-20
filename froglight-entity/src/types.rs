@@ -6,7 +6,7 @@ use core::ops::{Deref, DerefMut};
 use bevy_reflect::std_traits::ReflectDefault;
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 use glam::{IVec3, Vec3, Vec3A};
 
 /// A variable-length [`i32`].

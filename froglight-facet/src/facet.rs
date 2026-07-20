@@ -16,6 +16,7 @@ pub mod prelude {
     };
 
     pub use crate::{
+        self as mc,
         deserialize::varint::{decode_u32_from, decode_u64_from},
         facet::{FacetBorrowedTemplate, FacetTemplate},
         serialize::varint::{encode_u32_into, encode_u64_into},
@@ -191,7 +192,7 @@ pub type DeBorrowFn = for<'facet> fn(
 ///
 /// ```rust
 /// use facet::{Facet, Partial, ReflectError};
-/// use froglight_facet::{self as mc, facet::prelude::*, from_slice, to_vec};
+/// use froglight_facet::{facet::prelude::*, from_slice, to_vec};
 ///
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, Facet)]
 /// #[facet(mc::with = MyType::WITH)]

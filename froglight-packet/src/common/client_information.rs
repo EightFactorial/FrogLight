@@ -8,7 +8,7 @@ use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
 use facet::Facet;
 #[cfg(feature = "facet")]
-use froglight_facet::{self as mc, facet::prelude::*};
+use froglight_facet::facet::prelude::*;
 
 /// Information about the client and player.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
