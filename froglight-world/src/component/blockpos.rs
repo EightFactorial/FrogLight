@@ -11,8 +11,7 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

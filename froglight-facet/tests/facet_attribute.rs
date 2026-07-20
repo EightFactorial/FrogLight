@@ -2,7 +2,7 @@
 #![no_std]
 
 use facet::Facet;
-use froglight_facet::{self as mc, facet::template::*, from_slice, to_vec};
+use froglight_facet::{self as mc, facet::prelude::*, from_slice, to_vec};
 
 #[test]
 fn variable() {

@@ -10,8 +10,7 @@ use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::WithFnAttr;
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::facet::template::*;
+use froglight_facet::facet::prelude::*;
 use glam::U8Vec2;
 
 use crate::{

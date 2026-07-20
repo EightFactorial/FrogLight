@@ -6,8 +6,7 @@ use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 use glam::{DVec3, Vec3, Vec3A};
 
 use crate::generated::v26_1::play::{

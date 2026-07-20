@@ -5,8 +5,7 @@ use core::{fmt::Debug, hash::Hash, ops::Deref};
 #[cfg(feature = "froglight-facet")]
 use facet::Partial;
 #[cfg(feature = "froglight-facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::facet::{WithFnAttr, template::*};
+use froglight_facet::facet::{WithFnAttr, prelude::*};
 
 use crate::types::indexed::index::EntryIndex;
 

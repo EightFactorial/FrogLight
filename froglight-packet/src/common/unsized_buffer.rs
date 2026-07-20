@@ -9,8 +9,7 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 
 /// A buffer of bytes that has no length prefix.
 ///

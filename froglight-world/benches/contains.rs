@@ -385,7 +385,7 @@ fn contains_global_biome_best(b: Bencher) {
 
     let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type(TypeId::of::<Plains>(), &biomes));
+        black_box(global.contains_biome_type(TypeId::of::<Plains>(), biomes));
     });
 }
 
@@ -404,7 +404,7 @@ fn contains_global_biome_worst(b: Bencher) {
 
     let biomes = TestVersion::biomes();
     b.bench(|| {
-        black_box(global.contains_biome_type(TypeId::of::<Forest>(), &biomes));
+        black_box(global.contains_biome_type(TypeId::of::<Forest>(), biomes));
     });
 }
 
@@ -490,7 +490,7 @@ fn contains_global_block_best(b: Bencher) {
 
     let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type(TypeId::of::<Air>(), &blocks));
+        black_box(global.contains_block_type(TypeId::of::<Air>(), blocks));
     });
 }
 
@@ -509,6 +509,6 @@ fn contains_global_block_worst(b: Bencher) {
 
     let blocks = TestVersion::blocks();
     b.bench(|| {
-        black_box(global.contains_block_type(TypeId::of::<Stone>(), &blocks));
+        black_box(global.contains_block_type(TypeId::of::<Stone>(), blocks));
     });
 }

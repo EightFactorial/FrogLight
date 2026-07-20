@@ -10,8 +10,7 @@ use core::{
 };
 
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 
 use crate::prelude::MStr;
 

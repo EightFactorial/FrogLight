@@ -5,8 +5,7 @@
 use facet::Peek;
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
 
 #[derive(Debug, Clone, PartialEq)]

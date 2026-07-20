@@ -290,7 +290,7 @@ macro_rules! generate {
                     $(
                         $dataid => {
                             let (value, rem) = froglight_facet::from_slice_remainder(cursor.remaining())
-                                .map_err(|err| froglight_facet::facet::template::ReaderError::from_string(
+                                .map_err(|err| froglight_facet::facet::prelude::ReaderError::from_string(
                                     alloc::format!("Failed to decode `{}` entity data: {err}", stringify!($datatype))
                                 ))?;
                             cursor.consume(cursor.remaining().len() - rem.len());
@@ -319,7 +319,7 @@ macro_rules! generate {
                             max
                         };
 
-                        Err(froglight_facet::facet::template::ReaderError::from_string(
+                        Err(froglight_facet::facet::prelude::ReaderError::from_string(
                             alloc::format!("Unknown entity datatype id `{val}`, expected id between `0` and `{MAX}`",
                         )))
                     },
@@ -331,10 +331,10 @@ macro_rules! generate {
                         $crate::generated::datatype::EntityDataType::$datatype(value) => {
                             buffer.write_byte($dataid)?;
                             froglight_facet::to_writer(value, buffer)
-                                .map_err(froglight_facet::facet::template::WriterError::other)?;
+                                .map_err(froglight_facet::facet::prelude::WriterError::other)?;
                         }
                     )*
-                    _ => Err(froglight_facet::facet::template::WriterError::from_string("Unknown entity data type".into()))?,
+                    _ => Err(froglight_facet::facet::prelude::WriterError::from_string("Unknown entity data type".into()))?,
                 }
 
                 Ok(())

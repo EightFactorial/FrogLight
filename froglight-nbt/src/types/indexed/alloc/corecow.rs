@@ -4,8 +4,7 @@ use alloc::{borrow::Cow, vec::Vec};
 use core::{marker::PhantomData, range::Range};
 
 #[cfg(feature = "froglight-facet")]
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::facet::template::*;
+use froglight_facet::facet::prelude::*;
 
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},

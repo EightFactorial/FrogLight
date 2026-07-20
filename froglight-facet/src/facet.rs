@@ -6,7 +6,7 @@ use froglight_facet_iter::{
     serialize::SerializeItem,
 };
 
-pub mod template {
+pub mod prelude {
     //! Re-exports of everything needed for implementing [`FacetTemplate`].
 
     pub use froglight_facet_iter::{
@@ -191,7 +191,7 @@ pub type DeBorrowFn = for<'facet> fn(
 ///
 /// ```rust
 /// use facet::{Facet, Partial, ReflectError};
-/// use froglight_facet::{self as mc, facet::template::*, from_slice, to_vec};
+/// use froglight_facet::{self as mc, facet::prelude::*, from_slice, to_vec};
 ///
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, Facet)]
 /// #[facet(mc::with = MyType::WITH)]

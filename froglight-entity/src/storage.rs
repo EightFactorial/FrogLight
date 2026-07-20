@@ -94,14 +94,14 @@ macro_rules! implement_entities {
 
             #[cfg(feature = "facet")]
             const DATATYPE_DESERIALIZE: fn(
-                &mut froglight_facet::facet::template::Reader,
-            ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::template::ReaderError>  = $read;
+                &mut froglight_facet::facet::prelude::Reader,
+            ) -> Result<$crate::generated::datatype::EntityDataType, froglight_facet::facet::prelude::ReaderError>  = $read;
 
             #[cfg(feature = "facet")]
             const DATATYPE_SERIALIZE: fn(
                 &$crate::generated::datatype::EntityDataType,
-                &mut froglight_facet::facet::template::Writer,
-            ) -> Result<(), froglight_facet::facet::template::WriterError> = $write;
+                &mut froglight_facet::facet::prelude::Writer,
+            ) -> Result<(), froglight_facet::facet::prelude::WriterError> = $write;
         }
     };
 }

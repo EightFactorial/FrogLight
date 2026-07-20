@@ -2,8 +2,7 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 use facet::Facet;
-#[allow(clippy::wildcard_imports, reason = "Readability")]
-use froglight_facet::{self as mc, facet::template::*};
+use froglight_facet::{self as mc, facet::prelude::*};
 
 use crate::{entity::EntityDataSet, version::EntityVersion};
 

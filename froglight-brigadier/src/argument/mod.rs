@@ -64,7 +64,7 @@ impl ArgumentParseError<'_> {
     /// converting any borrowed data into owned data.
     #[must_use]
     pub fn into_owned(self) -> ArgumentParseError<'static> {
-        use ArgumentParseError::*;
+        use ArgumentParseError::{ExtraInput, InputInvalid, InputMismatch, Other, Unknown};
 
         match self {
             InputMismatch => InputMismatch,

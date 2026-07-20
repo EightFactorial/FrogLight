@@ -2,7 +2,7 @@
 
 use froglight_common::prelude::*;
 #[cfg(feature = "facet")]
-use froglight_facet::facet::template::{Reader, ReaderError, Writer, WriterError};
+use froglight_facet::facet::prelude::*;
 pub use froglight_registry_template::types::OnceLock;
 
 #[cfg(feature = "facet")]
