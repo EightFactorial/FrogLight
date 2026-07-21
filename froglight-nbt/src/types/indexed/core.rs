@@ -10,7 +10,7 @@ use froglight_facet::facet::{WithFnAttr, prelude::*};
 use crate::types::indexed::index::EntryIndex;
 
 /// A trait for an index of NBT entries.
-pub trait IndexCore<A: NbtAccess>: Eq {
+pub trait IndexCore<A: NbtAccess>: IndexCored + Eq {
     /// Get a reference to the root NBT data slice.
     #[must_use]
     fn root(&self) -> &[u8];
@@ -55,7 +55,48 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     unsafe fn entry_range_mut(&mut self, index: usize) -> &mut [EntryIndex]
     where
         A: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>;
+}
 
+impl<T: IndexCore<Mut>> IndexCore<Ref> for T {
+    #[inline]
+    fn root(&self) -> &[u8] { self.root() }
+
+    #[inline]
+    fn entries(&self) -> &[EntryIndex] { self.entries() }
+
+    #[inline]
+    unsafe fn entry_range(&self, index: usize) -> &[EntryIndex] {
+        // SAFETY: The caller ensures that this is safe.
+        unsafe { self.entry_range(index) }
+    }
+
+    #[inline]
+    fn root_mut(&mut self) -> &mut [u8]
+    where
+        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
+    {
+        unreachable!("Cannot get mutable access with `Ref`!")
+    }
+
+    #[inline]
+    unsafe fn entries_mut(&mut self) -> &mut [EntryIndex]
+    where
+        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
+    {
+        unreachable!("Cannot get mutable access with `Ref`!")
+    }
+
+    #[inline]
+    unsafe fn entry_range_mut(&mut self, _index: usize) -> &mut [EntryIndex]
+    where
+        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
+    {
+        unreachable!("Cannot get mutable access with `Ref`!")
+    }
+}
+
+/// A trait for an index of NBT entries without an [`NbtAccess`] generic.
+pub trait IndexCored {
     /// The [`WithFnAttr`] for this named NBT using this [`IndexCore`].
     #[cfg(feature = "froglight-facet")]
     const WITH_NAMED: WithFnAttr = WithFnAttr::using(
@@ -157,44 +198,6 @@ pub trait IndexCore<A: NbtAccess>: Eq {
     }
 }
 
-impl<T: IndexCore<Mut>> IndexCore<Ref> for T {
-    #[inline]
-    fn root(&self) -> &[u8] { self.root() }
-
-    #[inline]
-    fn entries(&self) -> &[EntryIndex] { self.entries() }
-
-    #[inline]
-    unsafe fn entry_range(&self, index: usize) -> &[EntryIndex] {
-        // SAFETY: The caller ensures that this is safe.
-        unsafe { self.entry_range(index) }
-    }
-
-    #[inline]
-    fn root_mut(&mut self) -> &mut [u8]
-    where
-        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        unreachable!("Cannot get mutable access with `Ref`!")
-    }
-
-    #[inline]
-    unsafe fn entries_mut(&mut self) -> &mut [EntryIndex]
-    where
-        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        unreachable!("Cannot get mutable access with `Ref`!")
-    }
-
-    #[inline]
-    unsafe fn entry_range_mut(&mut self, _index: usize) -> &mut [EntryIndex]
-    where
-        Ref: for<'a> NbtAccess<SLICE<'a> = &'a mut [u8]>,
-    {
-        unreachable!("Cannot get mutable access with `Ref`!")
-    }
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for either [`Ref`] or [`Mut`] access.
@@ -205,10 +208,17 @@ pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'stat
     type CORE<'a, C: ?Sized + 'a>: Deref<Target = C> + Sized + 'a;
 
     /// Convert [`Self::CORE`] into a reference.
+    #[must_use]
     fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C;
 
     /// Convert [`Self::SLICE`] into a reference.
+    #[must_use]
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8];
+
+    /// Resize the given slice to the given length,
+    /// returning `None` if the slice is not long enough.
+    #[must_use]
+    fn resize_ref(slice: Self::SLICE<'_>, length: usize) -> Option<Self::SLICE<'_>>;
 }
 
 /// A marker type for read-only access.
@@ -222,6 +232,10 @@ impl NbtAccess for Ref {
     fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
 
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
+
+    fn resize_ref(slice: Self::SLICE<'_>, length: usize) -> Option<Self::SLICE<'_>> {
+        slice.split_at_checked(length).map(|(head, _)| head)
+    }
 }
 
 /// A marker type for mutable access.
@@ -235,6 +249,10 @@ impl NbtAccess for Mut {
     fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
 
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
+
+    fn resize_ref(slice: Self::SLICE<'_>, length: usize) -> Option<Self::SLICE<'_>> {
+        slice.split_at_mut_checked(length).map(|(head, _)| head)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

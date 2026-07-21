@@ -85,7 +85,10 @@ impl BlockShape<'_> {
         {
             BlockShape::None
         } else {
-            BlockShape::Single(BlockAabb::new_corners(b, a))
+            BlockShape::Single(BlockAabb {
+                min: DVec3::new(libm::fmin(a.x, b.x), libm::fmin(a.y, b.y), libm::fmin(a.z, b.z)),
+                max: DVec3::new(libm::fmax(a.x, b.x), libm::fmax(a.y, b.y), libm::fmax(a.z, b.z)),
+            })
         }
     }
 

@@ -5,7 +5,7 @@ use froglight_common::identifier::Identifier;
 use froglight_nbt::types::indexed::{
     alloc::{CowCore, IndexedNbtCow},
     compound::IndexedCompound,
-    core::{Mut, Ref},
+    core::Ref,
 };
 use indexmap::IndexMap;
 
@@ -67,7 +67,7 @@ impl<'a> NbtRef<'a> {
 #[derive(Debug, Clone)]
 pub struct NbtValueRef<'a> {
     identifier: Identifier<'a>,
-    values: IndexedCompound<'a, Ref, CowCore<'static, Mut>>,
+    values: IndexedCompound<'a, Ref, CowCore<'static>>,
 }
 
 impl<'a> NbtValueRef<'a> {
@@ -76,7 +76,7 @@ impl<'a> NbtValueRef<'a> {
     #[must_use]
     pub const fn new(
         identifier: Identifier<'a>,
-        values: IndexedCompound<'a, Ref, CowCore<'static, Mut>>,
+        values: IndexedCompound<'a, Ref, CowCore<'static>>,
     ) -> Self {
         Self { identifier, values }
     }
@@ -88,7 +88,7 @@ impl<'a> NbtValueRef<'a> {
 }
 
 impl<'a> Deref for NbtValueRef<'a> {
-    type Target = IndexedCompound<'a, Ref, CowCore<'static, Mut>>;
+    type Target = IndexedCompound<'a, Ref, CowCore<'static>>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.values }

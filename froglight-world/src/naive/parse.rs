@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
 
-use bitvec::prelude::BitVec;
+use bit_vec::BitVec;
 use smallvec::SmallVec;
 
 use crate::{
@@ -218,22 +218,15 @@ impl<T: SectionType> SectionData<T> {
             SectionPaletteType::Global => SectionPalette::Global,
         };
 
-        // Get the number of `u64`s
+        // Get the number of `u64`s.
         let length =
             if bits == 0 { 0 } else { u32::from(T::VOLUME).div_ceil(u64::BITS / u32::from(bits)) };
-        let length = length as usize;
+        // Split the bitvec from the remaining input data.
+        let Some((data, input)) = input.split_at_checked(length as usize * 8) else { todo!() };
+        let data = BitVec::from_bytes_general(data);
 
-        // Take the `u64`s from the input
-        let (longs, _) = input.as_chunks::<8>();
-        let Some(longs) = longs.get(..length) else { todo!() };
-
-        let longs: Vec<_> = longs.iter().map(|b| u64::from_ne_bytes(*b)).collect();
-        input = &input[length * 8..];
-
-        // SAFETY: Input was parsed and is valid
-        unsafe {
-            Ok((Self::new_unchecked(usize::from(bits), palette, BitVec::from_vec(longs)), input))
-        }
+        // SAFETY: Input was parsed and is valid.
+        unsafe { Ok((Self::new_unchecked(usize::from(bits), palette, data), input)) }
     }
 }
 

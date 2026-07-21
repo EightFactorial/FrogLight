@@ -53,6 +53,61 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
             }),
         }
     }
+
+    /// Return the stored value.
+    #[must_use]
+    pub fn into_value(self) -> IndexedValueReference<'data, Ref, C> {
+        match self.index {
+            ValueIndex::Byte(index) => IndexedValueReference::Byte(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<u8, Ref>::new(root, index)
+            }),
+            ValueIndex::Short(index) => IndexedValueReference::Short(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<u16, Ref>::new(root, index)
+            }),
+            ValueIndex::Int(index) => IndexedValueReference::Int(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<u32, Ref>::new(root, index)
+            }),
+            ValueIndex::Long(index) => IndexedValueReference::Long(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<u64, Ref>::new(root, index)
+            }),
+            ValueIndex::Float(index) => IndexedValueReference::Float(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<f32, Ref>::new(root, index)
+            }),
+            ValueIndex::Double(index) => IndexedValueReference::Double(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<f64, Ref>::new(root, index)
+            }),
+            ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<[u8], Ref>::new(root, index)
+            }),
+            ValueIndex::String(index) => IndexedValueReference::String(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<MStr, Ref>::new(root, index)
+            }),
+            ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<[u32], Ref>::new(root, index)
+            }),
+            ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
+                let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+                IndexedReference::<[u64], Ref>::new(root, index)
+            }),
+            ValueIndex::List(index) => {
+                let core = A::into_core(self.core);
+                IndexedValueReference::List(create_list(core, index))
+            }
+            ValueIndex::Compound(index) => IndexedValueReference::Compound(unsafe {
+                let core = A::into_core(self.core);
+                IndexedCompound::<Ref, C>::new(core, index.value())
+            }),
+        }
+    }
 }
 
 impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
@@ -193,7 +248,7 @@ create_fns! {
 
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {
     /// Return a reference to the stored value if it is of type
-    /// [`IndexedCompound`], else else `None`.
+    /// [`IndexedCompound`], else `None`.
     #[must_use]
     pub fn as_compound(&self) -> Option<IndexedCompound<'_, Ref, C>> {
         if let ValueIndex::Compound(value) = self.index {
@@ -203,12 +258,34 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
         }
     }
 
+    /// Return the stored value if it is of type [`IndexedCompound`], else
+    /// `None`.
+    #[must_use]
+    pub fn into_compound(self) -> Option<IndexedCompound<'data, Ref, C>> {
+        if let ValueIndex::Compound(value) = self.index {
+            Some(unsafe { IndexedCompound::<Ref, C>::new(A::into_core(self.core), value.value()) })
+        } else {
+            None
+        }
+    }
+
     /// Return a reference to the stored value if it is of type
-    /// [`IndexedValueList`], else else `None`.
+    /// [`IndexedValueList`], else `None`.
     #[must_use]
     pub fn as_list(&self) -> Option<IndexedValueList<'_, Ref, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list(&self.core, index))
+        } else {
+            None
+        }
+    }
+
+    /// Return the stored value if it is of type [`IndexedValueList`], else
+    /// `None`.
+    #[must_use]
+    pub fn into_list(self) -> Option<IndexedValueList<'data, Ref, C>> {
+        if let ValueIndex::List(index) = self.index {
+            Some(create_list(A::into_core(self.core), index))
         } else {
             None
         }

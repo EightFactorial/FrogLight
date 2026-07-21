@@ -1,6 +1,6 @@
 //! TODO
 
-use bitvec::vec::BitVec;
+use bit_vec::BitVec;
 use froglight_world::{
     component::{ChunkBlockPos, SectionBlockPos},
     prelude::{BlockPos, NaiveChunk},
@@ -41,8 +41,8 @@ fn empty() {
         Section::new_unchecked(
             0,
             0,
-            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
-            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
+            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::new_general()),
+            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::new_general()),
         )
     };
 

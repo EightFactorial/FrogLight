@@ -7,7 +7,7 @@ use core::range::Range;
 use froglight_facet::facet::prelude::*;
 
 use crate::types::indexed::{
-    core::{IndexCore, Mut, NbtAccess, Ref},
+    core::{IndexCore, IndexCored, Mut, NbtAccess, Ref},
     index::EntryIndex,
 };
 
@@ -76,30 +76,6 @@ impl IndexCore<Ref> for SliceCore<'_, Ref> {
     {
         unreachable!("Cannot get mutable access with `Ref`!")
     }
-
-    #[cfg(feature = "froglight-facet")]
-    fn serialize_unnamed(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-    ) -> Result<(), WriterError> {
-        use crate::prelude::IndexedNbt;
-
-        let nbt = item.get::<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>>()?;
-
-        writer.write_bytes(nbt.as_slice())
-    }
-
-    #[cfg(feature = "froglight-facet")]
-    fn serialize_named(
-        item: SerializeItem<'_, '_>,
-        writer: &mut Writer<'_>,
-    ) -> Result<(), WriterError> {
-        use crate::prelude::IndexedNbt;
-
-        let nbt = item.get::<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>>()?;
-
-        writer.write_bytes(nbt.as_slice())
-    }
 }
 
 impl IndexCore<Mut> for SliceCore<'_, Mut> {
@@ -143,7 +119,9 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
             self.entries.as_mut_slice().get_unchecked_mut(*range)
         }
     }
+}
 
+impl IndexCored for SliceCore<'_, Ref> {
     #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
@@ -151,7 +129,7 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
     ) -> Result<(), WriterError> {
         use crate::prelude::IndexedNbt;
 
-        let nbt = item.get::<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>>()?;
+        let nbt = item.get::<IndexedNbt<SliceCore<'_, Ref>>>()?;
 
         writer.write_bytes(nbt.as_slice())
     }
@@ -163,7 +141,33 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
     ) -> Result<(), WriterError> {
         use crate::prelude::IndexedNbt;
 
-        let nbt = item.get::<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>>()?;
+        let nbt = item.get::<IndexedNbt<SliceCore<'_, Ref>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+}
+
+impl IndexCored for SliceCore<'_, Mut> {
+    #[cfg(feature = "froglight-facet")]
+    fn serialize_unnamed(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<SliceCore<'_, Mut>>>()?;
+
+        writer.write_bytes(nbt.as_slice())
+    }
+
+    #[cfg(feature = "froglight-facet")]
+    fn serialize_named(
+        item: SerializeItem<'_, '_>,
+        writer: &mut Writer<'_>,
+    ) -> Result<(), WriterError> {
+        use crate::prelude::IndexedNbt;
+
+        let nbt = item.get::<IndexedNbt<SliceCore<'_, Mut>>>()?;
 
         writer.write_bytes(nbt.as_slice())
     }

@@ -6,43 +6,31 @@ use froglight_mutf8::prelude::MStr;
 use crate::types::indexed::{
     IndexedNbt,
     alloc::SliceCore,
-    core::{Mut, Ref},
+    core::{IndexCored, NbtAccess},
     index::{EntryIndex, Index, ValueIndex},
     types::{IndexedListType, IndexedMapType},
 };
 
-pub(crate) fn parse_nbt_ref(
-    root: &[u8],
+pub(crate) fn parse_nbt<'data, A: NbtAccess>(
+    root: A::SLICE<'data>,
     named: bool,
-) -> Result<IndexedNbt<'_, Ref, SliceCore<'_, Ref>>, ()> {
-    let (length, name, entries, ranges) = parse_nbt(root, named)?;
+) -> Result<IndexedNbt<SliceCore<'data, A>>, ()>
+where
+    SliceCore<'data, A>: IndexCored,
+{
+    let (length, name, entries, ranges) = parse_nbt_inner(&root, named)?;
 
     // SAFETY: `slice` is a subslice of `root`.
     // SAFETY: `entries` and `ranges` were created using `root`.
     unsafe {
-        let slice = root.get_unchecked(..length);
+        let slice = A::resize_ref(root, length).ok_or(())?;
         let core = SliceCore::new(slice, entries, ranges);
-        Ok(IndexedNbt::<Ref, SliceCore<'_, Ref>>::new_core(core, name))
-    }
-}
-
-pub(crate) fn parse_nbt_mut(
-    root: &mut [u8],
-    named: bool,
-) -> Result<IndexedNbt<'_, Mut, SliceCore<'_, Mut>>, ()> {
-    let (length, name, entries, ranges) = parse_nbt(root, named)?;
-
-    // SAFETY: `slice` is a subslice of `root`.
-    // SAFETY: `entries` and `ranges` were created using `root`.
-    unsafe {
-        let slice = root.get_unchecked_mut(..length);
-        let core = SliceCore::new(slice, entries, ranges);
-        Ok(IndexedNbt::<Mut, SliceCore<'_, Mut>>::new_core(core, name))
+        Ok(IndexedNbt::<SliceCore<'_, A>>::new_core(core, name))
     }
 }
 
 #[expect(clippy::type_complexity, reason = "Returns multiple parsed components")]
-fn parse_nbt(
+fn parse_nbt_inner(
     root: &[u8],
     named: bool,
 ) -> Result<(usize, Option<Index<MStr>>, Vec<EntryIndex>, Vec<Range<usize>>), ()> {

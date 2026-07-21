@@ -73,3 +73,36 @@ pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     /// A [`u64`] array.
     LongArray(IndexedReference<'data, [u64], A>),
 }
+
+macro_rules! create_fns {
+    ($($ident:ident: $ty:ty => $variant:ident),*) => {
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValueReference<'data, A, C> {
+            $(
+                #[must_use]
+                #[doc = concat!("Return a reference to the stored reference if it is of type [`", stringify!($ty), "`], else `None`.")]
+                pub fn $ident(self) -> Option<$ty> {
+                    if let IndexedValueReference::$variant(value) = self {
+                        Some(value)
+                    } else {
+                        None
+                    }
+                }
+            )*
+        }
+    };
+}
+
+create_fns! {
+    as_byte: IndexedReference<'data, u8, A> => Byte,
+    as_short: IndexedReference<'data, u16, A> => Short,
+    as_int: IndexedReference<'data, u32, A> => Int,
+    as_long: IndexedReference<'data, u64, A> => Long,
+    as_float: IndexedReference<'data, f32, A> => Float,
+    as_double: IndexedReference<'data, f64, A> => Double,
+    as_byte_array: IndexedReference<'data, [u8], A> => ByteArray,
+    as_string: IndexedReference<'data, MStr, A> => String,
+    as_list: IndexedValueList<'data, A, C> => List,
+    as_compound: IndexedCompound<'data, A, C> => Compound,
+    as_int_array: IndexedReference<'data, [u32], A> => IntArray,
+    as_long_array: IndexedReference<'data, [u64], A> => LongArray
+}

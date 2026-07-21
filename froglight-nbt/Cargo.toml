@@ -29,6 +29,8 @@ smallvec = { features = ["const_generics", "const_new", "union"], workspace = tr
 
 # Optional dependencies
 facet = { features = ["alloc", "reflect", "uuid", "smallvec"], workspace = true, optional = true }
+facet-path = { features = ["alloc"], workspace = true, optional = true }
+facet-solver = { features = ["alloc"], workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
 froglight-facet-iter = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
@@ -44,7 +46,7 @@ name = "access"
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["dep:facet", "dep:froglight-facet-iter", "froglight-mutf8/facet"]
+facet = ["dep:facet", "dep:facet-path", "dep:facet-solver", "dep:froglight-facet-iter", "froglight-mutf8/facet"]
 # Enable `froglight-facet` support.
 froglight-facet = ["dep:froglight-facet", "facet"]
 
@@ -54,6 +56,6 @@ tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-facet-iter?/tra
 tracing_ext = ["tracing"]
 
 # Enable support for the standard library
-std = ["facet?/std", "froglight-facet?/std", "froglight-facet-iter?/std", "froglight-mutf8/std", "tracing?/std", "uuid/std"]
+std = ["facet?/std", "facet-path?/std", "facet-solver?/std", "froglight-facet?/std", "froglight-facet-iter?/std", "froglight-mutf8/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8/simd"]

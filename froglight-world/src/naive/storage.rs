@@ -50,11 +50,15 @@ impl ChunkStorage {
 
     /// Create an empty [`ChunkStorage::Large`].
     #[must_use]
-    pub fn empty_large() -> Self { Self::Large(ArrayChunkStorage::new([Section::EMPTY; _])) }
+    pub fn empty_large() -> Self {
+        Self::Large(ArrayChunkStorage::new(core::array::from_fn(|_| Section::empty())))
+    }
 
     /// Create an empty [`ChunkStorage::Normal`].
     #[must_use]
-    pub fn empty_normal() -> Self { Self::Normal(ArrayChunkStorage::new([Section::EMPTY; _])) }
+    pub fn empty_normal() -> Self {
+        Self::Normal(ArrayChunkStorage::new(core::array::from_fn(|_| Section::empty())))
+    }
 
     /// Create an empty [`ChunkStorage::Variable`].
     #[must_use]

@@ -1,8 +1,8 @@
 //! TODO
 
-use core::{marker::PhantomData, ops::Range};
+use core::marker::PhantomData;
 
-use bitvec::{field::BitField, order::Msb0, slice::BitSlice, vec::BitVec};
+use bit_vec::BitVec;
 use smallvec::SmallVec;
 
 mod traits;
@@ -21,12 +21,16 @@ pub struct Section {
 
 impl Section {
     /// An empty [`Section`].
-    pub const EMPTY: Self = Self {
-        block_count: 0,
-        fluid_count: 0,
-        blocks: SectionData::EMPTY,
-        biomes: SectionData::EMPTY,
-    };
+    #[inline]
+    #[must_use]
+    pub fn empty() -> Self {
+        Self {
+            block_count: 0,
+            fluid_count: 0,
+            blocks: SectionData::empty(),
+            biomes: SectionData::empty(),
+        }
+    }
 
     /// Create a new [`Section`] without performing any validation.
     ///
@@ -142,18 +146,22 @@ impl Section {
 pub struct SectionData<T: SectionType> {
     bits: usize,
     palette: SectionPalette,
-    data: BitVec<u64, Msb0>,
+    data: BitVec<u64>,
     _phantom: PhantomData<T>,
 }
 
 impl<T: SectionType> SectionData<T> {
     /// An empty [`SectionData`].
-    pub const EMPTY: Self = Self {
-        bits: 0,
-        palette: SectionPalette::Single(0),
-        data: BitVec::EMPTY,
-        _phantom: PhantomData,
-    };
+    #[inline]
+    #[must_use]
+    pub fn empty() -> Self {
+        Self {
+            bits: 0,
+            palette: SectionPalette::Single(0),
+            data: BitVec::new_general(),
+            _phantom: PhantomData,
+        }
+    }
 
     /// Create a new [`SectionData`] without performing any validation.
     ///
@@ -164,7 +172,7 @@ impl<T: SectionType> SectionData<T> {
     pub const unsafe fn new_unchecked(
         bits: usize,
         palette: SectionPalette,
-        data: BitVec<u64, Msb0>,
+        data: BitVec<u64>,
     ) -> Self {
         Self { bits, palette, data, _phantom: PhantomData }
     }
@@ -187,8 +195,9 @@ impl<T: SectionType> SectionData<T> {
     pub const unsafe fn palette_mut(&mut self) -> &mut SectionPalette { &mut self.palette }
 
     /// Get the raw bit data.
+    #[inline]
     #[must_use]
-    pub fn data(&self) -> &BitSlice<u64, Msb0> { self.data.as_bitslice() }
+    pub const fn data(&self) -> &BitVec<u64> { &self.data }
 
     /// Get the value at the given position within the section.
     #[must_use]
@@ -231,15 +240,20 @@ impl<T: SectionType> SectionData<T> {
             return None;
         }
 
+        // Use the value from the palette directly.
         if let SectionPalette::Single(value) = self.palette {
             return Some(value);
         }
 
-        let index = self.get_slice(index)?.load::<usize>();
+        // Read the value from the bit-packed data.
+        let index = self.read_index(index)?;
         match &self.palette {
             SectionPalette::Single(_) => unreachable!(),
-            SectionPalette::Vector(items) => items.get(index).copied(),
-            SectionPalette::Global => index.try_into().ok(),
+            SectionPalette::Global => Some(index),
+            SectionPalette::Vector(items) => {
+                let index = usize::try_from(index).ok()?;
+                items.get(index).copied()
+            }
         }
     }
 
@@ -256,29 +270,44 @@ impl<T: SectionType> SectionData<T> {
         todo!()
     }
 
-    /// Get a reference to the entry at the given index.
+    /// Read a [`u32`] starting as the given value-index.
     ///
     /// Returns `None` if the index is out of bounds.
-    #[inline]
     #[must_use]
-    pub fn get_slice(&self, index: usize) -> Option<&BitSlice<u64, Msb0>> {
+    fn read_index(&self, index: usize) -> Option<u32> {
         let start = index * self.bits;
-        self.data.get(Range { start, end: start + self.bits })
+        let end = start + self.bits;
+        if end > self.data.len() {
+            return None;
+        }
+
+        let mut value = 0u32;
+        for n in 0..self.bits {
+            if self.data.get(start + n).unwrap_or(false) {
+                value |= 1 << n;
+            }
+        }
+
+        Some(value)
     }
 
-    /// Get a mutable reference to the entry at the given index.
+    /// Write a [`u32`] starting as the given value-index.
     ///
-    /// Returns `None` if the index is out of bounds.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the data is a valid entry in the section's
-    /// palette.
-    #[inline]
-    #[must_use]
-    pub unsafe fn get_slice_mut(&mut self, index: usize) -> Option<&mut BitSlice<u64, Msb0>> {
+    /// Returns `false` if the index was out of bounds.
+    #[allow(unused, reason = "WIP")]
+    #[allow(clippy::must_use_candidate, reason = "Not required")]
+    fn write_index(&mut self, index: usize, value: u32) -> bool {
         let start = index * self.bits;
-        self.data.get_mut(Range { start, end: start + self.bits })
+        let end = start + self.bits;
+        if end > self.data.len() {
+            return false;
+        }
+
+        for n in 0..self.bits {
+            self.data.set(start + n, (value & (1 << n)) != 0);
+        }
+
+        true
     }
 
     /// Create an iterator over all values in this section.

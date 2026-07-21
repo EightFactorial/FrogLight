@@ -409,7 +409,12 @@ impl From<String> for MString {
     fn from(value: String) -> Self { MString::from_utf8_owned(value) }
 }
 impl From<&String> for MString {
-    fn from(value: &String) -> Self {
+    #[inline]
+    fn from(value: &String) -> Self { From::from(value.as_str()) }
+}
+impl From<&str> for MString {
+    #[inline]
+    fn from(value: &str) -> Self {
         match MString::from_utf8(value) {
             Cow::Borrowed(b) => b.to_mstring(),
             Cow::Owned(s) => s,
@@ -424,6 +429,10 @@ impl From<MString> for String {
 impl From<&MString> for String {
     #[inline]
     fn from(value: &MString) -> Self { value.clone().into_utf8() }
+}
+impl From<&MStr> for String {
+    #[inline]
+    fn from(value: &MStr) -> Self { value.to_mstring().into_utf8() }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -104,7 +104,9 @@ pub fn deserialize_owned_core(
     |item: Item<'static, false>| {
         let item = match item {
             Item::Item(item) => item,
-            Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
+            Item::Hint(.., partial) => {
+                return varint::decode_u32_from(reader).map(|hint| Item::Hint(hint, partial));
+            }
         };
 
         // Handle field attributes.
@@ -162,7 +164,9 @@ pub fn deserialize_borrowed_core<'facet>(
     |item: Item<'facet, true>| {
         let item = match item {
             Item::Item(item) => item,
-            Item::Size(..) => return varint::decode_u32_from(reader).map(Item::Size),
+            Item::Hint(.., partial) => {
+                return varint::decode_u32_from(reader).map(|hint| Item::Hint(hint, partial));
+            }
         };
 
         // Handle field attributes.

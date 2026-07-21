@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for IndexedNbt<'_, A, C> {
+impl<C: IndexCore<Ref>> fmt::Debug for IndexedNbt<C> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("IndexedNbt").field("content", &self.as_compound()).finish()
     }

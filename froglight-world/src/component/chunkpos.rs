@@ -138,6 +138,7 @@ impl Div<i32> for ChunkPos {
 
 // -------------------------------------------------------------------------------------------------
 
+#[cfg(feature = "facet")]
 #[expect(clippy::cast_sign_loss, reason = "Desired")]
 #[expect(clippy::cast_possible_wrap, reason = "Desired")]
 impl FacetTemplate for ChunkPos {

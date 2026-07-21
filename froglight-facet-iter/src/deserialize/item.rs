@@ -17,10 +17,9 @@ pub(super) enum StackItem {
 }
 
 /// A [`Deserializer`] item.
-#[derive(Debug)]
 pub enum Item<'facet, const BORROW: bool> {
     /// A size to be deserialized.
-    Size(u32),
+    Hint(u32, Partial<'facet, BORROW>),
     /// An item to be deserialized.
     Item(DeserializeItem<'facet, BORROW>),
 }
@@ -44,7 +43,7 @@ impl StackItem {
 // -------------------------------------------------------------------------------------------------
 
 /// A description of a deserialization item.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct DeserializeDesc {
     variable: bool,
     field: Option<&'static Field>,
@@ -120,6 +119,11 @@ impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
     #[inline]
     #[must_use]
     pub fn shape_attr(&self) -> &'static [Attr] { self.partial.shape().attributes }
+
+    /// Get the [`Field`] of the [`DeserializeItem`], if any.
+    #[inline]
+    #[must_use]
+    pub const fn field(&self) -> Option<&'static Field> { self.desc.field }
 
     /// Get the [`Field`] [`Attr`]s of the [`DeserializeItem`], if any.
     #[inline]

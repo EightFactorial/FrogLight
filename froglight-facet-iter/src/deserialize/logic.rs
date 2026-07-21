@@ -23,7 +23,7 @@ struct DeserializeIterator<'facet, const BORROW: bool> {
     namespace: Option<&'static str>,
 
     partial: Partial<'facet, BORROW>,
-    stack: SmallVec<[StackItem; 10]>,
+    stack: SmallVec<[StackItem; 12]>,
 }
 
 impl<
@@ -164,6 +164,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
 
             match item {
                 StackItem::Item(desc) => {
+                    // Deserialize the item.
                     let item = Item::Item(DeserializeItem::new(self.partial, desc));
                     let Item::Item(item) = core(item)? else { todo!() };
                     self.partial = item.into_inner().0;
@@ -345,15 +346,15 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
 
             Def::Map(..) => {
-                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                self.partial = self.partial.init_map()?;
+                let Item::Hint(len, partial) = core(Item::Hint(0, self.partial))? else { todo!() };
+                self.partial = partial.init_map()?;
 
                 self.stack.push(StackItem::Map(len as usize, false, false, desc.is_variable()));
                 Ok(self)
             }
             Def::Set(..) => {
-                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                self.partial = self.partial.init_set()?;
+                let Item::Hint(len, partial) = core(Item::Hint(0, self.partial))? else { todo!() };
+                self.partial = partial.init_set()?;
 
                 self.stack.push(StackItem::Set(len as usize, false, desc.is_variable()));
                 Ok(self)
@@ -369,8 +370,8 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     return Ok(self);
                 }
 
-                let Item::Size(len) = core(Item::Size(0))? else { todo!() };
-                self.partial = self.partial.init_list_with_capacity(len as usize)?;
+                let Item::Hint(len, partial) = core(Item::Hint(0, self.partial))? else { todo!() };
+                self.partial = partial.init_list_with_capacity(len as usize)?;
 
                 self.stack.push(StackItem::Seq(len as usize, false, desc.is_variable()));
                 Ok(self)
@@ -383,18 +384,20 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
 
             Def::Option(..) => {
-                let Item::Size(variant) = (core)(Item::Size(0))? else { todo!() };
+                let Item::Hint(variant, partial) = (core)(Item::Hint(0, self.partial))? else {
+                    todo!()
+                };
 
                 match variant {
                     0 => {
                         // Set `None`
-                        self.partial = self.partial.set_default()?;
+                        self.partial = partial.set_default()?;
                         self.partial = self.partial.end()?;
                         Ok(self)
                     }
                     1 => {
                         // Begin `Some`
-                        self.partial = self.partial.begin_some()?;
+                        self.partial = partial.begin_some()?;
                         self.stack.push(StackItem::Other(desc));
                         Ok(self)
                     }
@@ -403,18 +406,20 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 }
             }
             Def::Result(..) => {
-                let Item::Size(variant) = (core)(Item::Size(0))? else { todo!() };
+                let Item::Hint(variant, partial) = (core)(Item::Hint(0, self.partial))? else {
+                    todo!()
+                };
 
                 match variant {
                     0 => {
                         // Begin `Ok`
-                        self.partial = self.partial.begin_ok()?;
+                        self.partial = partial.begin_ok()?;
                         self.stack.push(StackItem::Other(desc));
                         Ok(self)
                     }
                     1 => {
                         // Begin `Err`
-                        self.partial = self.partial.begin_err()?;
+                        self.partial = partial.begin_err()?;
                         self.stack.push(StackItem::Other(desc));
                         Ok(self)
                     }
@@ -483,8 +488,12 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 #[expect(clippy::cast_possible_wrap, reason = "Expected behavior")]
                 {
                     // Deserialize the discriminant of the enum.
-                    let Item::Size(discriminant) = core(Item::Size(0))? else { todo!() };
-                    self.partial = self.partial.select_variant(i64::from(discriminant as i32))?;
+                    let Item::Hint(discriminant, partial) = core(Item::Hint(0, self.partial))?
+                    else {
+                        todo!()
+                    };
+
+                    self.partial = partial.select_variant(i64::from(discriminant as i32))?;
                 }
 
                 let variant = self.partial.selected_variant().unwrap();

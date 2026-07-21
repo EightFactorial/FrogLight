@@ -12,9 +12,15 @@ pub mod types;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "facet")]
+    pub use crate::facet::{
+        deserialize::{DeserializeNbt, functions::*},
+        serialize::{SerializeNbt, functions::*},
+    };
     pub use crate::types::{
         indexed::{
             IndexedNbt,
+            alloc::{IndexedNbtCow, IndexedNbtSlice},
             entry::{IndexedEntry, IndexedValue},
         },
         structured::Nbt,

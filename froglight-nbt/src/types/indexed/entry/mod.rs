@@ -68,12 +68,29 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedEntry
         unsafe { IndexedReference::new(root, self.index.name()) }
     }
 
+    /// Get the name of this entry.
+    #[inline]
+    #[must_use]
+    pub fn into_name(self) -> IndexedReference<'data, MStr, Ref> {
+        let root = <C as IndexCore<A>>::root(A::into_core(self.core));
+        // SAFETY: `IndexedValue` ensures this is safe.
+        unsafe { IndexedReference::new(root, self.index.name()) }
+    }
+
     /// Get the [`IndexedValue`] of this entry.
     #[inline]
     #[must_use]
     pub fn value(&self) -> IndexedValue<'_, Ref, C> {
         // SAFETY: `IndexedEntry` ensures this is safe.
         unsafe { IndexedValue::<Ref, C>::new(&self.core, self.index.value()) }
+    }
+
+    /// Get the [`IndexedValue`] of this entry.
+    #[inline]
+    #[must_use]
+    pub fn into_value(self) -> IndexedValue<'data, Ref, C> {
+        // SAFETY: `IndexedEntry` ensures this is safe.
+        unsafe { IndexedValue::<Ref, C>::new(A::into_core(self.core), self.index.value()) }
     }
 }
 

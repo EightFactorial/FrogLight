@@ -45,6 +45,7 @@ facet = { default-features = false, version = "=0.50.0-rc.5" }
 facet-format = { default-features = false, version = "=0.50.0-rc.5" }
 facet-json = { default-features = false, version = "=0.50.0-rc.5" }
 facet-path = { default-features = false, version = "=0.50.0-rc.5" }
+facet-solver = { default-features = false, version = "=0.50.0-rc.5" }
 facet-toml = { default-features = false, version = "=0.50.0-rc.5" }
 facet-value = { default-features = false, version = "=0.50.0-rc.5" }
 
@@ -70,7 +71,7 @@ async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 async-trait = { default-features = false, version = "0.1" }
 bitflags = { default-features = false, version = "2.13" }
-bitvec = { default-features = false, version = "1.0" }
+bit-vec = { default-features = false, version = "0.10" }
 blocking = { default-features = false, version = "1.6" }
 futures-lite = { default-features = false, version = "^2.0" }
 glam = { default-features = false, version = "=0.32" }

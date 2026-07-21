@@ -128,6 +128,12 @@ impl ReaderError {
     pub fn from_string(err: alloc::string::String) -> Self {
         Self::Other(Box::<dyn Error + Send + Sync>::from(err))
     }
+
+    /// Create a [`ReaderError::Other`] from a string slice.
+    #[inline]
+    #[must_use]
+    #[allow(clippy::should_implement_trait, reason = "Ignored")]
+    pub fn from_str(err: &str) -> Self { Self::from_string(err.into()) }
 }
 
 impl From<ReflectError> for ReaderError {

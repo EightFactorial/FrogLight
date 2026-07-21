@@ -5,7 +5,7 @@
 #[cfg(any(feature = "froglight-block", feature = "froglight-biome"))]
 use core::any::TypeId;
 
-use bitvec::vec::BitVec;
+use bit_vec::BitVec;
 use divan::prelude::*;
 #[cfg(feature = "froglight-biome")]
 use froglight_biome::{
@@ -39,7 +39,7 @@ macro_rules! create {
                     SectionData::new_unchecked(
                         0,
                         SectionPalette::Single(0),
-                        BitVec::EMPTY,
+                        BitVec::new_general(),
                     ),
                 )
             }),
@@ -54,7 +54,7 @@ macro_rules! create {
                     SectionData::new_unchecked(
                         0,
                         SectionPalette::Single(0),
-                        BitVec::EMPTY,
+                        BitVec::new_general(),
                     ),
                     $($tt)*,
                 )
@@ -71,7 +71,7 @@ fn contains_single_best(b: Bencher) {
         SectionData::new_unchecked(
             0,
             SectionPalette::Single(0),
-            BitVec::EMPTY,
+            BitVec::new_general(),
         )
     };
 
@@ -88,7 +88,7 @@ fn contains_single_worst(b: Bencher) {
         SectionData::new_unchecked(
             0,
             SectionPalette::Single(0),
-            BitVec::EMPTY,
+            BitVec::new_general(),
         )
     };
 
@@ -105,7 +105,7 @@ fn contains_single_best_iter(b: Bencher) {
         SectionData::new_unchecked(
             0,
             SectionPalette::Single(0),
-            BitVec::EMPTY,
+            BitVec::new_general(),
         )
     };
 
@@ -122,7 +122,7 @@ fn contains_single_worst_iter(b: Bencher) {
         SectionData::new_unchecked(
             0,
             SectionPalette::Single(0),
-            BitVec::EMPTY,
+            BitVec::new_general(),
         )
     };
 
@@ -139,7 +139,7 @@ fn contains_vector_best(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -156,7 +156,7 @@ fn contains_vector_best_iter(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -173,7 +173,7 @@ fn contains_vector_pass(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Vector(SmallVec::from_vec(vec![0])),
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -190,7 +190,7 @@ fn contains_vector_worst_iter(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -207,7 +207,7 @@ fn contains_vector_worst(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Vector(SmallVec::from_vec(vec![0, 1])),
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -224,7 +224,7 @@ fn contains_global_best(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -241,7 +241,7 @@ fn contains_global_worst(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -258,7 +258,7 @@ fn contains_global_best_iter(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -275,7 +275,7 @@ fn contains_global_worst_iter(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -379,7 +379,7 @@ fn contains_global_biome_best(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -398,7 +398,7 @@ fn contains_global_biome_worst(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -484,7 +484,7 @@ fn contains_global_block_best(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 
@@ -503,7 +503,7 @@ fn contains_global_block_worst(b: Bencher) {
         SectionData::new_unchecked(
             1,
             SectionPalette::Global,
-            BitVec::from_slice(&[0; 4096]),
+            BitVec::from_bytes_general(&[0; 4096]),
         )
     };
 

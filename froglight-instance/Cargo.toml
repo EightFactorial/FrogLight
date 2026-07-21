@@ -30,7 +30,7 @@ froglight-common = { features = ["bevy"], workspace = true }
 froglight-entity = { features = ["bevy"], workspace = true }
 froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-world = { features = ["bevy", "froglight-biome", "froglight-block"], workspace = true }
-hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true }
+hashbrown = { features = ["default-hasher"], workspace = true }
 
 # Optional dependencies
 tracing = { workspace = true, optional = true }

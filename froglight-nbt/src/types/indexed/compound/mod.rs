@@ -68,6 +68,29 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedCompo
         None
     }
 
+    /// Return the stored value for `key`, if it is present, else `None`.
+    #[must_use]
+    pub fn into_entry<K: PartialEq<MStr> + ?Sized>(
+        self,
+        key: &K,
+    ) -> Option<IndexedEntry<'data, Ref, C>> {
+        for entry in self.entries() {
+            // SAFETY: `IndexedCompound` guarantees that `entry.name()` is a valid index.
+            let entry_key = unsafe {
+                IndexedReference::<_, Ref>::new(<C as IndexCore<A>>::root(&self.core), entry.name())
+            };
+
+            if key == entry_key.get() {
+                let entry = *entry;
+                let core = A::into_core(self.core);
+
+                // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
+                return Some(unsafe { IndexedEntry::<Ref, C>::new(core, entry) });
+            }
+        }
+        None
+    }
+
     /// Get a key-value pair by index.
     ///
     /// Returns `None` if the index is out of bounds.

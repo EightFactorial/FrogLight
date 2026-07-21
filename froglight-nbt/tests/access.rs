@@ -6,14 +6,17 @@ extern crate alloc;
 extern crate std;
 
 use froglight_mutf8::mutf8;
-use froglight_nbt::prelude::*;
+use froglight_nbt::{
+    prelude::*,
+    types::indexed::{alloc::SliceCore, core::Ref},
+};
 
 #[test]
 fn hello_world() {
     static SLICE: &[u8] = include_bytes!("nbt/hello_world.nbt");
 
     // Parse `SLICE`
-    let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -42,7 +45,7 @@ fn short() {
     ];
 
     // Parse `SLICE`
-    let nbt = IndexedNbt::new_unnamed_ref(SLICE).unwrap();
+    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_unnamed(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -81,7 +84,7 @@ fn short() {
 fn inttest1023() {
     static SLICE: &[u8] = include_bytes!("nbt/inttest1023.nbt");
 
-    let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -101,7 +104,7 @@ fn inttest1023() {
 fn bigtest() {
     static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
 
-    let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -205,7 +208,7 @@ fn bigtest() {
 fn complex_player() {
     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
 
-    let nbt = IndexedNbt::new_named_ref(SLICE).unwrap();
+    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 

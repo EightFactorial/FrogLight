@@ -23,7 +23,7 @@ divan = { workspace = true }
 froglight-biome = { features = ["biome_data"], workspace = true }
 
 [dependencies]
-bitvec = { features = ["alloc"], workspace = true }
+bit-vec = { workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
@@ -68,6 +68,6 @@ libm = ["glam/nostd-libm", "froglight-block?/libm"]
 once_cell = ["froglight-registry-template?/once_cell"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "froglight-registry-template?/std", "glam/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bit-vec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "froglight-registry-template?/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-registry-template?/nightly", "smallvec/specialization", "std"]

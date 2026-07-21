@@ -1,4 +1,4 @@
-use facet::{Attr, Facet, Field, Peek, ReflectError, Shape};
+use facet::{Attr, ConstTypeId, Facet, Field, Peek, ReflectError, Shape};
 
 /// A [`Serializer`] item.
 pub enum Item<'mem, 'facet> {
@@ -65,6 +65,13 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     pub const fn with_ty(mut self, ty: ItemType) -> Self {
         self.ty = ty;
         self
+    }
+
+    /// Returns `true` if this [`StackItem`] is of the given type.
+    #[inline]
+    #[must_use]
+    pub fn is_type<T: Facet<'facet> + ?Sized>(&self) -> bool {
+        ConstTypeId::of::<T>() == self.shape().id
     }
 
     /// Returns `true` if this [`StackItem`] is variable-length.
