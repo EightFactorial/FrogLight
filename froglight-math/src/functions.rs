@@ -38,8 +38,9 @@ pub const fn fract(x: f64) -> f64 {
 /// Returns the base 2 logarithm of the number, rounded up.
 ///
 /// Similar to [`u32::ilog2`], but rounds up instead of down.
+#[inline]
 #[must_use]
-pub const fn ilog2_ceil(x: u32) -> u32 { u32::BITS - x.saturating_sub(1).leading_zeros() }
+pub const fn ilog2_ceil(x: u32) -> u32 { x.saturating_sub(1).bit_width() }
 
 /// Return the greatest common divisor of two numbers.
 ///

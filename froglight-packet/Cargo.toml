@@ -48,7 +48,7 @@ default = ["std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy", "froglight-player/bevy", "froglight-world/bevy", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet", "froglight-common/facet", "froglight-entity/facet", "dep:froglight-facet", "froglight-nbt/facet", "froglight-player/facet", "froglight-world/facet"]
+facet = ["dep:facet", "froglight-biome/facet", "froglight-block/facet", "froglight-common/facet", "froglight-entity/facet", "dep:froglight-facet", "froglight-nbt/facet", "froglight-player/facet", "froglight-world/facet"]
 # Enable `serde` support.
 serde = ["dep:serde", "froglight-common/serde", "froglight-player/serde", "froglight-world/serde", "indexmap/serde", "uuid/serde"]
 # Enable `tracing` support.

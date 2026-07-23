@@ -218,7 +218,7 @@ impl<T: SectionType> SectionData<T> {
     /// returning the previous value.
     #[must_use]
     #[expect(clippy::missing_panics_doc, reason = "The index cannot ever go out of bounds")]
-    pub fn set(&self, position: SectionBlockPos, id: u32) -> u32 {
+    pub fn set(&mut self, position: SectionBlockPos, id: u32) -> u32 {
         let width = usize::from(SECTION_WIDTH) / T::QUANTIZATION;
         let height = usize::from(SECTION_HEIGHT) / T::QUANTIZATION;
 
@@ -228,7 +228,7 @@ impl<T: SectionType> SectionData<T> {
                 + (usize::from(position.y()) / T::QUANTIZATION * width * height),
             id,
         )
-        .expect("SectionBlockPos should always be within bounds")
+        .expect("SectionBlockPos should always be within bounds?!")
     }
 
     /// Get the value at the given index within the section.
@@ -246,14 +246,14 @@ impl<T: SectionType> SectionData<T> {
         }
 
         // Read the value from the bit-packed data.
-        let index = self.read_index(index)?;
+        let index = self.read_raw_index(index)?;
         match &self.palette {
             SectionPalette::Single(_) => unreachable!(),
-            SectionPalette::Global => Some(index),
             SectionPalette::Vector(items) => {
                 let index = usize::try_from(index).ok()?;
                 items.get(index).copied()
             }
+            SectionPalette::Global => Some(index),
         }
     }
 
@@ -262,52 +262,53 @@ impl<T: SectionType> SectionData<T> {
     ///
     /// Returns `None` if the index is out of bounds.
     #[allow(clippy::must_use_candidate, reason = "Not required")]
-    pub fn set_index(&self, index: usize, _id: u32) -> Option<u32> {
+    pub fn set_index(&mut self, index: usize, id: u32) -> Option<u32> {
         if index > usize::from(T::VOLUME) {
             return None;
         }
 
-        todo!()
-    }
+        match &mut self.palette {
+            SectionPalette::Single(value) => {
+                let value = *value;
+                if id == value {
+                    return Some(value);
+                }
 
-    /// Read a [`u32`] starting as the given value-index.
-    ///
-    /// Returns `None` if the index is out of bounds.
-    #[must_use]
-    fn read_index(&self, index: usize) -> Option<u32> {
-        let start = index * self.bits;
-        let end = start + self.bits;
-        if end > self.data.len() {
-            return None;
-        }
+                // Convert `SectionPalette::Single` to `SectionPalette::Vector`.
+                let mut palette = SmallVec::new_const();
+                palette.push(value);
+                palette.push(id);
+                self.palette = SectionPalette::Vector(palette);
 
-        let mut value = 0u32;
-        for n in 0..self.bits {
-            if self.data.get(start + n).unwrap_or(false) {
-                value |= 1 << n;
+                self.grow_bitvec(1);
+                self.write_raw_index(index, 1);
+
+                Some(value)
+            }
+
+            // TODO: Convert `SectionPalette::Vector` to `SectionPalette::Global`.
+            #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
+            SectionPalette::Vector(items) => {
+                let id = items.iter().position(|v| *v == id).unwrap_or_else(|| {
+                    items.push(id);
+                    items.len() - 1
+                });
+
+                let previous = self.read_raw_index(index)?;
+                self.write_raw_index(index, id as u32).then_some(previous)
+            }
+
+            #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
+            SectionPalette::Global => {
+                // Grow the bitvec to fit the new id if necessary.
+                if id.bit_width() > self.bits as u32 {
+                    self.grow_bitvec(id.bit_width() as usize);
+                }
+
+                let previous = self.read_raw_index(index)?;
+                self.write_raw_index(index, id).then_some(previous)
             }
         }
-
-        Some(value)
-    }
-
-    /// Write a [`u32`] starting as the given value-index.
-    ///
-    /// Returns `false` if the index was out of bounds.
-    #[allow(unused, reason = "WIP")]
-    #[allow(clippy::must_use_candidate, reason = "Not required")]
-    fn write_index(&mut self, index: usize, value: u32) -> bool {
-        let start = index * self.bits;
-        let end = start + self.bits;
-        if end > self.data.len() {
-            return false;
-        }
-
-        for n in 0..self.bits {
-            self.data.set(start + n, (value & (1 << n)) != 0);
-        }
-
-        true
     }
 
     /// Create an iterator over all values in this section.
@@ -332,6 +333,98 @@ impl<T: SectionType> SectionData<T> {
             }
             SectionPalette::Global => self.iter().any(|value| value == id),
         }
+    }
+}
+
+impl<T: SectionType> SectionData<T> {
+    /// Read a [`u32`] starting at the given value-index.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[inline]
+    fn read_raw_index(&self, index: usize) -> Option<u32> {
+        Self::read_bitvec_index(&self.data, self.bits, index)
+    }
+
+    /// Read a [`u32`] starting at the given value-index.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    fn read_bitvec_index(bitvec: &BitVec<u64>, bits: usize, index: usize) -> Option<u32> {
+        let start = index * bits;
+        let end = start + bits;
+
+        if end > bitvec.len() {
+            return None;
+        }
+
+        let mut value = 0u32;
+        for n in 0..bits {
+            if bitvec.get(start + n).unwrap_or(false) {
+                value |= 1 << n;
+            }
+        }
+
+        Some(value)
+    }
+
+    /// Write a [`u32`] starting at the given value-index.
+    ///
+    /// Returns `false` if the index was out of bounds.
+    #[inline]
+    #[allow(clippy::must_use_candidate, reason = "Not required")]
+    fn write_raw_index(&mut self, index: usize, value: u32) -> bool {
+        Self::write_bitvec_index(&mut self.data, self.bits, index, value)
+    }
+
+    /// Write a [`u32`] starting at the given value-index.
+    ///
+    /// Returns `false` if the index was out of bounds.
+    #[allow(clippy::must_use_candidate, reason = "Not required")]
+    fn write_bitvec_index(bitvec: &mut BitVec<u64>, bits: usize, index: usize, value: u32) -> bool {
+        let start = index * bits;
+        let end = start + bits;
+        if end > bitvec.len() {
+            return false;
+        }
+
+        for n in 0..bits {
+            bitvec.set(start + n, (value & (1 << n)) != 0);
+        }
+
+        true
+    }
+
+    /// Grow the underlying [`BitVec`] to the given number of bits per entry.
+    ///
+    /// # Panics
+    ///
+    /// Panics if attempting to shrink the number of bits per entry.
+    fn grow_bitvec(&mut self, bits: usize) {
+        assert!(self.bits <= bits, "Cannot shrink the number of bits per entry!");
+
+        // Do nothing if the number is the same.
+        if self.bits == bits {
+            return;
+        }
+
+        let mut output = BitVec::from_elem_general(usize::from(T::VOLUME) * bits, false);
+
+        // Skip reading/writing if the current bitvec is empty.
+        if self.bits == 0 {
+            self.bits = bits;
+            self.data = output;
+            return;
+        }
+
+        // Read each value and write it to the new bitvec.
+        for index in (0..T::VOLUME).map(usize::from) {
+            if let Some(value) = self.read_raw_index(index) {
+                Self::write_bitvec_index(&mut output, bits, index, value);
+            }
+        }
+
+        self.bits = bits;
+        self.data = output;
     }
 }
 

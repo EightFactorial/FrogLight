@@ -3,6 +3,7 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use facet::Facet;
+use froglight_block::state::GlobalStateId;
 use froglight_common::prelude::Identifier;
 use froglight_entity::prelude::EntityId;
 use froglight_packet::common::{
@@ -20,7 +21,7 @@ use froglight_packet::common::{
     update_tags::TagMap,
 };
 use froglight_player::prelude::PlayerProfile;
-use froglight_world::prelude::ChunkPos;
+use froglight_world::{component::BlockPos, prelude::ChunkPos};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Facet)]
@@ -80,7 +81,7 @@ impl From<ServerboundHandshakeEvent> for ServerboundEventEnum {
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq))]
 pub enum ClientboundPlayEvent {
     ActionBarText(),
     AddEntity(AddEntityBundle),
@@ -90,7 +91,7 @@ pub enum ClientboundPlayEvent {
     BlockDestruction(),
     BlockEntityData(),
     BlockEvent(),
-    BlockUpdate(),
+    BlockUpdate(BlockPos, GlobalStateId),
     BossEvent(),
     BundleDelimiter,
     ChangeDifficulty(),

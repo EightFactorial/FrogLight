@@ -30,9 +30,9 @@ use froglight_packet::{
             ServerboundPackets as LoginServerboundPackets,
         },
         play::{
-            AcceptTeleportationC2SPacket, AddEntityS2CPacket, BundleDelimiterS2CPacket,
-            ChunkBatchFinishedS2CPacket, ChunkBatchReceivedC2SPacket, ChunkBatchStartS2CPacket,
-            ClearDialogS2CPacket as PlayClearDialogS2CPacket,
+            AcceptTeleportationC2SPacket, AddEntityS2CPacket, BlockUpdateS2CPacket,
+            BundleDelimiterS2CPacket, ChunkBatchFinishedS2CPacket, ChunkBatchReceivedC2SPacket,
+            ChunkBatchStartS2CPacket, ClearDialogS2CPacket as PlayClearDialogS2CPacket,
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
             DisconnectS2CPacket as PlayDisconnectS2CPacket, EntityPositionSyncS2CPacket,
@@ -218,8 +218,8 @@ impl EventVersion for V26_2 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockEvent(packet))))
                 }
-                ClientboundPlayEvent::BlockUpdate() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::BlockUpdate(position, block_id) => {
+                    let packet = BlockUpdateS2CPacket { position, block_id };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockUpdate(packet))))
                 }
                 ClientboundPlayEvent::BossEvent() => {
@@ -972,8 +972,11 @@ impl EventVersion for V26_2 {
                 PlayClientboundPackets::BlockEvent(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockEvent())))
                 }
-                PlayClientboundPackets::BlockUpdate(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockUpdate())))
+                PlayClientboundPackets::BlockUpdate(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockUpdate(
+                        packet.position,
+                        packet.block_id,
+                    ))))
                 }
                 PlayClientboundPackets::BossEvent(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BossEvent())))

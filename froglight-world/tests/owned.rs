@@ -1,16 +1,15 @@
 //! TODO
 
-use bit_vec::BitVec;
 use froglight_world::{
     component::{ChunkBlockPos, SectionBlockPos},
     prelude::{BlockPos, NaiveChunk},
-    section::{Section, SectionData, SectionPalette},
+    section::Section,
 };
 
 #[test]
 fn chunk() {
     // An empty chunk with no blocks.
-    let chunk = NaiveChunk::new_empty_large();
+    let mut chunk = NaiveChunk::new_empty_large();
     let offset = chunk.height_offset();
 
     for y in chunk.height_range() {
@@ -32,19 +31,36 @@ fn chunk() {
     for id in chunk.iter_raw_biomes() {
         assert_eq!(id, 0);
     }
+
+    // Set `[8, 8, 8]` to `1`.
+    let position = BlockPos::new_xyz(8, 8, 8);
+    let existing = chunk.set_raw_block(position, 1, is_air, is_fluid).unwrap();
+
+    assert_eq!(existing, 0);
+    assert_eq!(chunk.get_raw_block(position), Some(1));
+
+    // Check that adjacent blocks are still `0`.
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(7, 8, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 7, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 8, 7)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(7, 7, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(7, 8, 7)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 7, 7)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(7, 7, 7)), Some(0));
+
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(9, 8, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 9, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 8, 9)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(9, 9, 8)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(9, 8, 9)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(8, 9, 9)), Some(0));
+    assert_eq!(chunk.get_raw_block(BlockPos::new_xyz(9, 9, 9)), Some(0));
 }
 
 #[test]
-fn empty() {
+fn section() {
     // An empty section with no blocks.
-    let section = unsafe {
-        Section::new_unchecked(
-            0,
-            0,
-            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::new_general()),
-            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::new_general()),
-        )
-    };
+    let mut section = Section::empty();
 
     assert_eq!(section.block_count(), 0);
     assert_eq!(section.block_data().bits_per_entry(), 0);
@@ -67,4 +83,34 @@ fn empty() {
     for id in section.iter_raw_biomes() {
         assert_eq!(id, 0);
     }
+
+    // Set `[8, 8, 8]` to `1`.
+    let position = SectionBlockPos::new_xyz(8, 8, 8);
+    let existing = section.set_raw_block(position, 1, is_air, is_fluid);
+
+    assert_eq!(existing, 0);
+    assert_eq!(section.get_raw_block(position), 1);
+
+    // Check that adjacent blocks are still `0`.
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(7, 8, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 7, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 8, 7)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(7, 7, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(7, 8, 7)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 7, 7)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(7, 7, 7)), 0);
+
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(9, 8, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 9, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 8, 9)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(9, 9, 8)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(9, 8, 9)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(8, 9, 9)), 0);
+    assert_eq!(section.get_raw_block(SectionBlockPos::new_xyz(9, 9, 9)), 0);
 }
+
+// ------------------------------------------------------------------------------------------------
+
+fn is_air(id: u32) -> bool { id == 0 }
+
+fn is_fluid(_: u32) -> bool { false }

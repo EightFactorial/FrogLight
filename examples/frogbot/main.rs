@@ -11,7 +11,7 @@ use bevy::{
 use froglight::{
     bevy::plugins::NetworkPlugin,
     modules::{
-        api::api::{ClientApi, Offline},
+        api::api::Offline,
         network::{
             bevy::ClientDespawn,
             connection::FuturesLite,
@@ -67,7 +67,10 @@ impl Plugin for BotPlugin {
             .add_systems(Update, BotPlugin::message_handler)
             .add_systems(
                 PostUpdate,
-                (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
+                (
+                    BotPlugin::apply_blockedit_queue,
+                    (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
+                ),
             );
     }
 }
@@ -120,6 +123,20 @@ impl BotPlugin {
         conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
     }
 
+    /// Apply the bot's [`BlockEditQueue`].
+    fn apply_blockedit_queue(world: &mut World) {
+        let mut query =
+            world.query_filtered::<Entity, (With<ClientConnection>, Without<IsResource>)>();
+        let Ok(entity) = query.single_mut(world) else { return };
+
+        let entity = world.entity_mut(entity);
+        if let Some(queue) = entity.get::<BlockEditQueue>()
+            && !queue.is_empty()
+        {
+            BlockEditQueue::apply(entity).unwrap();
+        }
+    }
+
     /// An [`Observer`] that exits the app when the bot entity despawns.
     fn exit_on_despawn(_: On<ClientDespawn>, mut commands: Commands) {
         info!("Exiting...");
@@ -151,74 +168,105 @@ impl BotPlugin {
 
             match message.event() {
                 // Handle gameplay events.
-                ClientboundEventEnum::Play(event) => match event {
-                    // ClientboundPlayEvent::ActionBarText() => todo!(),
-                    ClientboundPlayEvent::AddEntity(data) => {
-                        let mut entity = commands.spawn((
-                            PartOfInstance::new(bot.id()),
-                            data.entity_id,
-                            data.entity_uuid,
-                            Position::new_xyz(
-                                data.position_x as f32,
-                                data.position_y as f32,
-                                data.position_z as f32,
-                            ),
-                            Velocity::new(data.velocity.as_vec3a()),
-                        ));
+                ClientboundEventEnum::Play(event) => {
+                    match event {
+                        // ClientboundPlayEvent::ActionBarText() => todo!(),
+                        ClientboundPlayEvent::AddEntity(data) => {
+                            let mut entity = commands.spawn((
+                                PartOfInstance::new(bot.id()),
+                                data.entity_id,
+                                data.entity_uuid,
+                                Position::new_xyz(
+                                    data.position_x as f32,
+                                    data.position_y as f32,
+                                    data.position_z as f32,
+                                ),
+                                Velocity::new(data.velocity.as_vec3a()),
+                            ));
 
-                        if let Some(bundle) =
-                            Version::entities().get_entity_by_id(data.entity_type.into())
-                        {
-                            info!(
-                                "Spawning Entity {} ({}) as \"{}\"",
-                                entity.id(),
-                                data.entity_id.0,
-                                bundle.identifier(),
+                            if let Some(bundle) =
+                                Version::entities().get_entity_by_id(data.entity_type.into())
+                            {
+                                info!(
+                                    "Spawning Entity {} ({}) as \"{}\"",
+                                    entity.id(),
+                                    data.entity_id.0,
+                                    bundle.identifier(),
+                                );
+
+                                entity.insert(bundle);
+                            } else {
+                                error!("Unknown Entity Type {:?}!", data.entity_type);
+                            }
+                        }
+                        // ClientboundPlayEvent::Animate() => todo!(),
+                        // ClientboundPlayEvent::AwardStats() => todo!(),
+                        // ClientboundPlayEvent::BlockChangedAck() => todo!(),
+                        // ClientboundPlayEvent::BlockDestruction() => todo!(),
+                        // ClientboundPlayEvent::BlockEntityData() => todo!(),
+                        // ClientboundPlayEvent::BlockEvent() => todo!(),
+                        ClientboundPlayEvent::BlockUpdate(blockpos, block_id) => {
+                            let blockpos = *blockpos;
+                            let block_id = *block_id;
+
+                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                            let Some(instance) = entity.get::<SessionInstance>() else {
+                                error!("Received BlockUpdate but bot doesn't have a SessionInstance!");
+                                return;
+                            };
+
+                            let Some(block) = instance.version_blocks().get_block_by_state(block_id) else {
+                                error!("Received BlockUpdate with unknown BlockState \"{}\"!", block_id.into_inner());
+                                return;
+                            };
+
+                            debug!(
+                                "Received BlockUpdate \"{}\" at {blockpos}: {:?}",
+                                block.identifier(),
+                                block.get_attributes().collect::<Vec<_>>()
                             );
 
-                            entity.insert(bundle);
-                        } else {
-                            error!("Unknown Entity Type {:?}!", data.entity_type);
+                            let Some(mut queue) = entity.get_mut::<BlockEditQueue>() else {
+                                error!(
+                                    "Received BlockUpdate but bot doesn't have a BlockEditQueue!"
+                                );
+                                return;
+                            };
+
+                            queue.push(blockpos, block);
+                        });
                         }
-                    }
-                    // ClientboundPlayEvent::Animate() => todo!(),
-                    // ClientboundPlayEvent::AwardStats() => todo!(),
-                    // ClientboundPlayEvent::BlockChangedAck() => todo!(),
-                    // ClientboundPlayEvent::BlockDestruction() => todo!(),
-                    // ClientboundPlayEvent::BlockEntityData() => todo!(),
-                    // ClientboundPlayEvent::BlockEvent() => todo!(),
-                    // ClientboundPlayEvent::BlockUpdate() => todo!(),
-                    // ClientboundPlayEvent::BossEvent() => todo!(),
-                    ClientboundPlayEvent::BundleDelimiter => {}
-                    // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
-                    // ClientboundPlayEvent::ChatSuggestions() => todo!(),
-                    ClientboundPlayEvent::ChunkBatchFinished(size) => {
-                        debug!("Received ChunkBatchFinished: {size} chunks");
+                        // ClientboundPlayEvent::BossEvent() => todo!(),
+                        ClientboundPlayEvent::BundleDelimiter => {}
+                        // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
+                        // ClientboundPlayEvent::ChatSuggestions() => todo!(),
+                        ClientboundPlayEvent::ChunkBatchFinished(size) => {
+                            debug!("Received ChunkBatchFinished: {size} chunks");
 
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundPlayEvent::ChunkBatchReceived(16.0),
-                        ));
-                    }
-                    ClientboundPlayEvent::ChunkBatchStart => {
-                        debug!("Received ChunkBatchStart");
-                    }
-                    // ClientboundPlayEvent::ChunkBiomes() => todo!(),
-                    // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
-                    // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
-                    // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    ClientboundPlayEvent::ChunkWithLight(chunk_pos, chunk_data, _) => {
-                        let chunk_pos = *chunk_pos;
-                        let chunk_data = chunk_data.clone();
+                            writer.write(ServerboundMessage::new(
+                                bot.id(),
+                                ServerboundPlayEvent::ChunkBatchReceived(16.0),
+                            ));
+                        }
+                        ClientboundPlayEvent::ChunkBatchStart => {
+                            debug!("Received ChunkBatchStart");
+                        }
+                        // ClientboundPlayEvent::ChunkBiomes() => todo!(),
+                        // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
+                        // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
+                        ClientboundPlayEvent::ChunkSectionUpdate() => {}
+                        ClientboundPlayEvent::ChunkWithLight(chunkpos, chunk_data, _) => {
+                            let chunkpos = *chunkpos;
+                            let chunk_data = chunk_data.clone();
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let bot_id = entity.id();
                             let Some(instance) = entity.get::<SessionInstance>() else {
                                 error!("Received ChunkWithLight but bot doesn't have a SessionInstance!");
                                 return
                             };
 
-                            let chunk_id = instance.query_chunk(&chunk_pos);
+                            let chunk_id = instance.query_chunk(&chunkpos);
                             let chunk = match chunk_data.try_parse::<Version>(
                                 instance.height_max(),
                                 instance.height_min(),
@@ -238,59 +286,59 @@ impl BotPlugin {
 
                                 info!(
                                     "Updating Chunk Entity {chunk_id} ({}, {})",
-                                    chunk_pos.x(),
-                                    chunk_pos.z()
+                                    chunkpos.x(),
+                                    chunkpos.z()
                                 );
                             } else {
                                 let chunk = world.spawn((
                                     PartOfInstance::new(bot_id),
                                     SharedChunk::new(chunk),
-                                    chunk_pos,
+                                    chunkpos,
                                 ));
 
                                 info!(
                                     "Spawning Chunk Entity {} ({}, {})",
                                     chunk.id(),
-                                    chunk_pos.x(),
-                                    chunk_pos.z()
+                                    chunkpos.x(),
+                                    chunkpos.z()
                                 );
                             }
                         });
-                    }
-                    // ClientboundPlayEvent::ClearDialog => todo!(),
-                    // ClientboundPlayEvent::ClearTitles() => todo!(),
-                    // ClientboundPlayEvent::CommandSuggestions() => todo!(),
-                    // ClientboundPlayEvent::Commands() => todo!(),
-                    // ClientboundPlayEvent::ContainerClose() => todo!(),
-                    // ClientboundPlayEvent::ContainerContent() => todo!(),
-                    // ClientboundPlayEvent::ContainerData() => todo!(),
-                    // ClientboundPlayEvent::ContainerSlot() => todo!(),
-                    // ClientboundPlayEvent::CookieRequest() => todo!(),
-                    // ClientboundPlayEvent::Cooldown() => todo!(),
-                    ClientboundPlayEvent::CustomPayload(identifier, payload) => {
-                        info!("Received CustomPayload \"{identifier}\": {payload:?}");
-                    }
-                    // ClientboundPlayEvent::CustomReportDetails() => todo!(),
-                    // ClientboundPlayEvent::DamageEvent() => todo!(),
-                    // ClientboundPlayEvent::DebugBlock() => todo!(),
-                    // ClientboundPlayEvent::DebugChunk() => todo!(),
-                    // ClientboundPlayEvent::DebugEntity() => todo!(),
-                    // ClientboundPlayEvent::DebugEvent() => todo!(),
-                    // ClientboundPlayEvent::DebugSample() => todo!(),
-                    // ClientboundPlayEvent::DeleteChat() => todo!(),
-                    ClientboundPlayEvent::Disconnect(reason) => {
-                        info!("Disconnected from server: {reason:?}");
-                        commands.write_message(AppExit::Success);
-                    }
-                    // ClientboundPlayEvent::DisguisedChat() => todo!(),
-                    // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
-                    // ClientboundPlayEvent::EntityEvent() => todo!(),
-                    ClientboundPlayEvent::EntityPosition(entity_id, data, _on_ground) => {
-                        let entity_id = *entity_id;
-                        let data = *data;
-                        // let _on_ground = *on_ground;
+                        }
+                        // ClientboundPlayEvent::ClearDialog => todo!(),
+                        // ClientboundPlayEvent::ClearTitles() => todo!(),
+                        // ClientboundPlayEvent::CommandSuggestions() => todo!(),
+                        // ClientboundPlayEvent::Commands() => todo!(),
+                        // ClientboundPlayEvent::ContainerClose() => todo!(),
+                        // ClientboundPlayEvent::ContainerContent() => todo!(),
+                        // ClientboundPlayEvent::ContainerData() => todo!(),
+                        // ClientboundPlayEvent::ContainerSlot() => todo!(),
+                        // ClientboundPlayEvent::CookieRequest() => todo!(),
+                        // ClientboundPlayEvent::Cooldown() => todo!(),
+                        ClientboundPlayEvent::CustomPayload(identifier, payload) => {
+                            info!("Received CustomPayload \"{identifier}\": {payload:?}");
+                        }
+                        // ClientboundPlayEvent::CustomReportDetails() => todo!(),
+                        // ClientboundPlayEvent::DamageEvent() => todo!(),
+                        // ClientboundPlayEvent::DebugBlock() => todo!(),
+                        // ClientboundPlayEvent::DebugChunk() => todo!(),
+                        // ClientboundPlayEvent::DebugEntity() => todo!(),
+                        // ClientboundPlayEvent::DebugEvent() => todo!(),
+                        // ClientboundPlayEvent::DebugSample() => todo!(),
+                        // ClientboundPlayEvent::DeleteChat() => todo!(),
+                        ClientboundPlayEvent::Disconnect(reason) => {
+                            info!("Disconnected from server: {reason:?}");
+                            commands.write_message(AppExit::Success);
+                        }
+                        // ClientboundPlayEvent::DisguisedChat() => todo!(),
+                        // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
+                        ClientboundPlayEvent::EntityEvent() => {}
+                        ClientboundPlayEvent::EntityPosition(entity_id, data, _on_ground) => {
+                            let entity_id = *entity_id;
+                            let data = *data;
+                            // let _on_ground = *on_ground;
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else {
                                 error!("Received EntityPosition but bot doesn't have a SessionInstance!");
                                 return
@@ -332,12 +380,12 @@ impl BotPlugin {
                             //     ground.0 = on_ground;
                             // }
                         });
-                    }
-                    // ClientboundPlayEvent::Explode() => todo!(),
-                    ClientboundPlayEvent::ForgetChunk(chunkpos) => {
-                        let chunkpos = *chunkpos;
+                        }
+                        // ClientboundPlayEvent::Explode() => todo!(),
+                        ClientboundPlayEvent::ForgetChunk(chunkpos) => {
+                            let chunkpos = *chunkpos;
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else {
                                 error!("Received ForgetChunk but bot doesn't have a SessionInstance!");
                                 return;
@@ -367,95 +415,98 @@ impl BotPlugin {
 
                             world.despawn();
                         });
-                    }
-                    // ClientboundPlayEvent::GameEvent() => todo!(),
-                    // ClientboundPlayEvent::GameRule() => todo!(),
-                    // ClientboundPlayEvent::GameTestHighlight() => todo!(),
-                    // ClientboundPlayEvent::GhostRecipe() => todo!(),
-                    // ClientboundPlayEvent::HurtAnimation() => todo!(),
-                    // ClientboundPlayEvent::InitializeBorder() => todo!(),
-                    ClientboundPlayEvent::KeepAlive(id) => {
-                        info!("Received KeepAlive: {id}");
+                        }
+                        // ClientboundPlayEvent::GameEvent() => todo!(),
+                        // ClientboundPlayEvent::GameRule() => todo!(),
+                        // ClientboundPlayEvent::GameTestHighlight() => todo!(),
+                        // ClientboundPlayEvent::GhostRecipe() => todo!(),
+                        // ClientboundPlayEvent::HurtAnimation() => todo!(),
+                        // ClientboundPlayEvent::InitializeBorder() => todo!(),
+                        ClientboundPlayEvent::KeepAlive(id) => {
+                            info!("Received KeepAlive: {id}");
 
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundPlayEvent::KeepAlive(*id),
-                        ));
-                    }
-                    // ClientboundPlayEvent::LevelEvent() => todo!(),
-                    // ClientboundPlayEvent::LevelParticles() => todo!(),
-                    // ClientboundPlayEvent::LightUpdate() => todo!(),
-                    ClientboundPlayEvent::Login(login) => {
-                        info!(
-                            "Joining as Entity {} ({:?}) in \"{}\"!",
-                            bot.id(),
-                            login.player_id.0,
-                            login.spawn_info.dimension
-                        );
-
-                        // Get the "minecraft:dimension_type" registry
-                        let registry = Version::registry().read();
-                        let dimensions = registry.get_nbt_by_identifier("minecraft:dimension_type");
-
-                        // Get the dimension's "min_y" and "logical_height" values.
-                        #[expect(clippy::cast_possible_wrap, reason = "Desired")]
-                        let (height_max, height_min) = if let Some(dimensions) = dimensions
-                            && let Some(dim) =
-                                dimensions.get_by_identifier(&login.spawn_info.dimension)
-                        {
-                            let min_y =
-                                dim.get("min_y").and_then(|v| v.into_int().map(|i| i as i32));
-                            let height = dim.get("logical_height").and_then(IndexedValue::into_int);
-
-                            let (Some(min_y), Some(height)) = (min_y, height) else {
-                                panic!("Failed to get dimension size?!")
-                            };
-                            let height = height
-                                .checked_add_signed(min_y)
-                                .expect("Dimension size overflowed?!");
-
+                            writer.write(ServerboundMessage::new(
+                                bot.id(),
+                                ServerboundPlayEvent::KeepAlive(*id),
+                            ));
+                        }
+                        // ClientboundPlayEvent::LevelEvent() => todo!(),
+                        // ClientboundPlayEvent::LevelParticles() => todo!(),
+                        ClientboundPlayEvent::LightUpdate(_chunkpos, _light_data) => {}
+                        ClientboundPlayEvent::Login(login) => {
                             info!(
-                                "Dimension \"{}\" has min_y=\"{min_y}\" and height=\"{height}\"!",
+                                "Joining as Entity {} ({:?}) in \"{}\"!",
+                                bot.id(),
+                                login.player_id.0,
                                 login.spawn_info.dimension
                             );
 
-                            (height, min_y)
-                        } else {
-                            error!(
-                                "Failed to get dimension \"{}\" from registry, using default \"minecraft:overworld\" values!",
-                                login.spawn_info.dimension
-                            );
+                            // Get the "minecraft:dimension_type" registry
+                            let registry = Version::registry().read();
+                            let dimensions =
+                                registry.get_nbt_by_identifier("minecraft:dimension_type");
 
-                            (320, -64)
-                        };
+                            // Get the dimension's "min_y" and "logical_height" values.
+                            #[expect(clippy::cast_possible_wrap, reason = "Desired")]
+                            let (height_max, height_min) = if let Some(dimensions) = dimensions
+                                && let Some(dim) =
+                                    dimensions.get_by_identifier(&login.spawn_info.dimension)
+                            {
+                                let min_y =
+                                    dim.get("min_y").and_then(|v| v.into_int().map(|i| i as i32));
+                                let height =
+                                    dim.get("logical_height").and_then(IndexedValue::into_int);
 
-                        // Insert the bot's initial components.
-                        let profile = bot.get::<PlayerProfile>().unwrap();
-                        commands.entity(bot.id()).insert((
-                            login.player_id,
-                            EntityUuid::new(*profile.uuid()),
-                            SessionInstance::new::<Version>(
-                                login.spawn_info.dimension.clone(),
-                                height_max,
-                                height_min,
-                            ),
-                            PartOfInstance::new(bot.id()),
-                            EntityBundle::new::<entity::Player, Version>(),
-                            Position::ZERO,
-                            Rotation::IDENTITY,
-                            Velocity::ZERO,
-                            Acceleration::ZERO,
-                        ));
-                    }
-                    // ClientboundPlayEvent::MapItemData() => todo!(),
-                    // ClientboundPlayEvent::MerchantOffers() => todo!(),
-                    // ClientboundPlayEvent::MountScreen() => todo!(),
-                    ClientboundPlayEvent::MoveEntityPos(data)
-                    | ClientboundPlayEvent::MoveEntityPosRot(data)
-                    | ClientboundPlayEvent::MoveEntityRot(data) => {
-                        let data = *data;
+                                let (Some(min_y), Some(height)) = (min_y, height) else {
+                                    panic!("Failed to get dimension size?!")
+                                };
+                                let height = height
+                                    .checked_add_signed(min_y)
+                                    .expect("Dimension size overflowed?!");
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                                info!(
+                                    "Dimension \"{}\" has min_y=\"{min_y}\" and height=\"{height}\"!",
+                                    login.spawn_info.dimension
+                                );
+
+                                (height, min_y)
+                            } else {
+                                error!(
+                                    "Failed to get dimension \"{}\" from registry, using default \"minecraft:overworld\" values!",
+                                    login.spawn_info.dimension
+                                );
+
+                                (320, -64)
+                            };
+
+                            // Insert the bot's initial components.
+                            let profile = bot.get::<PlayerProfile>().unwrap();
+                            commands.entity(bot.id()).insert((
+                                login.player_id,
+                                EntityUuid::new(*profile.uuid()),
+                                BlockEditQueue::new(),
+                                SessionInstance::new::<Version>(
+                                    login.spawn_info.dimension.clone(),
+                                    height_max,
+                                    height_min,
+                                ),
+                                PartOfInstance::new(bot.id()),
+                                EntityBundle::new::<entity::Player, Version>(),
+                                Position::ZERO,
+                                Rotation::IDENTITY,
+                                Velocity::ZERO,
+                                Acceleration::ZERO,
+                            ));
+                        }
+                        // ClientboundPlayEvent::MapItemData() => todo!(),
+                        // ClientboundPlayEvent::MerchantOffers() => todo!(),
+                        // ClientboundPlayEvent::MountScreen() => todo!(),
+                        ClientboundPlayEvent::MoveEntityPos(data)
+                        | ClientboundPlayEvent::MoveEntityPosRot(data)
+                        | ClientboundPlayEvent::MoveEntityRot(data) => {
+                            let data = *data;
+
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
                             let Some(target) = instance.query_id(&data.entity_id) else {
                                 error!(
@@ -492,38 +543,38 @@ impl BotPlugin {
                             //     on_ground.0 = data.on_ground;
                             // }
                         });
-                    }
-                    // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
-                    // ClientboundPlayEvent::MoveVehicle() => todo!(),
-                    // ClientboundPlayEvent::OpenBook() => todo!(),
-                    // ClientboundPlayEvent::OpenScreen() => todo!(),
-                    // ClientboundPlayEvent::OpenSignEditor() => todo!(),
-                    ClientboundPlayEvent::Ping(id) => {
-                        info!("Received Ping: {id}");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundPlayEvent::Pong(*id),
-                        ));
-                    }
-                    // ClientboundPlayEvent::PlayerAbilities() => todo!(),
-                    // ClientboundPlayEvent::PlayerChat() => todo!(),
-                    // ClientboundPlayEvent::PlayerCombatEnd() => todo!(),
-                    // ClientboundPlayEvent::PlayerCombatEnter() => todo!(),
-                    // ClientboundPlayEvent::PlayerCombatKill() => todo!(),
-                    // ClientboundPlayEvent::PlayerInfoRemove() => todo!(),
-                    // ClientboundPlayEvent::PlayerInfoUpdate() => todo!(),
-                    // ClientboundPlayEvent::PlayerLookAt() => todo!(),
-                    ClientboundPlayEvent::PlayerPosition(teleport, data, flags) => {
-                        // Tell the server we accepted the teleport.
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundPlayEvent::AcceptTeleportation(*teleport),
-                        ));
+                        }
+                        // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
+                        // ClientboundPlayEvent::MoveVehicle() => todo!(),
+                        // ClientboundPlayEvent::OpenBook() => todo!(),
+                        // ClientboundPlayEvent::OpenScreen() => todo!(),
+                        // ClientboundPlayEvent::OpenSignEditor() => todo!(),
+                        ClientboundPlayEvent::Ping(id) => {
+                            info!("Received Ping: {id}");
+                            writer.write(ServerboundMessage::new(
+                                bot.id(),
+                                ServerboundPlayEvent::Pong(*id),
+                            ));
+                        }
+                        // ClientboundPlayEvent::PlayerAbilities() => todo!(),
+                        // ClientboundPlayEvent::PlayerChat() => todo!(),
+                        // ClientboundPlayEvent::PlayerCombatEnd() => todo!(),
+                        // ClientboundPlayEvent::PlayerCombatEnter() => todo!(),
+                        // ClientboundPlayEvent::PlayerCombatKill() => todo!(),
+                        // ClientboundPlayEvent::PlayerInfoRemove() => todo!(),
+                        // ClientboundPlayEvent::PlayerInfoUpdate() => todo!(),
+                        // ClientboundPlayEvent::PlayerLookAt() => todo!(),
+                        ClientboundPlayEvent::PlayerPosition(teleport, data, flags) => {
+                            // Tell the server we accepted the teleport.
+                            writer.write(ServerboundMessage::new(
+                                bot.id(),
+                                ServerboundPlayEvent::AcceptTeleportation(*teleport),
+                            ));
 
-                        // Set the player's position/rotation/velocity.
-                        let data = *data;
-                        let flags = *flags;
-                        commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut| {
+                            // Set the player's position/rotation/velocity.
+                            let data = *data;
+                            let flags = *flags;
+                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut| {
                             if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
                                 &mut Position,
                                 &mut Rotation,
@@ -537,20 +588,20 @@ impl BotPlugin {
                                 );
                             }
                         });
-                    }
-                    // ClientboundPlayEvent::PlayerRotation() => todo!(),
-                    ClientboundPlayEvent::Pong(id) => {
-                        info!("Received Pong: {id}");
-                    }
-                    // ClientboundPlayEvent::ProjectilePower() => todo!(),
-                    // ClientboundPlayEvent::RecipeBookAdd() => todo!(),
-                    // ClientboundPlayEvent::RecipeBookRemove() => todo!(),
-                    // ClientboundPlayEvent::RecipeBookSettings() => todo!(),
-                    ClientboundPlayEvent::RemoveEntities(entities) => {
-                        let removed = entities.clone();
-                        let bot_id = bot.id();
+                        }
+                        // ClientboundPlayEvent::PlayerRotation() => todo!(),
+                        ClientboundPlayEvent::Pong(id) => {
+                            info!("Received Pong: {id}");
+                        }
+                        // ClientboundPlayEvent::ProjectilePower() => todo!(),
+                        // ClientboundPlayEvent::RecipeBookAdd() => todo!(),
+                        // ClientboundPlayEvent::RecipeBookRemove() => todo!(),
+                        // ClientboundPlayEvent::RecipeBookSettings() => todo!(),
+                        ClientboundPlayEvent::RemoveEntities(entities) => {
+                            let removed = entities.clone();
+                            let bot_id = bot.id();
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
 
                             let Ok(bot) = entities.get(bot_id) else { return };
@@ -573,35 +624,35 @@ impl BotPlugin {
                                 }
                             }
                         });
-                    }
-                    // ClientboundPlayEvent::RemoveMobEffect() => todo!(),
-                    // ClientboundPlayEvent::ResetScore() => todo!(),
-                    // ClientboundPlayEvent::ResourcePackPop() => todo!(),
-                    // ClientboundPlayEvent::ResourcePackPush() => todo!(),
-                    // ClientboundPlayEvent::Respawn() => todo!(),
-                    ClientboundPlayEvent::RotateHead() => {}
-                    // ClientboundPlayEvent::SelectAdvancementTab() => todo!(),
-                    // ClientboundPlayEvent::ServerData() => todo!(),
-                    // ClientboundPlayEvent::ServerLinks() => todo!(),
-                    // ClientboundPlayEvent::SetBorderCenter() => todo!(),
-                    // ClientboundPlayEvent::SetBorderLerpSize() => todo!(),
-                    // ClientboundPlayEvent::SetBorderSize() => todo!(),
-                    // ClientboundPlayEvent::SetBorderWarningDelay() => todo!(),
-                    // ClientboundPlayEvent::SetBorderWarningDistance() => todo!(),
-                    // ClientboundPlayEvent::SetCamera() => todo!(),
-                    // ClientboundPlayEvent::SetCursorItem() => todo!(),
-                    // ClientboundPlayEvent::SetDefaultSpawn() => todo!(),
-                    // ClientboundPlayEvent::SetDisplayObjective() => todo!(),
-                    ClientboundPlayEvent::SetEntityData(data) => {
-                        debug!("Received SetEntityData for EntityId {}", data.entity_id().0);
+                        }
+                        // ClientboundPlayEvent::RemoveMobEffect() => todo!(),
+                        // ClientboundPlayEvent::ResetScore() => todo!(),
+                        // ClientboundPlayEvent::ResourcePackPop() => todo!(),
+                        // ClientboundPlayEvent::ResourcePackPush() => todo!(),
+                        // ClientboundPlayEvent::Respawn() => todo!(),
+                        ClientboundPlayEvent::RotateHead() => {}
+                        // ClientboundPlayEvent::SelectAdvancementTab() => todo!(),
+                        // ClientboundPlayEvent::ServerData() => todo!(),
+                        // ClientboundPlayEvent::ServerLinks() => todo!(),
+                        // ClientboundPlayEvent::SetBorderCenter() => todo!(),
+                        // ClientboundPlayEvent::SetBorderLerpSize() => todo!(),
+                        // ClientboundPlayEvent::SetBorderSize() => todo!(),
+                        // ClientboundPlayEvent::SetBorderWarningDelay() => todo!(),
+                        // ClientboundPlayEvent::SetBorderWarningDistance() => todo!(),
+                        // ClientboundPlayEvent::SetCamera() => todo!(),
+                        // ClientboundPlayEvent::SetCursorItem() => todo!(),
+                        // ClientboundPlayEvent::SetDefaultSpawn() => todo!(),
+                        // ClientboundPlayEvent::SetDisplayObjective() => todo!(),
+                        ClientboundPlayEvent::SetEntityData(data) => {
+                            debug!("Received SetEntityData for EntityId {}", data.entity_id().0);
 
-                        let id = data.entity_id();
-                        let Ok(dataset) = data.parse() else {
-                            error!("Failed to parse EntityData for EntityId {}!", id.0);
-                            continue;
-                        };
+                            let id = data.entity_id();
+                            let Ok(dataset) = data.parse() else {
+                                error!("Failed to parse EntityData for EntityId {}!", id.0);
+                                continue;
+                            };
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
@@ -630,13 +681,13 @@ impl BotPlugin {
                                 error!("Received SetEntityData for unknown EntityId {}!", id.0);
                             }
                         });
-                    }
-                    // ClientboundPlayEvent::SetEntityLink() => todo!(),
-                    ClientboundPlayEvent::SetEntityMotion(id, delta) => {
-                        let id = *id;
-                        let delta = *delta;
+                        }
+                        // ClientboundPlayEvent::SetEntityLink() => todo!(),
+                        ClientboundPlayEvent::SetEntityMotion(id, delta) => {
+                            let id = *id;
+                            let delta = *delta;
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
@@ -653,43 +704,43 @@ impl BotPlugin {
                                 error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
                             }
                         });
-                    }
-                    // ClientboundPlayEvent::SetEquipment() => todo!(),
-                    // ClientboundPlayEvent::SetExperience() => todo!(),
-                    // ClientboundPlayEvent::SetHealth() => todo!(),
-                    // ClientboundPlayEvent::SetHeldSlot() => todo!(),
-                    // ClientboundPlayEvent::SetObjective() => todo!(),
-                    // ClientboundPlayEvent::SetPassengers() => todo!(),
-                    // ClientboundPlayEvent::SetPlayerInventory() => todo!(),
-                    // ClientboundPlayEvent::SetPlayerTeam() => todo!(),
-                    // ClientboundPlayEvent::SetScore() => todo!(),
-                    // ClientboundPlayEvent::SetSimulationDistance() => todo!(),
-                    // ClientboundPlayEvent::SetSubtitleText() => todo!(),
-                    ClientboundPlayEvent::SetTime() => {}
-                    // ClientboundPlayEvent::SetTitleAnimation() => todo!(),
-                    // ClientboundPlayEvent::SetTitleText() => todo!(),
-                    // ClientboundPlayEvent::ShowDialog() => todo!(),
-                    // ClientboundPlayEvent::Sound() => todo!(),
-                    // ClientboundPlayEvent::SoundEntity() => todo!(),
-                    ClientboundPlayEvent::StartConfiguration => {
-                        info!("Reconfiguring...");
-                        let mut commands = commands.entity(bot.id());
+                        }
+                        // ClientboundPlayEvent::SetEquipment() => todo!(),
+                        // ClientboundPlayEvent::SetExperience() => todo!(),
+                        // ClientboundPlayEvent::SetHealth() => todo!(),
+                        // ClientboundPlayEvent::SetHeldSlot() => todo!(),
+                        // ClientboundPlayEvent::SetObjective() => todo!(),
+                        // ClientboundPlayEvent::SetPassengers() => todo!(),
+                        // ClientboundPlayEvent::SetPlayerInventory() => todo!(),
+                        // ClientboundPlayEvent::SetPlayerTeam() => todo!(),
+                        // ClientboundPlayEvent::SetScore() => todo!(),
+                        // ClientboundPlayEvent::SetSimulationDistance() => todo!(),
+                        // ClientboundPlayEvent::SetSubtitleText() => todo!(),
+                        ClientboundPlayEvent::SetTime() => {}
+                        // ClientboundPlayEvent::SetTitleAnimation() => todo!(),
+                        // ClientboundPlayEvent::SetTitleText() => todo!(),
+                        // ClientboundPlayEvent::ShowDialog() => todo!(),
+                        // ClientboundPlayEvent::Sound() => todo!(),
+                        // ClientboundPlayEvent::SoundEntity() => todo!(),
+                        ClientboundPlayEvent::StartConfiguration => {
+                            info!("Reconfiguring...");
+                            let mut commands = commands.entity(bot.id());
 
-                        commands.remove::<SessionInstance>();
-                    }
-                    // ClientboundPlayEvent::StopSound() => todo!(),
-                    // ClientboundPlayEvent::StoreCookie() => todo!(),
-                    // ClientboundPlayEvent::SystemChat() => todo!(),
-                    // ClientboundPlayEvent::TabList() => todo!(),
-                    // ClientboundPlayEvent::TagQuery() => todo!(),
-                    // ClientboundPlayEvent::TakeItemEntity() => todo!(),
-                    ClientboundPlayEvent::TeleportEntity(id, data, flags, _on_ground) => {
-                        let id = *id;
-                        let data = *data;
-                        let flags = *flags;
-                        // let on_ground = *on_ground;
+                            commands.remove::<SessionInstance>();
+                        }
+                        // ClientboundPlayEvent::StopSound() => todo!(),
+                        // ClientboundPlayEvent::StoreCookie() => todo!(),
+                        // ClientboundPlayEvent::SystemChat() => todo!(),
+                        // ClientboundPlayEvent::TabList() => todo!(),
+                        // ClientboundPlayEvent::TagQuery() => todo!(),
+                        // ClientboundPlayEvent::TakeItemEntity() => todo!(),
+                        ClientboundPlayEvent::TeleportEntity(id, data, flags, _on_ground) => {
+                            let id = *id;
+                            let data = *data;
+                            let flags = *flags;
+                            // let on_ground = *on_ground;
 
-                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
@@ -718,19 +769,20 @@ impl BotPlugin {
                                 error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
                             }
                         });
+                        }
+                        // ClientboundPlayEvent::TestBlockStatus() => todo!(),
+                        // ClientboundPlayEvent::TickingState() => todo!(),
+                        // ClientboundPlayEvent::TickingStep() => todo!(),
+                        // ClientboundPlayEvent::Transfer() => todo!(),
+                        // ClientboundPlayEvent::UpdateAdvancements() => todo!(),
+                        // ClientboundPlayEvent::UpdateAttributes() => todo!(),
+                        // ClientboundPlayEvent::UpdateMobEffect() => todo!(),
+                        // ClientboundPlayEvent::UpdateRecipes() => todo!(),
+                        // ClientboundPlayEvent::UpdateTags() => todo!(),
+                        // ClientboundPlayEvent::Waypoint() => todo!(),
+                        other => debug!("Unhandled Event: {other:?}"),
                     }
-                    // ClientboundPlayEvent::TestBlockStatus() => todo!(),
-                    // ClientboundPlayEvent::TickingState() => todo!(),
-                    // ClientboundPlayEvent::TickingStep() => todo!(),
-                    // ClientboundPlayEvent::Transfer() => todo!(),
-                    // ClientboundPlayEvent::UpdateAdvancements() => todo!(),
-                    // ClientboundPlayEvent::UpdateAttributes() => todo!(),
-                    // ClientboundPlayEvent::UpdateMobEffect() => todo!(),
-                    // ClientboundPlayEvent::UpdateRecipes() => todo!(),
-                    // ClientboundPlayEvent::UpdateTags() => todo!(),
-                    // ClientboundPlayEvent::Waypoint() => todo!(),
-                    other => debug!("Unhandled Event: {other:?}"),
-                },
+                }
 
                 // Handle configuration events.
                 ClientboundEventEnum::Config(event) => match event {
@@ -899,6 +951,19 @@ impl BotPlugin {
                             profile.username(),
                             profile.uuid().as_hyphenated()
                         );
+
+                        if let Some(existing) = bot.get::<PlayerProfile>()
+                            && (existing.username() != profile.username()
+                                || existing.uuid() != profile.uuid())
+                        {
+                            warn!(
+                                "Bot using \"{}\" ({}) was changed to \"{}\" ({})!",
+                                existing.username(),
+                                existing.uuid().as_hyphenated(),
+                                profile.username(),
+                                profile.uuid().as_hyphenated()
+                            );
+                        }
 
                         commands
                             .entity(bot.entity())

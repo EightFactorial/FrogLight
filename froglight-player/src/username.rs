@@ -65,12 +65,10 @@ impl Username {
     /// Be very sure that this is what you need before using it.
     #[must_use]
     pub fn uuid_offline(&self) -> Uuid {
-        Md5::new()
-            .chain("OfflinePlayer:")
-            .chain(self.as_str())
-            .finalize()
-            .first_chunk::<16>()
-            .map_or(Uuid::nil(), |&data| Builder::from_md5_bytes(data).into_uuid())
+        Builder::from_md5_bytes(
+            Md5::new().chain("OfflinePlayer:").chain(self.as_str()).finalize().0,
+        )
+        .into_uuid()
     }
 }
 

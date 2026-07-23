@@ -44,8 +44,8 @@ impl BlockEditQueue {
     #[must_use]
     pub const fn is_empty(&self) -> bool { self.is_empty }
 
-    /// Queue a block edit to be applied to a [`Chunk`].
-    pub fn queue(&mut self, position: BlockPos, block: Block) {
+    /// Push a block edit to be applied to a [`Chunk`].
+    pub fn push(&mut self, position: BlockPos, block: Block) {
         let chunk = position.into_chunk_pos();
         let queue = self.queue.entry(chunk).or_default();
         queue.push(BlockEdit { position, block });

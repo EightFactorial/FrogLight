@@ -13,6 +13,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
+        api::ClientApi,
         client::HttpClient,
         player::{PlayerProfileExt, UsernameExt},
         resolver::DnsResolver,

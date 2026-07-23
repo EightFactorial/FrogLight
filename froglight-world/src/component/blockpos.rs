@@ -11,7 +11,7 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
-use froglight_facet::facet::prelude::*;
+use froglight_facet::facet::{WithFnAttr, prelude::*};
 use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -116,6 +116,63 @@ impl FacetTemplate for BlockPos {
 
 // -------------------------------------------------------------------------------------------------
 
+#[cfg(feature = "facet")]
+impl BlockPos {
+    /// A [`WithFnAttr`] for serializing and deserializing packed
+    /// [`BlockPos`].
+    ///
+    /// See [`FacetTemplate`] for more information.
+    pub const WITH_PACKED: WithFnAttr = WithFnAttr::template::<Packed>();
+}
+
+#[cfg(feature = "facet")]
+struct Packed;
+
+#[rustfmt::skip]
+#[cfg(feature = "facet")]
+impl Packed {
+    // <3 Azalea
+
+    const PACKED_X_LENGTH: u64 = 1 + 25; // minecraft does something a bit more complicated to get this 25
+    const PACKED_Z_LENGTH: u64 = Self::PACKED_X_LENGTH;
+    const PACKED_Y_LENGTH: u64 = 64 - Self::PACKED_X_LENGTH - Self::PACKED_Z_LENGTH;
+    const PACKED_X_MASK: u64 = (1 << Self::PACKED_X_LENGTH) - 1;
+    const PACKED_Y_MASK: u64 = (1 << Self::PACKED_Y_LENGTH) - 1;
+    const PACKED_Z_MASK: u64 = (1 << Self::PACKED_Z_LENGTH) - 1;
+    const Z_OFFSET: u64 = Self::PACKED_Y_LENGTH;
+    const X_OFFSET: u64 = Self::PACKED_Y_LENGTH + Self::PACKED_Z_LENGTH;
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "facet")]
+#[expect(clippy::cast_sign_loss, reason = "Expected")]
+impl FacetTemplate for Packed {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let item = item.get::<BlockPos>()?;
+
+        let mut val: u64 = 0;
+        val |= ((item.x() as u64) & Self::PACKED_X_MASK) << Self::X_OFFSET;
+        val |= (item.y() as u64) & Self::PACKED_Y_MASK;
+        val |= ((item.z() as u64) & Self::PACKED_Z_MASK) << Self::Z_OFFSET;
+
+        writer.write_bytes(&val.to_be_bytes())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        item: DeserializeItem<'facet, BORROW>,
+        reader: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        let val = i64::from_be_bytes(*reader.read_array()?);
+        let x = (val << (64 - Self::X_OFFSET - Self::PACKED_X_LENGTH) >> (64 - Self::PACKED_X_LENGTH)) as i32;
+        let y = (val << (64 - Self::PACKED_Y_LENGTH) >> (64 - Self::PACKED_Y_LENGTH)) as i32;
+        let z = (val << (64 - Self::Z_OFFSET - Self::PACKED_Z_LENGTH) >> (64 - Self::PACKED_Z_LENGTH)) as i32;
+
+        item.set(BlockPos::new_xyz(x, y, z))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 impl<T: Into<IVec3>> From<T> for BlockPos {
     #[inline]
     fn from(value: T) -> Self { BlockPos::new(value.into()) }
@@ -123,11 +180,7 @@ impl<T: Into<IVec3>> From<T> for BlockPos {
 
 impl fmt::Display for BlockPos {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BlockPos")
-            .field("x", &self.x())
-            .field("y", &self.y())
-            .field("z", &self.z())
-            .finish()
+        core::write!(f, "[{}, {}, {}]", self.x(), self.y(), self.z())
     }
 }
 
