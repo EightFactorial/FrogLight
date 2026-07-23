@@ -52,6 +52,14 @@ test:
     cargo nextest run --workspace --release --{{ NO_FEATURES }}  --{{ EXCLUDE }}
     cargo test --doc --workspace --{{ NO_FEATURES }} --{{ EXCLUDE }}
 
+# Build all profiles and check the size of the resulting binaries
+buildsize:
+    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=dev
+    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=release
+    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=distribution
+    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=distribution-size
+    ls -lha target/*/examples/frogbot
+
 # Check all files for typos
 typos:
     typos
