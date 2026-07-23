@@ -51,7 +51,7 @@ facet-value = { default-features = false, version = "=0.50.0-rc.5" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.1" }
-base64 = { default-features = false, version = "0.22.1" }
+base64 = { default-features = false, version = "0.23.0" }
 cfb8 = { default-features = false, version = "0.9.1" }
 cipher = { default-features = false, version = "0.5.2" }
 crc32c = { default-features = false, version = "0.6.8" }
