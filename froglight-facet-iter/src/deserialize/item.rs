@@ -43,7 +43,7 @@ impl StackItem {
 // -------------------------------------------------------------------------------------------------
 
 /// A description of a deserialization item.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct DeserializeDesc {
     variable: bool,
     field: Option<&'static Field>,
@@ -94,6 +94,16 @@ impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
     #[must_use]
     pub const fn new(partial: Partial<'facet, BORROW>, desc: DeserializeDesc) -> Self {
         Self { partial, desc }
+    }
+
+    /// Create a new [`DeserializeItem`] for the given [`Partial`].
+    ///
+    /// This is equivalent to [`DeserializeItem::new`] with a default
+    /// [`DeserializeDesc`].
+    #[inline]
+    #[must_use]
+    pub const fn new_partial(partial: Partial<'facet, BORROW>) -> Self {
+        Self::new(partial, DeserializeDesc::new(false, None))
     }
 
     /// Get the inner [`Partial`] of the [`DeserializeItem`].

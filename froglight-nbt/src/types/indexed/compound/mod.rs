@@ -1,5 +1,7 @@
 //! TODO
 
+use core::fmt;
+
 use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
@@ -10,7 +12,7 @@ use crate::types::indexed::{
 };
 
 mod iter;
-pub use iter::CompoundIter;
+pub use iter::{CompoundIter, CompoundOwnedIter};
 
 /// An NBT Compound that is indexed by an [`IndexCore`].
 pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
@@ -19,7 +21,7 @@ pub struct IndexedCompound<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
 }
 
 impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedCompound<'data, A, C> {
-    /// Create a new [`IndexedCompound`] from the given core and index.
+    /// Create a new [`IndexedCompound`] from the given core and range index.
     ///
     /// # Safety
     ///
@@ -28,11 +30,26 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedCompound<'data, A, C> 
     #[must_use]
     pub const unsafe fn new(core: A::CORE<'data, C>, index: usize) -> Self { Self { core, index } }
 
+    /// Get the list of entries held by this compound.
     #[inline]
     #[must_use]
     fn entries(&self) -> &[EntryIndex] {
-        // SAFETY: `IndexedCompound` guarantees that `self.index` is a valid index.
+        // SAFETY: `IndexedCompound` guarantees that `index` is a valid range index.
         unsafe { self.core.entry_range(self.index) }
+    }
+
+    /// Get the index of the entry with the given key, if it exists.
+    #[must_use]
+    fn entry_with_key<K: PartialEq<MStr> + ?Sized>(&self, key: &K) -> Option<&EntryIndex> {
+        self.entries().iter().find(|entry| {
+            let name = entry.name();
+            let root = <C as IndexCore<A>>::root(&self.core);
+
+            // SAFETY: `IndexedCompound` guarantees that `name` is a valid index.
+            let entry_key = unsafe { IndexedReference::<_, Ref>::new(root, name) };
+
+            key == entry_key.get()
+        })
     }
 
     /// Get the number of entries in this compound.
@@ -44,68 +61,92 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedCompound<'data, A, C> 
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.entries().is_empty() }
-}
-
-impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedCompound<'data, A, C> {
-    /// Return a reference to the stored value for `key`, if it is present, else
-    /// `None`.
-    #[must_use]
-    pub fn get<'a, K: PartialEq<MStr> + ?Sized>(
-        &'a self,
-        key: &K,
-    ) -> Option<IndexedValue<'a, Ref, C>> {
-        for entry in self.entries() {
-            // SAFETY: `IndexedCompound` guarantees that `entry.name()` is a valid index.
-            let entry_key = unsafe {
-                IndexedReference::<_, Ref>::new(<C as IndexCore<A>>::root(&self.core), entry.name())
-            };
-
-            if key == entry_key.get() {
-                // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
-                return Some(unsafe { IndexedValue::<Ref, C>::new(&self.core, entry.value()) });
-            }
-        }
-        None
-    }
 
     /// Return the stored value for `key`, if it is present, else `None`.
     #[must_use]
-    pub fn into_entry<K: PartialEq<MStr> + ?Sized>(
-        self,
-        key: &K,
-    ) -> Option<IndexedEntry<'data, Ref, C>> {
-        for entry in self.entries() {
-            // SAFETY: `IndexedCompound` guarantees that `entry.name()` is a valid index.
-            let entry_key = unsafe {
-                IndexedReference::<_, Ref>::new(<C as IndexCore<A>>::root(&self.core), entry.name())
-            };
-
-            if key == entry_key.get() {
-                let entry = *entry;
-                let core = A::into_core(self.core);
-
-                // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
-                return Some(unsafe { IndexedEntry::<Ref, C>::new(core, entry) });
-            }
+    pub fn get<K: PartialEq<MStr> + ?Sized>(self, key: &K) -> Option<IndexedValue<'data, A, C>> {
+        if let Some(index) = self.entry_with_key(key).copied() {
+            let value = index.value();
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            Some(unsafe { IndexedValue::<A, C>::new(self.core, value) })
+        } else {
+            None
         }
-        None
     }
 
     /// Get a key-value pair by index.
     ///
     /// Returns `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_index(&self, index: usize) -> Option<IndexedEntry<'_, Ref, C>> {
-        self.entries().get(index).copied().map(|entry| {
+    pub fn get_index(self, index: usize) -> Option<IndexedEntry<'data, A, C>> {
+        if let Some(entry) = self.entries().get(index).copied() {
             // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
-            unsafe { IndexedEntry::<Ref, C>::new(&self.core, entry) }
-        })
+            Some(unsafe { IndexedEntry::<A, C>::new(self.core, entry) })
+        } else {
+            None
+        }
+    }
+
+    /// Return a reference to the stored value for `key`, if it is present, else
+    /// `None`.
+    #[must_use]
+    pub fn get_ref<'a, K: PartialEq<MStr> + ?Sized>(
+        &'a self,
+        key: &K,
+    ) -> Option<IndexedValue<'a, Ref, C>>
+    where
+        C: IndexCore<Ref>,
+    {
+        if let Some(index) = self.entry_with_key(key).copied() {
+            let value = index.value();
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            Some(unsafe { IndexedValue::<Ref, C>::new(&self.core, value) })
+        } else {
+            None
+        }
+    }
+
+    /// Get a reference to a key-value pair by index.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get_index_ref(&self, index: usize) -> Option<IndexedEntry<'_, Ref, C>>
+    where
+        C: IndexCore<Ref>,
+    {
+        if let Some(entry) = self.entries().get(index).copied() {
+            // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
+            Some(unsafe { IndexedEntry::<Ref, C>::new(&self.core, entry) })
+        } else {
+            None
+        }
     }
 
     /// Return an iterator over the entries in this compound.
     #[inline]
     #[must_use]
-    pub fn iter(&self) -> CompoundIter<'_, 'data, A, C> { CompoundIter::new(self) }
+    pub const fn iter(&self) -> CompoundIter<'_, 'data, A, C>
+    where
+        C: IndexCore<Ref>,
+    {
+        CompoundIter::new(self)
+    }
+
+    /// Return an owned iterator over the entries in this compound.
+    ///
+    /// # Note
+    ///
+    /// This function requires `Copy`, but the iterator only requires `Clone`!
+    ///
+    /// This is to prevent accidental `Clone`s, which can be very expensive.
+    #[inline]
+    #[must_use]
+    pub const fn into_iter(self) -> CompoundOwnedIter<'data, A, C>
+    where
+        <A as NbtAccess>::CORE<'data, C>: Copy,
+    {
+        CompoundOwnedIter::new(self)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -118,39 +159,57 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedCompound<'data, Mut, C> {
         &'a mut self,
         key: &K,
     ) -> Option<IndexedValue<'a, Mut, C>> {
-        for entry in self.entries() {
-            // SAFETY: `IndexedCompound` guarantees that `entry.name()` is a valid index.
-            let entry_key = unsafe {
-                IndexedReference::<_, Ref>::new(
-                    <C as IndexCore<Mut>>::root(self.core),
-                    entry.name(),
-                )
-            };
-
-            if key == entry_key.get() {
-                // SAFETY: `IndexedCompound` guarantees that `entry.value()` is a valid index.
-                let value = entry.value();
-                return Some(unsafe { IndexedValue::<Mut, C>::new(self.core, value) });
-            }
+        if let Some(index) = self.entry_with_key(key).copied() {
+            let value = index.value();
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            Some(unsafe { IndexedValue::<Mut, C>::new(self.core, value) })
+        } else {
+            None
         }
-        None
     }
 
     /// Get a key-value pair by index.
     #[must_use]
     pub fn get_index_mut(&mut self, index: usize) -> Option<IndexedEntry<'_, Mut, C>> {
-        self.entries().get(index).copied().map(|entry| {
+        if let Some(entry) = self.entries().get(index).copied() {
             // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
-            unsafe { IndexedEntry::<Mut, C>::new(self.core, entry) }
-        })
+            Some(unsafe { IndexedEntry::<Mut, C>::new(self.core, entry) })
+        } else {
+            None
+        }
     }
+
+    /// Return an iterator over the entries in this compound.
+    #[inline]
+    #[must_use]
+    pub fn iter_mut(&mut self) -> CompoundIter<'_, 'data, Mut, C> { CompoundIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'a, A: NbtAccess, C: IndexCore<A>> Clone for IndexedCompound<'a, A, C>
+impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for IndexedCompound<'_, A, C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_map().entries(self.iter().map(IndexedEntry::pair)).finish()
+    }
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedCompound<'data, A, C>
 where
-    A::CORE<'a, C>: Clone,
+    <A as NbtAccess>::CORE<'data, C>: Clone,
 {
+    #[inline]
     fn clone(&self) -> Self { Self { core: self.core.clone(), index: self.index } }
 }
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedCompound<'data, A, C> where
+    <A as NbtAccess>::CORE<'data, C>: Copy
+{
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for IndexedCompound<'data, A, C> {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+            && <C as IndexCore<A>>::root(&self.core) == <C as IndexCore<A>>::root(&other.core)
+    }
+}
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for IndexedCompound<'data, A, C> {}

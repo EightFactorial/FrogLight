@@ -74,7 +74,7 @@ impl Rotation {
     /// # Warning
     ///
     /// This is *not* a vector!
-    /// It is just being stored in a [`Vec3A`] for performance.
+    /// It is just being stored in a [`Vec3A`] for performance!
     #[inline]
     #[must_use]
     pub const fn as_vec3a(&mut self) -> &mut Vec3A { &mut self.0 }

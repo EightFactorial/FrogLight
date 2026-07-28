@@ -1,12 +1,10 @@
 //! TODO
 #![allow(missing_docs, reason = "WIP")]
 
-#[cfg(feature = "facet")]
-use facet::Peek;
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
+use froglight_nbt::prelude::IndexedNbtCow;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
@@ -14,39 +12,6 @@ use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct RegistryDataEntry {
     pub identifier: Identifier<'static>,
-    #[cfg_attr(feature = "facet", facet(mc::with = RegistryDataEntry::WITH))]
+    #[cfg_attr(feature = "facet", facet(mc::with = IndexedNbtCow::WITH_OPT_UNNAMED))]
     pub nbt: Option<IndexedNbtCow<'static>>,
-}
-
-#[cfg(feature = "facet")]
-impl FacetTemplate for RegistryDataEntry {
-    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
-        let item = item.get::<Option<IndexedNbtCow<'_>>>()?;
-        if let Some(nbt) = item {
-            writer.write_byte(1)?;
-
-            let inner = SerializeItem::new(Peek::new(nbt), SerializeItemType::Value, false);
-            IndexedNbtCow::WITH_UNNAMED.serialize(inner, writer)
-        } else {
-            writer.write_byte(0)
-        }
-    }
-
-    fn deserialize<'facet, const BORROW: bool>(
-        item: DeserializeItem<'facet, BORROW>,
-        reader: &mut Reader<'_>,
-    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        match reader.read_byte()? {
-            0 => item.set::<Option<IndexedNbtCow<'facet>>>(None),
-            1 => item.scoped(|mut partial| {
-                partial = partial.begin_some()?;
-
-                let mut item = DeserializeItem::new(partial, DeserializeDesc::new(false, None));
-                item = IndexedNbtCow::WITH_UNNAMED.deserialize(item, reader)?;
-
-                Ok(item.into_inner().0)
-            }),
-            unk => Err(ReaderError::InvalidBool(unk)),
-        }
-    }
 }

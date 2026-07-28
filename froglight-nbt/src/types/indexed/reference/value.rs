@@ -1,8 +1,10 @@
+use core::fmt;
+
 use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
     compound::IndexedCompound,
-    core::{IndexCore, NbtAccess},
+    core::{IndexCore, NbtAccess, Ref},
     index::Index,
     list::IndexedValueList,
     reference::{IndexableValue, IndexableValueMut, IndexedReference},
@@ -89,6 +91,81 @@ macro_rules! create_fns {
                 }
             )*
         }
+
+        impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug
+            for IndexedValueReference<'_, A, C>
+        {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                match self {
+                    $(
+                        IndexedValueReference::$variant(value) => f.debug_tuple(stringify!($variant)).field(value).finish(),
+                    )*
+                }
+            }
+        }
+
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedValueReference<'data, A, C>
+        where
+            <A as NbtAccess>::CORE<'data, C>: Clone,
+            <A as NbtAccess>::SLICE<'data>: Clone,
+        {
+            fn clone(&self) -> Self {
+                match self {
+                    $(
+                        IndexedValueReference::$variant(value) => IndexedValueReference::$variant(value.clone()),
+                    )*
+                }
+            }
+        }
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedValueReference<'data, A, C>
+        where
+            <A as NbtAccess>::CORE<'data, C>: Copy,
+            <A as NbtAccess>::SLICE<'data>: Copy,
+        {
+        }
+
+        impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> PartialEq
+            for IndexedValueReference<'data, A, C>
+        where
+            A::SLICE<'data>: PartialEq,
+        {
+            fn eq(&self, other: &Self) -> bool {
+                match (self, other) {
+                    $(
+                        (IndexedValueReference::$variant(a), IndexedValueReference::$variant(b)) => a == b,
+                    )*
+                    _ => false,
+                }
+            }
+        }
+        impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> Eq
+            for IndexedValueReference<'data, A, C>
+        where
+            A::SLICE<'data>: Eq,
+        {
+        }
+
+        $(
+            impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> From<$ty>
+                for IndexedValueReference<'data, A, C>
+            {
+                fn from(value: $ty) -> Self {
+                    IndexedValueReference::$variant(value.into())
+                }
+            }
+
+            impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> TryFrom<IndexedValueReference<'data, A, C>> for $ty {
+                type Error = IndexedValueReference<'data, A, C>;
+
+                fn try_from(value: IndexedValueReference<'data, A, C>) -> Result<Self, Self::Error> {
+                    if let IndexedValueReference::$variant(inner) = value {
+                        Ok(inner)
+                    } else {
+                        Err(value)
+                    }
+                }
+            }
+        )*
     };
 }
 

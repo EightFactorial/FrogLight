@@ -39,6 +39,8 @@ impl<T: InstanceData + Clone> FromType<T> for ReflectSession {
         Self {
             insert_fn: |world, entity, caller| {
                 if world.get::<T>(entity).is_none() {
+                    #[cfg(feature = "tracing")]
+                    tracing::error!(target: "froglight_instance", "Entity {entity} attempted to register a `{}` via reflection!", T::short_type_path());
                     return;
                 }
 
@@ -50,6 +52,8 @@ impl<T: InstanceData + Clone> FromType<T> for ReflectSession {
             },
             discard_fn: |world, entity, caller| {
                 if world.get::<T>(entity).is_none() {
+                    #[cfg(feature = "tracing")]
+                    tracing::error!(target: "froglight_instance", "Entity {entity} attempted to unregister a `{}` via reflection!", T::short_type_path());
                     return;
                 }
 

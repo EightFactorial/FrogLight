@@ -37,6 +37,7 @@ impl Section {
     /// # Safety
     ///
     /// The caller must ensure that the provided data is valid.
+    #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(
         block_count: u16,
@@ -48,26 +49,32 @@ impl Section {
     }
 
     /// Get the number of non-air blocks in this section.
+    #[inline]
     #[must_use]
     pub const fn block_count(&self) -> u16 { self.block_count }
 
     /// Get the number of fluid blocks in this section.
+    #[inline]
     #[must_use]
     pub const fn fluid_count(&self) -> u16 { self.fluid_count }
 
     /// Get the [`SectionData`] for blocks.
+    #[inline]
     #[must_use]
     pub const fn block_data(&self) -> &SectionData<BlockSection> { &self.blocks }
 
     /// Get the [`SectionData`] for blocks mutably.
+    #[inline]
     #[must_use]
     pub const fn block_data_mut(&mut self) -> &mut SectionData<BlockSection> { &mut self.blocks }
 
     /// Get the [`SectionData`] for biomes.
+    #[inline]
     #[must_use]
     pub const fn biome_data(&self) -> &SectionData<BiomeSection> { &self.biomes }
 
     /// Get the [`SectionData`] for biomes mutably.
+    #[inline]
     #[must_use]
     pub const fn biome_data_mut(&mut self) -> &mut SectionData<BiomeSection> { &mut self.biomes }
 
@@ -79,8 +86,8 @@ impl Section {
     /// Set the block id at the given position within the section,
     /// returning the previous id.
     ///
-    /// The provided closure must return `true` if the block id corresponds with
-    /// some form of air.
+    /// The provided closures must return `true` if the block id corresponds
+    /// with some form of air or fluid, respectively.
     #[must_use]
     pub fn set_raw_block(
         &mut self,
@@ -211,7 +218,7 @@ impl<T: SectionType> SectionData<T> {
                 + (usize::from(position.z()) / T::QUANTIZATION * width)
                 + (usize::from(position.y()) / T::QUANTIZATION * width * height),
         )
-        .expect("SectionBlockPos should always be within bounds")
+        .expect("SectionBlockPos should always be within bounds?!")
     }
 
     /// Set the value at the given position within the section,
@@ -245,7 +252,7 @@ impl<T: SectionType> SectionData<T> {
             return Some(value);
         }
 
-        // Read the value from the bit-packed data.
+        // Read an index from the bit-packed data.
         let index = self.read_raw_index(index)?;
         match &self.palette {
             SectionPalette::Single(_) => unreachable!(),
@@ -269,31 +276,39 @@ impl<T: SectionType> SectionData<T> {
 
         match &mut self.palette {
             SectionPalette::Single(value) => {
+                // Do nothing if the value is the same.
                 let value = *value;
                 if id == value {
                     return Some(value);
                 }
 
                 // Convert `SectionPalette::Single` to `SectionPalette::Vector`.
-                let mut palette = SmallVec::new_const();
-                palette.push(value);
-                palette.push(id);
+                let palette = SmallVec::from_slice(&[value, id]);
                 self.palette = SectionPalette::Vector(palette);
 
+                // Set the new value.
                 self.grow_bitvec(1);
                 self.write_raw_index(index, 1);
 
+                // Return the previous value.
                 Some(value)
             }
 
             // TODO: Convert `SectionPalette::Vector` to `SectionPalette::Global`.
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             SectionPalette::Vector(items) => {
+                // Get the previous or assign a new index.
                 let id = items.iter().position(|v| *v == id).unwrap_or_else(|| {
                     items.push(id);
                     items.len() - 1
                 });
 
+                // Grow the bitvec to fit the new id if necessary.
+                if id.bit_width() > self.bits as u32 {
+                    self.grow_bitvec(id.bit_width() as usize);
+                }
+
+                // Write the raw value and return the previous.
                 let previous = self.read_raw_index(index)?;
                 self.write_raw_index(index, id as u32).then_some(previous)
             }
@@ -305,6 +320,7 @@ impl<T: SectionType> SectionData<T> {
                     self.grow_bitvec(id.bit_width() as usize);
                 }
 
+                // Write the raw value and return the previous.
                 let previous = self.read_raw_index(index)?;
                 self.write_raw_index(index, id).then_some(previous)
             }
@@ -312,6 +328,11 @@ impl<T: SectionType> SectionData<T> {
     }
 
     /// Create an iterator over all values in this section.
+    ///
+    /// # Note
+    ///
+    /// If you are testing for the presence of a value,
+    /// use [`SectionData::contains`] instead as it is more efficient.
     #[expect(clippy::missing_panics_doc, reason = "The index cannot ever go out of bounds")]
     pub fn iter(&self) -> impl Iterator<Item = u32> + '_ {
         (0..usize::from(T::VOLUME))

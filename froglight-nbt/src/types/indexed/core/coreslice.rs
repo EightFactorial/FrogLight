@@ -12,7 +12,7 @@ use crate::types::indexed::{
 };
 
 /// An [`IndexCore`] for borrowed NBT data.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SliceCore<'data, A: NbtAccess> {
     pub(crate) root: A::SLICE<'data>,
     pub(crate) entries: Vec<EntryIndex>,
@@ -34,6 +34,14 @@ impl<'data, A: NbtAccess> SliceCore<'data, A> {
         ranges: Vec<Range<usize>>,
     ) -> Self {
         Self { root, entries, ranges }
+    }
+
+    /// Convert a [`SliceCore<'_, Mut>`](Mut)
+    /// into a [`SliceCore<'_, Ref>`](Ref).
+    #[inline]
+    #[must_use]
+    pub fn into_ref(self) -> SliceCore<'data, Ref> {
+        SliceCore { root: A::into_ref(self.root), entries: self.entries, ranges: self.ranges }
     }
 }
 

@@ -11,6 +11,7 @@ extern crate std;
 #[cfg(feature = "simd")]
 pub mod simd;
 
+pub mod custom;
 pub mod facet;
 
 pub mod deserialize;

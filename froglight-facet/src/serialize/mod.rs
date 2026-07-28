@@ -78,7 +78,7 @@ pub fn serialize_core<'mem, 'facet>(
     |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         let item = match item {
             Item::Item(item) => item,
-            Item::Size(size) => return varint::encode_u32_into(size, writer),
+            Item::Hint(hint, _peek) => return varint::encode_u32_into(hint, writer),
         };
 
         // Handle field attributes.

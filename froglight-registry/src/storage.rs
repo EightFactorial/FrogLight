@@ -5,11 +5,11 @@ use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
-use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
+use froglight_nbt::prelude::IndexedNbtCow;
 use indexmap::IndexMap;
 
 use crate::{
-    registry::{NbtRef, TagRef},
+    registry::{NbtMap, NbtRef, TagMap, TagRef},
     state::GlobalRegistryId,
     version::RegistryVersion,
 };
@@ -18,16 +18,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct RegistryStorage {
     version: TypeId,
-    tag_data: IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
-        RandomState,
-    >,
-    nbt_data: IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>,
-        RandomState,
-    >,
+    tag_data: TagMap,
+    nbt_data: NbtMap,
 }
 
 impl RegistryStorage {
@@ -87,54 +79,22 @@ impl RegistryStorage {
     /// Get the [`IndexMap`] of tag data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn tags(
-        &self,
-    ) -> &IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
-        RandomState,
-    > {
-        &self.tag_data
-    }
+    pub const fn tags(&self) -> &TagMap { &self.tag_data }
 
     /// Get the mutable [`IndexMap`] of tag data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn tags_mut(
-        &mut self,
-    ) -> &mut IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
-        RandomState,
-    > {
-        &mut self.tag_data
-    }
+    pub const fn tags_mut(&mut self) -> &mut TagMap { &mut self.tag_data }
 
     /// Get the [`IndexMap`] of NBT data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn nbt(
-        &self,
-    ) -> &IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>,
-        RandomState,
-    > {
-        &self.nbt_data
-    }
+    pub const fn nbt(&self) -> &NbtMap { &self.nbt_data }
 
     /// Get the mutable [`IndexMap`] of NBT data in this [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub const fn nbt_mut(
-        &mut self,
-    ) -> &mut IndexMap<
-        Identifier<'static>,
-        IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>,
-        RandomState,
-    > {
-        &mut self.nbt_data
-    }
+    pub const fn nbt_mut(&mut self) -> &mut NbtMap { &mut self.nbt_data }
 
     /// Build a new [`RegistryStorage`] for the given [`RegistryVersion`].
     #[must_use]

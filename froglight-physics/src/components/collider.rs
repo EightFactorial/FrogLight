@@ -13,7 +13,7 @@ use glam::Vec3A;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "bevy")]
-use crate::components::{Position, Rotation};
+use crate::prelude::{CollidingWith, Position, Rotation};
 
 /// An entity collider.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -21,7 +21,7 @@ use crate::components::{Position, Rotation};
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", require(Position, Rotation, PrevCollider))]
+#[cfg_attr(feature = "bevy", require(Position, Rotation, CollidingWith, PrevCollider))]
 pub struct Collider {
     /// The minimum corner of this [`Collider`].
     pub min: Vec3A,
@@ -51,19 +51,24 @@ impl Collider {
         Self::new(Vec3A::new(min_x, min_y, min_z), Vec3A::new(max_x, max_y, max_z))
     }
 
-    /// Get the center of this [`Collider`].
+    /// Get the "actual" center of this [`Collider`],
+    /// or the center of the entity's bounding box.
+    ///
+    /// Also see [`Collider::center_canonical`].
     #[inline]
     #[must_use]
-    pub fn center(&self) -> Vec3A { self.min.midpoint(self.max) }
+    pub fn center_actual(&self) -> Vec3A { self.min.midpoint(self.max) }
 
     /// Get the "canonical" center of this [`Collider`],
-    /// or the entity's center at it's foot position.
+    /// or the center of the entity's bounding box at it's feet.
     ///
     /// This is used when the server and client communicate an entity's
     /// position.
+    ///
+    /// Also see [`Collider::center_actual`].
     #[inline]
     #[must_use]
-    pub fn center_canonical(&self) -> Vec3A { self.center().with_y(self.min.y) }
+    pub fn center_canonical(&self) -> Vec3A { self.center_actual().with_y(self.min.y) }
 
     /// Get the size of this [`Collider`].
     #[inline]
@@ -73,15 +78,31 @@ impl Collider {
     /// Returns `true` if this [`Collider`] intersects the other.
     #[inline]
     #[must_use]
-    pub fn intersects(&self, other: &Self) -> bool {
-        self.min.cmple(other.max).all() && self.max.cmpge(other.min).all()
+    pub fn intersects(&self, self_pos: &Position, other: &Self, other_pos: &Position) -> bool {
+        let self_pos = self_pos.to_vec3a();
+        let other_pos = other_pos.to_vec3a();
+
+        let self_min = self.min + self_pos;
+        let self_max = self.max + self_pos;
+        let other_min = other.min + other_pos;
+        let other_max = other.max + other_pos;
+
+        self_min.cmple(other_max).all() && self_max.cmpge(other_min).all()
     }
 
     /// Returns `true` if this [`Collider`] contains the other.
     #[inline]
     #[must_use]
-    pub fn contains(&self, other: &Self) -> bool {
-        self.min.cmple(other.min).all() && self.max.cmpge(other.max).all()
+    pub fn contains(&self, self_pos: &Position, other: &Self, other_pos: &Position) -> bool {
+        let self_pos = self_pos.to_vec3a();
+        let other_pos = other_pos.to_vec3a();
+
+        let self_min = self.min + self_pos;
+        let self_max = self.max + self_pos;
+        let other_min = other.min + other_pos;
+        let other_max = other.max + other_pos;
+
+        self_min.cmple(other_min).all() && self_max.cmpge(other_max).all()
     }
 }
 

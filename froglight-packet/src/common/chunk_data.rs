@@ -7,7 +7,7 @@ use froglight_biome::prelude::BiomeVersion;
 use froglight_block::prelude::BlockVersion;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
-use froglight_nbt::types::indexed::alloc::IndexedNbtCow;
+use froglight_nbt::prelude::IndexedNbtCow;
 use froglight_world::{
     component::ChunkBlockPos,
     naive::ParseError,

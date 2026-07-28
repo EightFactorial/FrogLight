@@ -188,7 +188,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     self.stack.push(StackItem::Fields(len, fields, variable_base));
 
                     // Update `variable` using the field's attributes.
-                    let variable = variable_base | field.has_attr(Some("mc"), "variable");
+                    let variable = variable_base | field.has_attr(self.namespace, "variable");
 
                     // Push the current field to the stack.
                     let desc = DeserializeDesc::new(variable, Some(field));
@@ -268,13 +268,13 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
         core: &mut C,
     ) -> Result<Self, DeserializeError> {
         // TODO: Pass this into `Deserializer` to allow more flexibility?
-        if self.namespace.is_some_and(|ns| ns == "mc") {
+        if self.namespace.is_some() {
             // Set `var` and `with` using the field and type attributes.
             let mut var = desc.is_variable();
             let mut with = false;
 
             if let Some(attrs) = desc.field_attr() {
-                for attr in attrs.iter().filter(|attr| attr.ns.is_some_and(|ns| ns == "mc")) {
+                for attr in attrs.iter().filter(|attr| attr.ns == self.namespace) {
                     // #[facet(mc::variable)]
                     var |= attr.key == "variable";
                     // #[facet(mc::with = ...)]
@@ -282,7 +282,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 }
             }
             for attr in self.partial.shape().attributes {
-                if attr.ns.is_some_and(|ns| ns == "mc") {
+                if attr.ns == self.namespace {
                     // #[facet(mc::variable)]
                     var |= attr.key == "variable";
                     // #[facet(mc::with = ...)]
@@ -462,9 +462,13 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
 
             Type::User(UserType::Struct(ty)) => {
                 // Determine whether the struct should pass the variable flag to its fields.
-                let variable_base = if self.partial.shape().attributes.iter().any(|attr| {
-                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
-                }) {
+                let variable_base = if self
+                    .partial
+                    .shape()
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                {
                     desc.is_variable()
                 } else {
                     false
@@ -477,9 +481,13 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
             Type::User(UserType::Enum(..)) => {
                 // Determine whether the struct should pass the variable flag to its fields.
-                let variable_base = if self.partial.shape().attributes.iter().any(|attr| {
-                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
-                }) {
+                let variable_base = if self
+                    .partial
+                    .shape()
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                {
                     desc.is_variable()
                 } else {
                     false

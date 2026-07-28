@@ -5,8 +5,7 @@ use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
     IndexedNbt,
-    alloc::SliceCore,
-    core::{IndexCored, NbtAccess},
+    core::{IndexCored, NbtAccess, SliceCore},
     index::{EntryIndex, Index, ValueIndex},
     types::{IndexedListType, IndexedMapType},
 };

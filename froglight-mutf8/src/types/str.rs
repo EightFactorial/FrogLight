@@ -321,7 +321,7 @@ macro_rules! mutf8 {
     ($str:literal) => {{
         match $crate::prelude::MStr::const_from_utf8($str) {
             Some(mstr) => mstr,
-            None => panic!(concat!("Invalid MUTF-8 string literal: ", $str)),
+            None => panic!(concat!("Invalid MUTF-8 string literal: `", $str, "`")),
         }
     }};
 }

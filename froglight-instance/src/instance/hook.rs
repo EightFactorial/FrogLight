@@ -32,7 +32,7 @@ pub(crate) fn insert_hook<T: InstanceData + Clone>(mut world: DeferredWorld, ctx
         && previous != ctx.entity
     {
         #[cfg(feature = "tracing")]
-        tracing::debug!(target: "froglight_instance", "Entity {} is replacing Entity {} via `{}`, despawning!", ctx.entity, previous, T::short_type_path());
+        tracing::debug!(target: "froglight_instance", "Entity {} is replacing Entity {previous} via `{}`, despawning!", ctx.entity, T::short_type_path());
 
         world.commands().entity(previous).despawn();
     }
@@ -59,8 +59,5 @@ pub(crate) fn discard_hook<T: InstanceData + Clone>(mut world: DeferredWorld, ct
     };
 
     // Remove the entity from the instance.
-    if !T::remove(&trigger, &mut instance) {
-        #[cfg(feature = "tracing")]
-        tracing::warn!(target: "froglight_instance", "Entity {}'s `{}` was not found in the `SessionInstance`!", ctx.entity, T::short_type_path());
-    }
+    T::remove(&trigger, &mut instance);
 }

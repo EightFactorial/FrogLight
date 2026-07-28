@@ -4,21 +4,23 @@ use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
 use indexmap::IndexMap;
 
+/// A map of [`Identifier`]s to [`TagInnerMap`]s.
+pub type TagMap = IndexMap<Identifier<'static>, TagInnerMap, RandomState>;
+/// A map of [`Identifier`]s to [`Vec<u32>`]s.
+pub type TagInnerMap = IndexMap<Identifier<'static>, Vec<u32>, RandomState>;
+
 /// A reference to a [`Tag`] and it's associated values.
 #[derive(Debug, Clone)]
 pub struct TagRef<'a> {
     identifier: Identifier<'a>,
-    values: &'a IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
+    values: &'a TagInnerMap,
 }
 
 impl<'a> TagRef<'a> {
     /// Create a new [`TagRef`].
     #[inline]
     #[must_use]
-    pub const fn new(
-        identifier: Identifier<'a>,
-        values: &'a IndexMap<Identifier<'static>, Vec<u32>, RandomState>,
-    ) -> Self {
+    pub const fn new(identifier: Identifier<'a>, values: &'a TagInnerMap) -> Self {
         Self { identifier, values }
     }
 

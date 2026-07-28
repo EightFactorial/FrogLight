@@ -19,7 +19,7 @@ pub trait SerializeNbt<'facet> {}
 fn serialize(peek: Peek<'_, '_>, nbt: &mut Nbt) -> Result<(), SerializeError> {
     // Create and complete the serializer.
     let mut core = serialize_core(nbt);
-    Serializer::new(peek, false, &mut core, Some("mc")).complete()
+    Serializer::new(peek, false, &mut core, Some("nbt")).complete()
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ pub fn serialize_core<'mem, 'facet>(
     |item: Item<'mem, 'facet>| -> Result<(), WriterError> {
         let _item = match item {
             Item::Item(item) => item,
-            Item::Size(_size) => todo!(),
+            Item::Hint(_hint, _peek) => todo!(),
         };
 
         todo!()

@@ -3,27 +3,28 @@ use core::ops::Deref;
 use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
 use froglight_nbt::types::indexed::{
-    alloc::{CowCore, IndexedNbtCow},
     compound::IndexedCompound,
-    core::Ref,
+    core::{CowCore, IndexedNbtCow, Ref},
 };
 use indexmap::IndexMap;
+
+/// A map of [`Identifier`]s to [`NbtInnerMap`]s.
+pub type NbtMap = IndexMap<Identifier<'static>, NbtInnerMap, RandomState>;
+/// A map of [`Identifier`]s to [`IndexedNbtCow`]s.
+pub type NbtInnerMap = IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>;
 
 /// A reference to a [`Nbt`] and it's associated values.
 #[derive(Debug, Clone)]
 pub struct NbtRef<'a> {
     identifier: Identifier<'a>,
-    values: &'a IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>,
+    values: &'a NbtInnerMap,
 }
 
 impl<'a> NbtRef<'a> {
     /// Create a new [`NbtRef`].
     #[inline]
     #[must_use]
-    pub const fn new(
-        identifier: Identifier<'a>,
-        values: &'a IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>,
-    ) -> Self {
+    pub const fn new(identifier: Identifier<'a>, values: &'a NbtInnerMap) -> Self {
         Self { identifier, values }
     }
 

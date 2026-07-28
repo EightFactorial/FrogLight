@@ -3,9 +3,10 @@
 use bevy_app::{App, Plugin};
 #[cfg(feature = "tracing")]
 use bevy_ecs::entity::EntityNotSpawnedError;
-use bevy_ecs::{prelude::*, world::DeferredWorld};
+use bevy_ecs::{prelude::*, resource::IsResource, world::DeferredWorld};
 use bevy_tasks::ComputeTaskPool;
 use froglight_entity::{bevy::EntityBundleEvent, prelude::EntityBundle};
+use froglight_instance::prelude::PartOfInstance;
 
 use crate::prelude::*;
 
@@ -63,7 +64,7 @@ impl PhysicsPlugin {
                     // Insert `Collider`, `Position`, and `Rotation`
                     // (preserves `Position` and `Rotation` if they already exist)
                     let collider = Collider::new_entity(*bundle.metadata().aabb());
-                    commands.insert(collider);
+                    commands.insert(collider).insert_if_new((Position::ZERO, Rotation::IDENTITY));
 
                     // Insert `Velocity` and `Acceleration`
                     // (overwrites `Velocity` and `Acceleration` to zero)
@@ -92,27 +93,32 @@ impl PhysicsPlugin {
     /// # Note
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
-    pub fn update_entity_collisions(
-        mut query: Query<(Entity, &Collider, &mut CollidingWith)>,
+    pub fn update_collisions(
+        mut query: Query<
+            (Entity, &PartOfInstance, &Position, &Collider, &mut CollidingWith),
+            Without<IsResource>,
+        >,
         mut collisions: ResMut<EntityCollisions>,
     ) {
         let mut iter = query.iter_combinations_mut::<2>();
 
         while let Some(
             [
-                (entity_a, collider_a, mut colliding_with_a),
-                (entity_b, collider_b, mut colliding_with_b),
+                (entity_a, instance_a, position_a, collider_a, mut colliding_with_a),
+                (entity_b, instance_b, position_b, collider_b, mut colliding_with_b),
             ],
         ) = iter.fetch_next()
         {
-            if collider_a.intersects(collider_b) {
-                if collisions.push_pair(entity_a, entity_b) {
-                    colliding_with_a.insert(entity_b);
-                    colliding_with_b.insert(entity_a);
+            if instance_a == instance_b {
+                if collider_a.intersects(position_a, collider_b, position_b) {
+                    if collisions.push_pair(entity_a, entity_b) {
+                        colliding_with_a.insert(entity_b);
+                        colliding_with_b.insert(entity_a);
+                    }
+                } else if collisions.remove_pair(entity_a, entity_b) {
+                    colliding_with_a.remove(&entity_b);
+                    colliding_with_b.remove(&entity_a);
                 }
-            } else if collisions.remove_pair(entity_a, entity_b) {
-                colliding_with_a.remove(&entity_b);
-                colliding_with_b.remove(&entity_a);
             }
         }
     }
@@ -131,11 +137,11 @@ impl PhysicsPlugin {
     /// - [`Collider`] -> [`PrevCollider`]
     #[expect(clippy::missing_panics_doc, reason = "Components are dense, so `unwrap` is ok.")]
     pub fn update_prev_components(
-        mut accel: Query<(&Acceleration, &mut PrevAcceleration)>,
-        mut pos: Query<(&Position, &mut PrevPosition)>,
-        mut rot: Query<(&Rotation, &mut PrevRotation)>,
-        mut vel: Query<(&Velocity, &mut PrevVelocity)>,
-        mut col: Query<(&Collider, &mut PrevCollider)>,
+        mut accel: Query<(&Acceleration, &mut PrevAcceleration), Without<IsResource>>,
+        mut pos: Query<(&Position, &mut PrevPosition), Without<IsResource>>,
+        mut rot: Query<(&Rotation, &mut PrevRotation), Without<IsResource>>,
+        mut vel: Query<(&Velocity, &mut PrevVelocity), Without<IsResource>>,
+        mut col: Query<(&Collider, &mut PrevCollider), Without<IsResource>>,
     ) {
         ComputeTaskPool::get().scope::<_, ()>(|scope| {
             scope.spawn(async {

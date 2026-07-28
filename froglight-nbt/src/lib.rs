@@ -20,7 +20,7 @@ pub mod prelude {
     pub use crate::types::{
         indexed::{
             IndexedNbt,
-            alloc::{IndexedNbtCow, IndexedNbtSlice},
+            core::{IndexedNbtCow, IndexedNbtSlice},
             entry::{IndexedEntry, IndexedValue},
         },
         structured::Nbt,

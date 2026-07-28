@@ -2,7 +2,10 @@
 
 use alloc::vec::Vec;
 
-use bevy_ecs::{component::Component, reflect::ReflectComponent, world::EntityWorldMut};
+use bevy_ecs::{
+    component::Component, query::Without, reflect::ReflectComponent, resource::IsResource,
+    system::Query,
+};
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use froglight_block::prelude::*;
@@ -52,53 +55,48 @@ impl BlockEditQueue {
         self.is_empty = false;
     }
 
+    /// Remove all queued block edits for a [`Chunk`].
+    ///
+    /// In case you are sent a [`Chunk`] after queuing edits for it,
+    /// you can use this to remove the queued edits.
+    #[inline]
+    pub fn remove(&mut self, chunk: &ChunkPos) { self.queue.remove(chunk); }
+
     /// Apply queued block edits to a [`SessionInstance`]'s [`SharedChunk`]s.
     ///
-    /// # Errors
+    /// # Note
     ///
-    /// Returns an error if the entity does not have a [`BlockEditQueue`] or
-    /// [`SessionInstance`] component.
-    #[expect(clippy::result_unit_err, reason = "TODO")]
-    pub fn apply(mut entity: EntityWorldMut<'_>) -> Result<(), ()> {
-        // Take the `BlockEditQueue` from the `Entity`.
-        let Some(queue) = entity.get_mut::<BlockEditQueue>() else { return Err(()) };
-        let mut queue = core::mem::take(queue.into_inner());
-
-        // Map the `ChunkPos` to `Entity` of the chunks to be edited
-        let mut entities = Vec::with_capacity(8);
-        let Some(instance) = entity.get::<SessionInstance>() else { return Err(()) };
-        for chunk in queue.queue.keys() {
-            if let Some(entity) = instance.query_chunk(chunk) {
-                entities.push((*chunk, entity));
-            }
-        }
-
-        // Apply the queued block edits to the chunks
-        entity.world_scope(|world| {
-            for (chunk, edits) in &mut queue.queue {
-                // Get the `SharedChunk`
-                let Some((_, entity)) = entities.iter().find(|(pos, _)| chunk == pos) else {
-                    continue;
-                };
-                let Some(mut shared) = world.get_mut::<SharedChunk>(*entity) else { continue };
-
-                // Apply the block edits
+    /// If you're having issues with `chunk`,
+    /// you can use [`Query::reborrow`] to obtain ownership
+    /// and [`Query::transmute_lens`] to change it's values.
+    pub fn apply(
+        &mut self,
+        instance: &SessionInstance,
+        mut chunks: Query<&mut SharedChunk, Without<IsResource>>,
+    ) {
+        for (chunk, edits) in &mut self.queue {
+            if let Some(entity) = instance.query_chunk(chunk)
+                && let Ok(mut shared) = chunks.get_mut(entity)
+            {
+                // Clone, apply edits, and replace the existing chunk.
                 let mut chunk = shared.clone_inner();
                 for BlockEdit { position, block } in edits.drain(..) {
                     chunk.set_block(position, block);
                 }
                 shared.store(chunk);
+            } else {
+                #[cfg(feature = "tracing")]
+                tracing::warn!(
+                    target: "froglight_instance",
+                    "Could not find Chunk ({}, {}), dropping edits.",
+                    chunk.x(),
+                    chunk.z(),
+                );
+
+                // Drop edits for missing chunks.
+                edits.clear();
             }
-        });
-
-        // Mark the queue as empty
-        queue.is_empty = true;
-
-        // Store the `BlockEditQueue` back into the `Entity`.
-        if let Some(mut q) = entity.get_mut::<BlockEditQueue>() {
-            *q = queue;
         }
-
-        Ok(())
+        self.is_empty = true;
     }
 }

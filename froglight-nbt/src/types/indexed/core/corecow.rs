@@ -134,7 +134,7 @@ impl IndexCored for CowCore<'_> {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        use crate::{prelude::IndexedNbt, types::indexed::alloc::SliceCore};
+        use crate::{prelude::IndexedNbt, types::indexed::core::SliceCore};
 
         let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(reader.remaining())
             .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;
@@ -148,7 +148,7 @@ impl IndexCored for CowCore<'_> {
         item: DeserializeItem<'facet, BORROW>,
         reader: &mut Reader<'_>,
     ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
-        use crate::{prelude::IndexedNbt, types::indexed::alloc::SliceCore};
+        use crate::{prelude::IndexedNbt, types::indexed::core::SliceCore};
 
         let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_unnamed(reader.remaining())
             .map_err(|()| ReaderError::from_string("Failed to read IndexedNbt".into()))?;

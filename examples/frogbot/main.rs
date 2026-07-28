@@ -9,7 +9,7 @@ use bevy::{
     app::PluginGroupBuilder, ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on,
 };
 use froglight::{
-    bevy::plugins::NetworkPlugin,
+    bevy::plugins::{InstancePlugin, NetworkPlugin, PhysicsPlugin},
     modules::{
         api::api::Offline,
         network::{
@@ -30,6 +30,9 @@ use froglight::{
     },
     prelude::*,
 };
+
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 fn main() -> AppExit {
     App::new()
@@ -68,9 +71,12 @@ impl Plugin for BotPlugin {
             .add_systems(
                 PostUpdate,
                 (
-                    BotPlugin::apply_blockedit_queue,
+                    InstancePlugin::apply_blockedits,
+                    PhysicsPlugin::update_collisions,
+                    PhysicsPlugin::update_prev_components,
                     (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
-                ),
+                )
+                    .ambiguous_with_all(),
             );
     }
 }
@@ -123,20 +129,6 @@ impl BotPlugin {
         conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
     }
 
-    /// Apply the bot's [`BlockEditQueue`].
-    fn apply_blockedit_queue(world: &mut World) {
-        let mut query =
-            world.query_filtered::<Entity, (With<ClientConnection>, Without<IsResource>)>();
-        let Ok(entity) = query.single_mut(world) else { return };
-
-        let entity = world.entity_mut(entity);
-        if let Some(queue) = entity.get::<BlockEditQueue>()
-            && !queue.is_empty()
-        {
-            BlockEditQueue::apply(entity).unwrap();
-        }
-    }
-
     /// An [`Observer`] that exits the app when the bot entity despawns.
     fn exit_on_despawn(_: On<ClientDespawn>, mut commands: Commands) {
         info!("Exiting...");
@@ -172,29 +164,28 @@ impl BotPlugin {
                     match event {
                         // ClientboundPlayEvent::ActionBarText() => todo!(),
                         ClientboundPlayEvent::AddEntity(data) => {
-                            let mut entity = commands.spawn((
-                                PartOfInstance::new(bot.id()),
-                                data.entity_id,
-                                data.entity_uuid,
-                                Position::new_xyz(
-                                    data.position_x as f32,
-                                    data.position_y as f32,
-                                    data.position_z as f32,
-                                ),
-                                Velocity::new(data.velocity.as_vec3a()),
-                            ));
-
                             if let Some(bundle) =
                                 Version::entities().get_entity_by_id(data.entity_type.into())
                             {
+                                let ident = bundle.identifier();
+                                let entity = commands.spawn((
+                                    PartOfInstance::new(bot.id()),
+                                    data.entity_id,
+                                    data.entity_uuid,
+                                    bundle,
+                                    Position::new_xyz(
+                                        data.position_x as f32,
+                                        data.position_y as f32,
+                                        data.position_z as f32,
+                                    ),
+                                    Velocity::new(data.velocity.as_vec3a()),
+                                ));
+
                                 info!(
-                                    "Spawning Entity {} ({}) as \"{}\"",
+                                    "Spawning Entity {} ({}) as \"{ident}\"",
                                     entity.id(),
                                     data.entity_id.0,
-                                    bundle.identifier(),
                                 );
-
-                                entity.insert(bundle);
                             } else {
                                 error!("Unknown Entity Type {:?}!", data.entity_type);
                             }
@@ -259,51 +250,60 @@ impl BotPlugin {
                             let chunkpos = *chunkpos;
                             let chunk_data = chunk_data.clone();
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
-                            let bot_id = entity.id();
-                            let Some(instance) = entity.get::<SessionInstance>() else {
-                                error!("Received ChunkWithLight but bot doesn't have a SessionInstance!");
-                                return
-                            };
+                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                                let bot_id = entity.id();
+                                let Some(instance) = entity.get::<SessionInstance>() else {
+                                    error!("Received ChunkWithLight but bot doesn't have a SessionInstance!");
+                                    return
+                                };
 
-                            let chunk_id = instance.query_chunk(&chunkpos);
-                            let chunk = match chunk_data.try_parse::<Version>(
-                                instance.height_max(),
-                                instance.height_min(),
-                            ) {
-                                Ok(chunk) => chunk,
-                                Err(err) => {
-                                    error!("Failed to parse Chunk: {err:?}");
-                                    return;
+                                let chunk_id = instance.query_chunk(&chunkpos);
+                                let chunk = match chunk_data.try_parse::<Version>(
+                                    instance.height_max(),
+                                    instance.height_min(),
+                                ) {
+                                    Ok(chunk) => chunk,
+                                    Err(err) => {
+                                        error!("Failed to parse Chunk: {err:?}");
+                                        return;
+                                    }
+                                };
+
+
+                                if let Some(chunk_id) = chunk_id {
+                                    // Store the chunk in the existing chunk entity.
+                                    entity.world_scope(|world| {
+                                        if let Some(mut shared) =  world.get_mut::<SharedChunk>(chunk_id) {
+                                            shared.store(chunk);
+
+                                            info!(
+                                                "Updating Chunk Entity {chunk_id} ({}, {})",
+                                                chunkpos.x(),
+                                                chunkpos.z()
+                                            );
+                                        }
+                                    });
+
+                                    // Remove any queued block edits for the new chunk.
+                                    if let Some(mut queue) = entity.get_mut::<BlockEditQueue>() {
+                                        queue.remove(&chunkpos);
+                                    }
+                                } else {
+                                    // Spawn a new entity containing the chunk.
+                                    let chunk = entity.into_world_mut().spawn((
+                                        PartOfInstance::new(bot_id),
+                                        SharedChunk::new(chunk),
+                                        chunkpos,
+                                    ));
+
+                                    info!(
+                                        "Spawning Chunk Entity {} ({}, {})",
+                                        chunk.id(),
+                                        chunkpos.x(),
+                                        chunkpos.z()
+                                    );
                                 }
-                            };
-
-                            let world = entity.into_world_mut();
-
-                            if let Some(chunk_id) = chunk_id
-                                && let Some(mut shared) =  world.get_mut::<SharedChunk>(chunk_id) {
-                                shared.store(chunk);
-
-                                info!(
-                                    "Updating Chunk Entity {chunk_id} ({}, {})",
-                                    chunkpos.x(),
-                                    chunkpos.z()
-                                );
-                            } else {
-                                let chunk = world.spawn((
-                                    PartOfInstance::new(bot_id),
-                                    SharedChunk::new(chunk),
-                                    chunkpos,
-                                ));
-
-                                info!(
-                                    "Spawning Chunk Entity {} ({}, {})",
-                                    chunk.id(),
-                                    chunkpos.x(),
-                                    chunkpos.z()
-                                );
-                            }
-                        });
+                            });
                         }
                         // ClientboundPlayEvent::ClearDialog => todo!(),
                         // ClientboundPlayEvent::ClearTitles() => todo!(),
@@ -385,36 +385,40 @@ impl BotPlugin {
                         ClientboundPlayEvent::ForgetChunk(chunkpos) => {
                             let chunkpos = *chunkpos;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
-                            let Some(instance) = entity.get::<SessionInstance>() else {
-                                error!("Received ForgetChunk but bot doesn't have a SessionInstance!");
-                                return;
-                            };
+                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                                if let Some(mut queue) = entity.get_mut::<BlockEditQueue>()  {
+                                    queue.remove(&chunkpos);
+                                }
 
-                            let Some(chunk_id) = instance.query_chunk(&chunkpos) else {
-                                warn!(
-                                    "Received ForgetChunk for unknown Chunk Position ({}, {})!",
+                                let Some(instance) = entity.get::<SessionInstance>() else {
+                                    error!("Received ForgetChunk but bot doesn't have a SessionInstance!");
+                                    return;
+                                };
+
+                                let Some(chunk_id) = instance.query_chunk(&chunkpos) else {
+                                    warn!(
+                                        "Received ForgetChunk for unknown Chunk Position ({}, {})!",
+                                        chunkpos.x(),
+                                        chunkpos.z()
+                                    );
+                                    return;
+                                };
+
+                                let Ok(world) = entity.into_world_mut().get_entity_mut(chunk_id) else {
+                                    error!(
+                                        "Received ForgetChunk for Chunk Entity {chunk_id} that doesn't exist!"
+                                    );
+                                    return;
+                                };
+
+                                info!(
+                                    "Despawning Chunk Entity {chunk_id} ({}, {})",
                                     chunkpos.x(),
                                     chunkpos.z()
                                 );
-                                return;
-                            };
 
-                            let Ok(world) = entity.into_world_mut().get_entity_mut(chunk_id) else {
-                                error!(
-                                    "Received ForgetChunk for Chunk Entity {chunk_id} that doesn't exist!"
-                                );
-                                return;
-                            };
-
-                            info!(
-                                "Despawning Chunk Entity {chunk_id} ({}, {})",
-                                chunkpos.x(),
-                                chunkpos.z()
-                            );
-
-                            world.despawn();
-                        });
+                                world.despawn();
+                            });
                         }
                         // ClientboundPlayEvent::GameEvent() => todo!(),
                         // ClientboundPlayEvent::GameRule() => todo!(),
@@ -440,6 +444,7 @@ impl BotPlugin {
                                 login.player_id.0,
                                 login.spawn_info.dimension
                             );
+                            debug!("Login Info: {login:#?}");
 
                             // Get the "minecraft:dimension_type" registry
                             let registry = Version::registry().read();
@@ -451,25 +456,22 @@ impl BotPlugin {
                             let (height_max, height_min) = if let Some(dimensions) = dimensions
                                 && let Some(dim) =
                                     dimensions.get_by_identifier(&login.spawn_info.dimension)
+                                && let Some(min_y) =
+                                    dim.get("min_y").and_then(IndexedValue::into_int)
+                                && let Some(logical_height) =
+                                    dim.get("logical_height").and_then(IndexedValue::into_int)
                             {
-                                let min_y =
-                                    dim.get("min_y").and_then(|v| v.into_int().map(|i| i as i32));
-                                let height =
-                                    dim.get("logical_height").and_then(IndexedValue::into_int);
-
-                                let (Some(min_y), Some(height)) = (min_y, height) else {
-                                    panic!("Failed to get dimension size?!")
-                                };
-                                let height = height
-                                    .checked_add_signed(min_y)
-                                    .expect("Dimension size overflowed?!");
-
                                 info!(
-                                    "Dimension \"{}\" has min_y=\"{min_y}\" and height=\"{height}\"!",
-                                    login.spawn_info.dimension
+                                    "Dimension \"{}\" has min_y=\"{}\" and logical_height=\"{logical_height}\"!",
+                                    login.spawn_info.dimension, min_y as i32
                                 );
 
-                                (height, min_y)
+                                // Convert from logical to relative height.
+                                let height = logical_height
+                                    .checked_add_signed(min_y as i32)
+                                    .expect("Dimension height overflowed?!");
+
+                                (height, min_y as i32)
                             } else {
                                 error!(
                                     "Failed to get dimension \"{}\" from registry, using default \"minecraft:overworld\" values!",
@@ -602,28 +604,28 @@ impl BotPlugin {
                             let bot_id = bot.id();
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
-                            let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
+                                let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
 
-                            let Ok(bot) = entities.get(bot_id) else { return };
-                            let Some(instance) = bot.get::<SessionInstance>() else {
-                                error!(
-                                    "Received RemoveEntities but bot doesn't have a SessionInstance!"
-                                );
-                                return;
-                            };
+                                let Ok(bot) = entities.get(bot_id) else { return };
+                                let Some(instance) = bot.get::<SessionInstance>() else {
+                                    error!(
+                                        "Received RemoveEntities but bot doesn't have a SessionInstance!"
+                                    );
+                                    return;
+                                };
 
-                            for entity_id in removed {
-                                if let Some(entity) = instance.query_id(&entity_id) {
-                                    let Ok(entity_ref) = entities.get(entity) else { continue };
-                                    let identifier = entity_ref.get::<EntityBundle>().map_or(String::from("<unknown>"), |bundle| bundle.identifier().to_string());
-                                    info!("Despawning Entity {entity} ({}) as \"{identifier}\"", entity_id.0);
+                                for entity_id in removed {
+                                    if let Some(entity) = instance.query_id(&entity_id) {
+                                        let Ok(entity_ref) = entities.get(entity) else { continue };
+                                        let identifier = entity_ref.get::<EntityBundle>().map_or("<unknown>", |bundle| bundle.metadata().identifier());
+                                        info!("Despawning Entity {entity} ({}) as \"{identifier}\"", entity_id.0);
 
-                                    commands.entity(entity).despawn();
-                                } else {
-                                    error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
+                                        commands.entity(entity).despawn();
+                                    } else {
+                                        error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
+                                    }
                                 }
-                            }
-                        });
+                            });
                         }
                         // ClientboundPlayEvent::RemoveMobEffect() => todo!(),
                         // ClientboundPlayEvent::ResetScore() => todo!(),
@@ -741,10 +743,14 @@ impl BotPlugin {
                             // let on_ground = *on_ground;
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
-                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                                let Some(instance) = entity.get::<SessionInstance>() else { return };
+                                let Some(target) = instance.query_id(&id) else {
+                                    error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
+                                    return;
+                                };
 
-                            if let Some(target) = instance.query_id(&id) {
-                                let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
+                                let world = entity.into_world_mut();
+                                let Ok(mut entity) = world.get_entity_mut(target) else {
                                     error!(
                                         "Received TeleportEntity for Entity {target} that doesn't exist!"
                                     );
@@ -765,10 +771,7 @@ impl BotPlugin {
                                         "Received TeleportEntity for Entity {target} without Transform, Velocity, or OnGround!"
                                     );
                                 }
-                            } else {
-                                error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
-                            }
-                        });
+                            });
                         }
                         // ClientboundPlayEvent::TestBlockStatus() => todo!(),
                         // ClientboundPlayEvent::TickingState() => todo!(),
@@ -868,14 +871,14 @@ impl BotPlugin {
                         for RegistryDataEntry { identifier, nbt } in entries.clone() {
                             if let Some(nbt) = &nbt {
                                 debug!(" - \"{identifier}\":");
-                                for entry in &nbt.as_compound() {
+                                for entry in nbt.as_compound() {
                                     debug!("   - \"{}\": <hidden>", entry.name().get());
                                 }
                             } else {
                                 debug!(" - \"{identifier}\": <empty>");
                             }
 
-                            storage.entry(identifier).insert_entry(nbt.unwrap_or_default());
+                            storage.insert(identifier, nbt.unwrap_or_default());
                         }
                     }
                     ClientboundConfigEvent::ResetChat => {
@@ -913,7 +916,7 @@ impl BotPlugin {
 
                             for tag in tags.clone() {
                                 debug!(" - \"{}\"", tag.identifier);
-                                storage.entry(tag.identifier).insert_entry(tag.values.clone());
+                                storage.insert(tag.identifier, tag.values);
                             }
                         }
                     }

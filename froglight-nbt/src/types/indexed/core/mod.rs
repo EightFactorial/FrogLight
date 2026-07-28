@@ -3,11 +3,23 @@
 use core::{fmt::Debug, hash::Hash, ops::Deref};
 
 #[cfg(feature = "froglight-facet")]
-use facet::Partial;
-#[cfg(feature = "froglight-facet")]
 use froglight_facet::facet::{WithFnAttr, prelude::*};
 
-use crate::types::indexed::index::EntryIndex;
+use crate::types::indexed::{IndexedNbt, index::EntryIndex};
+
+mod corecow;
+pub use corecow::CowCore;
+
+mod coreslice;
+pub use coreslice::SliceCore;
+
+/// A type alias for an [`IndexedNbt`] with a [`SliceCore`] core.
+pub type IndexedNbtSlice<'a> = IndexedNbt<SliceCore<'a, Ref>>;
+
+/// A type alias for an [`IndexedNbt`] with a [`CowCore`] core.
+pub type IndexedNbtCow<'a> = IndexedNbt<CowCore<'a>>;
+
+// -------------------------------------------------------------------------------------------------
 
 /// A trait for an index of NBT entries.
 pub trait IndexCore<A: NbtAccess>: IndexCored + Eq {
@@ -111,38 +123,6 @@ pub trait IndexCored {
         Self::serialize_unnamed,
         Self::deserialize_unnamed::<false>,
         Self::deserialize_unnamed::<true>,
-    );
-
-    /// The [`WithFnAttr`] for optional unnamed NBT using this [`IndexCore`].
-    #[cfg(feature = "froglight-facet")]
-    const WITH_OPT_UNNAMED: WithFnAttr = WithFnAttr::using(
-        |item, writer| {
-            let option = item.peek().into_option()?;
-            if let Some(inner) = option.value() {
-                let item = SerializeItem::new(inner, SerializeItemType::Value, false);
-                (Self::WITH_UNNAMED.ser)(item, writer)
-            } else {
-                writer.write_byte(0)
-            }
-        },
-        |mut item, reader| {
-            if let [0, ..] = reader.remaining() {
-                item = item.scoped(Partial::set_default)?;
-                Ok(item)
-            } else {
-                item = item.scoped(Partial::begin_some)?;
-                (Self::WITH_UNNAMED.de_owned)(item, reader)
-            }
-        },
-        |mut item, reader| {
-            if let [0, ..] = reader.remaining() {
-                item = item.scoped(Partial::set_default)?;
-                Ok(item)
-            } else {
-                item = item.scoped(Partial::begin_some)?;
-                (Self::WITH_UNNAMED.de_owned_borrow)(item, reader)
-            }
-        },
     );
 
     /// A facet deserializer for this [`IndexCore`].

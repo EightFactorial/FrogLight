@@ -3,7 +3,7 @@ use facet::{Attr, ConstTypeId, Facet, Field, Peek, ReflectError, Shape};
 /// A [`Serializer`] item.
 pub enum Item<'mem, 'facet> {
     /// A size to be serialized.
-    Size(u32),
+    Hint(u32, Peek<'mem, 'facet>),
     /// An item to be serialized.
     Item(SerializeItem<'mem, 'facet>),
 }
@@ -34,6 +34,15 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     #[must_use]
     pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
         Self { peek, ty, variable: var, field_attr: None }
+    }
+
+    /// Create a new [`StackItem`] for a [`ItemType::Value`].
+    ///
+    /// This is equivalent to calling [`Self::new`] with [`ItemType::Value`].
+    #[inline]
+    #[must_use]
+    pub fn new_peek<T: Facet<'facet>>(value: &'mem T) -> Self {
+        Self::new(Peek::new(value), ItemType::Value, false)
     }
 
     /// Get the value of this [`StackItem`].

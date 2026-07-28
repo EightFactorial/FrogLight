@@ -6,17 +6,14 @@ extern crate alloc;
 extern crate std;
 
 use froglight_mutf8::mutf8;
-use froglight_nbt::{
-    prelude::*,
-    types::indexed::{alloc::SliceCore, core::Ref},
-};
+use froglight_nbt::prelude::*;
 
 #[test]
 fn hello_world() {
     static SLICE: &[u8] = include_bytes!("nbt/hello_world.nbt");
 
     // Parse `SLICE`
-    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
+    let nbt = IndexedNbtSlice::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -24,15 +21,15 @@ fn hello_world() {
 
     // Test getting entries by name
     if let Some(value) = compound.get("name") {
-        assert_eq!(value.as_string().unwrap().get(), mutf8!("Bananrama"));
+        assert_eq!(value.into_string().unwrap(), mutf8!("Bananrama"));
     } else {
         panic!("`hello world` not found!");
     }
 
     // Test iterating over entries
-    for entry in &compound {
+    for entry in compound {
         assert_eq!(entry.name().get(), mutf8!("name"));
-        assert_eq!(entry.value().as_string().unwrap().get(), mutf8!("Bananrama"));
+        assert_eq!(entry.value().into_string().unwrap(), mutf8!("Bananrama"));
     }
 }
 
@@ -45,7 +42,7 @@ fn short() {
     ];
 
     // Parse `SLICE`
-    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_unnamed(SLICE).unwrap();
+    let nbt = IndexedNbtSlice::new_unnamed(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -53,13 +50,13 @@ fn short() {
 
     // Test getting entries by name
     if let Some(value) = compound.get("entry_name") {
-        assert_eq!(value.as_string().unwrap().get(), mutf8!("entry_value"));
+        assert_eq!(value.into_string().unwrap(), mutf8!("entry_value"));
     } else {
         panic!("`entry_name` not found!");
     }
 
     if let Some(value) = compound.get("Short") {
-        assert_eq!(value.as_short().unwrap().get(), 0x1234);
+        assert_eq!(value.into_short().unwrap(), 0x1234);
     } else {
         panic!("`Short` not found!");
     }
@@ -68,12 +65,12 @@ fn short() {
     for (index, entry) in compound.iter().enumerate() {
         match index {
             0 => {
-                assert_eq!(entry.name().get(), mutf8!("entry_name"));
-                assert_eq!(entry.value().as_string().unwrap().get(), mutf8!("entry_value"));
+                assert_eq!(entry.name_ref().get(), mutf8!("entry_name"));
+                assert_eq!(entry.value_ref().into_string().unwrap(), mutf8!("entry_value"));
             }
             1 => {
-                assert_eq!(entry.name().get(), mutf8!("Short"));
-                assert_eq!(entry.value().as_short().unwrap().get(), 0x1234);
+                assert_eq!(entry.name_ref().get(), mutf8!("Short"));
+                assert_eq!(entry.value_ref().into_short().unwrap(), 0x1234);
             }
             _ => unreachable!(),
         }
@@ -84,18 +81,18 @@ fn short() {
 fn inttest1023() {
     static SLICE: &[u8] = include_bytes!("nbt/inttest1023.nbt");
 
-    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
+    let nbt = IndexedNbtSlice::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
     let compound = nbt.as_compound();
 
     let value = compound.get("").unwrap();
-    let list = value.as_list().unwrap();
+    let list = value.into_list().unwrap();
     assert_eq!(list.len(), 1023);
 
     #[expect(clippy::cast_possible_truncation, reason = "Only 1024 entries")]
-    for (index, entry) in list.as_int().unwrap().into_iter().enumerate() {
+    for (index, entry) in list.into_int().unwrap().into_iter().enumerate() {
         assert_eq!(entry, index as u32, "Entry {entry:?} is not {index}?");
     }
 }
@@ -104,7 +101,7 @@ fn inttest1023() {
 fn bigtest() {
     static SLICE: &[u8] = include_bytes!("nbt/bigtest.nbt");
 
-    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
+    let nbt = IndexedNbtSlice::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 
@@ -112,32 +109,32 @@ fn bigtest() {
 
     // Test getting entries by name
     if let Some(long_test) = compound.get("longTest") {
-        assert_eq!(long_test.as_long().unwrap().get(), 9_223_372_036_854_775_807);
+        assert_eq!(long_test.into_long().unwrap(), 9_223_372_036_854_775_807);
     } else {
         panic!("`longTest` not found!");
     }
 
     if let Some(int_test) = compound.get("intTest") {
-        assert_eq!(int_test.as_int().unwrap().get(), 2_147_483_647);
+        assert_eq!(int_test.into_int().unwrap(), 2_147_483_647);
     } else {
         panic!("`intTest` not found!");
     }
 
     if let Some(short_test) = compound.get("shortTest") {
-        assert_eq!(short_test.as_short().unwrap().get(), 32767);
+        assert_eq!(short_test.into_short().unwrap(), 32767);
     } else {
         panic!("`shortTest` not found!");
     }
 
     if let Some(byte_test) = compound.get("byteTest") {
-        assert_eq!(byte_test.as_byte().unwrap().get(), 127);
+        assert_eq!(byte_test.into_byte().unwrap(), 127);
     } else {
         panic!("`byteTest` not found!");
     }
 
     if let Some(string_test) = compound.get("stringTest") {
         assert_eq!(
-            string_test.as_string().unwrap().get(),
+            string_test.into_string().unwrap(),
             mutf8!("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")
         );
     } else {
@@ -146,51 +143,50 @@ fn bigtest() {
 
     #[expect(clippy::float_cmp, reason = "TODO")]
     if let Some(float_test) = compound.get("floatTest") {
-        assert_eq!(float_test.as_float().unwrap().get(), 0.498_231_47);
+        assert_eq!(float_test.into_float().unwrap(), 0.498_231_47);
     } else {
         panic!("`floatTest` not found!");
     }
 
     #[expect(clippy::float_cmp, reason = "TODO")]
     if let Some(double_test) = compound.get("doubleTest") {
-        assert_eq!(double_test.as_double().unwrap().get(), 0.493_128_713_218_231_5);
+        assert_eq!(double_test.into_double().unwrap(), 0.493_128_713_218_231_5);
     } else {
         panic!("`doubleTest` not found!");
     }
 
     if let Some(nested) = compound.get("nested compound test") {
-        let nested = nested.as_compound().unwrap();
+        let nested = nested.into_compound().unwrap();
 
         let Some(ham) = nested.get("ham") else {
             panic!("`ham` not found!");
         };
-        let Some(ham) = ham.as_compound() else {
+        let Some(ham) = ham.into_compound() else {
             panic!("`ham` is not a compound!");
         };
         let Some(name) = ham.get("name") else {
             panic!("`ham` does not contain `name`!");
         };
 
-        assert_eq!(name.as_string().unwrap().get(), mutf8!("Hampus"));
+        assert_eq!(name.into_string().unwrap(), mutf8!("Hampus"));
 
         let Some(egg) = nested.get("egg") else {
             panic!("`egg` not found!");
         };
-        let Some(egg) = egg.as_compound() else {
+        let Some(egg) = egg.into_compound() else {
             panic!("`egg` is not a compound!");
         };
         let Some(name) = egg.get("name") else {
             panic!("`egg` does not contain `name`!");
         };
 
-        assert_eq!(name.as_string().unwrap().get(), mutf8!("Eggbert"));
+        assert_eq!(name.into_string().unwrap(), mutf8!("Eggbert"));
     } else {
         panic!("`nested compound test` not found!");
     }
 
     if let Some(array) = compound.get("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))") {
-        let array = array.as_byte_array().unwrap();
-        let array = array.get();
+        let array = array.into_byte_array().unwrap();
 
         assert_eq!(array.len(), 1000);
         for (index, entry) in array.iter().enumerate() {
@@ -208,7 +204,7 @@ fn bigtest() {
 fn complex_player() {
     static SLICE: &[u8] = include_bytes!("nbt/complex_player.nbt");
 
-    let nbt = IndexedNbt::<SliceCore<'_, Ref>>::new_named(SLICE).unwrap();
+    let nbt = IndexedNbtSlice::new_named(SLICE).unwrap();
     #[cfg(feature = "std")]
     std::println!("NBT: {nbt:#?}");
 

@@ -1,5 +1,7 @@
 //! TODO
 
+use core::fmt;
+
 use crate::types::indexed::{
     core::{Mut, NbtAccess},
     index::Index,
@@ -28,20 +30,20 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'data, T,
         Self { slice, index }
     }
 
-    /// Get the value held by this reference.
-    #[inline]
-    #[must_use]
-    pub fn get(&self) -> T::Value<'_> {
-        // SAFETY: `IndexedReference` guarantees that this is safe
-        unsafe { T::get(self.slice.as_ref(), self.index) }
-    }
-
     /// Convert this reference into the value it holds.
     #[inline]
     #[must_use]
-    pub fn into_value(self) -> T::Value<'data> {
+    pub fn get(self) -> T::Value<'data> {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::get(A::into_ref(self.slice), self.index) }
+    }
+
+    /// Get the value held by this reference.
+    #[inline]
+    #[must_use]
+    pub fn get_ref(&self) -> T::Value<'_> {
+        // SAFETY: `IndexedReference` guarantees that this is safe
+        unsafe { T::get(self.slice.as_ref(), self.index) }
     }
 }
 
@@ -51,6 +53,36 @@ impl<'data, T: IndexableValueMut + ?Sized> IndexedReference<'data, T, Mut> {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::set(self.slice, self.index, value) }
     }
+}
+
+impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Clone for IndexedReference<'data, T, A>
+where
+    <A as NbtAccess>::SLICE<'data>: Clone,
+{
+    fn clone(&self) -> Self { Self { slice: self.slice.clone(), index: self.index } }
+}
+impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Copy for IndexedReference<'data, T, A> where
+    <A as NbtAccess>::SLICE<'data>: Copy
+{
+}
+
+impl<T: IndexableValue + ?Sized, A: NbtAccess> fmt::Debug for IndexedReference<'_, T, A>
+where
+    for<'a> T::Value<'a>: fmt::Debug,
+{
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.get_ref(), f) }
+}
+
+impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> PartialEq for IndexedReference<'data, T, A>
+where
+    A::SLICE<'data>: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool { self.index == other.index && self.slice == other.slice }
+}
+impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Eq for IndexedReference<'data, T, A> where
+    A::SLICE<'data>: PartialEq
+{
 }
 
 // -------------------------------------------------------------------------------------------------

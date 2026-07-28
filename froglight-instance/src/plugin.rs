@@ -1,15 +1,16 @@
 //! TODO
 
 use bevy_app::{App, Plugin};
+use bevy_ecs::{prelude::*, resource::IsResource};
 use froglight_entity::prelude::{EntityId, EntityUuid};
-use froglight_world::prelude::ChunkPos;
+use froglight_world::prelude::{ChunkPos, SharedChunk};
 
 use crate::{
     instance::{
         hook::{discard_hook, insert_hook},
         reflect::ReflectSession,
     },
-    prelude::SessionInstance,
+    prelude::*,
 };
 
 /// A [`Plugin`] that ...
@@ -39,3 +40,32 @@ impl Plugin for InstancePlugin {
             .on_discard(discard_hook::<ChunkPos>);
     }
 }
+
+impl InstancePlugin {
+    /// A [`System`] that applies [`BlockEditQueue`]s to [`SessionInstance`]s.
+    ///
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
+    pub fn apply_blockedits(
+        query: Query<(&mut BlockEditQueue, &SessionInstance), Without<IsResource>>,
+        mut chunks: Query<&mut SharedChunk, Without<IsResource>>,
+    ) {
+        for (mut queue, instance) in query {
+            queue.apply(instance, chunks.reborrow());
+        }
+    }
+}
+
+// /// Apply the bot's [`BlockEditQueue`].
+// #[expect(clippy::type_complexity, reason = "Complex Query Filters")]
+// fn apply_blockedit_queue(
+//     bot: Single<
+//         (&SessionInstance, &mut BlockEditQueue),
+//         (With<ClientConnection>, Without<SharedChunk>, Without<IsResource>),
+//     >,
+//     chunks: Query<&mut SharedChunk>,
+// ) {
+//     let (instance, mut edit_queue) = bot.into_inner();
+//     edit_queue.apply(instance, chunks);
+// }

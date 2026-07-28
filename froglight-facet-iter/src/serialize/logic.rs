@@ -105,13 +105,13 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
         mut item: SerializeItem<'mem, 'facet>,
     ) -> Result<(), SerializeError> {
         // TODO: Pass this into `Serializer` to allow more flexibility?
-        if self.namespace.is_some_and(|nc| nc == "mc") {
+        if self.namespace.is_some() {
             // Set `var` and `with` using the field and type attributes.
             let mut var = item.is_variable();
             let mut with = false;
 
             if let Some(attrs) = item.field_attr() {
-                for attr in attrs.iter().filter(|attr| attr.ns.is_some_and(|ns| ns == "mc")) {
+                for attr in attrs.iter().filter(|attr| attr.ns == self.namespace) {
                     // #[facet(mc::variable)]
                     var |= attr.key == "variable";
                     // #[facet(mc::with = ...)]
@@ -119,7 +119,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                 }
             }
             for attr in item.shape().attributes {
-                if attr.ns.is_some_and(|ns| ns == "mc") {
+                if attr.ns == self.namespace {
                     // #[facet(mc::variable)]
                     var |= attr.key == "variable";
                     // #[facet(mc::with = ...)]
@@ -237,7 +237,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Def::Map(..) => {
                 let map = item.peek().into_map()?;
                 // Serialize the length of the map.
-                (self.core)(Item::Size(map.len().try_into().map_err(WriterError::other)?))?;
+                (self.core)(Item::Hint(
+                    map.len().try_into().map_err(WriterError::other)?,
+                    *item.peek(),
+                ))?;
 
                 // Push the items in reverse order.
                 let iter = map.iter();
@@ -251,7 +254,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Def::Set(..) => {
                 let set = item.peek().into_set()?;
                 // Serialize the length of the set.
-                (self.core)(Item::Size(set.len().try_into().map_err(WriterError::other)?))?;
+                (self.core)(Item::Hint(
+                    set.len().try_into().map_err(WriterError::other)?,
+                    *item.peek(),
+                ))?;
 
                 // Push the items in reverse order.
                 let iter = set.iter();
@@ -265,7 +271,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Def::List(..) | Def::Slice(..) => {
                 let list = item.peek().into_list()?;
                 // Serialize the length of the list.
-                (self.core)(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
+                (self.core)(Item::Hint(
+                    list.len().try_into().map_err(WriterError::other)?,
+                    *item.peek(),
+                ))?;
 
                 // Push the items in reverse order.
                 let iter = list.iter();
@@ -314,7 +323,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Def::Option(..) => {
                 let option = item.peek().into_option()?;
                 // Serialize the discriminant of the option.
-                (self.core)(Item::Size(u32::from(option.is_some())))?;
+                (self.core)(Item::Hint(u32::from(option.is_some()), *item.peek()))?;
 
                 // If the option is `Some`, push the value.
                 if let Some(value) = option.value() {
@@ -326,7 +335,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Def::Result(..) => {
                 let result = item.peek().into_result()?;
                 // Serialize the discriminant of the result.
-                (self.core)(Item::Size(u32::from(result.is_ok())))?;
+                (self.core)(Item::Hint(u32::from(result.is_ok()), *item.peek()))?;
 
                 if let Some(value) = result.ok() {
                     // Push `Ok(..)`.
@@ -362,7 +371,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Type::Sequence(..) => {
                 let list = item.peek().into_list_like()?;
                 // Serialize the length of the list.
-                (self.core)(Item::Size(list.len().try_into().map_err(WriterError::other)?))?;
+                (self.core)(Item::Hint(
+                    list.len().try_into().map_err(WriterError::other)?,
+                    *item.peek(),
+                ))?;
 
                 // Push the items in reverse order.
                 let iter = list.iter();
@@ -382,9 +394,12 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                 let iter = item.peek().into_struct()?.fields_for_binary_serialize();
 
                 // Determine whether the struct should pass the variable flag to its fields.
-                let variable_base = if item.shape().attributes.iter().any(|attr| {
-                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
-                }) {
+                let variable_base = if item
+                    .shape()
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                {
                     item.is_variable()
                 } else {
                     false
@@ -396,10 +411,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
 
                     if let Some(field) = field.field {
                         // Update `variable` using the field's attributes.
-                        variable |= field.has_attr(Some("mc"), "variable");
+                        variable |= field.has_attr(self.namespace, "variable");
 
                         // If the field has a custom serializer, treat it as a value.
-                        if field.has_attr(Some("mc"), "with") {
+                        if field.has_attr(self.namespace, "with") {
                             field_ty = ItemType::Value;
                         }
                     }
@@ -415,9 +430,12 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                 let enum_ = item.peek().into_enum()?;
 
                 // Determine whether the enum should pass the variable flag to its fields.
-                let variable_base = if item.shape().attributes.iter().any(|attr| {
-                    attr.ns.is_some_and(|ns| ns == "mc") && attr.key == "variable_inner"
-                }) {
+                let variable_base = if item
+                    .shape()
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                {
                     item.is_variable()
                 } else {
                     false
@@ -428,8 +446,9 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
 
                 // Serialize the discriminant of the enum.
                 #[expect(clippy::cast_sign_loss, reason = "Expected behavior")]
-                (self.core)(Item::Size(
+                (self.core)(Item::Hint(
                     (enum_.discriminant() as u64).try_into().map_err(WriterError::other)?,
+                    *item.peek(),
                 ))?;
 
                 // Push the fields in reverse order.
@@ -440,10 +459,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
 
                     if let Some(field) = field.field {
                         // Update `variable` using the field's attributes.
-                        variable |= field.has_attr(Some("mc"), "variable");
+                        variable |= field.has_attr(self.namespace, "variable");
 
                         // If the field has a custom serializer, treat it as a value.
-                        if field.has_attr(Some("mc"), "with") {
+                        if field.has_attr(self.namespace, "with") {
                             field_ty = ItemType::Value;
                         }
                     }
