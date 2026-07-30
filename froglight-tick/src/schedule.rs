@@ -48,6 +48,7 @@ impl TickSchedule {
     #[cfg(not(feature = "froglight"))]
     pub fn tickfirst_disable(
         query: Query<(Entity, &mut TickTimer)>,
+        children: Query<&Children>,
         time: Res<Time<Real>>,
         mut disabled: ResMut<TickDisabledSet>,
         mut commands: Commands,
@@ -57,8 +58,12 @@ impl TickSchedule {
                 #[cfg(feature = "tracing")]
                 tracing::trace!(target: "froglight_tick", "Ticking Entity {entity}");
             } else {
+                // Disable the ticked entity.
                 disabled.insert(entity);
                 commands.entity(entity).insert(TickDisabled);
+
+                // Disable all the entity's children.
+                Self::disable_children(entity, &children, &mut disabled, &mut commands);
             }
         }
     }
@@ -70,6 +75,7 @@ impl TickSchedule {
     #[cfg(feature = "froglight")]
     pub fn tickfirst_disable(
         query: Query<(Entity, Option<&SessionInstance>, &mut TickTimer)>,
+        children: Query<&Children>,
         time: Res<Time<Real>>,
         mut disabled: ResMut<TickDisabledSet>,
         mut commands: Commands,
@@ -79,18 +85,61 @@ impl TickSchedule {
                 #[cfg(feature = "tracing")]
                 tracing::trace!(target: "froglight_tick", "Ticking Entity {entity}");
             } else {
+                // Disable the ticked entity.
                 disabled.insert(entity);
                 commands.entity(entity).insert(TickDisabled);
 
-                // Disable all entities in the instance.
+                // Disable all the entity's children.
+                Self::disable_children(entity, &children, &mut disabled, &mut commands);
+
+                // If the entity has a [`SessionInstance`],
+                // disable all the entities in the instance as well.
                 if let Some(instance) = instance {
                     disabled.extend(instance.iter_entity().copied());
+                    // Disable all the children of the entities in the instance as well.
+                    for entity in instance.iter_entity() {
+                        Self::disable_children(*entity, &children, &mut disabled, &mut commands);
+                    }
 
                     let batch: alloc::vec::Vec<_> =
-                        instance.iter_entity().copied().map(|e| (e, TickDisabled)).collect();
+                        instance.iter_entity().map(|e| (*e, TickDisabled)).collect();
                     commands.insert_batch(batch);
                 }
             }
+        }
+    }
+
+    /// Recursively disables all children of the given entity.
+    ///
+    /// Batches [`TickDisabled`] insertions.
+    fn disable_children(
+        entity: Entity,
+        children: &Query<&Children>,
+        disabled: &mut TickDisabledSet,
+        commands: &mut Commands,
+    ) {
+        // Skip if the entity has no children.
+        if !children.contains(entity) {
+            return;
+        }
+
+        // Collect all descendants that are not already disabled.
+        let descendants: alloc::vec::Vec<_> =
+            children.iter_descendants(entity).filter(|e| !disabled.contains(e)).collect();
+        // Skip if there are no descendants to disable.
+        if descendants.is_empty() {
+            return;
+        }
+
+        // Register all the descendants as disabled.
+        disabled.extend(descendants.iter().copied());
+        // Batch insert `TickDisabled`.
+        let batch: alloc::vec::Vec<_> = descendants.iter().map(|e| (*e, TickDisabled)).collect();
+        commands.insert_batch(batch);
+
+        // Recursively disable all descendants of all descendants.
+        for entity in descendants.into_iter().filter(|e| children.contains(*e)) {
+            Self::disable_children(entity, children, disabled, commands);
         }
     }
 

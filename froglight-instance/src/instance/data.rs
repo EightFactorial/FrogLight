@@ -52,9 +52,9 @@ macro_rules! create_data {
                 if let Some(entity) = instance.$token.remove(self) {
                     // Remove from the `entity` set if not present in any of the other maps.
                     if !(
-                            instance.entity_id.iter().any(|(_, v)| &entity == v)
-                            || instance.entity_uuid.iter().any(|(_, v)| &entity == v)
-                            || instance.chunk_pos.iter().any(|(_, v)| &entity == v)
+                            instance.entity_id.values().any(|v| &entity == v)
+                            || instance.entity_uuid.values().any(|v| &entity == v)
+                            || instance.chunk_pos.values().any(|v| &entity == v)
                         )
                     {
                         instance.entity.remove(&entity);

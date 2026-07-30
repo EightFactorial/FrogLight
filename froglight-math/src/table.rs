@@ -13,7 +13,7 @@ use once_cell::sync::Lazy as LazyLock;
 /// A precomputed sine table for angles in the range `[0, 2π)`.
 ///
 /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
-#[cfg(not(feature = "nightly"))]
+#[cfg(any(not(feature = "nightly"), not(feature = "std")))]
 pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
     /// The sine function from the standard library.
     #[cfg(feature = "std")]
@@ -44,7 +44,7 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
 /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
 ///
 /// Uses SIMD intrinsics for better performance (generates roughly 64x faster).
-#[cfg(feature = "nightly")]
+#[cfg(all(feature = "nightly", feature = "std"))]
 pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
     const BATCH: usize = 64;
 
