@@ -112,7 +112,7 @@ impl BotPlugin {
 
         // Add the profile to the Offline API.
         let api = ClientApi::offline();
-        let _ = Offline::insert_profile(profile.clone());
+        Offline::insert_profile(profile.clone()).unwrap();
 
         // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<Version>(ADDRESS, ConnectionIntent::Login);
@@ -142,21 +142,19 @@ impl BotPlugin {
     #[allow(clippy::match_same_arms, reason = "Example")]
     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
     fn message_handler(
-        bot: Single<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
+        bot: Query<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
         mut writer: MessageWriter<ServerboundMessage>,
         mut commands: Commands,
     ) {
         for message in reader.read() {
-            // Warn if the message isn't for the bot entity.
-            if message.source() != bot.id() {
-                warn!(
-                    "Received a message for a different entity: {} != {}",
-                    message.source(),
-                    bot.id()
-                );
-                continue;
-            }
+            let bot = match bot.get(message.source()) {
+                Ok(bot) => bot,
+                Err(err) => {
+                    error!("Failed to get bot entity: {err}");
+                    continue;
+                }
+            };
 
             match message.event() {
                 // Handle gameplay events.
@@ -484,15 +482,16 @@ impl BotPlugin {
                             // Insert the bot's initial components.
                             let profile = bot.get::<PlayerProfile>().unwrap();
                             commands.entity(bot.id()).insert((
-                                login.player_id,
-                                EntityUuid::new(*profile.uuid()),
-                                BlockEditQueue::new(),
                                 SessionInstance::new::<Version>(
                                     login.spawn_info.dimension.clone(),
                                     height_max,
                                     height_min,
                                 ),
                                 PartOfInstance::new(bot.id()),
+                                BlockEditQueue::new(),
+                                TickTimer::default(),
+                                login.player_id,
+                                EntityUuid::new(*profile.uuid()),
                                 EntityBundle::new::<entity::Player, Version>(),
                                 Position::ZERO,
                                 Rotation::IDENTITY,

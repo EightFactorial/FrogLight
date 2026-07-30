@@ -1,12 +1,15 @@
 //! TODO
 
+use alloc::vec::Vec;
+
 use bevy_app::{App, Plugin};
 #[cfg(feature = "tracing")]
 use bevy_ecs::entity::EntityNotSpawnedError;
-use bevy_ecs::{prelude::*, resource::IsResource, world::DeferredWorld};
+use bevy_ecs::{entity::UniqueEntityArray, prelude::*, resource::IsResource, world::DeferredWorld};
 use bevy_tasks::ComputeTaskPool;
 use froglight_entity::{bevy::EntityBundleEvent, prelude::EntityBundle};
-use froglight_instance::prelude::PartOfInstance;
+use froglight_instance::prelude::SessionInstance;
+use parking_lot::Mutex;
 
 use crate::prelude::*;
 
@@ -94,31 +97,61 @@ impl PhysicsPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn update_collisions(
-        mut query: Query<
-            (Entity, &PartOfInstance, &Position, &Collider, &mut CollidingWith),
+        instances: Query<(Entity, &SessionInstance), Without<IsResource>>,
+        mut colliders: Query<
+            (Entity, &Position, &Collider, &mut CollidingWith),
             Without<IsResource>,
         >,
         mut collisions: ResMut<EntityCollisions>,
+        cache: Local<Mutex<Vec<UniqueEntityArray<2>>>>,
     ) {
-        let mut iter = query.iter_combinations_mut::<2>();
+        let collider_lens = colliders.transmute_lens::<(Entity, &Position, &Collider)>();
+        let collider_lens = collider_lens.query_inner();
 
-        while let Some(
-            [
-                (entity_a, instance_a, position_a, collider_a, mut colliding_with_a),
-                (entity_b, instance_b, position_b, collider_b, mut colliding_with_b),
-            ],
-        ) = iter.fetch_next()
-        {
-            if instance_a == instance_b {
-                if collider_a.intersects(position_a, collider_b, position_b) {
-                    if collisions.push_pair(entity_a, entity_b) {
-                        colliding_with_a.insert(entity_b);
-                        colliding_with_b.insert(entity_a);
+        // Calculate all collisions in parallel.
+        instances.par_iter().for_each(|(_entity, instance)| {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::info_span!(target: "froglight_physics", "par_update_collisions", instance = %_entity).entered();
+
+            let mut entities = Vec::<&Entity>::with_capacity(instance.iter_entity().len());
+            entities.extend(instance.iter_entity());
+
+            for (start, a) in entities.iter().enumerate() {
+                for b in entities.iter().skip(start + 1) {
+                    // Skip checking collisions with itself.
+                    if a == b {
+                        continue;
                     }
-                } else if collisions.remove_pair(entity_a, entity_b) {
-                    colliding_with_a.remove(&entity_b);
-                    colliding_with_b.remove(&entity_a);
+
+                    let (a, b) = (**a, **b);
+                    if let (Ok((_, position_a, collider_a)), Ok((_, position_b, collider_b))) =
+                        (collider_lens.get(a), collider_lens.get(b))
+                        && collider_a.intersects(position_a, collider_b, position_b)
+                    {
+                        // SAFETY: Already checked that `a` and `b` are not equal.
+                        cache
+                            .lock()
+                            .push(unsafe { UniqueEntityArray::from_array_unchecked([a, b]) });
+                    }
                 }
+            }
+        });
+
+        // Clear all existing collisions.
+        collisions.clear();
+        for (_, _, _, mut colliding_with) in colliders.iter_mut() {
+            colliding_with.clear();
+        }
+
+        // Insert all new collisions.
+        for pair in cache.lock().drain(..) {
+            let [a, b] = pair.into_inner();
+            if collisions.push_pair(a, b)
+                && let Ok([(.., mut colliding_with_a), (.., mut colliding_with_b)]) =
+                    colliders.get_many_unique_mut(pair)
+            {
+                colliding_with_a.insert(a);
+                colliding_with_b.insert(b);
             }
         }
     }
@@ -172,13 +205,12 @@ impl PhysicsPlugin {
                     }
                 }
             });
-            scope.spawn(async {
-                for (col, prev) in col.contiguous_iter_mut().unwrap() {
-                    for (col, prev) in col.iter().zip(prev) {
-                        *prev = PrevCollider::new_col(*col);
-                    }
+
+            for (col, prev) in col.contiguous_iter_mut().unwrap() {
+                for (col, prev) in col.iter().zip(prev) {
+                    *prev = PrevCollider::new_col(*col);
                 }
-            });
+            }
         });
     }
 }

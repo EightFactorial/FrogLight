@@ -27,6 +27,8 @@ pub mod modules {
     pub use froglight_registry as registry;
     pub use froglight_snbt as snbt;
     pub use froglight_text as text;
+    #[cfg(feature = "bevy")]
+    pub use froglight_tick as tick;
     pub use froglight_world as world;
 }
 
@@ -47,6 +49,6 @@ pub mod prelude {
     #[cfg(feature = "bevy")]
     pub use crate::{
         bevy::plugins::FroglightPlugins,
-        modules::{brigadier::prelude::*, instance::prelude::*},
+        modules::{brigadier::prelude::*, instance::prelude::*, tick::prelude::*},
     };
 }

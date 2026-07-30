@@ -27,6 +27,7 @@ froglight-registry = { default-features = false, path = "froglight-registry", ve
 froglight-registry-template = { default-features = false, path = "froglight-registry-template", version = "0.0.1" }
 froglight-snbt = { default-features = false, path = "froglight-snbt", version = "0.0.1" }
 froglight-text = { default-features = false, path = "froglight-text", version = "0.0.1" }
+froglight-tick = { default-features = false, path = "froglight-tick", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
@@ -37,6 +38,7 @@ bevy_math = { default-features = false, version = "0.19" }
 bevy_reflect = { default-features = false, version = "0.19" }
 bevy_sprite = { default-features = false, version = "0.19" }
 bevy_tasks = { default-features = false, version = "0.19" }
+bevy_time = { default-features = false, version = "0.19" }
 bevy_transform = { default-features = false, version = "0.19" }
 bevy_ui = { default-features = false, version = "0.19" }
 
@@ -155,6 +157,7 @@ members = [
   "froglight-registry-template",
   "froglight-snbt",
   "froglight-text",
+  "froglight-tick",
   "froglight-world",
 ]
 resolver = "3"

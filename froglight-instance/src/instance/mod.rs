@@ -1,6 +1,10 @@
 //! TODO
 
-use bevy_ecs::{component::Component, entity::Entity, reflect::ReflectComponent};
+use bevy_ecs::{
+    component::Component,
+    entity::{Entity, EntityHashSet, hash_set::Iter},
+    reflect::ReflectComponent,
+};
 use bevy_reflect::Reflect;
 use foldhash::fast::FixedState;
 use froglight_biome::{storage::BiomeStorage, version::BiomeVersion};
@@ -13,7 +17,7 @@ use froglight_entity::{
 };
 use froglight_item::{storage::ItemStorage, version::ItemVersion};
 use froglight_world::prelude::ChunkPos;
-use hashbrown::{HashMap, hash_map::Values};
+use hashbrown::HashMap;
 
 pub(crate) mod data;
 pub(crate) mod hook;
@@ -28,11 +32,12 @@ pub struct SessionInstance {
     dimension: Identifier<'static>,
     height_max_min: (u32, i32),
 
-    biomes: &'static BiomeStorage,
-    blocks: &'static BlockStorage,
-    entities: &'static EntityStorage,
-    items: &'static ItemStorage,
+    v_biomes: &'static BiomeStorage,
+    v_blocks: &'static BlockStorage,
+    v_entities: &'static EntityStorage,
+    v_items: &'static ItemStorage,
 
+    entity: EntityHashSet,
     entity_id: HashMap<EntityId, Entity, FixedState>,
     entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
     chunk_pos: HashMap<ChunkPos, Entity, FixedState>,
@@ -60,11 +65,12 @@ impl SessionInstance {
             dimension,
             height_max_min: (height_max, height_min),
 
-            biomes: V::biomes(),
-            blocks: V::blocks(),
-            entities: V::entities(),
-            items: V::items(),
+            v_biomes: V::biomes(),
+            v_blocks: V::blocks(),
+            v_entities: V::entities(),
+            v_items: V::items(),
 
+            entity: EntityHashSet::new(),
             entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
             entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
             chunk_pos: HashMap::with_hasher(FixedState::with_seed(seed_c)),
@@ -103,25 +109,25 @@ impl SessionInstance {
     /// Get the [`BiomeStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_biomes(&self) -> &'static BiomeStorage { self.biomes }
+    pub const fn version_biomes(&self) -> &'static BiomeStorage { self.v_biomes }
 
     /// Get the [`BlockStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_blocks(&self) -> &'static BlockStorage { self.blocks }
+    pub const fn version_blocks(&self) -> &'static BlockStorage { self.v_blocks }
 
     /// Get the [`EntityStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_entities(&self) -> &'static EntityStorage { self.entities }
+    pub const fn version_entities(&self) -> &'static EntityStorage { self.v_entities }
 
     /// Get the [`ItemStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_items(&self) -> &'static ItemStorage { self.items }
+    pub const fn version_items(&self) -> &'static ItemStorage { self.v_items }
 
     /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub fn iter_entity(&self) -> Values<'_, EntityId, Entity> { self.entity_id.values() }
+    pub fn iter_entity(&self) -> Iter<'_> { self.entity.iter() }
 }

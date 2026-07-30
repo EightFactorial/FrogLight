@@ -82,6 +82,13 @@ impl EntityCollisions {
         self.0.get(&entity_a).is_some_and(|set| set.contains(&entity_b))
             || self.0.get(&entity_b).is_some_and(|set| set.contains(&entity_a))
     }
+
+    /// Clear all collisions for all entities.
+    pub fn clear(&mut self) { self.0.values_mut().for_each(|set| set.clear()); }
+
+    /// Clear all collisions for all entities, removing collision maps.
+    #[inline]
+    pub fn clear_all(&mut self) { self.0.clear(); }
 }
 
 // -------------------------------------------------------------------------------------------------

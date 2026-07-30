@@ -43,12 +43,27 @@ macro_rules! create_data {
 
             #[inline]
             fn insert(self, instance: &mut SessionInstance, entity: Entity) -> Option<Entity> {
+                instance.entity.insert(entity);
                 instance.$token.insert(self, entity)
             }
 
             #[inline]
             fn remove(&self, instance: &mut SessionInstance) -> bool {
-                instance.$token.remove(self).is_some()
+                if let Some(entity) = instance.$token.remove(self) {
+                    // Remove from the `entity` set if not present in any of the other maps.
+                    if !(
+                            instance.entity_id.iter().any(|(_, v)| &entity == v)
+                            || instance.entity_uuid.iter().any(|(_, v)| &entity == v)
+                            || instance.chunk_pos.iter().any(|(_, v)| &entity == v)
+                        )
+                    {
+                        instance.entity.remove(&entity);
+                    }
+
+                    true
+                } else {
+                    false
+                }
             }
         }
 

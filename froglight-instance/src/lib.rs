@@ -3,8 +3,8 @@
 
 extern crate alloc;
 
+pub mod bevy;
 pub mod instance;
-pub mod plugin;
 pub mod query;
 pub mod queue;
 pub mod relationship;
