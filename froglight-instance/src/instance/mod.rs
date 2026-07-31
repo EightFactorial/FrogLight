@@ -130,4 +130,9 @@ impl SessionInstance {
     #[inline]
     #[must_use]
     pub fn iter_entity(&self) -> Iter<'_> { self.entity.iter() }
+
+    /// Returns the number of entities in the [`SessionInstance`].
+    #[inline]
+    #[must_use]
+    pub fn entity_count(&self) -> usize { self.entity.len() }
 }

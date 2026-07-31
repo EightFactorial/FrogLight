@@ -8,8 +8,8 @@ use bevy_time::{Timer, TimerMode};
 
 /// The per-instance timer for the [`Tick`] schedule.
 ///
-/// If the timer has not finished,
-/// the entity will disabled during the [`Tick`] schedule.
+/// If not ticking, disables the entity and all children
+/// recursively for the duration of the [`Tick`] schedule.
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Reflect, Component)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]

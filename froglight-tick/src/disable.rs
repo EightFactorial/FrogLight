@@ -5,10 +5,9 @@ use core::ops::{Deref, DerefMut};
 use bevy_ecs::{entity::EntityHashSet, prelude::*};
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
-/// A marker [`Component`] similar to [`Disabled`].
+/// A marker [`Component`] equivalent to [`Disabled`].
 ///
-/// Temporarily disables [`SessionInstance`]s from being ticked by
-/// [`TickSchedule`](crate::schedule::TickSchedule).
+/// Prevents entities from being [`Query`]'d by default.
 ///
 /// [`Disabled`]: bevy_ecs::entity_disabling::Disabled
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, Component)]

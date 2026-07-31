@@ -11,6 +11,12 @@ pub struct TickPlugin;
 
 impl Plugin for TickPlugin {
     fn build(&self, app: &mut App) {
+        // Add `TickDisabled` and `TickDisabledSet`.
+        app.init_resource::<TickDisabledSet>()
+            .register_type::<TickDisabledSet>()
+            .register_type::<TickDisabled>();
+        app.register_disabling_component::<TickDisabled>();
+
         // Create and add the `RunTickLoop` schedule.
         let mut tick_schedule = Schedule::new(RunTickLoop);
         tick_schedule.set_executor(SingleThreadedExecutor::new());
@@ -26,16 +32,5 @@ impl Plugin for TickPlugin {
 
         // Add `RunTickLoop::run_tick` system to the `RunTickLoop` schedule.
         app.add_systems(RunTickLoop, RunTickLoop::run_tick);
-
-        // Add `TickDisabled` and `TickDisabledSet`.
-        app.init_resource::<TickDisabledSet>()
-            .register_type::<TickDisabledSet>()
-            .register_type::<TickDisabled>();
-        app.register_disabling_component::<TickDisabled>();
-
-        // Add `TickSchedule::tickfirst_disable` and
-        // `TickSchedule::ticklast_reenable` systems.
-        app.add_systems(TickFirst, TickSchedule::tickfirst_disable);
-        app.add_systems(TickLast, TickSchedule::ticklast_reenable);
     }
 }
