@@ -8,9 +8,11 @@ use bevy_ecs::{
     schedule::ScheduleLabel,
 };
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use bevy_tasks::{ComputeTaskPool, Scope};
 use bevy_time::{Real, Time};
 #[cfg(feature = "froglight")]
 use froglight_instance::prelude::SessionInstance;
+use parking_lot::Mutex;
 
 use crate::{disable::TickDisabledSet, prelude::*};
 
@@ -54,6 +56,12 @@ pub enum TickSchedule {
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
 pub struct RunTickLoop;
 
+#[derive(Default, Resource)]
+struct TickCache {
+    enabled: Mutex<EntityHashMap<u32>>,
+    disabled: Mutex<EntityHashSet>,
+}
+
 impl RunTickLoop {
     /// A [`System`] that runs the [`TickSchedule`]s in order.
     ///
@@ -62,123 +70,156 @@ impl RunTickLoop {
     /// Disabled [`TickTimer`]s and their children are temporarily marked
     /// [`TickDisabled`].
     pub fn run_tick(world: &mut World) {
-        // Collect all ticking timers to keep enabled.
-        let mut enabled = EntityHashMap::new();
-        // Collect all non-ticking entities to disable.
-        let mut disabled = EntityHashSet::with_capacity(enabled.len());
+        world.init_resource::<TickCache>();
+        world.resource_scope::<TickCache, ()>(|world, mut cache| {
+            let TickCache { enabled, disabled } = &mut *cache;
 
-        // TODO: Set a maximum delta time and/or tick count.
-        let delta = world.resource::<Time<Real>>().delta();
-        for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
-            if timer.tick(delta).just_finished() {
-                enabled.insert(entity, timer.times_finished_this_tick());
-            }
-        }
-
-        // Get the maximum tick count of the timers (or return if none).
-        let Some(ticks) = enabled.values().max() else { return };
-
-        // Run the tick schedule for each tick.
-        for iteration in 0..*ticks {
-            // Disable all non-ticking entities.
-            Self::insert_disable(iteration, &mut enabled, &mut disabled, world);
-            // Stop if there are no enabled timers left.
-            if enabled.is_empty() {
-                break;
+            // TODO: Set a maximum delta time and/or tick count.
+            let delta = world.resource::<Time<Real>>().delta();
+            for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
+                if timer.tick(delta).just_finished() {
+                    enabled.get_mut().insert(entity, timer.times_finished_this_tick());
+                }
             }
 
-            // Run all `TickSchedule`s.
-            let _ = world.try_run_schedule(TickSchedule::TickFirst);
-            let _ = world.try_run_schedule(TickSchedule::PreTick);
-            let _ = world.try_run_schedule(TickSchedule::Tick);
-            let _ = world.try_run_schedule(TickSchedule::PostTick);
-            let _ = world.try_run_schedule(TickSchedule::TickLast);
-        }
+            // Get the maximum tick count of the timers (or return if none).
+            let Some(ticks) = enabled.get_mut().values().max() else { return };
 
-        // Re-enable all previously disabled entities.
-        Self::remove_disable(world);
+            // Run the tick schedule for each tick.
+            for iteration in 0..*ticks {
+                // Disable all non-ticking entities.
+                Self::insert_disable(iteration, enabled, disabled, world);
+                // Stop if there are no enabled timers left.
+                if enabled.get_mut().is_empty() {
+                    break;
+                }
+
+                // Run all `TickSchedule`s.
+                let _ = world.try_run_schedule(TickSchedule::TickFirst);
+                let _ = world.try_run_schedule(TickSchedule::PreTick);
+                let _ = world.try_run_schedule(TickSchedule::Tick);
+                let _ = world.try_run_schedule(TickSchedule::PostTick);
+                let _ = world.try_run_schedule(TickSchedule::TickLast);
+            }
+
+            // Re-enable all previously disabled entities.
+            Self::remove_disable(world);
+        });
     }
 
     fn insert_disable(
         iteration: u32,
-        enabled: &mut EntityHashMap<u32>,
-        disabled: &mut EntityHashSet,
+        enabled: &mut Mutex<EntityHashMap<u32>>,
+        disabled: &mut Mutex<EntityHashSet>,
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        enabled.retain(|_, count| iteration < *count);
+        enabled.get_mut().retain(|_, count| iteration < *count);
         // Stop if there are no enabled timers left.
-        if enabled.is_empty() {
+        if enabled.get_mut().is_empty() {
             return;
         }
 
         // Collect all non-ticking timers.
         let mut timers = Vec::new();
         for entity in world.query_filtered::<Entity, With<TickTimer>>().iter(world) {
-            if !enabled.contains_key(&entity) {
+            if !enabled.get_mut().contains_key(&entity) {
                 timers.push(entity);
             }
         }
-
-        // Add all of the timers' children.
-        disabled.extend(timers.iter().copied());
-        for entity in timers.iter().filter_map(|e| world.get_entity(*e).ok()) {
-            Self::insert_disable_timer(entity, disabled, world);
+        // Stop if there are no non-ticking timers.
+        if timers.is_empty() {
+            return;
         }
 
+        // Add all of the timers' children.
+        disabled.get_mut().extend(timers.iter().copied());
+        ComputeTaskPool::get().scope::<_, ()>(|spawner| {
+            timers.retain(|e| !disabled.get_mut().contains(e));
+
+            let disabled = &*disabled;
+            let world = &*world;
+
+            for entity in timers.into_iter().filter_map(|e| world.get_entity(e).ok()) {
+                spawner.spawn(async move {
+                    Self::insert_disable_timer(entity, disabled, spawner, world);
+                });
+            }
+        });
+
         // Batch disable all non-ticking entities.
+        let disabled = disabled.get_mut();
         world.resource_mut::<TickDisabledSet>().extend(disabled.iter().copied());
         world.commands().insert_batch(disabled.clone().into_iter().map(|e| (e, TickDisabled)));
     }
 
-    fn insert_disable_timer(entity: EntityRef<'_>, disabled: &mut EntityHashSet, world: &World) {
+    fn insert_disable_timer<'scope>(
+        entity: EntityRef<'_>,
+        disabled: &'scope Mutex<EntityHashSet>,
+        spawner: &'scope Scope<'scope, '_, ()>,
+        world: &'scope World,
+    ) {
         // Skip checking this timer if it is already disabled.
-        if disabled.contains(&entity.id()) {
+        if disabled.lock().contains(&entity.id()) {
             return;
         }
 
         // Disable all entities in the `SessionInstance` if present.
         #[cfg(feature = "froglight")]
         if entity.contains::<SessionInstance>() {
-            Self::insert_disable_instance(entity, disabled, world);
+            Self::insert_disable_instance(entity, disabled, spawner, world);
         }
 
         // Disable all children if present.
         if entity.contains::<Children>() {
-            Self::insert_disable_children(entity, disabled, world);
+            Self::insert_disable_children(entity, disabled, spawner, world);
         }
     }
 
     #[cfg(feature = "froglight")]
-    fn insert_disable_instance(entity: EntityRef<'_>, disabled: &mut EntityHashSet, world: &World) {
+    fn insert_disable_instance<'scope>(
+        entity: EntityRef<'_>,
+        disabled: &'scope Mutex<EntityHashSet>,
+        spawner: &'scope Scope<'scope, '_, ()>,
+        world: &'scope World,
+    ) {
         let Some(instance) = entity.get::<SessionInstance>() else { return };
         if instance.entity_count() == 0 {
             return;
         }
 
         // Disable all entities in the `SessionInstance`.
-        disabled.extend(instance.iter_entity());
+        disabled.lock().extend(instance.iter_entity());
 
         // Disable all children of the entities in the `SessionInstance`.
         for entity in instance.iter_entity().filter_map(|e| world.get_entity(*e).ok()) {
             if entity.contains::<Children>() {
-                Self::insert_disable_children(entity, disabled, world);
+                spawner.spawn(async move {
+                    Self::insert_disable_children(entity, disabled, spawner, world);
+                });
             }
         }
     }
 
-    fn insert_disable_children(entity: EntityRef<'_>, disabled: &mut EntityHashSet, world: &World) {
+    fn insert_disable_children<'scope>(
+        entity: EntityRef<'_>,
+        disabled: &'scope Mutex<EntityHashSet>,
+        spawner: &'scope Scope<'scope, '_, ()>,
+        world: &'scope World,
+    ) {
         let Some(children) = entity.get::<Children>() else { return };
         if children.is_empty() {
             return;
         }
 
         // Disable all children of the entity.
-        disabled.extend(children.iter());
+        disabled.lock().extend(children.iter());
 
         // Disable all children of the children.
         for entity in children.iter().filter_map(|e| world.get_entity(e).ok()) {
-            Self::insert_disable_timer(entity, disabled, world);
+            spawner.spawn(async move {
+                Self::insert_disable_children(entity, disabled, spawner, world);
+            });
         }
     }
 

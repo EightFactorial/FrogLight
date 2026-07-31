@@ -10,6 +10,7 @@ pub mod counter;
 #[cfg(feature = "bevy_diagnostic")]
 pub mod diagnostic;
 pub mod disable;
+pub mod event;
 pub mod schedule;
 pub mod timer;
 
@@ -19,6 +20,7 @@ pub mod prelude {
     pub use crate::{
         counter::TickCounter,
         disable::TickDisabled,
+        event::Ticked,
         schedule::TickSchedule::{self, PostTick, PreTick, Tick, TickFirst, TickLast},
         timer::TickTimer,
     };

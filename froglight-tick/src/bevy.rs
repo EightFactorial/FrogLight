@@ -14,6 +14,9 @@ impl Plugin for TickPlugin {
         // Add the `TickCounter` resource.
         app.init_resource::<TickCounter>().register_type::<TickCounter>();
 
+        // Add the `Ticked` event type.
+        app.register_type::<Ticked>();
+
         // Add `TickDisabled` and `TickDisabledSet`.
         app.init_resource::<TickDisabledSet>()
             .register_type::<TickDisabledSet>()
@@ -38,6 +41,8 @@ impl Plugin for TickPlugin {
 
         // Add `TickCounter::increment_counter` to the `TickFirst` schedule.
         app.add_systems(TickFirst, TickCounter::increment_counter);
+        // Add `Ticked::trigger_ticked` to the `Tick` schedule.
+        app.add_systems(Tick, Ticked::trigger_ticked);
 
         // Add the `TickMeasurementPlugin`.
         #[cfg(feature = "bevy_diagnostic")]
