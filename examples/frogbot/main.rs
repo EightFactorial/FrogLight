@@ -6,10 +6,11 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
 use bevy::{
-    app::PluginGroupBuilder, ecs::resource::IsResource, math::DVec3, prelude::*, tasks::block_on,
+    app::PluginGroupBuilder, diagnostic::DiagnosticsStore, ecs::resource::IsResource, math::DVec3,
+    prelude::*, tasks::block_on,
 };
 use froglight::{
-    bevy::plugins::{InstancePlugin, NetworkPlugin, PhysicsPlugin},
+    bevy::plugins::{InstancePlugin, NetworkPlugin, PhysicsPlugin, TickMeasurementPlugin},
     modules::{
         api::api::Offline,
         network::{
@@ -67,7 +68,10 @@ impl Plugin for BotPlugin {
         // Add systems for creating the bot and handling messages.
         app.add_systems(Startup, BotPlugin::create_bot)
             .add_systems(PreUpdate, NetworkPlugin::clientbound_messages)
-            .add_systems(Update, BotPlugin::message_handler)
+            .add_systems(
+                Update,
+                (BotPlugin::message_handler, BotPlugin::tick_runtime).ambiguous_with_all(),
+            )
             .add_systems(
                 PostUpdate,
                 (
@@ -133,6 +137,20 @@ impl BotPlugin {
     fn exit_on_despawn(_: On<ClientDespawn>, mut commands: Commands) {
         info!("Exiting...");
         commands.write_message(AppExit::Success);
+    }
+
+    /// Log the amount of time to took to run a tick.
+    fn tick_runtime(diag: Res<DiagnosticsStore>, time: Res<Time>, mut timer: Local<Option<Timer>>) {
+        let timer = timer.get_or_insert_with(|| Timer::from_seconds(10., TimerMode::Repeating));
+        if !timer.tick(time.delta()).just_finished() {
+            return;
+        }
+
+        if let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
+            && let Some(average) = diag.average()
+        {
+            info!("Tick Runtime: {average:.3}{}", diag.suffix);
+        }
     }
 
     /// Handle reading/writing all messages for the bot.

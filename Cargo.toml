@@ -33,6 +33,7 @@ froglight-world = { default-features = false, path = "froglight-world", version 
 # Bevy Dependencies
 bevy = { default-features = false, version = "0.19" }
 bevy_app = { default-features = false, version = "0.19" }
+bevy_diagnostic = { default-features = false, version = "0.19" }
 bevy_ecs = { default-features = false, version = "0.19" }
 bevy_math = { default-features = false, version = "0.19" }
 bevy_reflect = { default-features = false, version = "0.19" }

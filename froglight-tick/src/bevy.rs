@@ -11,6 +11,9 @@ pub struct TickPlugin;
 
 impl Plugin for TickPlugin {
     fn build(&self, app: &mut App) {
+        // Add the `TickCounter` resource.
+        app.init_resource::<TickCounter>().register_type::<TickCounter>();
+
         // Add `TickDisabled` and `TickDisabledSet`.
         app.init_resource::<TickDisabledSet>()
             .register_type::<TickDisabledSet>()
@@ -32,5 +35,12 @@ impl Plugin for TickPlugin {
 
         // Add `RunTickLoop::run_tick` system to the `RunTickLoop` schedule.
         app.add_systems(RunTickLoop, RunTickLoop::run_tick);
+
+        // Add `TickCounter::increment_counter` to the `TickFirst` schedule.
+        app.add_systems(TickFirst, TickCounter::increment_counter);
+
+        // Add the `TickMeasurementPlugin`.
+        #[cfg(feature = "bevy_diagnostic")]
+        app.add_plugins(crate::diagnostic::TickMeasurementPlugin);
     }
 }
