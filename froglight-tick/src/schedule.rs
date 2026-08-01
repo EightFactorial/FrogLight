@@ -115,23 +115,22 @@ impl RunTickLoop {
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        let timers: alloc::vec::Vec<Entity> =
+        let finished: alloc::vec::Vec<Entity> =
             enabled.extract_if(|_, count| iteration >= *count).map(|(e, _)| e).collect();
-        // Skip if there are no timers to disable.
-        if timers.is_empty() {
+        // Skip if there are no finished timers to disable.
+        if finished.is_empty() {
             return;
         }
 
         // Disable the timers.
-        disabled.get_mut().extend(timers.iter().copied());
+        disabled.get_mut().extend(finished.iter().copied());
         ComputeTaskPool::get().scope::<_, ()>(|spawner| {
             let disabled = &*disabled;
             let world = &*world;
 
-            // Disable all of the timers' children.
-            for entity in timers.into_iter().filter_map(|e| world.get_entity(e).ok()) {
+            for timer in finished.into_iter().filter_map(|e| world.get_entity(e).ok()) {
                 spawner.spawn(async move {
-                    Self::insert_disable_timer(entity, disabled, spawner, world);
+                    Self::insert_disable_timer(timer, disabled, spawner, world);
                 });
             }
         });
@@ -200,22 +199,12 @@ impl RunTickLoop {
         disabled.lock().extend(children.iter());
 
         // Disable all children of the children.
-        let mut child_iter = children.iter().filter_map(|e| world.get_entity(e).ok());
-        let first = child_iter.next();
-
-        for entity in child_iter {
+        for entity in children.iter().filter_map(|e| world.get_entity(e).ok()) {
             if entity.contains::<Children>() {
                 spawner.spawn(async move {
                     Self::insert_disable_children(entity, disabled, spawner, world);
                 });
             }
-        }
-
-        // Do the first result on the current thread.
-        if let Some(first) = first
-            && first.contains::<Children>()
-        {
-            Self::insert_disable_children(first, disabled, spawner, world);
         }
     }
 
