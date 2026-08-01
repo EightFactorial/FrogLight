@@ -1,7 +1,5 @@
 //! TODO
 
-use alloc::vec::Vec;
-
 use bevy_ecs::{
     entity::{EntityHashMap, EntityHashSet},
     prelude::*,
@@ -77,9 +75,8 @@ impl RunTickLoop {
             // TODO: Set a maximum delta time and/or tick count.
             let delta = world.resource::<Time<Real>>().delta();
             for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
-                if timer.tick(delta).just_finished() {
-                    enabled.insert(entity, timer.times_finished_this_tick());
-                }
+                timer.tick(delta);
+                enabled.insert(entity, timer.times_finished_this_tick());
             }
 
             // Get the maximum tick count of the timers (or return if none).
@@ -118,7 +115,7 @@ impl RunTickLoop {
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        let timers: Vec<_> =
+        let timers: alloc::vec::Vec<Entity> =
             enabled.extract_if(|_, count| iteration >= *count).map(|(e, _)| e).collect();
         // Skip if there are no timers to disable.
         if timers.is_empty() {
@@ -151,11 +148,6 @@ impl RunTickLoop {
         spawner: &'scope Scope<'scope, '_, ()>,
         world: &'scope World,
     ) {
-        // Skip checking this timer if it is already disabled.
-        if disabled.lock().contains(&entity.id()) {
-            return;
-        }
-
         // Disable all entities in the `SessionInstance` if present.
         #[cfg(feature = "froglight")]
         if entity.contains::<SessionInstance>() {
@@ -212,9 +204,11 @@ impl RunTickLoop {
         let first = child_iter.next();
 
         for entity in child_iter {
-            spawner.spawn(async move {
-                Self::insert_disable_children(entity, disabled, spawner, world);
-            });
+            if entity.contains::<Children>() {
+                spawner.spawn(async move {
+                    Self::insert_disable_children(entity, disabled, spawner, world);
+                });
+            }
         }
 
         // Do the first result on the current thread.
