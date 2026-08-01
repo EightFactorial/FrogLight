@@ -118,23 +118,8 @@ impl RunTickLoop {
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        enabled.retain(|_, count| iteration < *count);
-        // Stop if there are no enabled timers left.
-        if enabled.is_empty() {
-            return;
-        }
-
-        // Collect all non-ticking timers.
-        let mut timers = Vec::new();
-        for entity in world.query_filtered::<Entity, With<TickTimer>>().iter(world) {
-            if !enabled.contains_key(&entity) && disabled.get_mut().contains(&entity) {
-                timers.push(entity);
-            }
-        }
-        // Stop if there are no non-ticking timers.
-        if timers.is_empty() {
-            return;
-        }
+        let timers: Vec<_> =
+            enabled.extract_if(|_, count| iteration < *count).map(|(e, _)| e).collect();
 
         // Disable the timers.
         disabled.get_mut().extend(timers.iter().copied());
