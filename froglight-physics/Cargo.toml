@@ -62,4 +62,4 @@ alloc = ["serde?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bevy_transform?/std", "bitflags/std", "dep:quick_cache", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-instance?/std", "froglight-math/std", "froglight-world/std", "glam/std", "serde?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-instance?/nightly", "froglight-math/nightly", "froglight-world/std", "parking_lot/nightly"]
+nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-instance?/nightly", "froglight-math/nightly", "froglight-world/nightly", "parking_lot/nightly"]

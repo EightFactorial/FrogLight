@@ -68,15 +68,17 @@ impl NaiveChunk {
             .and_then(|id| storage.get_biome_by_id(GlobalBiomeId::new(id)))
     }
 
-    /// Returns `true` if the chunk contains at least one biome of the same
-    /// type.
+    /// Returns `true` if the chunk contains the biome.
     #[must_use]
-    pub fn contains_biome(&self, biome: Biome) -> bool {
-        self.contains_raw_biome(biome.global_id().into_inner())
+    pub fn contains_biome(&self, biome: Biome, storage: &BiomeStorage) -> bool {
+        let biome_id = match biome.using_version_storage(storage) {
+            Some(biome) => biome.global_id().into_inner(),
+            None => return false,
+        };
+        self.contains_raw_biome(biome_id)
     }
 
-    /// Returns `true` if the chunk contains at least one biome of the same
-    /// type.
+    /// Returns `true` if the chunk contains a biome of the same type.
     #[must_use]
     pub fn contains_biome_type(&self, biome_type: TypeId, storage: &BiomeStorage) -> bool {
         let Some(biome_id) = storage.metadata().iter().find_map(|(_, meta)| {

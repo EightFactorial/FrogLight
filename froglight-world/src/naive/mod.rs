@@ -183,6 +183,18 @@ impl NaiveChunk {
         self.storage.as_slice().iter().any(|section| section.contains_raw_block(block_id))
     }
 
+    /// Returns `true` if the chunk contains any solid blocks.
+    #[must_use]
+    pub fn contains_any_solids(&self) -> bool {
+        self.storage.as_slice().iter().any(|section| section.block_count() != 0)
+    }
+
+    /// Returns `true` if the chunk contains any fluid blocks.
+    #[must_use]
+    pub fn contains_any_fluids(&self) -> bool {
+        self.storage.as_slice().iter().any(|section| section.fluid_count() != 0)
+    }
+
     /// Get the biome id at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds.

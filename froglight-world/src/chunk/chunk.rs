@@ -74,6 +74,11 @@ impl Chunk {
     #[must_use]
     pub const fn as_naive(&self) -> &NaiveChunk { &self.naive }
 
+    /// Get a mutable reference to the inner [`NaiveChunk`] of this chunk.
+    #[inline]
+    #[must_use]
+    pub const fn as_naive_mut(&mut self) -> &mut NaiveChunk { &mut self.naive }
+
     /// Get the inner [`NaiveChunk`] of this chunk.
     #[inline]
     #[must_use]
@@ -87,7 +92,7 @@ impl Chunk {
     /// and takes into account the chunk's vertical offset.
     #[inline]
     #[must_use]
-    pub const fn height(&self) -> i32 { self.naive.height() }
+    pub const fn height(&self) -> i32 { self.as_naive().height() }
 
     /// Get the height range of this [`Chunk`].
     ///
@@ -97,7 +102,7 @@ impl Chunk {
     /// vertical offset.
     #[inline]
     #[must_use]
-    pub const fn height_range(&self) -> Range<i32> { self.naive.height_range() }
+    pub const fn height_range(&self) -> Range<i32> { self.as_naive().height_range() }
 
     /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
     ///
@@ -108,105 +113,135 @@ impl Chunk {
     /// In most cases, you probably want [`Chunk::height`] instead.
     #[inline]
     #[must_use]
-    pub const fn height_total(&self) -> usize { self.naive.height_total() }
+    pub const fn height_total(&self) -> usize { self.as_naive().height_total() }
 
     /// Get the height offset of this [`Chunk`].
     #[inline]
     #[must_use]
-    pub const fn height_offset(&self) -> i32 { self.naive.height_offset() }
+    pub const fn height_offset(&self) -> i32 { self.as_naive().height_offset() }
 
     /// Get a reference to the sections in this [`Chunk`].
     #[inline]
     #[must_use]
-    pub const fn sections(&self) -> &[Section] { self.naive.sections() }
+    pub const fn sections(&self) -> &[Section] { self.as_naive().sections() }
 
     /// Get a mutable reference to the sections in this [`Chunk`].
     #[inline]
     #[must_use]
-    pub const fn sections_mut(&mut self) -> &mut [Section] { self.naive.sections_mut() }
+    pub const fn sections_mut(&mut self) -> &mut [Section] { self.as_naive_mut().sections_mut() }
 
     /// Get the [`Block`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Block`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     #[must_use]
     pub fn get_block<P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_using::<P>(position, self.blocks())
+        self.as_naive().get_block_using::<P>(position, self.blocks)
     }
 
     /// Get the [`Block`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Block`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     #[must_use]
     pub fn get_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Block> {
-        self.naive.get_block_pos_using::<P>(position, self.blocks())
+        self.as_naive().get_block_pos_using::<P>(position, self.blocks)
     }
 
     /// Set the [`Block`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Block`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
-        self.naive.set_block_using::<P>(position, block, self.blocks())
+        self.naive.set_block_using::<P>(position, block, self.blocks)
     }
 
     /// Set the [`Block`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Block`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     pub fn set_block_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
         block: Block,
     ) -> Option<Block> {
-        if self.blocks().version_ty() != block.version_ty() {
-            return None;
-        }
+        self.naive.set_block_pos_using::<P>(position, block, self.blocks)
+    }
 
-        self.naive.set_block_pos_using::<P>(position, block, self.blocks())
+    /// Returns `true` if this [`Chunk`] contains the given [`Block`], including
+    /// it's exact state.
+    #[inline]
+    #[must_use]
+    pub fn contains_block_exact(&self, block: Block) -> bool {
+        self.as_naive().contains_block_exact(block)
+    }
+
+    /// Returns `true` if this [`Chunk`] contains the given [`Block`], ignoring
+    /// it's state.
+    #[inline]
+    #[must_use]
+    pub fn contains_block_type(&self, block: Block) -> bool {
+        self.as_naive().contains_block_type(block.block_ty(), self.blocks)
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Biome`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     #[must_use]
     pub fn get_biome<P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_using::<P>(position, self.biomes())
+        self.as_naive().get_biome_using::<P>(position, self.biomes)
     }
 
     /// Get the [`Biome`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Biome`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     #[must_use]
     pub fn get_biome_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Biome> {
-        self.naive.get_biome_pos_using::<P>(position, self.biomes())
+        self.as_naive().get_biome_pos_using::<P>(position, self.biomes)
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Biome`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     pub fn set_biome<P: Into<BlockPos>>(&mut self, position: P, biome: Biome) -> Option<Biome> {
-        self.naive.set_biome_using::<P>(position, biome, self.biomes())
+        self.naive.set_biome_using::<P>(position, biome, self.biomes)
     }
 
     /// Set the [`Biome`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds, or if the [`Biome`]
     /// does not exist in this [`Version`](froglight_common::version::Version).
+    #[inline]
     pub fn set_biome_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
         biome: Biome,
     ) -> Option<Biome> {
-        if self.biomes().version_ty() != biome.version_ty() {
-            return None;
-        }
-
         self.naive.set_biome_pos_using::<P>(position, biome, self.biomes)
+    }
+
+    /// Returns `true` if this [`Chunk`] contains the given [`Biome`].
+    #[inline]
+    #[must_use]
+    pub fn contains_biome(&self, biome: Biome) -> bool {
+        self.as_naive().contains_biome(biome, self.biomes)
+    }
+
+    /// Returns `true` if this [`Chunk`] contains the given [`Biome`] type.
+    #[inline]
+    #[must_use]
+    pub fn contains_biome_type(&self, biome: Biome) -> bool {
+        self.as_naive().contains_biome_type(biome.biome_ty(), self.biomes)
     }
 
     /// Convert this [`Chunk`] into another version.
@@ -287,19 +322,19 @@ impl Chunk {
             return;
         }
 
-        let old = self.blocks;
-        let new = V::blocks();
+        let self_a = self.blocks;
+        let new_b = V::blocks();
 
         // Fallback to `minecraft:stone`, which is usually `1`.
-        let fallback = new
+        let fallback = new_b
             .get_block_by_identifier(&Identifier::new_static("minecraft:stone"))
             .map_or(1, |biome| biome.global_id().into_inner());
 
         let mut cache = SmallVec::<[(u32, u32); 15]>::new();
-        let mut convert_id = |id: u32| -> u32 {
+        let mut convert_new = |id: u32| -> u32 {
             if let Some((_, cached)) = cache.iter().find(|(cached, _)| id == *cached) {
                 *cached
-            } else if let Some(block) = old.get_block_by_state(GlobalStateId::new(id))
+            } else if let Some(block) = self_a.get_block_by_state(GlobalStateId::new(id))
                 && let Some(blocks) = block.using_version::<V>()
             {
                 cache.push((id, blocks.global_id().into_inner()));
@@ -316,11 +351,11 @@ impl Chunk {
             unsafe {
                 match biome.palette_mut() {
                     SectionPalette::Single(biome_id) => {
-                        *biome_id = convert_id(*biome_id);
+                        *biome_id = convert_new(*biome_id);
                     }
                     SectionPalette::Vector(biome_ids) => {
                         for biome_id in biome_ids {
-                            *biome_id = convert_id(*biome_id);
+                            *biome_id = convert_new(*biome_id);
                         }
                     }
                     SectionPalette::Global => {
@@ -328,7 +363,7 @@ impl Chunk {
                         // SAFETY: `index` is always within bounds `0..BiomeSection::VOLUME`.
                         for index in (0..BiomeSection::VOLUME).map(usize::from) {
                             let biome_id = biome.get_index(index).unwrap_unchecked();
-                            biome.set_index(index, convert_id(biome_id));
+                            biome.set_index(index, convert_new(biome_id));
                         }
                     }
                 }
@@ -336,7 +371,7 @@ impl Chunk {
         }
 
         // Use the new version's block storage.
-        self.blocks = new;
+        self.blocks = new_b;
     }
 
     #[inline(always)]
@@ -357,19 +392,19 @@ impl Chunk {
             let other_biomes = other.biomes();
 
             // Create a closure to compare the biome ids.
-            let compare_ab = |a: u32, b: u32| -> bool {
+            let compare_ab = |self_a: u32, other_b: u32| -> bool {
                 other_biomes
-                    .get_biome_by_id(GlobalBiomeId::new(b))
+                    .get_biome_by_id(GlobalBiomeId::new(other_b))
                     .and_then(|b| b.using_version_storage(self_biomes))
-                    .is_some_and(|b| b.global_id() == a)
+                    .is_some_and(|other_b| other_b.global_id() == self_a)
             };
 
-            for (a, b) in self.sections().iter().zip(other.sections().iter()) {
-                let a = a.biome_data();
-                let b = b.biome_data();
+            for (self_a, other_b) in self.sections().iter().zip(other.sections().iter()) {
+                let self_a = self_a.biome_data();
+                let other_b = other_b.biome_data();
 
                 // Compare the palettes
-                match (a.palette(), b.palette()) {
+                match (self_a.palette(), other_b.palette()) {
                     (SectionPalette::Single(a), SectionPalette::Single(b)) => {
                         if !compare_ab(*a, *b) {
                             return false;
@@ -387,7 +422,7 @@ impl Chunk {
                 }
 
                 // Compare the data
-                if a.data() != b.data() {
+                if self_a.data() != other_b.data() {
                     return false;
                 }
             }
@@ -414,24 +449,26 @@ impl Chunk {
             let other_blocks = other.blocks();
 
             // Create a closure to compare the block ids.
-            let compare_ab = |a: u32, b: u32| -> bool {
+            let compare_ab = |self_a: u32, other_b: u32| -> bool {
                 other_blocks
-                    .get_block_by_state(GlobalStateId::new(b))
+                    .get_block_by_state(GlobalStateId::new(other_b))
                     .and_then(|b| b.using_version_storage(self_blocks))
-                    .is_some_and(|b| b.global_id() == a)
+                    .is_some_and(|other_b| other_b.global_id() == self_a)
             };
 
-            for (a, b) in self.sections().iter().zip(other.sections().iter()) {
+            for (self_a, other_b) in self.sections().iter().zip(other.sections().iter()) {
                 // Compare the block and fluid counts
-                if a.block_count() != b.block_count() || a.fluid_count() != b.fluid_count() {
+                if self_a.block_count() != other_b.block_count()
+                    || self_a.fluid_count() != other_b.fluid_count()
+                {
                     return false;
                 }
 
-                let a = a.block_data();
-                let b = b.block_data();
+                let self_a = self_a.block_data();
+                let other_b = other_b.block_data();
 
                 // Compare the palettes
-                match (a.palette(), b.palette()) {
+                match (self_a.palette(), other_b.palette()) {
                     (SectionPalette::Single(a), SectionPalette::Single(b)) => {
                         if !compare_ab(*a, *b) {
                             return false;
@@ -449,7 +486,7 @@ impl Chunk {
                 }
 
                 // Compare the data
-                if a.data() != b.data() {
+                if self_a.data() != other_b.data() {
                     return false;
                 }
             }

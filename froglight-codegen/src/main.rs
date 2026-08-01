@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![allow(clippy::std_instead_of_alloc, clippy::std_instead_of_core, reason = "Requires `std`")]
+#![allow(semicolon_in_expressions_from_macros, reason = "Dependency")]
 #![allow(dead_code, unreachable_pub, reason = "Binary")]
 
 use miette::{Result, bail};
