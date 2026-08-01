@@ -119,7 +119,11 @@ impl RunTickLoop {
     ) {
         // Remove finished timers from the `enabled` map.
         let timers: Vec<_> =
-            enabled.extract_if(|_, count| iteration < *count).map(|(e, _)| e).collect();
+            enabled.extract_if(|_, count| iteration >= *count).map(|(e, _)| e).collect();
+        // Skip if there are no timers to disable.
+        if timers.is_empty() {
+            return;
+        }
 
         // Disable the timers.
         disabled.get_mut().extend(timers.iter().copied());

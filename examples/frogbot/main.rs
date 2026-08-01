@@ -142,11 +142,8 @@ impl BotPlugin {
     /// Log the amount of time to took to run a tick.
     fn tick_runtime(diag: Res<DiagnosticsStore>, time: Res<Time>, mut timer: Local<Option<Timer>>) {
         let timer = timer.get_or_insert_with(|| Timer::from_seconds(10., TimerMode::Repeating));
-        if !timer.tick(time.delta()).just_finished() {
-            return;
-        }
-
-        if let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
+        if timer.tick(time.delta()).just_finished()
+            && let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
             && let Some(average) = diag.average()
         {
             info!("Tick Runtime: {average:.3}{}", diag.suffix);
