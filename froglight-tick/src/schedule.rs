@@ -56,9 +56,9 @@ pub enum TickSchedule {
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
 pub struct RunTickLoop;
 
-#[derive(Default, Resource)]
+#[derive(Debug, Default, Resource)]
 struct TickCache {
-    enabled: Mutex<EntityHashMap<u32>>,
+    enabled: EntityHashMap<u32>,
     disabled: Mutex<EntityHashSet>,
 }
 
@@ -78,19 +78,19 @@ impl RunTickLoop {
             let delta = world.resource::<Time<Real>>().delta();
             for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
                 if timer.tick(delta).just_finished() {
-                    enabled.get_mut().insert(entity, timer.times_finished_this_tick());
+                    enabled.insert(entity, timer.times_finished_this_tick());
                 }
             }
 
             // Get the maximum tick count of the timers (or return if none).
-            let Some(ticks) = enabled.get_mut().values().max() else { return };
+            let Some(ticks) = enabled.values().max() else { return };
 
             // Run the tick schedule for each tick.
             for iteration in 0..*ticks {
                 // Disable all non-ticking entities.
                 Self::insert_disable(iteration, enabled, disabled, world);
                 // Stop if there are no enabled timers left.
-                if enabled.get_mut().is_empty() {
+                if enabled.is_empty() {
                     break;
                 }
 
@@ -104,26 +104,30 @@ impl RunTickLoop {
 
             // Re-enable all previously disabled entities.
             Self::remove_disable(world);
+
+            // Clear the cache for reuse.
+            enabled.clear();
+            disabled.get_mut().clear();
         });
     }
 
     fn insert_disable(
         iteration: u32,
-        enabled: &mut Mutex<EntityHashMap<u32>>,
+        enabled: &mut EntityHashMap<u32>,
         disabled: &mut Mutex<EntityHashSet>,
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        enabled.get_mut().retain(|_, count| iteration < *count);
+        enabled.retain(|_, count| iteration < *count);
         // Stop if there are no enabled timers left.
-        if enabled.get_mut().is_empty() {
+        if enabled.is_empty() {
             return;
         }
 
         // Collect all non-ticking timers.
         let mut timers = Vec::new();
         for entity in world.query_filtered::<Entity, With<TickTimer>>().iter(world) {
-            if !enabled.get_mut().contains_key(&entity) {
+            if !enabled.contains_key(&entity) && disabled.get_mut().contains(&entity) {
                 timers.push(entity);
             }
         }
@@ -132,14 +136,13 @@ impl RunTickLoop {
             return;
         }
 
-        // Add all of the timers' children.
+        // Disable the timers.
         disabled.get_mut().extend(timers.iter().copied());
         ComputeTaskPool::get().scope::<_, ()>(|spawner| {
-            timers.retain(|e| !disabled.get_mut().contains(e));
-
             let disabled = &*disabled;
             let world = &*world;
 
+            // Disable all of the timers' children.
             for entity in timers.into_iter().filter_map(|e| world.get_entity(e).ok()) {
                 spawner.spawn(async move {
                     Self::insert_disable_timer(entity, disabled, spawner, world);
@@ -216,10 +219,20 @@ impl RunTickLoop {
         disabled.lock().extend(children.iter());
 
         // Disable all children of the children.
-        for entity in children.iter().filter_map(|e| world.get_entity(e).ok()) {
+        let mut child_iter = children.iter().filter_map(|e| world.get_entity(e).ok());
+        let first = child_iter.next();
+
+        for entity in child_iter {
             spawner.spawn(async move {
                 Self::insert_disable_children(entity, disabled, spawner, world);
             });
+        }
+
+        // Do the first result on the current thread.
+        if let Some(first) = first
+            && first.contains::<Children>()
+        {
+            Self::insert_disable_children(first, disabled, spawner, world);
         }
     }
 

@@ -155,14 +155,19 @@ impl BotPlugin {
 
     /// Handle reading/writing all messages for the bot.
     ///
-    /// Run every frame during [`Update`].
+    /// Runs every frame during [`Update`].
+    ///
+    /// # Note
+    ///
+    /// All world operationsa are done through [`Commands`] to guarantee the
+    /// correct order of operations. Otherwise, a position might be applied
+    /// before an entity is spawned.
     #[allow(clippy::too_many_lines, reason = "Example")]
     #[allow(clippy::match_same_arms, reason = "Example")]
     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
     fn message_handler(
         bot: Query<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
-        mut writer: MessageWriter<ServerboundMessage>,
         mut commands: Commands,
     ) {
         for message in reader.read() {
@@ -250,10 +255,15 @@ impl BotPlugin {
                         ClientboundPlayEvent::ChunkBatchFinished(size) => {
                             debug!("Received ChunkBatchFinished: {size} chunks");
 
-                            writer.write(ServerboundMessage::new(
-                                bot.id(),
-                                ServerboundPlayEvent::ChunkBatchReceived(16.0),
-                            ));
+                            commands.entity(bot.id()).queue(|mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundPlayEvent::ChunkBatchReceived(16.0),
+                                    ),
+                                );
+                            });
                         }
                         ClientboundPlayEvent::ChunkBatchStart => {
                             debug!("Received ChunkBatchStart");
@@ -354,7 +364,7 @@ impl BotPlugin {
                             let data = *data;
                             // let _on_ground = *on_ground;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else {
                                 error!("Received EntityPosition but bot doesn't have a SessionInstance!");
                                 return
@@ -445,10 +455,18 @@ impl BotPlugin {
                         ClientboundPlayEvent::KeepAlive(id) => {
                             info!("Received KeepAlive: {id}");
 
-                            writer.write(ServerboundMessage::new(
-                                bot.id(),
-                                ServerboundPlayEvent::KeepAlive(*id),
-                            ));
+                            let id = *id;
+                            commands.entity(bot.id()).queue(
+                                move |mut entity: EntityWorldMut<'_>| {
+                                    let entity_id = entity.id();
+                                    entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                        ServerboundMessage::new(
+                                            entity_id,
+                                            ServerboundPlayEvent::KeepAlive(id),
+                                        ),
+                                    );
+                                },
+                            );
                         }
                         // ClientboundPlayEvent::LevelEvent() => todo!(),
                         // ClientboundPlayEvent::LevelParticles() => todo!(),
@@ -525,7 +543,7 @@ impl BotPlugin {
                         | ClientboundPlayEvent::MoveEntityRot(data) => {
                             let data = *data;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
                             let Some(target) = instance.query_id(&data.entity_id) else {
                                 error!(
@@ -570,10 +588,19 @@ impl BotPlugin {
                         // ClientboundPlayEvent::OpenSignEditor() => todo!(),
                         ClientboundPlayEvent::Ping(id) => {
                             info!("Received Ping: {id}");
-                            writer.write(ServerboundMessage::new(
-                                bot.id(),
-                                ServerboundPlayEvent::Pong(*id),
-                            ));
+
+                            let id = *id;
+                            commands.entity(bot.id()).queue(
+                                move |mut entity: EntityWorldMut<'_>| {
+                                    let entity_id = entity.id();
+                                    entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                        ServerboundMessage::new(
+                                            entity_id,
+                                            ServerboundPlayEvent::Pong(id),
+                                        ),
+                                    );
+                                },
+                            );
                         }
                         // ClientboundPlayEvent::PlayerAbilities() => todo!(),
                         // ClientboundPlayEvent::PlayerChat() => todo!(),
@@ -584,29 +611,32 @@ impl BotPlugin {
                         // ClientboundPlayEvent::PlayerInfoUpdate() => todo!(),
                         // ClientboundPlayEvent::PlayerLookAt() => todo!(),
                         ClientboundPlayEvent::PlayerPosition(teleport, data, flags) => {
-                            // Tell the server we accepted the teleport.
-                            writer.write(ServerboundMessage::new(
-                                bot.id(),
-                                ServerboundPlayEvent::AcceptTeleportation(*teleport),
-                            ));
-
-                            // Set the player's position/rotation/velocity.
+                            let teleport = *teleport;
                             let data = *data;
                             let flags = *flags;
-                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut| {
-                            if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
-                                &mut Position,
-                                &mut Rotation,
-                                &mut Velocity,
-                            )>(
-                            ) {
-                                data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
-                            } else {
-                                error!(
-                                    "Received TeleportEntity for Player without Position, Rotation, or Velocity!"
-                                );
-                            }
-                        });
+
+                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                                // Set the player's position/rotation/velocity.
+                                if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
+                                    &mut Position,
+                                    &mut Rotation,
+                                    &mut Velocity,
+                                )>(
+                                ) {
+                                    data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
+                                } else {
+                                    error!(
+                                        "Received TeleportEntity for Player without Position, Rotation, or Velocity!"
+                                    );
+                                }
+
+                                // Tell the server we accepted the teleport.
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundPlayEvent::AcceptTeleportation(teleport),
+                                ));
+                            });
                         }
                         // ClientboundPlayEvent::PlayerRotation() => todo!(),
                         ClientboundPlayEvent::Pong(id) => {
@@ -671,7 +701,7 @@ impl BotPlugin {
                                 continue;
                             };
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
@@ -706,7 +736,7 @@ impl BotPlugin {
                             let id = *id;
                             let delta = *delta;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
                             if let Some(target) = instance.query_id(&id) {
@@ -759,7 +789,7 @@ impl BotPlugin {
                             let flags = *flags;
                             // let on_ground = *on_ground;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                                 let Some(instance) = entity.get::<SessionInstance>() else { return };
                                 let Some(target) = instance.query_id(&id) else {
                                     error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
@@ -812,17 +842,30 @@ impl BotPlugin {
                     ClientboundConfigEvent::CodeOfConduct() => {
                         info!("Received Code of Conduct: <placeholder>");
                         warn!("Accepting Code of Conduct...");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::AcceptCodeOfConduct,
-                        ));
+
+                        commands.entity(bot.entity()).queue(|mut entity: EntityWorldMut<'_>| {
+                            let entity_id = entity.id();
+                            entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundConfigEvent::AcceptCodeOfConduct,
+                                ),
+                            );
+                        });
                     }
                     ClientboundConfigEvent::CookieRequest(identifier) => {
                         info!("Received CookieRequest: \"{identifier}\"");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::CookieResponse(identifier.clone(), None),
-                        ));
+
+                        let identifier = identifier.clone();
+                        commands.entity(bot.entity()).queue(|mut entity: EntityWorldMut<'_>| {
+                            let entity_id = entity.id();
+                            entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundConfigEvent::CookieResponse(identifier, None),
+                                ),
+                            );
+                        });
                     }
                     ClientboundConfigEvent::CustomPayload(identifier, _) => {
                         info!("Received CustomPayload: \"{identifier}\"");
@@ -830,12 +873,20 @@ impl BotPlugin {
                         // Use this as the trigger to send the client information packet
                         if identifier == "minecraft:brand" {
                             info!("Sending client information...");
-                            writer.write(ServerboundMessage::new(
-                                bot.id(),
-                                ServerboundConfigEvent::ClientInformation(
-                                    ClientInformation::default(),
-                                ),
-                            ));
+
+                            commands.entity(bot.entity()).queue(
+                                |mut entity: EntityWorldMut<'_>| {
+                                    let entity_id = entity.id();
+                                    entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                        ServerboundMessage::new(
+                                            entity_id,
+                                            ServerboundConfigEvent::ClientInformation(
+                                                ClientInformation::default(),
+                                            ),
+                                        ),
+                                    );
+                                },
+                            );
                         }
                     }
                     ClientboundConfigEvent::CustomReportDetails() => {
@@ -850,32 +901,60 @@ impl BotPlugin {
                     }
                     ClientboundConfigEvent::FinishConfig => {
                         info!("Successfully configured!");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::AcknowledgeConfig,
-                        ));
+                        commands.entity(bot.entity()).queue(|mut entity: EntityWorldMut<'_>| {
+                            let entity_id = entity.id();
+                            entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundConfigEvent::AcknowledgeConfig,
+                                ),
+                            );
+                        });
                     }
                     ClientboundConfigEvent::KeepAlive(id) => {
                         info!("Received KeepAlive: {id}");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::KeepAlive(*id),
-                        ));
+
+                        let id = *id;
+                        commands.entity(bot.entity()).queue(
+                            move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundConfigEvent::KeepAlive(id),
+                                    ),
+                                );
+                            },
+                        );
                     }
                     ClientboundConfigEvent::KnownResourcePacks(known) => {
                         info!("Received KnownResourcePacks: {known:?}");
                         info!("Selecting no resource packs...");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::ResourcePackResponse(Vec::new()),
-                        ));
+                        commands.entity(bot.entity()).queue(|mut entity: EntityWorldMut<'_>| {
+                            let entity_id = entity.id();
+                            entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundConfigEvent::ResourcePackResponse(Vec::new()),
+                                ),
+                            );
+                        });
                     }
                     ClientboundConfigEvent::Ping(id) => {
                         info!("Received Ping: {id}");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundConfigEvent::Pong(*id),
-                        ));
+
+                        let id = *id;
+                        commands.entity(bot.entity()).queue(
+                            move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundConfigEvent::Pong(id),
+                                    ),
+                                );
+                            },
+                        );
                     }
                     ClientboundConfigEvent::RegistryData(identifier, entries) => {
                         info!("Received RegistryData: \"{identifier}\"");
@@ -944,17 +1023,35 @@ impl BotPlugin {
                 ClientboundEventEnum::Login(event) => match event {
                     ClientboundLoginEvent::CookieRequest(identifier) => {
                         info!("Received CookieRequest: \"{identifier}\"");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundLoginEvent::CookieResponse(identifier.clone(), None),
-                        ));
+
+                        let identifier = identifier.clone();
+                        commands.entity(bot.entity()).queue(
+                            move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundLoginEvent::CookieResponse(identifier, None),
+                                    ),
+                                );
+                            },
+                        );
                     }
                     ClientboundLoginEvent::CustomPayload(id, identifier, _) => {
                         info!("Received CustomPayload: \"{identifier}\"");
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundLoginEvent::CustomPayload(*id, None),
-                        ));
+
+                        let id = *id;
+                        commands.entity(bot.entity()).queue(
+                            move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundLoginEvent::CustomPayload(id, None),
+                                    ),
+                                );
+                            },
+                        );
                     }
                     ClientboundLoginEvent::Disconnect(reason) => {
                         error!("Failed to connect to server: {reason}");
@@ -987,12 +1084,16 @@ impl BotPlugin {
 
                         commands
                             .entity(bot.entity())
-                            .insert((profile.username().clone(), profile.clone()));
-
-                        writer.write(ServerboundMessage::new(
-                            bot.id(),
-                            ServerboundLoginEvent::AcknowledgeLogin,
-                        ));
+                            .insert((profile.username().clone(), profile.clone()))
+                            .queue(|mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundLoginEvent::AcknowledgeLogin,
+                                    ),
+                                );
+                            });
                     }
                     other => warn!("Unhandled Event: {other:?}"),
                 },
