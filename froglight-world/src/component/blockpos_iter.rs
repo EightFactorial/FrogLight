@@ -9,7 +9,6 @@ pub struct BlockPosIter {
 
 impl BlockPosIter {
     /// Create a new [`BlockPosIter`] between two corners, inclusive.
-    #[inline]
     #[must_use]
     pub const fn new_inclusive(first: BlockPos, second: BlockPos) -> Self {
         let [mut min_x, mut min_y, mut min_z] = first.as_ivec3().to_array();
@@ -33,15 +32,48 @@ impl BlockPosIter {
     /// Create a new [`BlockPosIter`] between two corners, exclusive.
     #[must_use]
     pub const fn new_exclusive(first: BlockPos, second: BlockPos) -> Self {
-        let mut iter = Self::new_inclusive(first, second);
-        iter.min.set_x(iter.min.x() + 1);
-        iter.min.set_y(iter.min.y() + 1);
-        iter.min.set_z(iter.min.z() + 1);
-        iter.max.set_x(iter.max.x() - 1);
-        iter.max.set_y(iter.max.y() - 1);
-        iter.max.set_z(iter.max.z() - 1);
-        iter.current = iter.min;
-        iter
+        let [mut min_x, mut min_y, mut min_z] = first.as_ivec3().to_array();
+        let [mut max_x, mut max_y, mut max_z] = second.as_ivec3().to_array();
+
+        if min_x > max_x {
+            core::mem::swap(&mut min_x, &mut max_x);
+        }
+        if min_y > max_y {
+            core::mem::swap(&mut min_y, &mut max_y);
+        }
+        if min_z > max_z {
+            core::mem::swap(&mut min_z, &mut max_z);
+        }
+
+        min_x += 1;
+        min_y += 1;
+        min_z += 1;
+        max_x -= 1;
+        max_y -= 1;
+        max_z -= 1;
+
+        if min_x > max_x {
+            min_x = max_x;
+        }
+        if max_x < min_x {
+            max_x = min_x;
+        }
+        if min_y > max_y {
+            min_y = max_y;
+        }
+        if max_y < min_y {
+            max_y = min_y;
+        }
+        if min_z > max_z {
+            min_z = max_z;
+        }
+        if max_z < min_z {
+            max_z = min_z;
+        }
+
+        let min = BlockPos::new_xyz(min_x, min_y, min_z);
+        let max = BlockPos::new_xyz(max_x, max_y, max_z);
+        Self { min, max, current: min }
     }
 
     /// Get the maximum corner of this [`BlockPosIter`].

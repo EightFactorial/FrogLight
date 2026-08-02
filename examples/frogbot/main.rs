@@ -2,7 +2,7 @@
 #![allow(clippy::std_instead_of_alloc, reason = "Example")]
 #![allow(clippy::std_instead_of_core, reason = "Example")]
 
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use core::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use async_net::TcpStream;
 use bevy::{
