@@ -95,7 +95,7 @@ impl NetworkPlugin {
     ///
     /// Not added by default, must added manually.
     pub fn poll_connections(
-        mut query: Query<(Entity, &mut ClientConnection), Without<IsResource>>,
+        mut query: Query<(Entity, &mut ClientConnection)>,
         mut commands: Commands,
     ) {
         for (entity, mut conn) in &mut query {

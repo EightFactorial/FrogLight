@@ -71,11 +71,10 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains the biome.
     #[must_use]
     pub fn contains_biome(&self, biome: Biome, storage: &BiomeStorage) -> bool {
-        let biome_id = match biome.using_version_storage(storage) {
-            Some(biome) => biome.global_id().into_inner(),
-            None => return false,
-        };
-        self.contains_raw_biome(biome_id)
+        match biome.using_version_storage(storage) {
+            Some(biome) => self.contains_raw_biome(biome.global_id().into_inner()),
+            None => false,
+        }
     }
 
     /// Returns `true` if the chunk contains a biome of the same type.

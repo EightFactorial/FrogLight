@@ -34,7 +34,7 @@ pub mod prelude {
     #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
     pub use crate::chunk::{Chunk, SharedChunk};
     pub use crate::{
-        component::{BlockPos, ChunkPos},
+        component::{BlockPos, BlockPosIter, ChunkPos},
         naive::NaiveChunk,
     };
 }

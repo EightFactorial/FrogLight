@@ -3,6 +3,9 @@
 mod blockpos;
 pub use blockpos::BlockPos;
 
+mod blockpos_iter;
+pub use blockpos_iter::BlockPosIter;
+
 mod chunkblockpos;
 pub use chunkblockpos::ChunkBlockPos;
 

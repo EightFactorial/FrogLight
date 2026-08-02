@@ -76,8 +76,9 @@ impl Plugin for BotPlugin {
                 PostUpdate,
                 (
                     InstancePlugin::apply_blockedits,
-                    PhysicsPlugin::update_collisions,
-                    PhysicsPlugin::update_prev_components,
+                    PhysicsPlugin::update_colliders,
+                    PhysicsPlugin::update_collisions.after(PhysicsPlugin::update_colliders),
+                    PhysicsPlugin::update_prev_components.after(PhysicsPlugin::update_colliders),
                     (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
                 )
                     .ambiguous_with_all(),
@@ -103,10 +104,7 @@ impl BotPlugin {
 
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
-        let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(
-            stream,
-            cfg!(debug_assertions),
-        );
+        let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(stream, false);
 
         info!(
             "Attempting to login as \"{}\" ({})...",
@@ -141,7 +139,10 @@ impl BotPlugin {
 
     /// Log the amount of time to took to run a tick.
     fn tick_runtime(diag: Res<DiagnosticsStore>, time: Res<Time>, mut timer: Local<Option<Timer>>) {
-        let timer = timer.get_or_insert_with(|| Timer::from_seconds(10., TimerMode::Repeating));
+        const SECONDS_BETWEEN_LOGS: f32 = 10.0;
+
+        let timer = timer
+            .get_or_insert_with(|| Timer::from_seconds(SECONDS_BETWEEN_LOGS, TimerMode::Repeating));
         if timer.tick(time.delta()).just_finished()
             && let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
             && let Some(average) = diag.average()
@@ -156,7 +157,7 @@ impl BotPlugin {
     ///
     /// # Note
     ///
-    /// All world operationsa are done through [`Commands`] to guarantee the
+    /// All world operations are done through [`Commands`] to guarantee the
     /// correct order of operations. Otherwise, a position might be applied
     /// before an entity is spawned.
     #[allow(clippy::too_many_lines, reason = "Example")]

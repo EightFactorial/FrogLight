@@ -1,7 +1,7 @@
 //! TODO
 
 use bevy_app::{App, Plugin};
-use bevy_ecs::{entity::EntityHashMap, prelude::*, resource::IsResource};
+use bevy_ecs::{entity::EntityHashMap, prelude::*};
 use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::{ChunkPos, SharedChunk};
 use parking_lot::Mutex;
@@ -54,8 +54,8 @@ impl InstancePlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn apply_blockedits(
-        query: Query<(&mut BlockEditQueue, &SessionInstance), Without<IsResource>>,
-        mut chunks: Query<&mut SharedChunk, Without<IsResource>>,
+        query: Query<(&mut BlockEditQueue, &SessionInstance)>,
+        mut chunks: Query<&mut SharedChunk>,
     ) {
         for (mut queue, instance) in query {
             queue.apply_to(instance, chunks.reborrow());
@@ -74,8 +74,8 @@ impl InstancePlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn par_apply_blockedits(
-        mut query: Query<(&mut BlockEditQueue, &SessionInstance), Without<IsResource>>,
-        mut chunks: Query<&mut SharedChunk, Without<IsResource>>,
+        mut query: Query<(&mut BlockEditQueue, &SessionInstance)>,
+        mut chunks: Query<&mut SharedChunk>,
         cache: Local<Mutex<EntityHashMap<SharedChunk>>>,
     ) {
         // Apply all `BlockEditQueue`s in parallel.

@@ -53,15 +53,27 @@ impl BlockPos {
     #[must_use]
     pub const fn x(&self) -> i32 { self.0.x }
 
+    /// Set the x coordinate of this [`BlockPos`].
+    #[inline]
+    pub const fn set_x(&mut self, x: i32) { self.0.x = x; }
+
     /// Get the y coordinate of this [`BlockPos`].
     #[inline]
     #[must_use]
     pub const fn y(&self) -> i32 { self.0.y }
 
+    /// Set the y coordinate of this [`BlockPos`].
+    #[inline]
+    pub const fn set_y(&mut self, y: i32) { self.0.y = y; }
+
     /// Get the z coordinate of this [`BlockPos`].
     #[inline]
     #[must_use]
     pub const fn z(&self) -> i32 { self.0.z }
+
+    /// Set the z coordinate of this [`BlockPos`].
+    #[inline]
+    pub const fn set_z(&mut self, z: i32) { self.0.z = z; }
 
     /// Get the coordinates of this [`BlockPos`] as an [`IVec3`].
     #[inline]
@@ -83,6 +95,41 @@ impl BlockPos {
     #[must_use]
     pub const fn into_chunk_pos(self) -> ChunkPos {
         ChunkPos::new_xz(self.x() / CHUNK_LENGTH as i32, self.z() / CHUNK_WIDTH as i32)
+    }
+
+    /// A `const` version of [`PartialEq::eq`].
+    #[inline]
+    #[must_use]
+    pub const fn const_eq(self, other: Self) -> bool {
+        self.x() == other.x() && self.y() == other.y() && self.z() == other.z()
+    }
+
+    /// A `const` version of [`PartialOrd::gt`].
+    #[inline]
+    #[must_use]
+    pub const fn const_gt(self, other: Self) -> bool {
+        self.x() > other.x() && self.y() > other.y() && self.z() > other.z()
+    }
+
+    /// A `const` version of [`PartialOrd::ge`].
+    #[inline]
+    #[must_use]
+    pub const fn const_ge(self, other: Self) -> bool {
+        self.x() >= other.x() && self.y() >= other.y() && self.z() >= other.z()
+    }
+
+    /// A `const` version of [`PartialOrd::lt`].
+    #[inline]
+    #[must_use]
+    pub const fn const_lt(self, other: Self) -> bool {
+        self.x() < other.x() && self.y() < other.y() && self.z() < other.z()
+    }
+
+    /// A `const` version of [`PartialOrd::le`].
+    #[inline]
+    #[must_use]
+    pub const fn const_le(self, other: Self) -> bool {
+        self.x() <= other.x() && self.y() <= other.y() && self.z() <= other.z()
     }
 }
 

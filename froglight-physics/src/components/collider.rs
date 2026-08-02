@@ -1,12 +1,9 @@
-use core::ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign};
+use core::ops::{Deref, DerefMut};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{
-    Reflect, ReflectDeserialize, ReflectSerialize,
-    std_traits::{ReflectAdd, ReflectAddAssign, ReflectDefault, ReflectSub, ReflectSubAssign},
-};
+use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
 use froglight_entity::prelude::EntityAabb;
 use glam::Vec3A;
 #[cfg(feature = "serde")]
@@ -20,7 +17,7 @@ use crate::prelude::{CollidingWith, Position, Rotation};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", require(Position, Rotation, CollidingWith, PrevCollider))]
 pub struct Collider {
     /// The minimum corner of this [`Collider`].
@@ -51,6 +48,33 @@ impl Collider {
         Self::new(Vec3A::new(min_x, min_y, min_z), Vec3A::new(max_x, max_y, max_z))
     }
 
+    /// Get the size of this [`Collider`].
+    #[inline]
+    #[must_use]
+    pub const fn size(&self) -> Vec3A {
+        let [max_x, max_y, max_z] = self.max.to_array();
+        let [min_x, min_y, min_z] = self.min.to_array();
+        Vec3A::new(max_x - min_x, max_y - min_y, max_z - min_z)
+    }
+
+    /// Get the width of this [`Collider`].
+    #[inline]
+    #[must_use]
+    pub const fn width(&self) -> f32 {
+        let [max_x, _, max_z] = self.max.to_array();
+        let [min_x, _, min_z] = self.min.to_array();
+        f32::max(max_x - min_x, max_z - min_z)
+    }
+
+    /// Get the height of this [`Collider`].
+    #[inline]
+    #[must_use]
+    pub const fn height(&self) -> f32 {
+        let [_, max_y, _] = self.max.to_array();
+        let [_, min_y, _] = self.min.to_array();
+        max_y - min_y
+    }
+
     /// Get the "actual" center of this [`Collider`],
     /// or the center of the entity's bounding box.
     ///
@@ -70,69 +94,31 @@ impl Collider {
     #[must_use]
     pub fn center_canonical(&self) -> Vec3A { self.center_actual().with_y(self.min.y) }
 
-    /// Get the size of this [`Collider`].
+    /// Set the position of this [`Collider`].
     #[inline]
-    #[must_use]
-    pub fn size(&self) -> Vec3A { self.max - self.min }
+    pub fn set_position(&mut self, position: Vec3A) {
+        *self = Self::new_centered(position, self.size() / 2.0);
+    }
+
+    /// Translate this [`Collider`] by the given [`Vec3A`].
+    #[inline]
+    pub fn translate(&mut self, translation: Vec3A) {
+        self.min += translation;
+        self.max += translation;
+    }
 
     /// Returns `true` if this [`Collider`] intersects the other.
     #[inline]
     #[must_use]
-    pub fn intersects(&self, self_pos: &Position, other: &Self, other_pos: &Position) -> bool {
-        let self_pos = self_pos.to_vec3a();
-        let other_pos = other_pos.to_vec3a();
-
-        let self_min = self.min + self_pos;
-        let self_max = self.max + self_pos;
-        let other_min = other.min + other_pos;
-        let other_max = other.max + other_pos;
-
-        self_min.cmple(other_max).all() && self_max.cmpge(other_min).all()
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.min.cmple(other.max).all() && self.max.cmpge(other.min).all()
     }
 
     /// Returns `true` if this [`Collider`] contains the other.
     #[inline]
     #[must_use]
-    pub fn contains(&self, self_pos: &Position, other: &Self, other_pos: &Position) -> bool {
-        let self_pos = self_pos.to_vec3a();
-        let other_pos = other_pos.to_vec3a();
-
-        let self_min = self.min + self_pos;
-        let self_max = self.max + self_pos;
-        let other_min = other.min + other_pos;
-        let other_max = other.max + other_pos;
-
-        self_min.cmple(other_min).all() && self_max.cmpge(other_max).all()
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl Add for Collider {
-    type Output = Self;
-
-    #[inline]
-    fn add(self, rhs: Self) -> Self::Output { Self::new(self.min + rhs.min, self.max + rhs.max) }
-}
-impl AddAssign for Collider {
-    #[inline]
-    fn add_assign(&mut self, rhs: Self) {
-        self.min += rhs.min;
-        self.max += rhs.max;
-    }
-}
-
-impl Sub for Collider {
-    type Output = Self;
-
-    #[inline]
-    fn sub(self, rhs: Self) -> Self::Output { Self::new(self.min - rhs.min, self.max - rhs.max) }
-}
-impl SubAssign for Collider {
-    #[inline]
-    fn sub_assign(&mut self, rhs: Self) {
-        self.min -= rhs.min;
-        self.max -= rhs.max;
+    pub fn contains(&self, other: &Self) -> bool {
+        self.min.cmple(other.min).all() && self.max.cmpge(other.max).all()
     }
 }
 
@@ -144,7 +130,7 @@ impl SubAssign for Collider {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 pub struct PrevCollider(Collider);
 
 impl PrevCollider {
@@ -204,28 +190,4 @@ impl Deref for PrevCollider {
 impl DerefMut for PrevCollider {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl Add for PrevCollider {
-    type Output = Self;
-
-    #[inline]
-    fn add(self, rhs: Self) -> Self::Output { Self::new_col(self.0 + rhs.0) }
-}
-impl AddAssign for PrevCollider {
-    #[inline]
-    fn add_assign(&mut self, rhs: Self) { self.0 += rhs.0; }
-}
-
-impl Sub for PrevCollider {
-    type Output = Self;
-
-    #[inline]
-    fn sub(self, rhs: Self) -> Self::Output { Self::new_col(self.0 - rhs.0) }
-}
-impl SubAssign for PrevCollider {
-    #[inline]
-    fn sub_assign(&mut self, rhs: Self) { self.0 -= rhs.0; }
 }
