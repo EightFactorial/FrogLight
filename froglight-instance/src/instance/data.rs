@@ -2,7 +2,7 @@ use bevy_ecs::{component::Component, entity::Entity};
 use bevy_reflect::TypePath;
 use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::ChunkPos;
-use hashbrown::hash_map::Iter;
+use hashbrown::hash_map::{HashMap, Iter};
 
 use crate::prelude::SessionInstance;
 
@@ -31,7 +31,7 @@ pub trait InstanceData: Component + TypePath + Sized {
 // -------------------------------------------------------------------------------------------------
 
 macro_rules! create_data {
-    ($ty:ty => $token:tt ( $iter_fn:ident $query_fn:ident ) ) => {
+    ($ty:ty => $token:tt: $query_fn:ident, $map_fn:ident, $iter_fn:ident) => {
         impl $crate::instance::data::InstanceData for $ty {
             #[inline]
             fn iter(instance: &SessionInstance) -> Iter<'_, Self, Entity> { instance.$token.iter() }
@@ -70,17 +70,22 @@ macro_rules! create_data {
         impl SessionInstance {
             #[inline]
             #[must_use]
-            #[doc = concat!("Get an iterator over all [`Entity`]-[`", stringify!($ty), "`] pairs in the [`SessionInstance`].")]
-            pub fn $iter_fn(&self) -> Iter<'_, $ty, Entity> { self.$token.iter() }
+            #[doc = concat!("Query the [`SessionInstance`] for the associated [`Entity`] of a given [`", stringify!($ty), "`].")]
+            pub fn $query_fn(&self, data: &$ty) -> Option<Entity> { self.$token.get(data).copied() }
 
             #[inline]
             #[must_use]
-            #[doc = concat!("Query the [`SessionInstance`] for the associated [`Entity`] of a given [`", stringify!($ty), "`].")]
-            pub fn $query_fn(&self, data: &$ty) -> Option<Entity> { self.$token.get(data).copied() }
+            #[doc = concat!("Get a reference to the [`HashMap`] of [`", stringify!($ty), "`]-[`Entity`] pairs in the [`SessionInstance`].")]
+            pub const fn $map_fn(&self) -> &HashMap<$ty, Entity, foldhash::fast::FixedState> { &self.$token }
+
+            #[inline]
+            #[must_use]
+            #[doc = concat!("Get an iterator over all [`Entity`]-[`", stringify!($ty), "`] pairs in the [`SessionInstance`].")]
+            pub fn $iter_fn(&self) -> Iter<'_, $ty, Entity> { self.$token.iter() }
         }
     };
 }
 
-create_data!(EntityId => entity_id (iter_id query_id));
-create_data!(EntityUuid => entity_uuid (iter_uuid query_uuid));
-create_data!(ChunkPos => chunk_pos (iter_chunk query_chunk));
+create_data!(EntityId => entity_id: get_id, id_map, iter_id);
+create_data!(EntityUuid => entity_uuid: get_uuid, uuid_map, iter_uuid);
+create_data!(ChunkPos => chunk_pos: get_chunk, chunk_map, iter_chunk);

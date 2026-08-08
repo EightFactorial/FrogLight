@@ -297,7 +297,7 @@ impl BotPlugin {
                                     return
                                 };
 
-                                let chunk_id = instance.query_chunk(&chunkpos);
+                                let chunk_id = instance.get_chunk(&chunkpos);
                                 let chunk = match chunk_data.try_parse::<Version>(
                                     instance.height_max(),
                                     instance.height_min(),
@@ -383,7 +383,7 @@ impl BotPlugin {
                                 error!("Received EntityPosition but bot doesn't have a SessionInstance!");
                                 return
                             };
-                            let Some(target) = instance.query_id(&entity_id) else {
+                            let Some(target) = instance.get_id(&entity_id) else {
                                 error!(
                                     "Received EntityPosition for unknown EntityId {}!",
                                     entity_id.0
@@ -435,7 +435,7 @@ impl BotPlugin {
                                     return;
                                 };
 
-                                let Some(chunk_id) = instance.query_chunk(&chunkpos) else {
+                                let Some(chunk_id) = instance.get_chunk(&chunkpos) else {
                                     warn!(
                                         "Received ForgetChunk for unknown Chunk Position ({}, {})!",
                                         chunkpos.x(),
@@ -559,7 +559,7 @@ impl BotPlugin {
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
-                            let Some(target) = instance.query_id(&data.entity_id) else {
+                            let Some(target) = instance.get_id(&data.entity_id) else {
                                 error!(
                                     "Received MoveEntity for unknown EntityId {}!",
                                     data.entity_id.0
@@ -676,7 +676,7 @@ impl BotPlugin {
                                 };
 
                                 for entity_id in removed {
-                                    if let Some(entity) = instance.query_id(&entity_id) {
+                                    if let Some(entity) = instance.get_id(&entity_id) {
                                         let Ok(entity_ref) = entities.get(entity) else { continue };
                                         let identifier = entity_ref.get::<EntityBundle>().map_or("<unknown>", |bundle| bundle.metadata().identifier());
                                         info!("Despawning Entity {entity} ({}) as \"{identifier}\"", entity_id.0);
@@ -718,7 +718,7 @@ impl BotPlugin {
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.query_id(&id) {
+                            if let Some(target) = instance.get_id(&id) {
                                 let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
                                     error!(
                                         "Received SetEntityData for Entity {target} that doesn't exist!"
@@ -753,7 +753,7 @@ impl BotPlugin {
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.query_id(&id) {
+                            if let Some(target) = instance.get_id(&id) {
                                 if let Some(mut velocity) =
                                     entity.into_world_mut().get_mut::<Velocity>(target)
                                 {
@@ -805,7 +805,7 @@ impl BotPlugin {
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                                 let Some(instance) = entity.get::<SessionInstance>() else { return };
-                                let Some(target) = instance.query_id(&id) else {
+                                let Some(target) = instance.get_id(&id) else {
                                     error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
                                     return;
                                 };

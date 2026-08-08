@@ -83,7 +83,7 @@ impl BlockEditQueue {
         }
 
         for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
-            if let Some(entity) = instance.query_chunk(chunk)
+            if let Some(entity) = instance.get_chunk(chunk)
                 && let Ok(mut shared) = chunks.get_mut(entity)
             {
                 // Apply edits, cloning only if needed.
@@ -130,7 +130,7 @@ impl BlockEditQueue {
         }
 
         for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
-            if let Some(entity) = instance.query_chunk(chunk)
+            if let Some(entity) = instance.get_chunk(chunk)
                 && let Ok(shared) = chunks.get(entity)
             {
                 // Clone, apply edits, and store the modified chunk.
