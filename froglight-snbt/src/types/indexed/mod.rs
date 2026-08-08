@@ -33,6 +33,7 @@ impl<C: core::IndexCore> IndexedSnbt<C> {
         let range = Range { start: 0, end: 1 };
         let index = unsafe { self.core.get_entries(range).get_unchecked(0) };
         debug_assert!(matches!(index.value(), entry::ValueIndex::Compound(..)));
+
         // SAFETY: The first entry is always the root compound.
         unsafe { compound::IndexedCompound::new(&self.core, index.value().range()) }
     }
@@ -61,7 +62,6 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
     /// # Errors
     ///
     /// Returns an error if the string slice is not valid SNBT data.
-    #[inline]
     pub fn new_owned_ref(string: &'data str) -> Result<Self, ()> {
         let borrowed = parse::parse_snbt(string)?;
         Ok(IndexedSnbt::new(core::CowCore::from_slice(borrowed.core)))
@@ -72,7 +72,6 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
     /// # Errors
     ///
     /// Returns an error if the string slice is not valid SNBT data.
-    #[inline]
     pub fn new_owned(string: String) -> Result<IndexedSnbt<core::CowCore<'static>>, ()> {
         let borrowed = parse::parse_snbt(&string)?;
         let entries = borrowed.core.entries;

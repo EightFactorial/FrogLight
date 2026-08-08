@@ -339,7 +339,7 @@ impl IndexableValue for Integer {
 
         let desc = index.description();
 
-        // Handle `IntegerType::Bool` seperately.
+        // Handle `IntegerType::Bool` separately.
         if matches!(desc.ty(), IntegerType::Bool) {
             let desc = BoolDescription::Boolean;
             return unsafe {

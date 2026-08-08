@@ -10,7 +10,7 @@ use crate::types::indexed::{
 mod slice;
 
 mod value;
-pub use value::IndexedValueReference;
+pub use value::ValueReference;
 
 /// A type that accessed via an [`Index`].
 pub struct IndexedReference<'data, T: IndexableValue + ?Sized, A: NbtAccess> {

@@ -31,15 +31,22 @@ impl<'data, C: IndexCore> EntryReference<'data, C> {
         }
     }
 
-    /// Get a reference to the name of this entry.
+    /// Get the [`IndexedReference`] to the name of this entry.
     #[inline]
     #[must_use]
-    pub fn name(&self) -> IndexedReference<'data, String> { self.name }
+    pub const fn name(self) -> IndexedReference<'data, String> { self.name }
 
-    /// Get a reference to the value of this entry.
+    /// Get the [`ValueReference`] to the value of this entry.
     #[inline]
     #[must_use]
-    pub fn value(&self) -> ValueReference<'data, C> { self.value }
+    pub const fn value(self) -> ValueReference<'data, C> { self.value }
+
+    /// Get the [`IndexedReference`] and [`ValueReference`] of this entry.
+    #[inline]
+    #[must_use]
+    pub const fn pair(self) -> (IndexedReference<'data, String>, ValueReference<'data, C>) {
+        (self.name(), self.value())
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -49,10 +49,10 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// Return a reference to the value matching the `key`, if it is present,
     /// else `None`.
     #[must_use]
-    pub fn get<K: PartialEq<str> + ?Sized>(&self, key: &K) -> Option<ValueReference<'data, C>> {
+    pub fn get<K: PartialEq<str> + ?Sized>(self, key: &K) -> Option<ValueReference<'data, C>> {
         self.entries()
             .iter()
-            .find(|e| key == unsafe { e.name().read_value(self.core.root()) }.as_ref())
+            .find(|e| key == unsafe { e.name().read_value(self.core.root()) })
             .map(|e| unsafe { ValueReference::new(self.core, e.value()) })
     }
 
@@ -60,21 +60,21 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     ///
     /// Returns `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_index(&self, index: usize) -> Option<EntryReference<'data, C>> {
-        self.entries().get(index).map(|e| unsafe { EntryReference::new(self.core, *e) })
+    pub fn get_index(self, index: usize) -> Option<EntryReference<'data, C>> {
+        self.entries().get(index).map(|e| unsafe { e.into_ref(self.core) })
     }
 
     /// Create an iterator over this compound.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> CompoundIter<'_, 'data, C> { CompoundIter::new(self) }
+    pub const fn into_iter(self) -> CompoundIter<'data, C> { CompoundIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 impl<C: IndexCore> fmt::Debug for IndexedCompound<'_, C> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_map().entries(self.iter().map(|e| (e.name(), e.value()))).finish()
+        f.debug_map().entries(self.into_iter().map(|e| (e.name(), e.value()))).finish()
     }
 }
 

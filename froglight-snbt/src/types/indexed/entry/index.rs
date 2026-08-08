@@ -4,12 +4,14 @@ use alloc::string::String;
 use core::range::Range;
 
 use crate::types::indexed::{
+    core::IndexCore,
     index::{
         Index,
         bool::BoolDescription,
         numeric::{Float, FloatDescription, Integer, IntegerDescription},
         string::StringDescription,
     },
+    reference::EntryReference,
     types::{IndexedListType, IndexedMapType},
 };
 
@@ -26,6 +28,18 @@ impl EntryIndex {
     #[must_use]
     pub const fn new(name: Index<String>, value: ValueIndex) -> Self { Self { name, value } }
 
+    /// Create an [`EntryReference`] from this [`EntryIndex`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the [`EntryIndex`] is valid for the given core.
+    #[inline]
+    #[must_use]
+    pub unsafe fn into_ref<C: IndexCore>(self, core: &C) -> EntryReference<'_, C> {
+        // SAFETY: This is guaranteed safe by the caller.
+        unsafe { EntryReference::new(core, self) }
+    }
+
     /// Get the [`Index`] of the name of this entry.
     ///
     /// # Panics
@@ -34,12 +48,12 @@ impl EntryIndex {
     /// [`Index`] of `0..0`.
     #[inline]
     #[must_use]
-    pub const fn name(&self) -> Index<String> { self.name }
+    pub const fn name(self) -> Index<String> { self.name }
 
     /// Get the [`ValueIndex`] of this entry.
     #[inline]
     #[must_use]
-    pub const fn value(&self) -> ValueIndex { self.value }
+    pub const fn value(self) -> ValueIndex { self.value }
 }
 
 // -------------------------------------------------------------------------------------------------

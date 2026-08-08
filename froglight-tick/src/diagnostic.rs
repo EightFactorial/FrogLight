@@ -26,7 +26,7 @@ impl Plugin for TickMeasurementPlugin {
 // -------------------------------------------------------------------------------------------------
 
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, Reflect, Resource)]
+#[derive(Debug, Clone, PartialEq, Eq, Resource, Reflect)]
 #[reflect(Debug, Clone, PartialEq, Resource)]
 struct TickInstant(Instant);
 

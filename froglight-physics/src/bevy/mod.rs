@@ -62,16 +62,15 @@ impl PhysicsPlugin {
         match entities.get(entity_id) {
             Ok(entity) => {
                 if let Some(bundle) = entity.get::<EntityBundle>() {
+                    // Insert `Collider` and preserve `Position` and `Rotation` (added if missing).
+                    // Forcefully overwrite `Velocity` and `Acceleration` to `ZERO`.
+                    let mut collider = Collider::new_entity(*bundle.metadata().aabb());
+                    if let Some(pos) = entity.get::<Position>() {
+                        collider.set_center(pos.to_vec3a());
+                    }
+
                     let mut commands = commands.entity(entity_id);
-
-                    // Insert `Collider`, `Position`, and `Rotation`
-                    // (preserves `Position` and `Rotation` if they already exist)
-                    let collider = Collider::new_entity(*bundle.metadata().aabb());
-                    commands.insert(collider).insert_if_new((Position::ZERO, Rotation::IDENTITY));
-
-                    // Insert `Velocity` and `Acceleration`
-                    // (overwrites `Velocity` and `Acceleration` to zero)
-                    commands.insert((Velocity::ZERO, Acceleration::ZERO));
+                    commands.insert((collider, Velocity::ZERO, Acceleration::ZERO));
                 } else {
                     #[cfg(feature = "tracing")]
                     tracing::error!(target: "froglight_physics", "Failed to add Collider to Entity {entity_id}, missing EntityBundle component?");
@@ -97,7 +96,7 @@ impl PhysicsPlugin {
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn update_colliders(colliders: Query<(&Position, &mut Collider)>) {
         colliders.par_iter_inner().for_each(|(pos, mut collider)| {
-            collider.set_position(pos.to_vec3a());
+            collider.set_center(pos.to_vec3a());
         });
     }
 
@@ -111,7 +110,7 @@ impl PhysicsPlugin {
         instances: Query<(Entity, &SessionInstance)>,
         mut colliders: Query<(Entity, &Collider, &mut CollidingWith)>,
         mut collisions: ResMut<EntityCollisions>,
-        cache: Local<Mutex<Vec<UniqueEntityArray<2>>>>,
+        mut cache: Local<Mutex<Vec<UniqueEntityArray<2>>>>,
     ) {
         let collider_lens = colliders.transmute_lens::<(Entity, &Collider)>();
         let collider_lens = collider_lens.query_inner();
@@ -119,6 +118,7 @@ impl PhysicsPlugin {
         // Calculate all collisions in parallel.
         instances.par_iter().for_each(|(_entity, instance)| {
             #[cfg(feature = "tracing")]
+            #[allow(clippy::used_underscore_binding, reason = "Used for tracing")]
             let _span = tracing::info_span!(target: "froglight_physics", "par_update_collisions", instance = %_entity).entered();
 
             let mut entities = Vec::<&Entity>::with_capacity(instance.iter_entity().len());
@@ -152,7 +152,7 @@ impl PhysicsPlugin {
         }
 
         // Insert all new collisions.
-        for pair in cache.lock().drain(..) {
+        for pair in cache.get_mut().drain(..) {
             let [a, b] = pair.into_inner();
             if collisions.push_pair(a, b)
                 && let Ok([(.., mut colliding_with_a), (.., mut colliding_with_b)]) =

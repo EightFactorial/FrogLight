@@ -8,7 +8,13 @@ pub use corecow::CowCore;
 mod coreslice;
 pub use coreslice::SliceCore;
 
-use crate::types::indexed::entry::EntryIndex;
+use crate::types::indexed::{IndexedSnbt, entry::EntryIndex};
+
+/// A type alias for an [`IndexedSnbt`] with a [`SliceCore`] core.
+pub type IndexedSnbtSlice<'a> = IndexedSnbt<SliceCore<'a>>;
+
+/// A type alias for an [`IndexedSnbt`] with a [`CowCore`] core.
+pub type IndexedSnbtCow<'a> = IndexedSnbt<CowCore<'a>>;
 
 /// A trait for an index of SNBT entries.
 pub trait IndexCore {

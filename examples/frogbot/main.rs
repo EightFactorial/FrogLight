@@ -2,12 +2,19 @@
 #![allow(clippy::std_instead_of_alloc, reason = "Example")]
 #![allow(clippy::std_instead_of_core, reason = "Example")]
 
-use core::net::{IpAddr, Ipv4Addr, SocketAddr};
+use core::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    time::Duration,
+};
 
 use async_net::TcpStream;
 use bevy::{
-    app::PluginGroupBuilder, diagnostic::DiagnosticsStore, ecs::resource::IsResource, math::DVec3,
-    prelude::*, tasks::block_on,
+    app::{PluginGroupBuilder, ScheduleRunnerPlugin},
+    diagnostic::DiagnosticsStore,
+    ecs::resource::IsResource,
+    math::DVec3,
+    prelude::*,
+    tasks::block_on,
 };
 use froglight::{
     bevy::plugins::{InstancePlugin, NetworkPlugin, PhysicsPlugin, TickMeasurementPlugin},
@@ -37,21 +44,30 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 fn main() -> AppExit {
     App::new()
-        .add_plugins(default_plugins())
+        .add_plugins(minimal_plugins())
         .add_plugins(FroglightPlugins)
         .add_plugins(BotPlugin)
         .run()
 }
 
-/// Set a custom `LogPlugin` that doesn't escape ANSI :rolling_eyes:
-fn default_plugins() -> PluginGroupBuilder {
+fn minimal_plugins() -> PluginGroupBuilder {
     use bevy::log::LogPlugin;
     use tracing_subscriber::fmt::Layer;
 
-    DefaultPlugins.set(LogPlugin {
-        fmt_layer: |_| Some(Box::new(Layer::default().with_ansi_sanitization(false))),
-        ..LogPlugin::default()
-    })
+    MinimalPlugins
+        .build()
+        // Add `LogPlugin` without escaping ANSI :rolling_eyes:
+        .add(LogPlugin {
+            fmt_layer: |_| Some(Box::new(Layer::default().with_ansi_sanitization(false))),
+            ..LogPlugin::default()
+        })
+        // Set `ScheduleRunnerPlugin` to wait, reducing CPU usage
+        //
+        // # Note
+        //
+        // This runs the main loop four times per tick, which is plenty for this example.
+        // If you are doing something timing sensitive, don't do this.
+        .set(ScheduleRunnerPlugin::run_loop(Duration::from_millis(5)))
 }
 
 // -------------------------------------------------------------------------------------------------

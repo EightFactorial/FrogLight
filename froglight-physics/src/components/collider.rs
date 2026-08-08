@@ -10,7 +10,7 @@ use glam::Vec3A;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "bevy")]
-use crate::prelude::{CollidingWith, Position, Rotation};
+use crate::prelude::*;
 
 /// An entity collider.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -94,17 +94,35 @@ impl Collider {
     #[must_use]
     pub fn center_canonical(&self) -> Vec3A { self.center_actual().with_y(self.min.y) }
 
-    /// Set the position of this [`Collider`].
+    /// Set the center of this [`Collider`] to the given position.
     #[inline]
-    pub fn set_position(&mut self, position: Vec3A) {
-        *self = Self::new_centered(position, self.size() / 2.0);
+    pub fn set_center(&mut self, center: Vec3A) {
+        *self = Self::new_centered(center, self.size() * 0.5);
     }
 
-    /// Translate this [`Collider`] by the given [`Vec3A`].
+    /// Translate this [`Collider`] by the given translation vector.
     #[inline]
     pub fn translate(&mut self, translation: Vec3A) {
         self.min += translation;
         self.max += translation;
+    }
+
+    /// Scale this [`Collider`] by the given scalar vector,
+    /// keeping the center at the same position.
+    #[inline]
+    pub fn scale_from_center(&mut self, scalar: Vec3A) {
+        let center = self.center_actual();
+        let half_size = self.size() * 0.5 * scalar;
+        *self = Self::new_centered(center, half_size);
+    }
+
+    /// Scale this [`Collider`] by the given scalar vector,
+    /// keeping the feet at the same position.
+    #[inline]
+    pub fn scale_from_feet(&mut self, scalar: Vec3A) {
+        let center = self.center_canonical();
+        let half_size = self.size() * 0.5 * scalar;
+        *self = Self::new_centered(center, half_size);
     }
 
     /// Returns `true` if this [`Collider`] intersects the other.

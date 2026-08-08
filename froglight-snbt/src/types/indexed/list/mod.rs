@@ -47,7 +47,7 @@ impl<'data, C: IndexCore> IndexedList<'data, C> {
     /// Create an iterator over this list.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> ListIter<'_, 'data, C> { ListIter::new(self) }
+    pub const fn into_iter(self) -> ListIter<'data, C> { ListIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------

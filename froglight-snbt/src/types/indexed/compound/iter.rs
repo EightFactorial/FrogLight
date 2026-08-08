@@ -1,25 +1,25 @@
+#![expect(clippy::into_iter_without_iter, reason = "Ignored")]
+
 use crate::types::indexed::{
     compound::IndexedCompound, core::IndexCore, reference::EntryReference,
 };
 
 /// An iterator over an [`IndexedCompound`].
-pub struct CompoundIter<'iter, 'data, C: IndexCore> {
-    compound: &'iter IndexedCompound<'data, C>,
+pub struct CompoundIter<'data, C: IndexCore> {
+    compound: IndexedCompound<'data, C>,
     index: usize,
 }
 
-impl<'iter, 'data, C: IndexCore> CompoundIter<'iter, 'data, C> {
+impl<'data, C: IndexCore> CompoundIter<'data, C> {
     /// Create a new [`CompoundIter`] over the given compound.
     #[inline]
     #[must_use]
-    pub const fn new(compound: &'iter IndexedCompound<'data, C>) -> Self {
-        Self { compound, index: 0 }
-    }
+    pub const fn new(compound: IndexedCompound<'data, C>) -> Self { Self { compound, index: 0 } }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, C: IndexCore> Iterator for CompoundIter<'_, 'data, C> {
+impl<'data, C: IndexCore> Iterator for CompoundIter<'data, C> {
     type Item = EntryReference<'data, C>;
 
     #[inline]
@@ -29,23 +29,29 @@ impl<'data, C: IndexCore> Iterator for CompoundIter<'_, 'data, C> {
         Some(entry)
     }
 }
-impl<C: IndexCore> ExactSizeIterator for CompoundIter<'_, '_, C> {
+impl<C: IndexCore> ExactSizeIterator for CompoundIter<'_, C> {
     #[inline]
     fn len(&self) -> usize { self.compound.entries().len() - self.index }
 }
 
-impl<'iter, 'data, C: IndexCore> IntoIterator for &'iter IndexedCompound<'data, C> {
-    type IntoIter = CompoundIter<'iter, 'data, C>;
+impl<'data, C: IndexCore> IntoIterator for IndexedCompound<'data, C> {
+    type IntoIter = CompoundIter<'data, C>;
     type Item = EntryReference<'data, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { CompoundIter::new(self) }
 }
-#[expect(clippy::into_iter_without_iter, reason = "Incorrect")]
-impl<'iter, 'data, C: IndexCore> IntoIterator for &'iter mut IndexedCompound<'data, C> {
-    type IntoIter = CompoundIter<'iter, 'data, C>;
+impl<'data, C: IndexCore> IntoIterator for &IndexedCompound<'data, C> {
+    type IntoIter = CompoundIter<'data, C>;
     type Item = EntryReference<'data, C>;
 
     #[inline]
-    fn into_iter(self) -> Self::IntoIter { CompoundIter::new(self) }
+    fn into_iter(self) -> Self::IntoIter { CompoundIter::new(*self) }
+}
+impl<'data, C: IndexCore> IntoIterator for &mut IndexedCompound<'data, C> {
+    type IntoIter = CompoundIter<'data, C>;
+    type Item = EntryReference<'data, C>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter { CompoundIter::new(*self) }
 }

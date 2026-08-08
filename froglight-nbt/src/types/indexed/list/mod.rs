@@ -14,7 +14,7 @@ mod iter;
 pub use iter::{ListIter, ListOwnedIter};
 
 mod value;
-pub use value::IndexedValueList;
+pub use value::ValueList;
 
 /// A typed NBT List that is indexed by an [`IndexCore`].
 pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> {
@@ -326,7 +326,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedLis
     /// Get the value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get(self, index: usize) -> Option<IndexedValueList<'data, A, C>> {
+    pub fn get(self, index: usize) -> Option<ValueList<'data, A, C>> {
         if index >= self.len() {
             return None;
         }
@@ -337,7 +337,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedLis
     /// Get a reference to value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_ref(&self, index: usize) -> Option<IndexedValueList<'_, Ref, C>>
+    pub fn get_ref(&self, index: usize) -> Option<ValueList<'_, Ref, C>>
     where
         C: IndexCore<Ref>,
     {
@@ -379,7 +379,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedList<'data, IndexedListType, Mut, 
     /// Get a reference to value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_mut(&mut self, index: usize) -> Option<IndexedValueList<'_, Mut, C>> {
+    pub fn get_mut(&mut self, index: usize) -> Option<ValueList<'_, Mut, C>> {
         if index >= self.len() {
             return None;
         }

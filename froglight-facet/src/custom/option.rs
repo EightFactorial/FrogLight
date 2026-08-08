@@ -50,15 +50,15 @@ use crate::facet::prelude::*;
 ///     }
 /// }
 /// ```
-pub struct FacetOption<T: FacetTemplate>(PhantomData<T>);
+pub struct OptionTemplate<T: FacetTemplate>(PhantomData<T>);
 
-impl<T: FacetTemplate> FacetTemplate for FacetOption<T> {
+impl<T: FacetTemplate> FacetTemplate for OptionTemplate<T> {
     fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         let option = item.peek().into_option()?;
         if let Some(value) = option.value() {
             writer.write_byte(1)?;
 
-            let item = SerializeItem::new(value, SerializeItemType::Value, false);
+            let item = SerializeItem::new(value, SerializeItemType::Value, item.is_variable());
             T::WITH.serialize(item, writer)
         } else {
             writer.write_byte(0)
@@ -74,20 +74,23 @@ impl<T: FacetTemplate> FacetTemplate for FacetOption<T> {
                 partial = partial.set_default()?;
                 Ok(partial)
             }),
-            1 => item.scoped(|mut partial| {
-                partial = partial.begin_some()?;
+            1 => {
+                let variable = item.is_variable();
+                item.scoped(|mut partial| {
+                    partial = partial.begin_some()?;
 
-                let mut item = DeserializeItem::new_partial(partial);
-                item = T::WITH.deserialize(item, reader)?;
+                    let mut item = DeserializeItem::new_partial(partial).with_variable(variable);
+                    item = T::WITH.deserialize(item, reader)?;
 
-                Ok(item.into_inner().0)
-            }),
+                    Ok(item.into_inner().0)
+                })
+            }
             unk => Err(ReaderError::InvalidBool(unk)),
         }
     }
 }
 
-impl<T: FacetBorrowedTemplate> FacetBorrowedTemplate for FacetOption<T> {
+impl<T: FacetBorrowedTemplate> FacetBorrowedTemplate for OptionTemplate<T> {
     fn deserialize_borrowed<'facet>(
         item: DeserializeItem<'facet, true>,
         reader: &mut Reader<'facet>,
@@ -97,14 +100,17 @@ impl<T: FacetBorrowedTemplate> FacetBorrowedTemplate for FacetOption<T> {
                 partial = partial.set_default()?;
                 Ok(partial)
             }),
-            1 => item.scoped(|mut partial| {
-                partial = partial.begin_some()?;
+            1 => {
+                let variable = item.is_variable();
+                item.scoped(|mut partial| {
+                    partial = partial.begin_some()?;
 
-                let mut item = DeserializeItem::new_partial(partial);
-                item = T::WITH.deserialize_borrowed(item, reader)?;
+                    let mut item = DeserializeItem::new_partial(partial).with_variable(variable);
+                    item = T::WITH.deserialize_borrowed(item, reader)?;
 
-                Ok(item.into_inner().0)
-            }),
+                    Ok(item.into_inner().0)
+                })
+            }
             unk => Err(ReaderError::InvalidBool(unk)),
         }
     }
@@ -120,8 +126,8 @@ impl<T: FacetBorrowedTemplate> FacetBorrowedTemplate for FacetOption<T> {
 ///
 ///
 /// This only works for [`WithFnAttr`](crate::facet::WithFnAttr) directly. If
-/// you have types that implement [`FacetTemplate`], you can use [`FacetOption`]
-/// instead.
+/// you have types that implement [`FacetTemplate`], you can use
+/// [`OptionTemplate`] instead.
 ///
 ///
 /// # Example
@@ -175,7 +181,7 @@ macro_rules! option_with {
                     let item = $crate::facet::prelude::SerializeItem::new(
                         inner,
                         $crate::facet::prelude::SerializeItemType::Value,
-                        false,
+                        item.is_variable(),
                     );
 
                     ($with.ser)(item, writer)
@@ -188,14 +194,19 @@ macro_rules! option_with {
                     partial = partial.set_default()?;
                     Ok(partial)
                 }),
-                1 => item.scoped(|mut partial| {
-                    partial = partial.begin_some()?;
+                1 => {
+                    let variable = item.is_variable();
+                    item.scoped(|mut partial| {
+                        partial = partial.begin_some()?;
 
-                    let mut item = $crate::facet::prelude::DeserializeItem::new_partial(partial);
-                    item = ($with.de_owned)(item, reader)?;
+                        let mut item =
+                            $crate::facet::prelude::DeserializeItem::new_partial(partial)
+                                .with_variable(variable);
+                        item = ($with.de_owned)(item, reader)?;
 
-                    Ok(item.into_inner().0)
-                }),
+                        Ok(item.into_inner().0)
+                    })
+                }
                 unk => Err($crate::facet::prelude::ReaderError::InvalidBool(unk)),
             },
             |mut item, reader| match reader.read_byte()? {
@@ -203,18 +214,21 @@ macro_rules! option_with {
                     partial = partial.set_default()?;
                     Ok(partial)
                 }),
-                1 => item.scoped(|mut partial| {
-                    partial = partial.begin_some()?;
+                1 => {
+                    let variable = item.is_variable();
+                    item.scoped(|mut partial| {
+                        partial = partial.begin_some()?;
 
-                    let mut item = $crate::facet::prelude::DeserializeItem::new_partial(partial);
-                    item = ($with.de_owned_borrow)(item, reader)?;
+                        let mut item =
+                            $crate::facet::prelude::DeserializeItem::new_partial(partial)
+                                .with_variable(variable);
+                        item = ($with.de_owned_borrow)(item, reader)?;
 
-                    Ok(item.into_inner().0)
-                }),
+                        Ok(item.into_inner().0)
+                    })
+                }
                 unk => Err($crate::facet::prelude::ReaderError::InvalidBool(unk)),
             },
         )
     };
 }
-
-// -------------------------------------------------------------------------------------------------

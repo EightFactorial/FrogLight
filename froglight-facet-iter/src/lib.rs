@@ -7,6 +7,7 @@ extern crate std;
 
 pub mod deserialize;
 pub mod serialize;
+pub mod solver;
 
 mod reader;
 pub use reader::{Reader, ReaderError};

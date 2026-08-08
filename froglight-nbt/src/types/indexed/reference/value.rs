@@ -6,7 +6,7 @@ use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, NbtAccess, Ref},
     index::Index,
-    list::IndexedValueList,
+    list::ValueList,
     reference::{IndexableValue, IndexableValueMut, IndexedReference},
 };
 
@@ -49,7 +49,7 @@ impl_indexable!(u8, u16, u32, u64, f32, f64);
 // -------------------------------------------------------------------------------------------------
 
 /// A reference to an NBT value that is indexed by an [`IndexCore`].
-pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+pub enum ValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     /// A [`u8`] value.
     Byte(IndexedReference<'data, u8, A>),
     /// A [`u16`] value.
@@ -67,7 +67,7 @@ pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     /// An [`MStr`] string.
     String(IndexedReference<'data, MStr, A>),
     /// A list of values.
-    List(IndexedValueList<'data, A, C>),
+    List(ValueList<'data, A, C>),
     /// A compound of named entries.
     Compound(IndexedCompound<'data, A, C>),
     /// A [`u32`] array.
@@ -78,12 +78,12 @@ pub enum IndexedValueReference<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
 
 macro_rules! create_fns {
     ($($ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValueReference<'data, A, C> {
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> ValueReference<'data, A, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored reference if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $ident(self) -> Option<$ty> {
-                    if let IndexedValueReference::$variant(value) = self {
+                    if let ValueReference::$variant(value) = self {
                         Some(value)
                     } else {
                         None
@@ -93,18 +93,18 @@ macro_rules! create_fns {
         }
 
         impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug
-            for IndexedValueReference<'_, A, C>
+            for ValueReference<'_, A, C>
         {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 match self {
                     $(
-                        IndexedValueReference::$variant(value) => f.debug_tuple(stringify!($variant)).field(value).finish(),
+                        ValueReference::$variant(value) => f.debug_tuple(stringify!($variant)).field(value).finish(),
                     )*
                 }
             }
         }
 
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedValueReference<'data, A, C>
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for ValueReference<'data, A, C>
         where
             <A as NbtAccess>::CORE<'data, C>: Clone,
             <A as NbtAccess>::SLICE<'data>: Clone,
@@ -112,12 +112,12 @@ macro_rules! create_fns {
             fn clone(&self) -> Self {
                 match self {
                     $(
-                        IndexedValueReference::$variant(value) => IndexedValueReference::$variant(value.clone()),
+                        ValueReference::$variant(value) => ValueReference::$variant(value.clone()),
                     )*
                 }
             }
         }
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedValueReference<'data, A, C>
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for ValueReference<'data, A, C>
         where
             <A as NbtAccess>::CORE<'data, C>: Copy,
             <A as NbtAccess>::SLICE<'data>: Copy,
@@ -125,21 +125,21 @@ macro_rules! create_fns {
         }
 
         impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> PartialEq
-            for IndexedValueReference<'data, A, C>
+            for ValueReference<'data, A, C>
         where
             A::SLICE<'data>: PartialEq,
         {
             fn eq(&self, other: &Self) -> bool {
                 match (self, other) {
                     $(
-                        (IndexedValueReference::$variant(a), IndexedValueReference::$variant(b)) => a == b,
+                        (ValueReference::$variant(a), ValueReference::$variant(b)) => a == b,
                     )*
                     _ => false,
                 }
             }
         }
         impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> Eq
-            for IndexedValueReference<'data, A, C>
+            for ValueReference<'data, A, C>
         where
             A::SLICE<'data>: Eq,
         {
@@ -147,18 +147,18 @@ macro_rules! create_fns {
 
         $(
             impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> From<$ty>
-                for IndexedValueReference<'data, A, C>
+                for ValueReference<'data, A, C>
             {
                 fn from(value: $ty) -> Self {
-                    IndexedValueReference::$variant(value.into())
+                    ValueReference::$variant(value.into())
                 }
             }
 
-            impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> TryFrom<IndexedValueReference<'data, A, C>> for $ty {
-                type Error = IndexedValueReference<'data, A, C>;
+            impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> TryFrom<ValueReference<'data, A, C>> for $ty {
+                type Error = ValueReference<'data, A, C>;
 
-                fn try_from(value: IndexedValueReference<'data, A, C>) -> Result<Self, Self::Error> {
-                    if let IndexedValueReference::$variant(inner) = value {
+                fn try_from(value: ValueReference<'data, A, C>) -> Result<Self, Self::Error> {
+                    if let ValueReference::$variant(inner) = value {
                         Ok(inner)
                     } else {
                         Err(value)
@@ -178,7 +178,7 @@ create_fns! {
     as_double: IndexedReference<'data, f64, A> => Double,
     as_byte_array: IndexedReference<'data, [u8], A> => ByteArray,
     as_string: IndexedReference<'data, MStr, A> => String,
-    as_list: IndexedValueList<'data, A, C> => List,
+    as_list: ValueList<'data, A, C> => List,
     as_compound: IndexedCompound<'data, A, C> => Compound,
     as_int_array: IndexedReference<'data, [u32], A> => IntArray,
     as_long_array: IndexedReference<'data, [u64], A> => LongArray

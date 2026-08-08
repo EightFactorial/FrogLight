@@ -120,6 +120,14 @@ impl<'facet, const BORROW: bool> DeserializeItem<'facet, BORROW> {
     #[inline]
     pub const fn set_variable(&mut self, variable: bool) { self.desc.variable = variable; }
 
+    /// Set whether this [`DeserializeItem`] is variable-length.
+    #[inline]
+    #[must_use]
+    pub const fn with_variable(mut self, variable: bool) -> Self {
+        self.desc.variable = variable;
+        self
+    }
+
     /// Get the [`Shape`] of the [`DeserializeItem`].
     #[inline]
     #[must_use]

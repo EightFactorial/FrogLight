@@ -28,17 +28,26 @@ impl<'data, C: IndexCore> IndexedEntry<'data, C> {
     pub const unsafe fn new(core: &'data C, index: EntryIndex) -> Self { Self { core, index } }
 
     /// Get the name of this entry.
+    #[inline]
     #[must_use]
-    pub fn name(&self) -> IndexedReference<'data, String> {
+    pub fn name(self) -> IndexedReference<'data, String> {
         // SAFETY: `IndexedEntry` guarantees that this is safe.
         unsafe { IndexedReference::new(self.core.root(), self.index.name()) }
     }
 
     /// Get the value of this entry.
+    #[inline]
     #[must_use]
-    pub fn value(&self) -> ValueReference<'data, C> {
+    pub fn value(self) -> ValueReference<'data, C> {
         // SAFETY: `IndexedEntry` guarantees that this is safe.
         unsafe { ValueReference::new(self.core, self.index.value()) }
+    }
+
+    /// Get the name and value pair of this entry.
+    #[inline]
+    #[must_use]
+    pub fn pair(self) -> (IndexedReference<'data, String>, ValueReference<'data, C>) {
+        (self.name(), self.value())
     }
 }
 

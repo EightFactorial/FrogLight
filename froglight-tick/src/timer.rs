@@ -11,7 +11,7 @@ use bevy_time::{Timer, TimerMode};
 /// If not ticking, disables the entity and all children
 /// recursively for the duration of the [`Tick`] schedule.
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Reflect, Component)]
+#[derive(Debug, Clone, PartialEq, Component, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Component)]
 pub struct TickTimer {
     timer: Timer,

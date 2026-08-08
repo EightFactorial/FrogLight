@@ -7,7 +7,7 @@ use crate::prelude::*;
 
 /// A counter for the number of ticks executed.
 #[repr(transparent)]
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Resource)]
 pub struct TickCounter {
     per_timer: EntityHashMap<u128>,

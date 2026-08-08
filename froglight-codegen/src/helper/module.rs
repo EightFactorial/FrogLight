@@ -203,7 +203,7 @@ impl ModuleBuilder {
         // Prepare the output buffer
         let mut output = String::new();
 
-        // Sort imports to guaratee consistent order
+        // Sort imports to guarantee a consistent order
         self.imports.sort();
 
         // Determine the file path for the module

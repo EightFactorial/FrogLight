@@ -11,7 +11,7 @@ use crate::types::indexed::{
 };
 
 /// An NBT List that is indexed by an [`IndexCore`].
-pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+pub enum ValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     /// An empty list.
     Empty,
     /// A [`u8`] value.
@@ -40,7 +40,7 @@ pub enum IndexedValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     LongArray(IndexedList<'data, [u64], A, C>),
 }
 
-impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IndexedValueList<'_, A, C> {
+impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'_, A, C> {
     /// Returns the length of this list.
     #[must_use]
     pub fn len(&self) -> usize {
@@ -72,27 +72,27 @@ impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IndexedValueList<'_, A, C> 
     pub fn is_empty(&self) -> bool { self.len() == 0 }
 }
 
-impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for IndexedValueList<'_, A, C> {
+impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for ValueList<'_, A, C> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            IndexedValueList::Empty => f.debug_tuple("Empty").finish(),
-            IndexedValueList::Byte(list) => f.debug_tuple("Byte").field(&list).finish(),
-            IndexedValueList::Short(list) => f.debug_tuple("Short").field(&list).finish(),
-            IndexedValueList::Int(list) => f.debug_tuple("Int").field(&list).finish(),
-            IndexedValueList::Long(list) => f.debug_tuple("Long").field(&list).finish(),
-            IndexedValueList::Float(list) => f.debug_tuple("Float").field(&list).finish(),
-            IndexedValueList::Double(list) => f.debug_tuple("Double").field(&list).finish(),
-            IndexedValueList::ByteArray(list) => f.debug_tuple("ByteArray").field(&list).finish(),
-            IndexedValueList::String(list) => f.debug_tuple("String").field(&list).finish(),
-            IndexedValueList::List(list) => f.debug_tuple("List").field(&list).finish(),
-            IndexedValueList::Compound(list) => f.debug_tuple("Compound").field(&list).finish(),
-            IndexedValueList::IntArray(list) => f.debug_tuple("IntArray").field(&list).finish(),
-            IndexedValueList::LongArray(list) => f.debug_tuple("LongArray").field(&list).finish(),
+            ValueList::Empty => f.debug_tuple("Empty").finish(),
+            ValueList::Byte(list) => f.debug_tuple("Byte").field(&list).finish(),
+            ValueList::Short(list) => f.debug_tuple("Short").field(&list).finish(),
+            ValueList::Int(list) => f.debug_tuple("Int").field(&list).finish(),
+            ValueList::Long(list) => f.debug_tuple("Long").field(&list).finish(),
+            ValueList::Float(list) => f.debug_tuple("Float").field(&list).finish(),
+            ValueList::Double(list) => f.debug_tuple("Double").field(&list).finish(),
+            ValueList::ByteArray(list) => f.debug_tuple("ByteArray").field(&list).finish(),
+            ValueList::String(list) => f.debug_tuple("String").field(&list).finish(),
+            ValueList::List(list) => f.debug_tuple("List").field(&list).finish(),
+            ValueList::Compound(list) => f.debug_tuple("Compound").field(&list).finish(),
+            ValueList::IntArray(list) => f.debug_tuple("IntArray").field(&list).finish(),
+            ValueList::LongArray(list) => f.debug_tuple("LongArray").field(&list).finish(),
         }
     }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedValueList<'data, A, C>
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for ValueList<'data, A, C>
 where
     <A as NbtAccess>::CORE<'data, C>: Clone,
     <A as NbtAccess>::SLICE<'data>: Clone,
@@ -116,14 +116,14 @@ where
         }
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedValueList<'data, A, C>
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for ValueList<'data, A, C>
 where
     <A as NbtAccess>::CORE<'data, C>: Copy,
     <A as NbtAccess>::SLICE<'data>: Copy,
 {
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for IndexedValueList<'data, A, C> {
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for ValueList<'data, A, C> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Byte(l0), Self::Byte(r0)) => l0 == r0,
@@ -142,18 +142,18 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for IndexedValueLis
         }
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for IndexedValueList<'data, A, C> {}
+impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for ValueList<'data, A, C> {}
 
 // -------------------------------------------------------------------------------------------------
 
 macro_rules! create_fns {
     (@ref $($as_ident:ident & $into_ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValueList<'data, A, C> {
+        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> ValueList<'data, A, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored list if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $as_ident(&self) -> Option<&IndexedList<'data, $ty, A, C>> {
-                    if let IndexedValueList::$variant(value) = self {
+                    if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {
                         None
@@ -163,7 +163,7 @@ macro_rules! create_fns {
                 #[must_use]
                 #[doc = concat!("Return a the stored list if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $into_ident(self) -> Option<IndexedList<'data, $ty, A, C>> {
-                    if let IndexedValueList::$variant(value) = self {
+                    if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {
                         None
@@ -173,17 +173,17 @@ macro_rules! create_fns {
         }
 
         $(
-            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> From<IndexedList<'data, $ty, A, C>> for IndexedValueList<'data, A, C> {
+            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> From<IndexedList<'data, $ty, A, C>> for ValueList<'data, A, C> {
                 fn from(value: IndexedList<'data, $ty, A, C>) -> Self {
-                    IndexedValueList::$variant(value)
+                    ValueList::$variant(value)
                 }
             }
 
-            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> TryFrom<IndexedValueList<'data, A, C>> for IndexedList<'data, $ty, A, C> {
-                type Error = IndexedValueList<'data, A, C>;
+            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> TryFrom<ValueList<'data, A, C>> for IndexedList<'data, $ty, A, C> {
+                type Error = ValueList<'data, A, C>;
 
-                fn try_from(value: IndexedValueList<'data, A, C>) -> Result<Self, Self::Error> {
-                    if let IndexedValueList::$variant(value) = value {
+                fn try_from(value: ValueList<'data, A, C>) -> Result<Self, Self::Error> {
+                    if let ValueList::$variant(value) = value {
                         Ok(value)
                     } else {
                         Err(value)
@@ -193,12 +193,12 @@ macro_rules! create_fns {
         )*
     };
     (@mut $($ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, C: IndexCore<Mut> + 'data> IndexedValueList<'data, Mut, C> {
+        impl<'data, C: IndexCore<Mut> + 'data> ValueList<'data, Mut, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a mutable reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
                 pub fn $ident(&mut self) -> Option<&mut IndexedList<'data, $ty, Mut, C>> {
-                    if let IndexedValueList::$variant(value) = self {
+                    if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {
                         None

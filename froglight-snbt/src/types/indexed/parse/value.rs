@@ -48,7 +48,7 @@ pub(super) fn parse_value<'root>(
             // Skip over the list and queue it for later
             let list_cursor = cursor.split_range(*range);
             queue.push_back((list_cursor, entries.len(), false));
-            cursor.next();
+            cursor.next_expect(']')?;
 
             Ok(PLACEHOLDER_LIST)
         }
@@ -67,6 +67,7 @@ pub(super) fn parse_value<'root>(
             // Skip over the compound and queue it for later
             let compound_cursor = cursor.split_range(*range);
             queue.push_back((compound_cursor, entries.len(), true));
+            cursor.next_expect('}')?;
 
             Ok(PLACEHOLDER_COMPOUND)
         }
@@ -161,40 +162,41 @@ pub(super) fn parse_numeric(cursor: &mut Cursor<'_>) -> Result<ValueIndex, ()> {
         !matches!(c, '0'..='9' | '-' | '+' | '.' | '_' | 'b' | 'e' | 'x' | 'E')
     });
 
-    // Check for a signess suffix if there is a type suffix after.
-    let signess = if matches!(cursor.peek2(), Some('b' | 'B' | 's' | 'S' | 'i' | 'I' | 'l' | 'L')) {
-        match cursor.peek() {
-            Some('u') => {
-                cursor.next();
-                Ok(IntegerSignness::Unsigned)
+    // Check for a signedness suffix if there is a type suffix after.
+    let signedness =
+        if matches!(cursor.peek2(), Some('b' | 'B' | 's' | 'S' | 'i' | 'I' | 'l' | 'L')) {
+            match cursor.peek() {
+                Some('u') => {
+                    cursor.next();
+                    Ok(IntegerSignness::Unsigned)
+                }
+                Some('s') => {
+                    cursor.next();
+                    Ok(IntegerSignness::Signed)
+                }
+                _ => Err(()),
             }
-            Some('s') => {
-                cursor.next();
-                Ok(IntegerSignness::Signed)
-            }
-            _ => Err(()),
-        }
-    } else {
-        Ok(IntegerSignness::None)
-    }?;
+        } else {
+            Ok(IntegerSignness::None)
+        }?;
 
     // Check for a type suffix.
     match cursor.peek() {
         Some('b' | 'B') => {
             cursor.next();
-            parse_integer(slice, start, IntegerType::Byte, signess)
+            parse_integer(slice, start, IntegerType::Byte, signedness)
         }
         Some('s' | 'S') => {
             cursor.next();
-            parse_integer(slice, start, IntegerType::Short, signess)
+            parse_integer(slice, start, IntegerType::Short, signedness)
         }
         Some('i' | 'I') => {
             cursor.next();
-            parse_integer(slice, start, IntegerType::Int, signess)
+            parse_integer(slice, start, IntegerType::Int, signedness)
         }
         Some('l' | 'L') => {
             cursor.next();
-            parse_integer(slice, start, IntegerType::Long, signess)
+            parse_integer(slice, start, IntegerType::Long, signedness)
         }
 
         Some('f' | 'F') => {
@@ -206,7 +208,7 @@ pub(super) fn parse_numeric(cursor: &mut Cursor<'_>) -> Result<ValueIndex, ()> {
             parse_float(slice, start, FloatType::Double)
         }
 
-        _ => parse_integer(slice, start, IntegerType::None, signess),
+        _ => parse_integer(slice, start, IntegerType::None, signedness),
     }
 }
 

@@ -11,7 +11,7 @@ use crate::prelude::TickTimer;
 ///
 /// Used for [`Observer`]s.
 #[repr(transparent)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, EntityEvent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EntityEvent, Reflect)]
 #[reflect(Debug, Clone, PartialEq, Hash, Event)]
 pub struct Ticked(pub Entity);
 

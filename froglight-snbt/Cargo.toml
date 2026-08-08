@@ -31,6 +31,8 @@ uuid = { workspace = true }
 
 # Optional dependencies
 facet = { features = ["alloc", "reflect", "smallvec"], workspace = true, optional = true }
+facet-path = { features = ["alloc"], workspace = true, optional = true }
+facet-solver = { features = ["alloc"], workspace = true, optional = true }
 froglight-facet-iter = { workspace = true, optional = true }
 froglight-mutf8 = { features = ["alloc"], workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true }
@@ -46,7 +48,7 @@ tracing = { workspace = true, optional = true }
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["dep:facet", "dep:froglight-facet-iter", "froglight-mutf8/facet", "froglight-nbt?/facet"]
+facet = ["dep:facet", "dep:facet-path", "dep:facet-solver", "dep:froglight-facet-iter", "froglight-mutf8/facet", "froglight-nbt?/facet"]
 # Enable `nbt` support.
 nbt = ["dep:froglight-mutf8", "dep:froglight-nbt"]
 # Enable `serde` support.
@@ -58,6 +60,6 @@ tracing = ["dep:tracing", "froglight-facet-iter?/tracing", "froglight-mutf8?/tra
 tracing_ext = ["tracing"]
 
 # Enable support for the standard library
-std = ["bitflags/std", "dep:regex-lite", "facet?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]
+std = ["bitflags/std", "dep:regex-lite", "facet?/std", "facet-path?/std", "facet-solver?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-facet-iter?/nightly", "froglight-mutf8?/nightly", "froglight-mutf8?/simd", "froglight-nbt?/nightly", "smallvec/specialization"]

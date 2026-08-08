@@ -1,5 +1,7 @@
 //! TODO
 
+use alloc::vec::Vec;
+
 use bevy_ecs::{
     entity::{EntityHashMap, EntityHashSet},
     prelude::*,
@@ -19,7 +21,7 @@ use crate::{disable::TickDisabledSet, prelude::*};
 /// [`Schedule`]: bevy_ecs::schedule::Schedule
 #[rustfmt::skip]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[derive(Reflect, ScheduleLabel)]
+#[derive(ScheduleLabel, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, PartialOrd, Hash)]
 pub enum TickSchedule {
     /// Runs first in the tick schedule.
@@ -50,7 +52,7 @@ pub enum TickSchedule {
 /// A [`Schedule`] that runs the [`TickSchedule`]s in order.
 ///
 /// [`Schedule`]: bevy_ecs::schedule::Schedule
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, ScheduleLabel)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
 pub struct RunTickLoop;
 
@@ -58,6 +60,7 @@ pub struct RunTickLoop;
 struct TickCache {
     enabled: EntityHashMap<u32>,
     disabled: Mutex<EntityHashSet>,
+    finished: Vec<Entity>,
 }
 
 impl RunTickLoop {
@@ -70,7 +73,7 @@ impl RunTickLoop {
     pub fn run_tick(world: &mut World) {
         world.init_resource::<TickCache>();
         world.resource_scope::<TickCache, ()>(|world, mut cache| {
-            let TickCache { enabled, disabled } = &mut *cache;
+            let TickCache { enabled, disabled, finished } = &mut *cache;
 
             // TODO: Set a maximum delta time and/or tick count.
             let delta = world.resource::<Time<Real>>().delta();
@@ -85,7 +88,7 @@ impl RunTickLoop {
             // Run the tick schedule for each tick.
             for iteration in 0..*ticks {
                 // Disable all non-ticking entities.
-                Self::insert_disable(iteration, enabled, disabled, world);
+                Self::insert_disable(iteration, enabled, disabled, finished, world);
                 // Stop if there are no enabled timers left.
                 if enabled.is_empty() {
                     break;
@@ -112,11 +115,11 @@ impl RunTickLoop {
         iteration: u32,
         enabled: &mut EntityHashMap<u32>,
         disabled: &mut Mutex<EntityHashSet>,
+        finished: &mut Vec<Entity>,
         world: &mut World,
     ) {
         // Remove finished timers from the `enabled` map.
-        let finished: alloc::vec::Vec<Entity> =
-            enabled.extract_if(|_, count| iteration >= *count).map(|(e, _)| e).collect();
+        finished.extend(enabled.extract_if(|_, count| iteration >= *count).map(|(e, _)| e));
         // Skip if there are no finished timers to disable.
         if finished.is_empty() {
             return;
@@ -125,10 +128,12 @@ impl RunTickLoop {
         // Disable the timers.
         disabled.get_mut().extend(finished.iter().copied());
         ComputeTaskPool::get().scope::<_, ()>(|spawner| {
+            #[allow(clippy::borrow_deref_ref, reason = "May be `&mut`")]
+            let spawner = &*spawner;
             let disabled = &*disabled;
             let world = &*world;
 
-            for timer in finished.into_iter().filter_map(|e| world.get_entity(e).ok()) {
+            for timer in finished.drain(..).filter_map(|e| world.get_entity(e).ok()) {
                 spawner.spawn(async move {
                     Self::insert_disable_timer(timer, disabled, spawner, world);
                 });

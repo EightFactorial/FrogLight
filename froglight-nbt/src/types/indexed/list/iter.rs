@@ -1,7 +1,7 @@
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, NbtAccess, Ref},
-    list::{IndexedList, IndexedValueList},
+    list::{IndexedList, ValueList},
     reference::IndexableValue,
     types::{IndexedListType, IndexedMapType},
 };
@@ -84,7 +84,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A>> Iterator for ListOwnedIter<'data, Ind
 where
     <A as NbtAccess>::CORE<'data, C>: Clone,
 {
-    type Item = IndexedValueList<'data, A, C>;
+    type Item = ValueList<'data, A, C>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let entry = self.list.clone().get(self.index)?;
@@ -182,7 +182,7 @@ impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ExactSizeIterator
 impl<'iter, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> Iterator
     for ListIter<'iter, '_, IndexedListType, A, C>
 {
-    type Item = IndexedValueList<'iter, Ref, C>;
+    type Item = ValueList<'iter, Ref, C>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let entry = self.list.get_ref(self.index)?;

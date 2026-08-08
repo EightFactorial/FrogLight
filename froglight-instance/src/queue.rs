@@ -82,21 +82,15 @@ impl BlockEditQueue {
             return;
         }
 
-        for (chunk, edits) in &mut self.queue {
-            // Skip if there are no edits for this chunk.
-            if edits.is_empty() {
-                continue;
-            }
-
+        for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
             if let Some(entity) = instance.query_chunk(chunk)
                 && let Ok(mut shared) = chunks.get_mut(entity)
             {
-                // Clone, apply edits, and replace the existing chunk.
-                let mut chunk = shared.clone_inner();
+                // Apply edits, cloning only if needed.
+                let chunk = shared.make_mut();
                 for BlockEdit { position, block } in edits.drain(..) {
                     chunk.set_block(position, block);
                 }
-                shared.store(chunk);
             } else {
                 #[cfg(feature = "tracing")]
                 tracing::warn!(
@@ -135,12 +129,7 @@ impl BlockEditQueue {
             return output;
         }
 
-        for (chunk, edits) in &mut self.queue {
-            // Skip if there are no edits for this chunk.
-            if edits.is_empty() {
-                continue;
-            }
-
+        for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
             if let Some(entity) = instance.query_chunk(chunk)
                 && let Ok(shared) = chunks.get(entity)
             {

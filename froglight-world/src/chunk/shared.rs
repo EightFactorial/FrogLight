@@ -51,13 +51,18 @@ impl SharedChunk {
     ///
     /// # Note
     ///
-    /// This should only be used when you need to modify the [`Chunk`].
-    ///
     /// If you only need read-only access consider [`SharedChunk::load`]
     /// instead.
     #[inline]
     #[must_use]
     pub fn clone_inner(&self) -> Chunk { Arc::as_ref(&self.0).clone() }
+
+    /// Get a mutable reference to the inner [`Chunk`], cloning if necessary.
+    ///
+    /// See [`Arc::make_mut`] for more details.
+    #[inline]
+    #[must_use]
+    pub fn make_mut(&mut self) -> &mut Chunk { Arc::make_mut(&mut self.0) }
 
     /// Replace the existing [`Chunk`] immediately.
     ///

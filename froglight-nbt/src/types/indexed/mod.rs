@@ -20,7 +20,7 @@ use index::Index;
 pub mod list;
 
 pub mod reference;
-use reference::{IndexedReference, IndexedValueReference};
+use reference::{IndexedReference, ValueReference};
 
 mod parse;
 
@@ -145,11 +145,11 @@ impl<C: IndexCored> IndexedNbt<C> {
     /// This is always a [`IndexedValueReference::Compound`].
     #[inline]
     #[must_use]
-    pub fn as_value(&self) -> IndexedValueReference<'_, Ref, C>
+    pub fn as_value(&self) -> ValueReference<'_, Ref, C>
     where
         C: IndexCore<Ref>,
     {
-        IndexedValueReference::Compound(self.as_compound())
+        ValueReference::Compound(self.as_compound())
     }
 
     /// Get the root [`IndexedValueReference`] of this NBT structure.
@@ -159,11 +159,11 @@ impl<C: IndexCored> IndexedNbt<C> {
     /// This is always a [`IndexedValueReference::Compound`].
     #[inline]
     #[must_use]
-    pub fn as_value_mut(&mut self) -> IndexedValueReference<'_, Mut, C>
+    pub fn as_value_mut(&mut self) -> ValueReference<'_, Mut, C>
     where
         C: IndexCore<Mut>,
     {
-        IndexedValueReference::Compound(self.as_compound_mut())
+        ValueReference::Compound(self.as_compound_mut())
     }
 
     /// Get the raw NBT data as a mutable byte slice.

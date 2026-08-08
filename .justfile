@@ -5,6 +5,9 @@ NO_FEATURES := "features=libm,once_cell --no-default-features"
 EXCLUDE := "exclude=froglight-codegen --exclude=froglight-api"
 EXCLUDE_CODEGEN := "exclude=froglight-codegen"
 
+default:
+    @just -l
+
 # Generate the changelog
 changelog path="CHANGELOG.md":
     git-cliff --output {{ path }}
@@ -52,7 +55,7 @@ test:
     cargo nextest run --workspace --release --{{ NO_FEATURES }}  --{{ EXCLUDE }}
     cargo test --doc --workspace --{{ NO_FEATURES }} --{{ EXCLUDE }}
 
-# Build all profiles and check the size of the resulting binaries
+# Build all profiles and compare their sizes
 buildsize:
     cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=dev
     cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=release
@@ -70,5 +73,5 @@ update:
     @echo '{{ CYAN + BOLD }}note{{ NORMAL }}: or, if you have `just` installed, run `just inspect <dep>@<ver>`'
 
 # Update and run all checks
-pre-commit: typos update generate clippy test
-    @echo '{{ GREEN + BOLD }}Success!{{ NORMAL }} All checks passed!'
+pre-commit: typos update clippy test
+    @echo '{{ GREEN + BOLD }}Success! {{ NORMAL }}All checks passed!'

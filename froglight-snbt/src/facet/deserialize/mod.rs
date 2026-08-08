@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::{borrow::Cow, string::String, vec::Vec};
+use alloc::{string::String, vec::Vec};
 
 use facet::{HeapValue, Partial, Type, UserType};
 use facet_path::PathStep;
@@ -10,13 +10,9 @@ use froglight_facet_iter::{
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
 };
 
-use crate::{
-    prelude::*,
-    types::indexed::{
-        core::{IndexCore, Ref, SliceCore},
-        list::ValueList,
-        reference::ValueReference,
-    },
+use crate::types::indexed::{
+    core::{IndexCore, IndexedSnbtSlice, SliceCore},
+    reference::ValueReference,
 };
 
 pub mod functions;
@@ -29,12 +25,12 @@ pub trait DeserializeNbt<'facet> {}
 #[inline(never)]
 fn deserialize_owned<'facet>(
     partial: Partial<'facet, false>,
-    nbt: &IndexedNbtSlice<'facet>,
+    snbt: &IndexedSnbtSlice<'facet>,
 ) -> Result<HeapValue<'facet, false>, DeserializeError> {
     // Create and complete the deserializer.
-    let mut core = deserialize_owned_core(nbt);
+    let mut core = deserialize_owned_core(snbt);
 
-    let de = Deserializer::new(partial, false, &mut core, Some("nbt"));
+    let de = Deserializer::new(partial, false, &mut core, Some("snbt"));
     de.complete()?.build().map_err(DeserializeError::from)
 }
 
@@ -44,19 +40,19 @@ fn deserialize_owned<'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_owned_core<'facet>(
-    nbt: &IndexedNbtSlice<'facet>,
+    snbt: &IndexedSnbtSlice<'facet>,
 ) -> impl FnMut(Item<'facet, false>) -> Result<Item<'facet, false>, ReaderError> {
     move |item: Item<'facet, false>| -> Result<Item<'facet, false>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = nbt.as_value();
+                let mut value = ValueReference::Compound(snbt.root());
                 value = navigate_nbt(item.partial(), value)?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = nbt.as_value();
+                let mut value = ValueReference::Compound(snbt.root());
                 value = navigate_nbt(&partial, value)?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
@@ -66,8 +62,9 @@ pub fn deserialize_owned_core<'facet>(
                     Ok(Item::Hint(index as u32, partial))
                 } else if let ValueReference::Compound(value) = &value {
                     Ok(Item::Hint(value.len() as u32, partial)) // Map
-                } else if let ValueReference::List(value) = &value {
-                    Ok(Item::Hint(value.len() as u32, partial)) // List
+                } else if let ValueReference::List(_value) = &value {
+                    // Ok(Item::Hint(value.len() as u32, partial)) // List
+                    todo!()
                 } else {
                     todo!()
                 }
@@ -81,12 +78,12 @@ pub fn deserialize_owned_core<'facet>(
 #[inline(never)]
 fn deserialize_borrowed<'facet>(
     partial: Partial<'facet, true>,
-    nbt: &IndexedNbtSlice<'facet>,
+    nbt: &IndexedSnbtSlice<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
     // Create and complete the deserializer.
     let mut core = deserialize_borrowed_core(nbt);
 
-    let de = Deserializer::new(partial, false, &mut core, Some("nbt"));
+    let de = Deserializer::new(partial, false, &mut core, Some("snbt"));
     de.complete()?.build().map_err(DeserializeError::from)
 }
 
@@ -96,19 +93,19 @@ fn deserialize_borrowed<'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_borrowed_core<'facet>(
-    nbt: &IndexedNbtSlice<'facet>,
+    nbt: &IndexedSnbtSlice<'facet>,
 ) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = nbt.as_value();
+                let mut value = ValueReference::Compound(nbt.root());
                 value = navigate_nbt(item.partial(), value)?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = nbt.as_value();
+                let mut value = ValueReference::Compound(nbt.root());
                 value = navigate_nbt(&partial, value)?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
@@ -118,8 +115,9 @@ pub fn deserialize_borrowed_core<'facet>(
                     Ok(Item::Hint(index as u32, partial))
                 } else if let ValueReference::Compound(value) = &value {
                     Ok(Item::Hint(value.len() as u32, partial)) // Map
-                } else if let ValueReference::List(value) = &value {
-                    Ok(Item::Hint(value.len() as u32, partial)) // List
+                } else if let ValueReference::List(_value) = &value {
+                    // Ok(Item::Hint(value.len() as u32, partial)) // List
+                    todo!()
                 } else {
                     todo!()
                 }
@@ -130,10 +128,10 @@ pub fn deserialize_borrowed_core<'facet>(
 
 // -------------------------------------------------------------------------------------------------
 
-fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
+fn navigate_nbt<'core, const BORROWED: bool>(
     partial: &Partial<'_, BORROWED>,
-    mut value: ValueReference<'nbt, Ref, SliceCore<'core, Ref>>,
-) -> Result<ValueReference<'nbt, Ref, SliceCore<'core, Ref>>, ReaderError> {
+    mut value: ValueReference<'core, SliceCore<'core>>,
+) -> Result<ValueReference<'core, SliceCore<'core>>, ReaderError> {
     let path = partial.path();
     let mut step_iter = path.steps().iter();
 
@@ -159,16 +157,15 @@ fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
                     })?;
 
                     // Get the entry with the given field name.
-                    let entry = compound.get(field.effective_name()).ok_or_else(|| {
+                    value = compound.get(field.effective_name()).ok_or_else(|| {
                         ReaderError::from_string(alloc::format!(
                             "Failed to get field with name {:?}",
                             field.effective_name()
                         ))
                     })?;
 
-                    // Update the shape and value.
+                    // Update the shape.
                     shape = field.shape();
-                    value = entry.into_value();
                 }
 
                 Type::User(UserType::Enum(ty)) => {
@@ -248,28 +245,29 @@ fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
 
 fn solve_enum_variant<const BORROWED: bool>(
     partial: &Partial<'_, BORROWED>,
-    value: ValueReference<'_, Ref, SliceCore<'_, Ref>>,
+    value: ValueReference<'_, SliceCore<'_>>,
 ) -> Result<&'static str, ReaderError> {
     fn collect_nbt_keys<'data>(
-        value: ValueReference<'data, Ref, SliceCore<'_, Ref>>,
-        depth: &mut Vec<Cow<'data, str>>,
-        list: &mut Vec<(Vec<Cow<'data, str>>, Cow<'data, str>)>,
+        value: ValueReference<'data, SliceCore<'_>>,
+        depth: &mut Vec<&'data str>,
+        list: &mut Vec<(Vec<&'data str>, &'data str)>,
     ) {
         match value {
             ValueReference::Compound(compound) => {
                 for entry in compound {
                     let (name, value) = entry.pair();
-                    let name = name.get().to_utf8();
-                    list.push((depth.clone(), name.clone()));
+
+                    let name = name.get();
+                    list.push((depth.clone(), name));
 
                     depth.push(name);
-                    collect_nbt_keys(value.into_value(), depth, list);
+                    collect_nbt_keys(value, depth, list);
                     let _ = depth.pop();
                 }
             }
-            ValueReference::List(ValueList::Compound(compounds)) => {
-                for compound in compounds {
-                    collect_nbt_keys(ValueReference::Compound(compound), depth, list);
+            ValueReference::List(vlist) => {
+                for item in vlist {
+                    collect_nbt_keys(item, depth, list);
                 }
             }
             _ => {}
@@ -295,7 +293,6 @@ fn solve_enum_variant<const BORROWED: bool>(
     // Solve the enum variant using the collected keys.
     let mut solution = None;
     for (path, key) in key_list {
-        let path: Vec<_> = path.iter().map(AsRef::as_ref).collect();
         if let KeyResult::Solved(resolution) = solver.probe_key(path.as_slice(), key.as_ref()) {
             solution = Some(resolution.resolution());
             break;
@@ -316,9 +313,9 @@ fn solve_enum_variant<const BORROWED: bool>(
 
 // -------------------------------------------------------------------------------------------------
 
-fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
+fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
     item: DeserializeItem<'facet, BORROWED>,
-    mut value: ValueReference<'_, Ref, C>,
+    mut value: ValueReference<'_, C>,
 ) -> Result<DeserializeItem<'facet, BORROWED>, ReaderError> {
     macro_rules! match_type {
         ( @int $($ty:ty => $ty_fn:ident),* ) => {
@@ -345,7 +342,7 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
                         ))
                     })?;
 
-                    let value = value.get().to_vec();
+                    let value = value.into_iter().collect::<Vec<_>>();
                     $(
                         #[allow(clippy::cast_possible_wrap, reason = "Ignored")]
                         let value = value.into_iter().map(|v| v as $ty_cast).collect::<Vec<_>>();
@@ -358,15 +355,14 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
     }
 
     value = match value {
-        ValueReference::Compound(compound) => compound
-            .get(item.field().unwrap().effective_name())
-            .ok_or_else(|| {
+        ValueReference::Compound(compound) => {
+            compound.get(item.field().unwrap().effective_name()).ok_or_else(|| {
                 ReaderError::from_string(alloc::format!(
                     "Failed to deserialize value: Compound missing \"{}\" field",
                     item.field().unwrap().effective_name()
                 ))
             })?
-            .into_value(),
+        }
         _ => value,
     };
 
@@ -408,6 +404,7 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
 // -------------------------------------------------------------------------------------------------
 
 #[test]
+#[allow(unused_variables, reason = "Testing")]
 #[allow(clippy::struct_field_names, reason = "Testing")]
 fn test() {
     use facet::Facet;
@@ -432,19 +429,17 @@ fn test() {
         inner_b: u64,
     }
 
-    static SLICE: &[u8] = &[
-        0x0A, 0x01, 0x00, 0x06, 0x62, 0x61, 0x73, 0x65, 0x5F, 0x61, 0x40, 0x0A, 0x00, 0x06, 0x62,
-        0x61, 0x73, 0x65, 0x5F, 0x62, 0x03, 0x00, 0x07, 0x69, 0x6E, 0x6E, 0x65, 0x72, 0x5F, 0x61,
-        0x00, 0x00, 0x19, 0x28, 0x04, 0x00, 0x07, 0x69, 0x6E, 0x6E, 0x65, 0x72, 0x5F, 0x62, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x28, 0x00, 0x02, 0x00, 0x06, 0x62, 0x61, 0x73, 0x65,
-        0x5F, 0x63, 0x19, 0x28, 0x00,
-    ];
+    static SLICE: &str = "{ base_a: 123b, base_b: { inner_a: 123, inner_b: 123L }, base_c: 123S }";
 
-    let nbt = IndexedNbtSlice::new_unnamed(SLICE).unwrap();
-    std::println!("{nbt:#?}");
+    let snbt = IndexedSnbtSlice::new_ref(SLICE).unwrap();
+
+    #[cfg(feature = "std")]
+    std::println!("{:#?}", snbt.root());
 
     let partial = Partial::alloc_owned::<Base>().unwrap();
-    let value = deserialize_owned(partial, &nbt).unwrap();
+    let value = deserialize_owned(partial, &snbt).unwrap();
     let value = value.materialize::<Base>().unwrap();
+
+    #[cfg(feature = "std")]
     std::println!("{value:#?}");
 }

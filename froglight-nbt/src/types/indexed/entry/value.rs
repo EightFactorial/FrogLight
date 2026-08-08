@@ -5,52 +5,52 @@ use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
     entry::IndexedValue,
     index::{Index, ValueIndex},
-    list::{IndexedList, IndexedValueList},
-    reference::{IndexableValue, IndexedReference, IndexedValueReference},
+    list::{IndexedList, ValueList},
+    reference::{IndexableValue, IndexedReference, ValueReference},
     types::IndexedListType,
 };
 
 impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {
     /// Return a reference to the stored value.
     #[must_use]
-    pub fn as_value(&self) -> IndexedValueReference<'_, Ref, C> {
+    pub fn as_value(&self) -> ValueReference<'_, Ref, C> {
         let root = <C as IndexCore<A>>::root(&self.core);
         match self.index {
-            ValueIndex::Byte(index) => IndexedValueReference::Byte(unsafe {
-                IndexedReference::<u8, Ref>::new(root, index)
-            }),
-            ValueIndex::Short(index) => IndexedValueReference::Short(unsafe {
-                IndexedReference::<u16, Ref>::new(root, index)
-            }),
-            ValueIndex::Int(index) => IndexedValueReference::Int(unsafe {
-                IndexedReference::<u32, Ref>::new(root, index)
-            }),
-            ValueIndex::Long(index) => IndexedValueReference::Long(unsafe {
-                IndexedReference::<u64, Ref>::new(root, index)
-            }),
-            ValueIndex::Float(index) => IndexedValueReference::Float(unsafe {
-                IndexedReference::<f32, Ref>::new(root, index)
-            }),
-            ValueIndex::Double(index) => IndexedValueReference::Double(unsafe {
-                IndexedReference::<f64, Ref>::new(root, index)
-            }),
-            ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
+            ValueIndex::Byte(index) => {
+                ValueReference::Byte(unsafe { IndexedReference::<u8, Ref>::new(root, index) })
+            }
+            ValueIndex::Short(index) => {
+                ValueReference::Short(unsafe { IndexedReference::<u16, Ref>::new(root, index) })
+            }
+            ValueIndex::Int(index) => {
+                ValueReference::Int(unsafe { IndexedReference::<u32, Ref>::new(root, index) })
+            }
+            ValueIndex::Long(index) => {
+                ValueReference::Long(unsafe { IndexedReference::<u64, Ref>::new(root, index) })
+            }
+            ValueIndex::Float(index) => {
+                ValueReference::Float(unsafe { IndexedReference::<f32, Ref>::new(root, index) })
+            }
+            ValueIndex::Double(index) => {
+                ValueReference::Double(unsafe { IndexedReference::<f64, Ref>::new(root, index) })
+            }
+            ValueIndex::ByteArray(index) => ValueReference::ByteArray(unsafe {
                 IndexedReference::<[u8], Ref>::new(root, index)
             }),
-            ValueIndex::String(index) => IndexedValueReference::String(unsafe {
-                IndexedReference::<MStr, Ref>::new(root, index)
-            }),
-            ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
+            ValueIndex::String(index) => {
+                ValueReference::String(unsafe { IndexedReference::<MStr, Ref>::new(root, index) })
+            }
+            ValueIndex::IntArray(index) => ValueReference::IntArray(unsafe {
                 IndexedReference::<[u32], Ref>::new(root, index)
             }),
-            ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
+            ValueIndex::LongArray(index) => ValueReference::LongArray(unsafe {
                 IndexedReference::<[u64], Ref>::new(root, index)
             }),
 
             ValueIndex::List(index) => {
-                IndexedValueReference::List(create_list::<C, Ref>(&self.core, index))
+                ValueReference::List(create_list::<C, Ref>(&self.core, index))
             }
-            ValueIndex::Compound(index) => IndexedValueReference::Compound(unsafe {
+            ValueIndex::Compound(index) => ValueReference::Compound(unsafe {
                 IndexedCompound::<Ref, C>::new(&self.core, index.value())
             }),
         }
@@ -58,53 +58,53 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
 
     /// Return the stored value.
     #[must_use]
-    pub fn into_value(self) -> IndexedValueReference<'data, Ref, C> {
+    pub fn into_value(self) -> ValueReference<'data, Ref, C> {
         match self.index {
-            ValueIndex::Byte(index) => IndexedValueReference::Byte(unsafe {
+            ValueIndex::Byte(index) => ValueReference::Byte(unsafe {
                 let root = <C as IndexCore<A>>::root(A::into_core(self.core));
                 IndexedReference::<u8, Ref>::new(root, index)
             }),
-            ValueIndex::Short(index) => IndexedValueReference::Short(unsafe {
+            ValueIndex::Short(index) => ValueReference::Short(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<u16, Ref>::new(root, index)
             }),
-            ValueIndex::Int(index) => IndexedValueReference::Int(unsafe {
+            ValueIndex::Int(index) => ValueReference::Int(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<u32, Ref>::new(root, index)
             }),
-            ValueIndex::Long(index) => IndexedValueReference::Long(unsafe {
+            ValueIndex::Long(index) => ValueReference::Long(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<u64, Ref>::new(root, index)
             }),
-            ValueIndex::Float(index) => IndexedValueReference::Float(unsafe {
+            ValueIndex::Float(index) => ValueReference::Float(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<f32, Ref>::new(root, index)
             }),
-            ValueIndex::Double(index) => IndexedValueReference::Double(unsafe {
+            ValueIndex::Double(index) => ValueReference::Double(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<f64, Ref>::new(root, index)
             }),
-            ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
+            ValueIndex::ByteArray(index) => ValueReference::ByteArray(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<[u8], Ref>::new(root, index)
             }),
-            ValueIndex::String(index) => IndexedValueReference::String(unsafe {
+            ValueIndex::String(index) => ValueReference::String(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<MStr, Ref>::new(root, index)
             }),
-            ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
+            ValueIndex::IntArray(index) => ValueReference::IntArray(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<[u32], Ref>::new(root, index)
             }),
-            ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
+            ValueIndex::LongArray(index) => ValueReference::LongArray(unsafe {
                 let root = <C as IndexCore<Ref>>::root(A::into_core(self.core));
                 IndexedReference::<[u64], Ref>::new(root, index)
             }),
             ValueIndex::List(index) => {
                 let core = A::into_core(self.core);
-                IndexedValueReference::List(create_list::<C, Ref>(core, index))
+                ValueReference::List(create_list::<C, Ref>(core, index))
             }
-            ValueIndex::Compound(index) => IndexedValueReference::Compound(unsafe {
+            ValueIndex::Compound(index) => ValueReference::Compound(unsafe {
                 let core = A::into_core(self.core);
                 IndexedCompound::<Ref, C>::new(core, index.value())
             }),
@@ -115,53 +115,51 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
 impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
     /// Return a reference to the stored value.
     #[must_use]
-    pub fn as_value_mut(&mut self) -> IndexedValueReference<'_, Mut, C> {
+    pub fn as_value_mut(&mut self) -> ValueReference<'_, Mut, C> {
         match self.index {
-            ValueIndex::Byte(index) => IndexedValueReference::Byte(unsafe {
+            ValueIndex::Byte(index) => ValueReference::Byte(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<u8, Mut>::new(root, index)
             }),
-            ValueIndex::Short(index) => IndexedValueReference::Short(unsafe {
+            ValueIndex::Short(index) => ValueReference::Short(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<u16, Mut>::new(root, index)
             }),
-            ValueIndex::Int(index) => IndexedValueReference::Int(unsafe {
+            ValueIndex::Int(index) => ValueReference::Int(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<u32, Mut>::new(root, index)
             }),
-            ValueIndex::Long(index) => IndexedValueReference::Long(unsafe {
+            ValueIndex::Long(index) => ValueReference::Long(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<u64, Mut>::new(root, index)
             }),
-            ValueIndex::Float(index) => IndexedValueReference::Float(unsafe {
+            ValueIndex::Float(index) => ValueReference::Float(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<f32, Mut>::new(root, index)
             }),
-            ValueIndex::Double(index) => IndexedValueReference::Double(unsafe {
+            ValueIndex::Double(index) => ValueReference::Double(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<f64, Mut>::new(root, index)
             }),
-            ValueIndex::ByteArray(index) => IndexedValueReference::ByteArray(unsafe {
+            ValueIndex::ByteArray(index) => ValueReference::ByteArray(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<[u8], Mut>::new(root, index)
             }),
-            ValueIndex::String(index) => IndexedValueReference::String(unsafe {
+            ValueIndex::String(index) => ValueReference::String(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<MStr, Mut>::new(root, index)
             }),
-            ValueIndex::IntArray(index) => IndexedValueReference::IntArray(unsafe {
+            ValueIndex::IntArray(index) => ValueReference::IntArray(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<[u32], Mut>::new(root, index)
             }),
-            ValueIndex::LongArray(index) => IndexedValueReference::LongArray(unsafe {
+            ValueIndex::LongArray(index) => ValueReference::LongArray(unsafe {
                 let root = <C as IndexCore<Mut>>::root_mut(self.core);
                 IndexedReference::<[u64], Mut>::new(root, index)
             }),
 
-            ValueIndex::List(index) => {
-                IndexedValueReference::List(create_list_mut(self.core, index))
-            }
-            ValueIndex::Compound(index) => IndexedValueReference::Compound(unsafe {
+            ValueIndex::List(index) => ValueReference::List(create_list_mut(self.core, index)),
+            ValueIndex::Compound(index) => ValueReference::Compound(unsafe {
                 IndexedCompound::<Mut, C>::new(self.core, index.value())
             }),
         }
@@ -274,7 +272,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     /// Return a reference to the stored value if it is of type
     /// [`IndexedValueList`], else `None`.
     #[must_use]
-    pub fn as_list(&self) -> Option<IndexedValueList<'_, Ref, C>> {
+    pub fn as_list(&self) -> Option<ValueList<'_, Ref, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list::<C, Ref>(&self.core, index))
         } else {
@@ -285,7 +283,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     /// Return the stored value if it is of type [`IndexedValueList`], else
     /// `None`.
     #[must_use]
-    pub fn into_list(self) -> Option<IndexedValueList<'data, A, C>> {
+    pub fn into_list(self) -> Option<ValueList<'data, A, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list::<C, A>(self.core, index))
         } else {
@@ -307,7 +305,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
 
     /// Return a mutable reference to the stored value if it is of type
     /// [`IndexedValueList`], else else `None`.
-    pub fn as_list_mut(&mut self) -> Option<IndexedValueList<'_, Mut, C>> {
+    pub fn as_list_mut(&mut self) -> Option<ValueList<'_, Mut, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list_mut(self.core, index))
         } else {
@@ -321,7 +319,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
 pub(in crate::types::indexed) fn create_list<C: IndexCore<A>, A: NbtAccess>(
     core: A::CORE<'_, C>,
     index: Index<IndexedListType>,
-) -> IndexedValueList<'_, A, C> {
+) -> ValueList<'_, A, C> {
     const UNRESERVED_BITS: usize = usize::BITS as usize - 1;
     const BITMASK: usize = (1 << UNRESERVED_BITS) - 1;
 
@@ -335,13 +333,13 @@ pub(in crate::types::indexed) fn create_list<C: IndexCore<A>, A: NbtAccess>(
 
         unsafe {
             match tag {
-                0 => IndexedValueList::Empty,
-                1 => IndexedValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
-                2 => IndexedValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
-                3 => IndexedValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
-                4 => IndexedValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
-                5 => IndexedValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
-                6 => IndexedValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
+                0 => ValueList::Empty,
+                1 => ValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
+                2 => ValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
+                3 => ValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
+                4 => ValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
+                5 => ValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
+                6 => ValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
                 #[cfg(debug_assertions)]
                 _ => unreachable!("Invalid byte-index tag \"{tag}\"!"),
                 #[cfg(not(debug_assertions))]
@@ -351,27 +349,27 @@ pub(in crate::types::indexed) fn create_list<C: IndexCore<A>, A: NbtAccess>(
     } else {
         // Flag, determine from entries in range
         let entries = unsafe { core.entry_range(index.value()) };
-        let Some(first) = entries.first() else { return IndexedValueList::Empty };
+        let Some(first) = entries.first() else { return ValueList::Empty };
 
         unsafe {
             match first.value() {
                 ValueIndex::ByteArray(..) => {
-                    IndexedValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::String(..) => {
-                    IndexedValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::List(..) => {
-                    IndexedValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::Compound(..) => {
-                    IndexedValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::IntArray(..) => {
-                    IndexedValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::LongArray(..) => {
-                    IndexedValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 #[cfg(debug_assertions)]
                 _ => unreachable!("Invalid range-entry tag \"{:?}\"!", first.value()),
@@ -385,7 +383,7 @@ pub(in crate::types::indexed) fn create_list<C: IndexCore<A>, A: NbtAccess>(
 pub(in crate::types::indexed) fn create_list_mut<C: IndexCore<Mut>>(
     core: &mut C,
     index: Index<IndexedListType>,
-) -> IndexedValueList<'_, Mut, C> {
+) -> ValueList<'_, Mut, C> {
     const UNRESERVED_BITS: usize = usize::BITS as usize - 1;
     const BITMASK: usize = (1 << UNRESERVED_BITS) - 1;
 
@@ -399,13 +397,13 @@ pub(in crate::types::indexed) fn create_list_mut<C: IndexCore<Mut>>(
 
         unsafe {
             match tag {
-                0 => IndexedValueList::Empty,
-                1 => IndexedValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
-                2 => IndexedValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
-                3 => IndexedValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
-                4 => IndexedValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
-                5 => IndexedValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
-                6 => IndexedValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
+                0 => ValueList::Empty,
+                1 => ValueList::Byte(IndexedList::<_, _, C>::new(core, index.cast())),
+                2 => ValueList::Short(IndexedList::<_, _, C>::new(core, index.cast())),
+                3 => ValueList::Int(IndexedList::<_, _, C>::new(core, index.cast())),
+                4 => ValueList::Long(IndexedList::<_, _, C>::new(core, index.cast())),
+                5 => ValueList::Float(IndexedList::<_, _, C>::new(core, index.cast())),
+                6 => ValueList::Double(IndexedList::<_, _, C>::new(core, index.cast())),
                 #[cfg(debug_assertions)]
                 _ => unreachable!("Invalid byte-index tag \"{tag}\"!"),
                 #[cfg(not(debug_assertions))]
@@ -415,27 +413,27 @@ pub(in crate::types::indexed) fn create_list_mut<C: IndexCore<Mut>>(
     } else {
         // Flag, determine from entries in range
         let entries = unsafe { core.entry_range(index.value()) };
-        let Some(first) = entries.first() else { return IndexedValueList::Empty };
+        let Some(first) = entries.first() else { return ValueList::Empty };
 
         unsafe {
             match first.value() {
                 ValueIndex::ByteArray(..) => {
-                    IndexedValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::ByteArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::String(..) => {
-                    IndexedValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::String(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::List(..) => {
-                    IndexedValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::List(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::Compound(..) => {
-                    IndexedValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::Compound(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::IntArray(..) => {
-                    IndexedValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::IntArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 ValueIndex::LongArray(..) => {
-                    IndexedValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
+                    ValueList::LongArray(IndexedList::<_, _, C>::new(core, index.cast()))
                 }
                 #[cfg(debug_assertions)]
                 _ => unreachable!("Invalid range-entry tag \"{:?}\"!", first.value()),

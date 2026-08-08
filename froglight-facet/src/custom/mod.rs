@@ -1,4 +1,4 @@
 //! TODO
 
 mod option;
-pub use option::FacetOption;
+pub use option::OptionTemplate;

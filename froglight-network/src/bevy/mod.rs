@@ -34,7 +34,9 @@ impl Plugin for NetworkPlugin {
 impl NetworkPlugin {
     /// A [`System`] that sends [`ServerboundMessage`]s to the server.
     ///
-    /// Not added by default, must be added manually.
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn serverbound_messages(
         query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut messages: ResMut<Messages<ServerboundMessage>>,
@@ -67,7 +69,9 @@ impl NetworkPlugin {
 
     /// A [`System`] that receives [`ClientboundMessage`]s from the server.
     ///
-    /// Not added by default, must added manually.
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn clientbound_messages(
         query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut writer: MessageWriter<ClientboundMessage>,
@@ -93,7 +97,9 @@ impl NetworkPlugin {
 
     /// A [`System`] that polls [`ClientConnection`]s for completion.
     ///
-    /// Not added by default, must added manually.
+    /// # Note
+    ///
+    /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn poll_connections(
         mut query: Query<(Entity, &mut ClientConnection)>,
         mut commands: Commands,

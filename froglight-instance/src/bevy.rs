@@ -76,7 +76,7 @@ impl InstancePlugin {
     pub fn par_apply_blockedits(
         mut query: Query<(&mut BlockEditQueue, &SessionInstance)>,
         mut chunks: Query<&mut SharedChunk>,
-        cache: Local<Mutex<EntityHashMap<SharedChunk>>>,
+        mut cache: Local<Mutex<EntityHashMap<SharedChunk>>>,
     ) {
         // Apply all `BlockEditQueue`s in parallel.
         let chunks_readonly = chunks.as_readonly();
@@ -86,7 +86,7 @@ impl InstancePlugin {
         });
 
         // Replace all `SharedChunk`s.
-        for (entity, new) in cache.lock().drain() {
+        for (entity, new) in cache.get_mut().drain() {
             if let Ok(mut old) = chunks.get_mut(entity) {
                 *old = new;
             }

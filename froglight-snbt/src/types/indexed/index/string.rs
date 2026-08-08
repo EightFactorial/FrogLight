@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::{borrow::Cow, string::String};
+use alloc::string::String;
 use core::fmt;
 
 use bitflags::bitflags;
@@ -72,20 +72,20 @@ impl fmt::Debug for StringDescription {
 // -------------------------------------------------------------------------------------------------
 
 impl IndexableValue for String {
-    type Value<'a> = Cow<'a, str>;
+    type Value<'a> = &'a str;
 
     unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_> {
         // SAFETY: The caller ensures that this is safe.
         let mut slice = unsafe { root.get_unchecked(index.range) };
 
         match index.description().quotes() {
-            StringQuotes::None => Cow::Borrowed(slice),
+            StringQuotes::None => slice,
             StringQuotes::Single | StringQuotes::Double => {
                 // SAFETY: `Index` guarantees that this is valid.
                 slice = unsafe { slice.get_unchecked(1..slice.len() - 1) };
 
                 // TODO: Un-escape the string.
-                Cow::Borrowed(slice)
+                slice
             }
         }
     }

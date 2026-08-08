@@ -18,10 +18,10 @@ where
     _phantom: PhantomData<T>,
 }
 
-impl<'data, C: IndexCore, T: Referenceable + 'static> IndexedSlice<'data, C, T>
+impl<'data, C: IndexCore, T: Referenceable + 'data> IndexedSlice<'data, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'static>>,
+    IntegerValue: Into<T::Value<'data>>,
 {
     /// Create a new [`IndexedSlice`] from a range and core.
     ///
@@ -46,7 +46,7 @@ where
     /// Get a value by it's index.
     ///
     /// Returns `None` if the index is out of bounds.
-    pub fn get(&self, index: usize) -> Option<T::Value<'static>> {
+    pub fn get(&self, index: usize) -> Option<T::Value<'data>> {
         self.get_value(index).map(IntegerValue::into)
     }
 
@@ -75,7 +75,7 @@ where
     /// Create an iterator over this slice.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> SliceIter<'_, 'data, C, T> { SliceIter::new(self) }
+    pub const fn into_iter(self) -> SliceIter<'data, C, T> { SliceIter::new(self) }
 
     /// Get this slice as an [`IndexedList`].
     #[inline]
@@ -94,11 +94,11 @@ where
 
 // -------------------------------------------------------------------------------------------------
 
-impl<C: IndexCore, T: Referenceable + 'static> fmt::Debug for IndexedSlice<'_, C, T>
+impl<'data, C: IndexCore, T: Referenceable + 'data> fmt::Debug for IndexedSlice<'data, C, T>
 where
-    for<'a> T::Value<'a>: fmt::Debug,
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'static>>,
+    T::Value<'data>: fmt::Debug,
+    IntegerValue: Into<T::Value<'data>>,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_list().entries(self).finish()

@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::{borrow::Cow, string::String};
+use alloc::string::String;
 use core::fmt;
 
 use crate::types::indexed::index::{
@@ -120,7 +120,7 @@ impl_referenceable! {
     String,
     => {
         type Indexable = String;
-        type Value<'a> = Cow<'a, str>;
+        type Value<'a> = &'a str;
 
         #[inline]
         fn get_value(reference: IndexedReference<'_, Self>) -> Self::Value<'_> {
