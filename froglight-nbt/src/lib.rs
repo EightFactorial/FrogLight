@@ -21,7 +21,6 @@ pub mod prelude {
         indexed::{
             IndexedNbt,
             core::{IndexedNbtCow, IndexedNbtSlice},
-            entry::{IndexedEntry, IndexedValue},
         },
         structured::Nbt,
     };

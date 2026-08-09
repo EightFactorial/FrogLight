@@ -12,11 +12,8 @@ cfg_select! {
     }
 }
 
-use foldhash::fast::RandomState;
-use parking_lot::RwLock;
-
-type HashMap<K, V> = hashbrown::HashMap<K, V, RandomState>;
-type LazyMap<K, V> = LazyLock<RwLock<HashMap<K, V>>>;
+type HashMap<K, V> = hashbrown::HashMap<K, V, foldhash::fast::RandomState>;
+type LazyMap<K, V> = LazyLock<parking_lot::RwLock<HashMap<K, V>>>;
 
 pub mod schema;
 pub mod typeplan;

@@ -4,9 +4,12 @@
 use facet::Facet;
 use froglight_facet_iter::deserialize::DeserializeError;
 
-use crate::types::indexed::{
-    compound::IndexedCompound,
-    core::{IndexCore, Ref},
+use crate::{
+    facet::deserialize::DeserializeNbt,
+    types::indexed::{
+        IndexedNbt,
+        core::{Ref, SliceCore},
+    },
 };
 
 /// TODO
@@ -15,10 +18,10 @@ use crate::types::indexed::{
 ///
 /// Returns an error if the value cannot be deserialized.
 #[inline(always)]
-pub fn from_nbt<T: Facet<'static>, C: IndexCore<Ref>>(
-    _value: IndexedCompound<'_, Ref, C>,
+pub fn from_nbt<T: Facet<'static>>(
+    nbt: &IndexedNbt<SliceCore<'_, Ref>>,
 ) -> Result<T, DeserializeError> {
-    todo!()
+    <T as DeserializeNbt>::from_nbt(nbt)
 }
 
 /// TODO
@@ -27,8 +30,8 @@ pub fn from_nbt<T: Facet<'static>, C: IndexCore<Ref>>(
 ///
 /// Returns an error if the value cannot be deserialized.
 #[inline(always)]
-pub fn from_nbt_borrowed<'facet, T: Facet<'facet>, C: IndexCore<Ref> + 'facet>(
-    _value: IndexedCompound<'facet, Ref, C>,
+pub fn from_nbt_borrowed<'facet, T: Facet<'facet>>(
+    nbt: &IndexedNbt<SliceCore<'facet, Ref>>,
 ) -> Result<T, DeserializeError> {
-    todo!()
+    <T as DeserializeNbt>::from_nbt_borrowed(nbt)
 }

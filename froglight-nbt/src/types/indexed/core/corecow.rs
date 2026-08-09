@@ -5,10 +5,12 @@ use core::range::Range;
 
 #[cfg(feature = "froglight-facet")]
 use froglight_facet::facet::prelude::*;
+use froglight_mutf8::types::MStr;
 
 use crate::types::indexed::{
-    core::{IndexCore, IndexCored, Mut, NbtAccess, Ref},
-    index::EntryIndex,
+    IndexedNbt,
+    core::{IndexCore, IndexCored, IndexedNbtSlice, Mut, NbtAccess, Ref, SliceCore},
+    index::{EntryIndex, Index},
 };
 
 /// An [`IndexCore`] for Copy-On-Write NBT data.
@@ -45,6 +47,40 @@ impl<'data> CowCore<'data> {
             entries: self.entries,
             ranges: self.ranges,
         }
+    }
+
+    /// Temporarily use this [`CowCore`] as a [`SliceCore`].
+    ///
+    /// # Note
+    ///
+    /// The inner [`IndexedNbtSlice`] will have no name. If you need it named,
+    /// use [`CowCore::as_named_slice_ref_for`] instead.
+    #[inline]
+    #[must_use]
+    pub fn as_slice_ref_for<R>(self, f: impl FnOnce(&IndexedNbtSlice<'_>) -> R) -> (Self, R) {
+        // SAFETY: It is always safe to call without a name.
+        unsafe { self.as_named_slice_ref_for(None, f) }
+    }
+
+    /// Temporarily use this [`CowCore`] as a [`SliceCore`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that `name` is `None` or a valid [`Index`] for
+    /// this [`CowCore`].
+    #[must_use]
+    pub unsafe fn as_named_slice_ref_for<R>(
+        mut self,
+        name: Option<Index<MStr>>,
+        f: impl FnOnce(&IndexedNbtSlice<'_>) -> R,
+    ) -> (Self, R) {
+        let slice = unsafe { SliceCore::<'_, Ref>::new(&self.root, self.entries, self.ranges) };
+        let nbt = unsafe { IndexedNbt::new_core(slice, name) };
+        let result = (f)(&nbt);
+
+        let slice = nbt.core;
+        (self.entries, self.ranges) = (slice.entries, slice.ranges);
+        (self, result)
     }
 }
 

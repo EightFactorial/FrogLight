@@ -2,7 +2,7 @@
 
 use alloc::{string::String, vec::Vec};
 
-use facet::{Def, HeapValue, Partial, SequenceType, Type, UserType};
+use facet::{Def, Facet, HeapValue, Partial, SequenceType, Type, UserType};
 use facet_path::PathStep;
 use facet_solver::{KeyResult, Solver};
 use froglight_facet_iter::{
@@ -17,16 +17,70 @@ use crate::types::indexed::{
 
 pub mod functions;
 
-/// A trait for types that can be deserialized from [`Nbt`].
-pub trait DeserializeNbt<'facet> {}
+/// A trait for types that can be deserialized from [`Snbt`].
+pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
+    /// Deserialize a value from an SNBT string.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the string is not valid SNBT,
+    /// or if the deserialization fails.
+    fn from_snbt_string(string: &str) -> Result<Self, DeserializeError>
+    where
+        'facet: 'static,
+        'static: 'facet,
+    {
+        IndexedSnbtSlice::new_ref(string)
+            .map_or_else(|()| Err(DeserializeError), |snbt| Self::from_snbt(&snbt))
+    }
+
+    /// Deserialize a value from an [`IndexedNbtSlice`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the deserialization fails.
+    fn from_snbt(snbt: &IndexedSnbtSlice<'_>) -> Result<Self, DeserializeError>
+    where
+        'facet: 'static,
+        'static: 'facet;
+
+    /// Deserialize a value from an [`IndexedNbtSlice`].
+    ///
+    /// Borrows from the input slice where possible.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the deserialization fails.
+    fn from_snbt_borrowed(snbt: &IndexedSnbtSlice<'facet>) -> Result<Self, DeserializeError>;
+}
+
+impl<'facet, T: Facet<'facet> + Sized> DeserializeSnbt<'facet> for T {
+    #[inline]
+    fn from_snbt(snbt: &IndexedSnbtSlice<'_>) -> Result<Self, DeserializeError>
+    where
+        'facet: 'static,
+        'static: 'facet,
+    {
+        let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
+        let value = deserialize_owned(Partial::alloc_owned_with_plan(plan)?, snbt)?;
+        Ok(value.materialize::<T>()?)
+    }
+
+    #[inline]
+    fn from_snbt_borrowed(snbt: &IndexedSnbtSlice<'facet>) -> Result<Self, DeserializeError> {
+        let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
+        let value = deserialize_borrowed(Partial::alloc_with_plan(plan)?, snbt)?;
+        Ok(value.materialize::<T>()?)
+    }
+}
 
 // -------------------------------------------------------------------------------------------------
 
 #[inline(never)]
-fn deserialize_owned<'facet>(
-    partial: Partial<'facet, false>,
-    snbt: &IndexedSnbtSlice<'facet>,
-) -> Result<HeapValue<'facet, false>, DeserializeError> {
+fn deserialize_owned(
+    partial: Partial<'static, false>,
+    snbt: &IndexedSnbtSlice<'_>,
+) -> Result<HeapValue<'static, false>, DeserializeError> {
     // Create and complete the deserializer.
     let mut core = deserialize_owned_core(snbt);
 
@@ -40,7 +94,7 @@ fn deserialize_owned<'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_owned_core<'facet>(
-    snbt: &IndexedSnbtSlice<'facet>,
+    snbt: &IndexedSnbtSlice<'_>,
 ) -> impl FnMut(Item<'facet, false>) -> Result<Item<'facet, false>, ReaderError> {
     move |item: Item<'facet, false>| -> Result<Item<'facet, false>, ReaderError> {
         match item {

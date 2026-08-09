@@ -43,7 +43,7 @@ pub unsafe fn typeplan_for(shape: &'static Shape) -> Result<Arc<TypePlanCore>, A
     } else {
         drop(schemas);
 
-        // SAFETY: T::SHAPE comes from Facet metadata for a real type (caller-ensured).
+        // SAFETY: `shape` comes from metadata for a real type (caller-ensured).
         let built = unsafe { TypePlanCore::from_shape(shape) }?;
         SCHEMAS.write().insert(shape, Arc::clone(&built));
 

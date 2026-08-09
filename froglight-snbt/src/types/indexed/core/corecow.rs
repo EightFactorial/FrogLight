@@ -2,7 +2,8 @@ use alloc::{borrow::Cow, boxed::Box};
 use core::range::Range;
 
 use crate::types::indexed::{
-    core::{IndexCore, SliceCore},
+    IndexedSnbt,
+    core::{IndexCore, IndexedSnbtSlice, SliceCore},
     entry::EntryIndex,
 };
 
@@ -58,6 +59,18 @@ impl<'data> CowCore<'data> {
     #[inline]
     #[must_use]
     pub const fn entries(&self) -> &[EntryIndex] { &self.entries }
+
+    /// Temporarily use this [`CowCore`] as a [`SliceCore`].
+    #[must_use]
+    pub fn as_slice_for<R>(mut self, f: impl FnOnce(&IndexedSnbtSlice<'_>) -> R) -> (Self, R) {
+        let slice = unsafe { SliceCore::<'_>::new(&self.root, self.entries) };
+        let snbt = IndexedSnbt::new(slice);
+        let result = (f)(&snbt);
+
+        let slice = snbt.core;
+        self.entries = slice.entries;
+        (self, result)
+    }
 
     /// Create an owned [`CowCore`] by cloning it's data.
     #[inline]

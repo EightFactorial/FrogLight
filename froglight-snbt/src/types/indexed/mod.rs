@@ -5,6 +5,8 @@ use alloc::string::String;
 
 use ::core::range::Range;
 
+use crate::types::indexed::core::SliceCore;
+
 pub mod compound;
 pub mod core;
 pub mod entry;
@@ -87,6 +89,17 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
 
         let root = alloc::borrow::Cow::Owned(string);
         Ok(IndexedSnbt::new(core::CowCore { root, entries }))
+    }
+
+    /// Access this [`CowCore`]-based SNBT as [`SliceCore`]-based SNBT in the
+    /// provided closure.
+    pub fn as_scoped_slice<R>(
+        mut self,
+        f: impl FnOnce(&IndexedSnbt<SliceCore<'_>>) -> R,
+    ) -> (Self, R) {
+        let (core, result) = self.core.as_slice_for::<R>(f);
+        self.core = core;
+        (self, result)
     }
 
     /// Take ownership of the SNBT data by cloning the root string.

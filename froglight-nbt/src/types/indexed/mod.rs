@@ -279,6 +279,18 @@ impl IndexedNbt<CowCore<'_>> {
         }
     }
 
+    /// Access this [`CowCore`]-based NBT as [`SliceCore`]-based NBT in the
+    /// provided closure.
+    pub fn as_scoped_slice<R>(
+        mut self,
+        f: impl FnOnce(&IndexedNbt<SliceCore<'_, Ref>>) -> R,
+    ) -> (Self, R) {
+        // SAFETY: `self.name` is always a valid index into `self.core`.
+        let (core, result) = unsafe { self.core.as_named_slice_ref_for::<R>(self.name, f) };
+        self.core = core;
+        (self, result)
+    }
+
     /// Take ownership of the underlying NBT data,
     /// returning a new [`IndexedNbt`] with an owned [`CowCore`] core.
     #[must_use]

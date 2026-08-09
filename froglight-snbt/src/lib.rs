@@ -13,6 +13,13 @@ pub mod unicode;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Delete me!
-    pub struct SnbtPlaceholder;
+    #[cfg(feature = "facet")]
+    pub use crate::facet::{
+        deserialize::{DeserializeSnbt, functions::*},
+        serialize::{SerializeSnbt, functions::*},
+    };
+    pub use crate::types::indexed::{
+        IndexedSnbt,
+        core::{IndexedSnbtCow, IndexedSnbtSlice},
+    };
 }
