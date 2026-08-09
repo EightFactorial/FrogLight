@@ -25,6 +25,7 @@ pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
     ///
     /// Returns an error if the string is not valid SNBT,
     /// or if the deserialization fails.
+    #[inline]
     fn from_snbt_string(string: &str) -> Result<Self, DeserializeError>
     where
         'facet: 'static,
@@ -501,9 +502,7 @@ fn test() {
     #[cfg(feature = "std")]
     std::println!("{:#?}", snbt.root());
 
-    let partial = Partial::alloc_owned::<Base>().unwrap();
-    let value = deserialize_owned(partial, &snbt).unwrap();
-    let value = value.materialize::<Base>().unwrap();
+    let value = Base::from_snbt(&snbt).unwrap();
 
     #[cfg(feature = "std")]
     std::println!("{value:#?}");

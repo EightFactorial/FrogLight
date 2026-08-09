@@ -493,10 +493,12 @@ fn test() {
     ];
 
     let nbt = IndexedNbtSlice::new_unnamed(SLICE).unwrap();
+
+    #[cfg(feature = "std")]
     std::println!("{nbt:#?}");
 
-    let partial = Partial::alloc_owned::<Base>().unwrap();
-    let value = deserialize_owned(partial, &nbt).unwrap();
-    let value = value.materialize::<Base>().unwrap();
+    let value = Base::from_nbt(&nbt).unwrap();
+
+    #[cfg(feature = "std")]
     std::println!("{value:#?}");
 }

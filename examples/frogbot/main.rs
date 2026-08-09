@@ -20,6 +20,7 @@ use froglight::{
     bevy::plugins::{InstancePlugin, NetworkPlugin, PhysicsPlugin, TickMeasurementPlugin},
     modules::{
         api::api::Offline,
+        nbt::types::indexed::entry::IndexedValue,
         network::{
             bevy::ClientDespawn,
             connection::FuturesLite,
