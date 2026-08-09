@@ -47,9 +47,9 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'data, T,
     }
 }
 
-impl<'data, T: IndexableValueMut + ?Sized> IndexedReference<'data, T, Mut> {
+impl<T: IndexableValueMut + ?Sized> IndexedReference<'_, T, Mut> {
     /// Set the value held by this reference.
-    pub fn set(&mut self, value: T::Value<'data>) {
+    pub fn set(&mut self, value: T::Value<'_>) {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::set(self.slice, self.index, value) }
     }

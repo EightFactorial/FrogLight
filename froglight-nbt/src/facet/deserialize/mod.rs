@@ -296,21 +296,13 @@ fn solve_enum_variant<const BORROWED: bool>(
         }
     }
 
-    // Get the current nbt value as a compound.
-    let ValueReference::Compound(..) = value else {
-        return Err(ReaderError::from_string(alloc::format!(
-            "Failed to get compound for struct {:?}",
-            partial.shape().type_name()
-        )));
-    };
+    // Create a solver for the enum variant.
+    let mut solver =
+        froglight_facet_iter::solver::solver(partial.shape()).map_err(ReaderError::other)?;
 
     // Collect all the keys in the nbt value.
     let mut key_list = Vec::new();
     collect_nbt_keys(value, &mut Vec::new(), &mut key_list);
-
-    // Create a solver for the enum variant.
-    let mut solver =
-        froglight_facet_iter::solver::solver(partial.shape()).map_err(ReaderError::other)?;
 
     // Solve the enum variant using the collected keys.
     let mut solution = None;
