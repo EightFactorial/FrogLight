@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-facet = { features = ["alloc", "reflect", "smallvec", "uuid"], workspace = true }
+facet = { features = ["alloc", "reflect", "smallvec"], workspace = true }
 facet-path = { features = ["alloc"], workspace = true }
 facet-solver = { features = ["alloc"], workspace = true }
 foldhash = { workspace = true }

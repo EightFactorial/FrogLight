@@ -4,7 +4,7 @@ use alloc::{borrow::Cow, string::String, vec::Vec};
 
 use facet::{Def, HeapValue, Partial, SequenceType, Type, UserType};
 use facet_path::PathStep;
-use facet_solver::KeyResult;
+use facet_solver::{KeyResult, Solver};
 use froglight_facet_iter::{
     ReaderError,
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
@@ -297,8 +297,9 @@ fn solve_enum_variant<const BORROWED: bool>(
     }
 
     // Create a solver for the enum variant.
-    let mut solver =
-        froglight_facet_iter::solver::solver(partial.shape()).map_err(ReaderError::other)?;
+    let schema = froglight_facet_iter::cache::schema::schema_for(partial.shape())
+        .map_err(ReaderError::other)?;
+    let mut solver = Solver::new(schema);
 
     // Collect all the keys in the nbt value.
     let mut key_list = Vec::new();

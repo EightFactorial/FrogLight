@@ -46,7 +46,9 @@ impl<T: Deserialize<'static>> DeserializeAsync for T {
         variable: bool,
     ) -> Result<(Self, &[u8]), DeserializeError> {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_async(Partial::alloc_owned::<T>()?, variable, &mut cursor).await?;
+        let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
+        let value =
+            deserialize_async(Partial::alloc_owned_with_plan(plan)?, variable, &mut cursor).await?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 }

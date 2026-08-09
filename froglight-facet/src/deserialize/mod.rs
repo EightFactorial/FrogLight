@@ -65,7 +65,9 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
         'static: 'facet,
     {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_owned(Partial::alloc_owned::<T>()?, variable, &mut cursor)?;
+        let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
+        let value =
+            deserialize_owned(Partial::alloc_owned_with_plan(plan)?, variable, &mut cursor)?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 
@@ -75,7 +77,8 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
         variable: bool,
     ) -> Result<(Self, &'facet [u8]), DeserializeError> {
         let mut cursor = Reader::new(slice);
-        let value = deserialize_borrowed(Partial::alloc::<T>()?, variable, &mut cursor)?;
+        let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
+        let value = deserialize_borrowed(Partial::alloc_with_plan(plan)?, variable, &mut cursor)?;
         Ok((value.materialize::<T>()?, cursor.remaining()))
     }
 }
