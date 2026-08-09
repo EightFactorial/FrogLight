@@ -185,15 +185,19 @@ pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'stat
     /// The type of slice that NBT data is accessed through.
     type SLICE<'data>: Deref<Target = [u8]> + 'data;
     /// The type of reference that the core is accessed through.
-    type CORE<'a, C: ?Sized + 'a>: Deref<Target = C> + Sized + 'a;
+    type CORE<'a, C: IndexCore<Self> + ?Sized + 'a>: Deref<Target = C> + Sized + 'a;
 
     /// Convert [`Self::CORE`] into a reference.
     #[must_use]
-    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C;
+    fn into_core<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> &C;
 
     /// Convert [`Self::SLICE`] into a reference.
     #[must_use]
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8];
+
+    /// Convert [`Self::CORE`] into [`Self::SLICE`].
+    #[must_use]
+    fn into_slice<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> Self::SLICE<'_>;
 
     /// Resize the given slice to the given length,
     /// returning `None` if the slice is not long enough.
@@ -206,12 +210,16 @@ pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'stat
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Ref;
 impl NbtAccess for Ref {
-    type CORE<'a, C: ?Sized + 'a> = &'a C;
+    type CORE<'a, C: IndexCore<Self> + ?Sized + 'a> = &'a C;
     type SLICE<'data> = &'data [u8];
 
-    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
+    fn into_core<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
 
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
+
+    fn into_slice<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> Self::SLICE<'_> {
+        core.root()
+    }
 
     fn resize_ref(slice: Self::SLICE<'_>, length: usize) -> Option<Self::SLICE<'_>> {
         slice.split_at_checked(length).map(|(head, _)| head)
@@ -223,12 +231,16 @@ impl NbtAccess for Ref {
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Mut;
 impl NbtAccess for Mut {
-    type CORE<'a, C: ?Sized + 'a> = &'a mut C;
+    type CORE<'a, C: IndexCore<Self> + ?Sized + 'a> = &'a mut C;
     type SLICE<'data> = &'data mut [u8];
 
-    fn into_core<C: ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
+    fn into_core<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
 
     fn into_ref(slice: Self::SLICE<'_>) -> &[u8] { slice }
+
+    fn into_slice<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> Self::SLICE<'_> {
+        core.root_mut()
+    }
 
     fn resize_ref(slice: Self::SLICE<'_>, length: usize) -> Option<Self::SLICE<'_>> {
         slice.split_at_mut_checked(length).map(|(head, _)| head)

@@ -158,6 +158,7 @@ impl Debug for DnsResolver {
 
 /// A trait for types that can act as network agents.
 #[async_trait]
+#[allow(clippy::double_must_use, reason = "Caused by `async_trait`")]
 pub trait NetworkResolver: Send + Sync + 'static {
     /// Resolves the given name to an iterator of [`IpAddr`]s.
     ///

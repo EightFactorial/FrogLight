@@ -113,12 +113,13 @@ unsafe fn encode_small<T: VarIntType>(value: T) -> ([u8; 31], u8) {
             let bytes = unsafe { _pdep_u64(v, 0x0000_000f_7f7f_7f7f) };
 
             // Set all but the last MSBs.
-            let (bytes, length) = super::fallback::mark_bytes(Simd::from_array(bytes.to_ne_bytes()));
+            let (bytes, length) =
+                super::fallback::mark_bytes(Simd::from_array(bytes.to_ne_bytes()));
 
             (super::arr8_to_31(bytes.to_array()), length.max(1))
         }
         // Otherwise use the fallback implementation.
-        _ => super::fallback::encode_small(value)
+        _ => super::fallback::encode_small(value),
     }
 }
 
@@ -144,13 +145,14 @@ unsafe fn encode_large<T: VarIntType>(value: T) -> ([u8; 31], u8) {
             bytes[2] = unsafe { _pdep_u64((v >> 112) as u64, 0x7f7f_7f7f_7f7f_7f7f) };
 
             // Set all but the last MSBs.
-            let bytes = Simd::from_array(unsafe { core::mem::transmute::<[u64; 3], [u8; 24]>(bytes) });
+            let bytes =
+                Simd::from_array(unsafe { core::mem::transmute::<[u64; 3], [u8; 24]>(bytes) });
             let (bytes, length) = super::fallback::mark_bytes(bytes);
 
             (super::arr24_to_31(bytes.to_array()), length.max(1))
         }
         // Otherwise use the fallback implementation.
-        _ => super::fallback::encode_large(value)
+        _ => super::fallback::encode_large(value),
     }
 }
 

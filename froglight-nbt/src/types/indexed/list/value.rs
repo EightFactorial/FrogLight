@@ -7,6 +7,7 @@ use froglight_mutf8::prelude::MStr;
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
     list::IndexedList,
+    reference::ValueReference,
     types::{IndexedListType, IndexedMapType},
 };
 
@@ -40,7 +41,49 @@ pub enum ValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     LongArray(IndexedList<'data, [u64], A, C>),
 }
 
-impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'_, A, C> {
+impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'data, A, C> {
+    /// Returns a [`ValueReference`](ValueReference) to the value at the given
+    /// index, if it exists.
+    #[must_use]
+    pub fn get(self, index: usize) -> Option<ValueReference<'data, A, C>> {
+        match self {
+            Self::Empty => None,
+            Self::Byte(list) => list.get_indexed(index).map(ValueReference::Byte),
+            Self::Short(list) => list.get_indexed(index).map(ValueReference::Short),
+            Self::Int(list) => list.get_indexed(index).map(ValueReference::Int),
+            Self::Long(list) => list.get_indexed(index).map(ValueReference::Long),
+            Self::Float(list) => list.get_indexed(index).map(ValueReference::Float),
+            Self::Double(list) => list.get_indexed(index).map(ValueReference::Double),
+            Self::ByteArray(list) => list.get_indexed(index).map(ValueReference::ByteArray),
+            Self::String(list) => list.get_indexed(index).map(ValueReference::String),
+            Self::IntArray(list) => list.get_indexed(index).map(ValueReference::IntArray),
+            Self::LongArray(list) => list.get_indexed(index).map(ValueReference::LongArray),
+            Self::List(list) => list.get(index).map(ValueReference::List),
+            Self::Compound(list) => list.get(index).map(ValueReference::Compound),
+        }
+    }
+
+    /// Returns a [`ValueReference`](ValueReference) to the value at the given
+    /// index, if it exists.
+    #[must_use]
+    pub fn get_ref(&self, index: usize) -> Option<ValueReference<'_, Ref, C>> {
+        match self {
+            Self::Empty => None,
+            Self::Byte(list) => list.get_indexed_ref(index).map(ValueReference::Byte),
+            Self::Short(list) => list.get_indexed_ref(index).map(ValueReference::Short),
+            Self::Int(list) => list.get_indexed_ref(index).map(ValueReference::Int),
+            Self::Long(list) => list.get_indexed_ref(index).map(ValueReference::Long),
+            Self::Float(list) => list.get_indexed_ref(index).map(ValueReference::Float),
+            Self::Double(list) => list.get_indexed_ref(index).map(ValueReference::Double),
+            Self::ByteArray(list) => list.get_indexed_ref(index).map(ValueReference::ByteArray),
+            Self::String(list) => list.get_indexed_ref(index).map(ValueReference::String),
+            Self::IntArray(list) => list.get_indexed_ref(index).map(ValueReference::IntArray),
+            Self::LongArray(list) => list.get_indexed_ref(index).map(ValueReference::LongArray),
+            Self::List(list) => list.get_ref(index).map(ValueReference::List),
+            Self::Compound(list) => list.get_ref(index).map(ValueReference::Compound),
+        }
+    }
+
     /// Returns the length of this list.
     #[must_use]
     pub fn len(&self) -> usize {
@@ -56,13 +99,8 @@ impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'_, A, C> {
             Self::String(list) => list.len(),
             Self::IntArray(list) => list.len(),
             Self::LongArray(list) => list.len(),
-
-            Self::List(list) => unsafe {
-                <C as IndexCore<A>>::entry_range(&list.core, list.index.value()).len()
-            },
-            Self::Compound(list) => unsafe {
-                <C as IndexCore<A>>::entry_range(&list.core, list.index.value()).len()
-            },
+            Self::List(list) => list.len(),
+            Self::Compound(list) => list.len(),
         }
     }
 

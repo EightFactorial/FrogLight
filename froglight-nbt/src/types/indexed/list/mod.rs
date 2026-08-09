@@ -6,7 +6,7 @@ use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, Mut, NbtAccess, Ref},
     index::Index,
-    reference::{IndexableValue, IndexableValueMut},
+    reference::{IndexableValue, IndexableValueMut, IndexedReference},
     types::{IndexedListType, IndexedMapType},
 };
 
@@ -83,7 +83,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
             // SAFETY: The index is valid for this core.
             Some(unsafe { T::get(root, index) })
         } else {
-            let first = Index::new(1 + 4 + value_index);
+            let first = Index::new(1 + 4 + value_index); // Past the `type` and `length` tags
             let size = unsafe { T::size(root, first) };
 
             // SAFETY: The index is valid for this core.
@@ -118,6 +118,69 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
 
             // SAFETY: The index is valid for this core.
             Some(unsafe { T::get(root, Index::new(first.value() + (size * index))) })
+        }
+    }
+
+    /// Get an [`IndexedReference`] to the value at the given index,
+    /// or `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get_indexed(self, index: usize) -> Option<IndexedReference<'data, T, A>> {
+        if index >= self.len() {
+            return None;
+        }
+
+        let value_index = self.index.value();
+
+        if T::LIST_INDEX_IS_ENTRY_RANGE {
+            // SAFETY: The index is valid for this core.
+            let entries = unsafe { <C as IndexCore<A>>::entry_range(&self.core, value_index) };
+
+            // SAFETY: The length was already checked.
+            let entry = unsafe { entries.get_unchecked(index) };
+            let index = Index::new(entry.value().index());
+
+            // SAFETY: The index is valid for this core.
+            let root = A::into_slice(self.core);
+            Some(unsafe { IndexedReference::<T, A>::new(root, index) })
+        } else {
+            let root = A::into_slice(self.core);
+            let first = Index::new(1 + 4 + value_index); // Past the `type` and `length` tags
+            let size = unsafe { T::size(&root, first) };
+
+            // SAFETY: The index is valid for this core.
+            let index = Index::new(first.value() + (size * index));
+            Some(unsafe { IndexedReference::<T, A>::new(root, index) })
+        }
+    }
+
+    /// Get an [`IndexedReference`] to the value at the given index,
+    /// or `None` if the index is out of bounds.
+    #[must_use]
+    pub fn get_indexed_ref(&self, index: usize) -> Option<IndexedReference<'_, T, Ref>> {
+        if index >= self.len() {
+            return None;
+        }
+
+        let root = self.core.root();
+        let value_index = self.index.value();
+
+        if T::LIST_INDEX_IS_ENTRY_RANGE {
+            // SAFETY: The index is valid for this core.
+            let entries = unsafe { <C as IndexCore<A>>::entry_range(&self.core, value_index) };
+
+            // SAFETY: The length was already checked.
+            let entry = unsafe { entries.get_unchecked(index) };
+            let index = Index::new(entry.value().index());
+
+            // SAFETY: The index is valid for this core.
+            Some(unsafe { IndexedReference::<T, Ref>::new(root, index) })
+        } else {
+            let first = Index::new(1 + 4 + value_index); // Past the `type` and `length` tags
+            let size = unsafe { T::size(root, first) };
+
+            // SAFETY: The index is valid for this core.
+            let index = Index::new(first.value() + (size * index));
+            Some(unsafe { IndexedReference::<T, Ref>::new(root, index) })
         }
     }
 

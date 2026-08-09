@@ -458,7 +458,7 @@ impl Chunk {
 
             for (self_a, other_b) in self.sections().iter().zip(other.sections().iter()) {
                 // Compare the block and fluid counts
-                if self_a.block_count() != other_b.block_count()
+                if self_a.solid_count() != other_b.solid_count()
                     || self_a.fluid_count() != other_b.fluid_count()
                 {
                     return false;

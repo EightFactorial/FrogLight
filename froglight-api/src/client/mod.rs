@@ -98,6 +98,7 @@ impl Debug for HttpClient {
 
 /// A trait for types that can act as a network client.
 #[async_trait]
+#[allow(clippy::double_must_use, reason = "Caused by `async_trait`")]
 pub trait NetworkClient: Any + Send + Sync + 'static {
     /// Performs a `GET` request to the specified URL.
     ///

@@ -186,7 +186,7 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains any solid blocks.
     #[must_use]
     pub fn contains_any_solids(&self) -> bool {
-        self.storage.as_slice().iter().any(|section| section.block_count() != 0)
+        self.storage.as_slice().iter().any(|section| section.solid_count() != 0)
     }
 
     /// Returns `true` if the chunk contains any fluid blocks.

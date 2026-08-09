@@ -137,6 +137,7 @@ impl Debug for ClientApi {
 
 /// A trait for types that can perform api calls.
 #[async_trait]
+#[allow(clippy::double_must_use, reason = "Caused by `async_trait`")]
 pub trait NetworkApi: Send + Sync + 'static {
     /// Queries the API for the [`Uuid`] of a given [`Username`].
     ///

@@ -44,6 +44,16 @@ impl<'data, C: IndexCore> IndexedList<'data, C> {
             .map(|entry| unsafe { ValueReference::new(self.core, entry.value()) })
     }
 
+    /// Get the number of values in this list.
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize { self.entries().len() }
+
+    /// Return `true` if this list contains no values.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.entries().is_empty() }
+
     /// Create an iterator over this list.
     #[inline]
     #[must_use]

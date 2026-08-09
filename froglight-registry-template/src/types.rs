@@ -2,10 +2,10 @@
 
 cfg_select! {
     feature = "std" => {
-        pub use std::sync::{OnceLock, LazyLock};
-    },
+        pub use std::sync::{LazyLock, OnceLock};
+    }
     _ => {
-        pub use ::once_cell::sync::{OnceCell as OnceLock, Lazy as LazyLock};
+        pub use ::once_cell::sync::{Lazy as LazyLock, OnceCell as OnceLock};
     }
 }
 

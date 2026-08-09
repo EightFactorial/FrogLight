@@ -26,7 +26,8 @@ impl<C: core::IndexCore> IndexedSnbt<C> {
     #[must_use]
     pub const fn new(core: C) -> Self { Self { core } }
 
-    /// Get the root compound of the SNBT structure.
+    /// Get the root [`IndexedCompound`](compound::IndexedCompound) of the SNBT
+    /// structure.
     #[inline]
     #[must_use]
     pub fn root(&self) -> compound::IndexedCompound<'_, C> {
@@ -36,6 +37,14 @@ impl<C: core::IndexCore> IndexedSnbt<C> {
 
         // SAFETY: The first entry is always the root compound.
         unsafe { compound::IndexedCompound::new(&self.core, index.value().range()) }
+    }
+
+    /// Get the root [`IndexedCompound`](compound::IndexedCompound) of the SNBT
+    /// structure as a [`ValueReference`](reference::ValueReference).
+    #[inline]
+    #[must_use]
+    pub fn root_value(&self) -> reference::ValueReference<'_, C> {
+        reference::ValueReference::Compound(self.root())
     }
 }
 

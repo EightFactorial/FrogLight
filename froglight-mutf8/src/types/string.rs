@@ -464,10 +464,10 @@ impl FacetTemplate for MString {
 
 cfg_select! {
     feature = "simd" => {
-        pub use crate::simd::mutf8::{utf8_to_mutf8, mutf8_to_utf8};
+        pub use crate::simd::mutf8::{mutf8_to_utf8, utf8_to_mutf8};
     }
     _ => {
-        pub use fallback::{utf8_to_mutf8, mutf8_to_utf8};
+        pub use fallback::{mutf8_to_utf8, utf8_to_mutf8};
     }
 }
 

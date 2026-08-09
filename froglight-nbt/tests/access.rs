@@ -141,14 +141,14 @@ fn bigtest() {
         panic!("`stringTest` not found!");
     }
 
-    #[expect(clippy::float_cmp, reason = "TODO")]
+    #[allow(clippy::float_cmp, reason = "TODO")]
     if let Some(float_test) = compound.get("floatTest") {
         assert_eq!(float_test.into_float().unwrap(), 0.498_231_47);
     } else {
         panic!("`floatTest` not found!");
     }
 
-    #[expect(clippy::float_cmp, reason = "TODO")]
+    #[allow(clippy::float_cmp, reason = "TODO")]
     if let Some(double_test) = compound.get("doubleTest") {
         assert_eq!(double_test.into_double().unwrap(), 0.493_128_713_218_231_5);
     } else {

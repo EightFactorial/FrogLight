@@ -2,7 +2,7 @@
 
 use alloc::{string::String, vec::Vec};
 
-use facet::{HeapValue, Partial, Type, UserType};
+use facet::{Def, HeapValue, Partial, SequenceType, Type, UserType};
 use facet_path::PathStep;
 use facet_solver::KeyResult;
 use froglight_facet_iter::{
@@ -45,26 +45,25 @@ pub fn deserialize_owned_core<'facet>(
     move |item: Item<'facet, false>| -> Result<Item<'facet, false>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = ValueReference::Compound(snbt.root());
-                value = navigate_nbt(item.partial(), value)?;
+                let mut value = snbt.root_value();
+                value = navigate_snbt(item.partial(), value)?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = ValueReference::Compound(snbt.root());
-                value = navigate_nbt(&partial, value)?;
+                let mut value = snbt.root_value();
+                value = navigate_snbt(&partial, value)?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let variant = solve_enum_variant(&partial, value)?;
                     let (index, _) = partial.find_variant(variant).unwrap();
 
-                    Ok(Item::Hint(index as u32, partial))
+                    Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
                     Ok(Item::Hint(value.len() as u32, partial)) // Map
-                } else if let ValueReference::List(_value) = &value {
-                    // Ok(Item::Hint(value.len() as u32, partial)) // List
-                    todo!()
+                } else if let ValueReference::List(value) = &value {
+                    Ok(Item::Hint(value.len() as u32, partial)) // List
                 } else {
                     todo!()
                 }
@@ -98,26 +97,25 @@ pub fn deserialize_borrowed_core<'facet>(
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = ValueReference::Compound(nbt.root());
-                value = navigate_nbt(item.partial(), value)?;
+                let mut value = nbt.root_value();
+                value = navigate_snbt(item.partial(), value)?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = ValueReference::Compound(nbt.root());
-                value = navigate_nbt(&partial, value)?;
+                let mut value = nbt.root_value();
+                value = navigate_snbt(&partial, value)?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let variant = solve_enum_variant(&partial, value)?;
                     let (index, _) = partial.find_variant(variant).unwrap();
 
-                    Ok(Item::Hint(index as u32, partial))
+                    Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
                     Ok(Item::Hint(value.len() as u32, partial)) // Map
-                } else if let ValueReference::List(_value) = &value {
-                    // Ok(Item::Hint(value.len() as u32, partial)) // List
-                    todo!()
+                } else if let ValueReference::List(value) = &value {
+                    Ok(Item::Hint(value.len() as u32, partial)) // List
                 } else {
                     todo!()
                 }
@@ -128,7 +126,8 @@ pub fn deserialize_borrowed_core<'facet>(
 
 // -------------------------------------------------------------------------------------------------
 
-fn navigate_nbt<'core, const BORROWED: bool>(
+#[allow(clippy::too_many_lines, reason = "Complex logic function")]
+fn navigate_snbt<'core, const BORROWED: bool>(
     partial: &Partial<'_, BORROWED>,
     mut value: ValueReference<'core, SliceCore<'core>>,
 ) -> Result<ValueReference<'core, SliceCore<'core>>, ReaderError> {
@@ -225,15 +224,34 @@ fn navigate_nbt<'core, const BORROWED: bool>(
                 _ => todo!(),
             },
 
-            PathStep::Index(_index) => {
-                let _list = value.as_list().ok_or_else(|| {
+            PathStep::Index(index) => {
+                let list = value.as_list().ok_or_else(|| {
                     ReaderError::from_string(alloc::format!(
                         "Failed to get list for type {:?}",
                         shape.type_name()
                     ))
                 })?;
 
-                todo!()
+                let item = list.get(*index as usize).ok_or_else(|| {
+                    ReaderError::from_string(alloc::format!(
+                        "Failed to get list item with index {index} for type {:?}",
+                        shape.type_name()
+                    ))
+                })?;
+
+                // Update the shape and value.
+                value = item;
+                match (shape.def, shape.ty) {
+                    (Def::Array(def), _) => shape = def.t,
+                    (Def::List(def), _) => shape = def.t,
+                    (Def::Slice(def), _) => shape = def.t,
+                    (_, Type::Sequence(SequenceType::Array(ty))) => shape = ty.t,
+                    (_, Type::Sequence(SequenceType::Slice(ty))) => shape = ty.t,
+                    _ => Err(ReaderError::from_string(alloc::format!(
+                        "Failed to get list item type for list type {:?}",
+                        shape.type_name()
+                    )))?,
+                }
             }
 
             _ => todo!(),

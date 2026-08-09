@@ -16,7 +16,6 @@ pub trait DeserializeAsync: Deserialize<'static> {
     ///
     /// Returns an error if the deserialization fails.
     #[inline]
-    #[must_use]
     fn from_slice_async(
         slice: &[u8],
         variable: bool,

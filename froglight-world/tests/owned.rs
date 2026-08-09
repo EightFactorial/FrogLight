@@ -62,7 +62,7 @@ fn section() {
     // An empty section with no blocks.
     let mut section = Section::empty();
 
-    assert_eq!(section.block_count(), 0);
+    assert_eq!(section.solid_count(), 0);
     assert_eq!(section.block_data().bits_per_entry(), 0);
     assert_eq!(section.biome_data().bits_per_entry(), 0);
 

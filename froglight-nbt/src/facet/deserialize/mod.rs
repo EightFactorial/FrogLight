@@ -2,7 +2,7 @@
 
 use alloc::{borrow::Cow, string::String, vec::Vec};
 
-use facet::{HeapValue, Partial, Type, UserType};
+use facet::{Def, HeapValue, Partial, SequenceType, Type, UserType};
 use facet_path::PathStep;
 use facet_solver::KeyResult;
 use froglight_facet_iter::{
@@ -115,7 +115,7 @@ pub fn deserialize_borrowed_core<'facet>(
                     let variant = solve_enum_variant(&partial, value)?;
                     let (index, _) = partial.find_variant(variant).unwrap();
 
-                    Ok(Item::Hint(index as u32, partial))
+                    Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
                     Ok(Item::Hint(value.len() as u32, partial)) // Map
                 } else if let ValueReference::List(value) = &value {
@@ -130,6 +130,7 @@ pub fn deserialize_borrowed_core<'facet>(
 
 // -------------------------------------------------------------------------------------------------
 
+#[allow(clippy::too_many_lines, reason = "Complex logic function")]
 fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
     partial: &Partial<'_, BORROWED>,
     mut value: ValueReference<'nbt, Ref, SliceCore<'core, Ref>>,
@@ -228,15 +229,34 @@ fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
                 _ => todo!(),
             },
 
-            PathStep::Index(_index) => {
-                let _list = value.as_list().ok_or_else(|| {
+            PathStep::Index(index) => {
+                let list = value.as_list().ok_or_else(|| {
                     ReaderError::from_string(alloc::format!(
                         "Failed to get list for type {:?}",
                         shape.type_name()
                     ))
                 })?;
 
-                todo!()
+                let item = list.get(*index as usize).ok_or_else(|| {
+                    ReaderError::from_string(alloc::format!(
+                        "Failed to get list item with index {index} for type {:?}",
+                        shape.type_name()
+                    ))
+                })?;
+
+                // Update the shape and value.
+                value = item;
+                match (shape.def, shape.ty) {
+                    (Def::Array(def), _) => shape = def.t,
+                    (Def::List(def), _) => shape = def.t,
+                    (Def::Slice(def), _) => shape = def.t,
+                    (_, Type::Sequence(SequenceType::Array(ty))) => shape = ty.t,
+                    (_, Type::Sequence(SequenceType::Slice(ty))) => shape = ty.t,
+                    _ => Err(ReaderError::from_string(alloc::format!(
+                        "Failed to get list item type for list type {:?}",
+                        shape.type_name()
+                    )))?,
+                }
             }
 
             _ => todo!(),

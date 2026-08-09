@@ -265,7 +265,8 @@ pub struct ArrayChunkStorage<const SECTIONS: usize, const OFFSET: i32>(ArrayStor
 
 cfg_select! {
     feature = "nightly" => {
-        type ArrayStorage<const SECTIONS: usize> = Box<[Section; SECTIONS], &'static (dyn Allocator + Send + Sync)>;
+        type ArrayStorage<const SECTIONS: usize> =
+            Box<[Section; SECTIONS], &'static (dyn Allocator + Send + Sync)>;
     }
     _ => {
         type ArrayStorage<const SECTIONS: usize> = Box<[Section; SECTIONS]>;
@@ -282,7 +283,8 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunkStorage<SECTIONS, OFFSE
                 Self::new_in(sections, &alloc::alloc::Global)
             }
 
-            /// Create a new [`ArrayChunkStorage`] from the given boxed [`Section`]s.
+            /// Create a new [`ArrayChunkStorage`] from the given boxed
+            /// [`Section`]s.
             #[inline]
             #[must_use]
             #[allow(clippy::boxed_local, reason = "Boxed constructor")]
@@ -300,7 +302,10 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunkStorage<SECTIONS, OFFSE
             /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
             #[inline]
             #[must_use]
-            pub fn new_in<A: Allocator + Send + Sync>(sections: [Section; SECTIONS], allocator: &'static A) -> Self {
+            pub fn new_in<A: Allocator + Send + Sync>(
+                sections: [Section; SECTIONS],
+                allocator: &'static A,
+            ) -> Self {
                 Self(Box::new_in(sections, allocator))
             }
         }
@@ -310,7 +315,8 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunkStorage<SECTIONS, OFFSE
             #[must_use]
             pub fn new(sections: [Section; SECTIONS]) -> Self { Self::new_from(Box::new(sections)) }
 
-            /// Create a new [`ArrayChunkStorage`] from the given boxed [`Section`]s.
+            /// Create a new [`ArrayChunkStorage`] from the given boxed
+            /// [`Section`]s.
             #[inline]
             #[must_use]
             pub fn new_from(sections: Box<[Section; SECTIONS]>) -> Self { Self(sections) }
@@ -369,7 +375,9 @@ impl VecChunkStorage {
                     use alloc::alloc::Global;
 
                     let (ptr, len, cap, Global) = Vec::into_parts_with_alloc(sections);
-                    Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(ptr, len, cap, &Global)
+                    Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(
+                        ptr, len, cap, &Global,
+                    )
                 };
 
                 Self(sections, offset)
@@ -378,11 +386,16 @@ impl VecChunkStorage {
             /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
             /// offset.
             #[must_use]
-            pub fn new_in<A: Allocator + Send + Sync>(sections: impl IntoIterator<Item = Section>, offset: i32, allocator: &'static A) -> Self {
+            pub fn new_in<A: Allocator + Send + Sync>(
+                sections: impl IntoIterator<Item = Section>,
+                offset: i32,
+                allocator: &'static A,
+            ) -> Self {
                 let sections = sections.into_iter();
-                let (lower_bound, upper_bound)= sections.size_hint();
+                let (lower_bound, upper_bound) = sections.size_hint();
 
-                let mut vec: Vec<Section, &'static (dyn Allocator + Send + Sync)> = Vec::with_capacity_in(upper_bound.unwrap_or(lower_bound), allocator);
+                let mut vec: Vec<Section, &'static (dyn Allocator + Send + Sync)> =
+                    Vec::with_capacity_in(upper_bound.unwrap_or(lower_bound), allocator);
                 vec.extend(sections);
 
                 Self(vec, offset)

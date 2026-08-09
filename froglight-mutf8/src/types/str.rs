@@ -330,10 +330,10 @@ macro_rules! mutf8 {
 
 cfg_select! {
     feature = "simd" => {
-        pub use crate::simd::mutf8::{contains_null_or_4_byte_header, contains_4_byte_header};
+        pub use crate::simd::mutf8::{contains_4_byte_header, contains_null_or_4_byte_header};
     }
     _ => {
-        pub use fallback::{contains_null_or_4_byte_header, contains_4_byte_header};
+        pub use fallback::{contains_4_byte_header, contains_null_or_4_byte_header};
     }
 }
 

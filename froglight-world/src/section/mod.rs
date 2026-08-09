@@ -13,7 +13,7 @@ use crate::{SECTION_HEIGHT, SECTION_WIDTH, component::SectionBlockPos};
 /// A piece of a chunk.
 #[derive(Default, Clone, PartialEq, Eq)]
 pub struct Section {
-    block_count: u16,
+    solid_count: u16,
     fluid_count: u16,
     blocks: SectionData<BlockSection>,
     biomes: SectionData<BiomeSection>,
@@ -25,7 +25,7 @@ impl Section {
     #[must_use]
     pub fn empty() -> Self {
         Self {
-            block_count: 0,
+            solid_count: 0,
             fluid_count: 0,
             blocks: SectionData::empty(),
             biomes: SectionData::empty(),
@@ -40,18 +40,18 @@ impl Section {
     #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(
-        block_count: u16,
+        solid_count: u16,
         fluid_count: u16,
         blocks: SectionData<BlockSection>,
         biomes: SectionData<BiomeSection>,
     ) -> Self {
-        Self { block_count, fluid_count, blocks, biomes }
+        Self { solid_count, fluid_count, blocks, biomes }
     }
 
-    /// Get the number of non-air blocks in this section.
+    /// Get the number of solid (non-air) blocks in this section.
     #[inline]
     #[must_use]
-    pub const fn block_count(&self) -> u16 { self.block_count }
+    pub const fn solid_count(&self) -> u16 { self.solid_count }
 
     /// Get the number of fluid blocks in this section.
     #[inline]
@@ -98,10 +98,10 @@ impl Section {
     ) -> u32 {
         let previous = self.blocks.set(position, block_id);
         match (is_air(previous), is_air(block_id)) {
-            // Non-air to air, decrement block counter.
-            (false, true) => self.block_count -= 1,
-            // Air to non-air, increment block counter.
-            (true, false) => self.block_count += 1,
+            // Non-air to air, decrement solid counter.
+            (false, true) => self.solid_count -= 1,
+            // Air to non-air, increment solid counter.
+            (true, false) => self.solid_count += 1,
             _ => {}
         }
         match (is_fluid(previous), is_fluid(block_id)) {

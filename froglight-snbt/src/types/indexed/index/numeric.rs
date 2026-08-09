@@ -404,7 +404,9 @@ cfg_select! {
             slice: &str,
             options: &T::Options,
         ) -> IntegerValue {
-            lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options).unwrap().into()
+            lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options)
+                .unwrap()
+                .into()
         }
 
         #[inline]
@@ -412,7 +414,9 @@ cfg_select! {
             slice: &str,
             options: &T::Options,
         ) -> IntegerValue {
-            lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options).unwrap().into()
+            lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options)
+                .unwrap()
+                .into()
         }
 
         #[inline]
@@ -420,7 +424,9 @@ cfg_select! {
             slice: &str,
             options: &T::Options,
         ) -> IntegerValue {
-            lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options).unwrap().into()
+            lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options)
+                .unwrap()
+                .into()
         }
     }
     _ => {
@@ -430,7 +436,11 @@ cfg_select! {
             options: &T::Options,
         ) -> IntegerValue {
             // SAFETY: `Index` guarantees that this is valid.
-            unsafe { lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options).unwrap_unchecked().into() }
+            unsafe {
+                lexical::parse_with_options::<T, &str, INTEGER_BINARY_FORMAT>(slice, options)
+                    .unwrap_unchecked()
+                    .into()
+            }
         }
 
         #[inline]
@@ -439,7 +449,11 @@ cfg_select! {
             options: &T::Options,
         ) -> IntegerValue {
             // SAFETY: `Index` guarantees that this is valid.
-            unsafe { lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options).unwrap_unchecked().into() }
+            unsafe {
+                lexical::parse_with_options::<T, &str, INTEGER_DECIMAL_FORMAT>(slice, options)
+                    .unwrap_unchecked()
+                    .into()
+            }
         }
 
         #[inline]
@@ -448,7 +462,11 @@ cfg_select! {
             options: &T::Options,
         ) -> IntegerValue {
             // SAFETY: `Index` guarantees that this is valid.
-            unsafe { lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options).unwrap_unchecked().into() }
+            unsafe {
+                lexical::parse_with_options::<T, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, options)
+                    .unwrap_unchecked()
+                    .into()
+            }
         }
     }
 }
@@ -670,7 +688,11 @@ cfg_select! {
             options: &T::Options,
         ) -> FloatValue {
             // SAFETY: `Index` guarantees that this is valid.
-            unsafe { lexical::parse_with_options::<T, &str, FLOAT_FORMAT>(slice, &options).unwrap_unchecked().into() }
+            unsafe {
+                lexical::parse_with_options::<T, &str, FLOAT_FORMAT>(slice, &options)
+                    .unwrap_unchecked()
+                    .into()
+            }
         }
     }
 }
