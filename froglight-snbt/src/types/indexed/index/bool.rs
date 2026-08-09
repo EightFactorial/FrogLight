@@ -33,13 +33,12 @@ impl BoolDescription {
     /// Create a new [`BoolDescription::Boolean`].
     #[inline]
     #[must_use]
-    #[expect(clippy::new_without_default, reason = "No default value")]
-    pub const fn new() -> Self { Self::Boolean }
+    pub const fn bool() -> Self { Self::Boolean }
 
     /// Create a new [`BoolDescription::Integer`].
     #[inline]
     #[must_use]
-    pub const fn new_integer(desc: IntegerDescription) -> Self { Self::Integer(desc) }
+    pub const fn integer(desc: IntegerDescription) -> Self { Self::Integer(desc) }
 }
 
 impl fmt::Debug for BoolDescription {

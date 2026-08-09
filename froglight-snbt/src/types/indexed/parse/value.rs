@@ -86,13 +86,13 @@ pub(super) fn parse_bool(cursor: &mut Cursor<'_>) -> Result<Index<bool>, ()> {
         cursor.take_slice(4);
 
         let range = Range { start, end: cursor.position() };
-        let desc = BoolDescription::Boolean;
+        let desc = BoolDescription::bool();
         Ok(unsafe { Index::new(range, desc) })
     } else if remaining.starts_with("false") {
         cursor.take_slice(5);
 
         let range = Range { start, end: cursor.position() };
-        let desc = BoolDescription::Boolean;
+        let desc = BoolDescription::bool();
         Ok(unsafe { Index::new(range, desc) })
     } else if remaining.starts_with("bool(") {
         cursor.take_slice(5);
@@ -127,14 +127,14 @@ pub(super) fn parse_numeric(cursor: &mut Cursor<'_>) -> Result<ValueIndex, ()> {
         cursor.take_slice(4);
 
         let range = Range { start, end: cursor.position() };
-        let desc = BoolDescription::Boolean;
+        let desc = BoolDescription::bool();
         return Ok(ValueIndex::Bool(unsafe { Index::new(range, desc) }));
     } else if remaining.starts_with("false") {
         let start = cursor.position();
         cursor.take_slice(5);
 
         let range = Range { start, end: cursor.position() };
-        let desc = BoolDescription::Boolean;
+        let desc = BoolDescription::bool();
         return Ok(ValueIndex::Bool(unsafe { Index::new(range, desc) }));
     } else if remaining.starts_with("bool(") {
         let start = cursor.position();
@@ -452,7 +452,7 @@ pub(super) fn parse_string<const BOOLEANS: bool>(
             );
 
             if BOOLEANS && matches!(slice, "true" | "false") {
-                let desc = BoolDescription::Boolean;
+                let desc = BoolDescription::bool();
                 return Ok(ValueIndex::Bool(unsafe { Index::new_from(slice, start, desc) }));
             }
 

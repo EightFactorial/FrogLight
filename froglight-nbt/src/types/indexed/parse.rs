@@ -34,8 +34,8 @@ fn parse_nbt_inner(
     named: bool,
 ) -> Result<(usize, Option<Index<MStr>>, Vec<EntryIndex>, Vec<Range<usize>>), ()> {
     let mut cursor = Cursor::new(root);
-    let mut entries = Vec::new();
-    let mut indexes = Vec::new();
+    let mut entries = Vec::with_capacity(8);
+    let mut indexes = Vec::with_capacity(4);
 
     // All NBT starts with a compound tag
     if !matches!(cursor.next()?, COMPOUND) {
@@ -47,7 +47,7 @@ fn parse_nbt_inner(
 
     // Prepare a queue of items to read
     let mut counter = 1;
-    let mut queue = VecDeque::with_capacity(1);
+    let mut queue = VecDeque::with_capacity(8);
 
     // Get the number of bytes read.
     let mut length = cursor.pos();
@@ -63,7 +63,7 @@ fn parse_nbt_inner(
         }
 
         // Use the furthest position reached.
-        length = length.max(cursor.pos());
+        length = usize::max(length, cursor.pos());
     }
 
     Ok((length, name, entries, indexes))
@@ -169,24 +169,12 @@ fn parse_item<'data, const NAMED: bool>(
         for _ in 0..length {
             match tag {
                 // Primitive types are calculated from the list's index, so skip them.
-                BYTE => {
-                    read_byte(cursor)?;
-                }
-                SHORT => {
-                    read_short(cursor)?;
-                }
-                INT => {
-                    read_int(cursor)?;
-                }
-                LONG => {
-                    read_long(cursor)?;
-                }
-                FLOAT => {
-                    read_float(cursor)?;
-                }
-                DOUBLE => {
-                    read_double(cursor)?;
-                }
+                BYTE => _ = read_byte(cursor)?,
+                SHORT => _ = read_short(cursor)?,
+                INT => _ = read_int(cursor)?,
+                LONG => _ = read_long(cursor)?,
+                FLOAT => _ = read_float(cursor)?,
+                DOUBLE => _ = read_double(cursor)?,
 
                 BYTE_ARRAY => {
                     let value = read_byte_array(cursor)?;
@@ -397,42 +385,18 @@ fn skip_item<const NAMED: bool>(cursor: &mut Cursor<'_>, depth: usize) -> Result
             read_string(cursor)?;
 
             match tag {
-                BYTE => {
-                    read_byte(cursor)?;
-                }
-                SHORT => {
-                    read_short(cursor)?;
-                }
-                INT => {
-                    read_int(cursor)?;
-                }
-                LONG => {
-                    read_long(cursor)?;
-                }
-                FLOAT => {
-                    read_float(cursor)?;
-                }
-                DOUBLE => {
-                    read_double(cursor)?;
-                }
-                BYTE_ARRAY => {
-                    read_byte_array(cursor)?;
-                }
-                STRING => {
-                    read_string(cursor)?;
-                }
-                COMPOUND => {
-                    skip_item::<true>(cursor, depth + 1)?;
-                }
-                LIST => {
-                    skip_item::<false>(cursor, depth + 1)?;
-                }
-                INT_ARRAY => {
-                    read_int_array(cursor)?;
-                }
-                LONG_ARRAY => {
-                    read_long_array(cursor)?;
-                }
+                BYTE => _ = read_byte(cursor)?,
+                SHORT => _ = read_short(cursor)?,
+                INT => _ = read_int(cursor)?,
+                LONG => _ = read_long(cursor)?,
+                FLOAT => _ = read_float(cursor)?,
+                DOUBLE => _ = read_double(cursor)?,
+                BYTE_ARRAY => _ = read_byte_array(cursor)?,
+                STRING => _ = read_string(cursor)?,
+                COMPOUND => skip_item::<true>(cursor, depth + 1)?,
+                LIST => skip_item::<false>(cursor, depth + 1)?,
+                INT_ARRAY => _ = read_int_array(cursor)?,
+                LONG_ARRAY => _ = read_long_array(cursor)?,
                 _ => return Err(()),
             }
         }
@@ -442,42 +406,18 @@ fn skip_item<const NAMED: bool>(cursor: &mut Cursor<'_>, depth: usize) -> Result
 
         for _ in 0..length {
             match tag {
-                BYTE => {
-                    read_byte(cursor)?;
-                }
-                SHORT => {
-                    read_short(cursor)?;
-                }
-                INT => {
-                    read_int(cursor)?;
-                }
-                LONG => {
-                    read_long(cursor)?;
-                }
-                FLOAT => {
-                    read_float(cursor)?;
-                }
-                DOUBLE => {
-                    read_double(cursor)?;
-                }
-                BYTE_ARRAY => {
-                    read_byte_array(cursor)?;
-                }
-                STRING => {
-                    read_string(cursor)?;
-                }
-                COMPOUND => {
-                    skip_item::<true>(cursor, depth + 1)?;
-                }
-                LIST => {
-                    skip_item::<false>(cursor, depth + 1)?;
-                }
-                INT_ARRAY => {
-                    read_int_array(cursor)?;
-                }
-                LONG_ARRAY => {
-                    read_long_array(cursor)?;
-                }
+                BYTE => _ = read_byte(cursor)?,
+                SHORT => _ = read_short(cursor)?,
+                INT => _ = read_int(cursor)?,
+                LONG => _ = read_long(cursor)?,
+                FLOAT => _ = read_float(cursor)?,
+                DOUBLE => _ = read_double(cursor)?,
+                BYTE_ARRAY => _ = read_byte_array(cursor)?,
+                STRING => _ = read_string(cursor)?,
+                COMPOUND => skip_item::<true>(cursor, depth + 1)?,
+                LIST => skip_item::<false>(cursor, depth + 1)?,
+                INT_ARRAY => _ = read_int_array(cursor)?,
+                LONG_ARRAY => _ = read_long_array(cursor)?,
                 _ => return Err(()),
             }
         }

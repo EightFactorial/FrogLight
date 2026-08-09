@@ -92,25 +92,25 @@ bench!(
 
 fn simd_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
     match froglight_mutf8::simd::mutf8::contains_null_or_4_byte_header(str.as_bytes()) {
-        // SAFETY: `true` means the input was valid MUTF-8.
-        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::simd::mutf8::utf8_to_mutf8(str)),
+        // SAFETY: `false` means the input was valid MUTF-8.
+        false => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        true => Cow::Owned(froglight_mutf8::simd::mutf8::utf8_to_mutf8(str)),
     }
 }
 
 fn fallback_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
     match froglight_mutf8::simd::mutf8::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
-        // SAFETY: `true` means the input was valid MUTF-8.
-        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::simd::mutf8::fallback::utf8_to_mutf8(str)),
+        // SAFETY: `false` means the input was valid MUTF-8.
+        false => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        true => Cow::Owned(froglight_mutf8::simd::mutf8::fallback::utf8_to_mutf8(str)),
     }
 }
 
 fn naive_utf8_to_mutf8(str: &str) -> Cow<'_, MStr> {
     match froglight_mutf8::types::str::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
-        // SAFETY: `true` means the input was valid MUTF-8.
-        true => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::types::string::fallback::utf8_to_mutf8(str)),
+        // SAFETY: `false` means the input was valid MUTF-8.
+        false => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
+        true => Cow::Owned(froglight_mutf8::types::string::fallback::utf8_to_mutf8(str)),
     }
 }
 
@@ -197,26 +197,24 @@ fn decode_ascii(c: &mut Criterion) {
 }
 
 fn simd_mutf8_to_utf8(str: &MStr) -> Cow<'_, str> {
-    match froglight_mutf8::simd::mutf8::contains_null_or_4_byte_header(str.as_bytes()) {
-        // SAFETY: `true` means the input was valid UTF-8.
-        true => Cow::Borrowed(unsafe { str::from_utf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::simd::mutf8::mutf8_to_utf8(str)),
+    match simdutf8::basic::from_utf8(str.as_bytes()) {
+        Ok(str) => Cow::Borrowed(str),
+        Err(..) => Cow::Owned(froglight_mutf8::simd::mutf8::mutf8_to_utf8(str)),
     }
 }
 
 fn fallback_mutf8_to_utf8(str: &MStr) -> Cow<'_, str> {
-    match froglight_mutf8::simd::mutf8::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
-        // SAFETY: `true` means the input was valid UTF-8.
-        true => Cow::Borrowed(unsafe { str::from_utf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::simd::mutf8::fallback::mutf8_to_utf8(str)),
+    match simdutf8::basic::from_utf8(str.as_bytes()) {
+        Ok(str) => Cow::Borrowed(str),
+        Err(..) => Cow::Owned(froglight_mutf8::simd::mutf8::fallback::mutf8_to_utf8(str)),
     }
 }
 
 fn naive_mutf8_to_utf8(str: &MStr) -> Cow<'_, str> {
-    match froglight_mutf8::types::str::fallback::contains_null_or_4_byte_header(str.as_bytes()) {
+    match str::from_utf8(str.as_bytes()) {
         // SAFETY: `true` means the input was valid UTF-8.
-        true => Cow::Borrowed(unsafe { str::from_utf8_unchecked(str.as_bytes()) }),
-        false => Cow::Owned(froglight_mutf8::types::string::fallback::mutf8_to_utf8(str)),
+        Ok(str) => Cow::Borrowed(str),
+        Err(..) => Cow::Owned(froglight_mutf8::types::string::fallback::mutf8_to_utf8(str)),
     }
 }
 

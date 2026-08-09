@@ -341,7 +341,7 @@ impl IndexableValue for Integer {
 
         // Handle `IntegerType::Bool` separately.
         if matches!(desc.ty(), IntegerType::Bool) {
-            let desc = BoolDescription::Boolean;
+            let desc = BoolDescription::bool();
             return unsafe {
                 let index = Index::<bool>::new(index.range, desc);
                 IntegerValue::Byte(u8::from(index.read_value(root).as_bool()))

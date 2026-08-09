@@ -96,13 +96,8 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid UTF-8.
-    pub fn as_utf8(&self) -> Result<&str, ()> {
-        if from_utf8_simd(self.as_bytes()).is_ok() {
-            Ok(unsafe { str::from_utf8_unchecked(self.as_bytes()) })
-        } else {
-            Err(())
-        }
-    }
+    #[inline]
+    pub fn as_utf8(&self) -> Result<&str, ()> { from_utf8_simd(self.as_bytes()).map_err(|_| ()) }
 
     /// Creates a new [`MStr`] from a string slice.
     ///
