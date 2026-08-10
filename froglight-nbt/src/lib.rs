@@ -12,6 +12,8 @@ pub mod types;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "froglight-facet")]
+    pub use crate::facet::with::NbtTemplate;
     #[cfg(feature = "facet")]
     pub use crate::facet::{
         deserialize::{DeserializeNbt, functions::*},

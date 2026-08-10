@@ -19,20 +19,21 @@ use crate::facet::prelude::*;
 ///
 /// ```rust
 /// use facet::*;
-/// use froglight_facet::{
-///     facet::{WithFnAttr, prelude::*},
-///     option_with,
-/// };
+/// use froglight_facet::facet::{WithFnAttr, prelude::*};
 ///
 /// #[derive(Facet)]
 /// pub struct MyStruct {
 ///     #[facet(mc::with = MyStruct::WITH_CUSTOM)]
 ///     inner: u32,
+///     #[facet(mc::with = MyStruct::WITH_OPTIONAL)]
+///     optional_inner: Option<u32>,
 /// }
 ///
 /// impl MyStruct {
 ///     /// A serializer and deserializer.
 ///     pub const WITH_CUSTOM: WithFnAttr = CustomTemplate::WITH;
+///     /// An optional serializer and deserializer.
+///     pub const WITH_OPTIONAL: WithFnAttr = OptionTemplate::<CustomTemplate>::WITH;
 /// }
 ///
 /// struct CustomTemplate;

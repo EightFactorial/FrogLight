@@ -86,11 +86,11 @@ impl<'facet, T: Facet<'facet> + Sized> Deserialize<'facet> for T {
 // -------------------------------------------------------------------------------------------------
 
 #[inline(never)]
-fn deserialize_owned(
-    partial: Partial<'static, false>,
+fn deserialize_owned<const BORROW: bool>(
+    partial: Partial<'static, BORROW>,
     variable: bool,
     reader: &mut Reader<'_>,
-) -> Result<HeapValue<'static, false>, DeserializeError> {
+) -> Result<HeapValue<'static, BORROW>, DeserializeError> {
     // Create and complete the deserializer.
     let mut core = deserialize_owned_core(reader);
     let de = Deserializer::new(partial, variable, &mut core, Some("mc"));
@@ -101,10 +101,10 @@ fn deserialize_owned(
 #[doc(hidden)]
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
-pub fn deserialize_owned_core(
+pub fn deserialize_owned_core<const BORROW: bool>(
     reader: &mut Reader<'_>,
-) -> impl FnMut(Item<'static, false>) -> Result<Item<'static, false>, ReaderError> {
-    |item: Item<'static, false>| {
+) -> impl FnMut(Item<'static, BORROW>) -> Result<Item<'static, BORROW>, ReaderError> {
+    |item: Item<'static, BORROW>| {
         let item = match item {
             Item::Item(item) => item,
             Item::Hint(.., partial) => {

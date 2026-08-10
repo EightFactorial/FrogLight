@@ -66,10 +66,10 @@ impl<'facet, T: Facet<'facet> + Sized> DeserializeNbt<'facet> for T {
 // -------------------------------------------------------------------------------------------------
 
 #[inline(never)]
-fn deserialize_owned(
-    partial: Partial<'static, false>,
+fn deserialize_owned<const BORROW: bool>(
+    partial: Partial<'static, BORROW>,
     nbt: &IndexedNbtSlice<'_>,
-) -> Result<HeapValue<'static, false>, DeserializeError> {
+) -> Result<HeapValue<'static, BORROW>, DeserializeError> {
     // Create and complete the deserializer.
     let mut core = deserialize_owned_core(nbt);
 
@@ -82,10 +82,10 @@ fn deserialize_owned(
 #[doc(hidden)]
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
-pub fn deserialize_owned_core<'facet>(
+pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     nbt: &IndexedNbtSlice<'_>,
-) -> impl FnMut(Item<'facet, false>) -> Result<Item<'facet, false>, ReaderError> {
-    move |item: Item<'facet, false>| -> Result<Item<'facet, false>, ReaderError> {
+) -> impl FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError> {
+    move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
                 let mut value = nbt.as_value();

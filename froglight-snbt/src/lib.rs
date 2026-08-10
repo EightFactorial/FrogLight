@@ -13,6 +13,8 @@ pub mod unicode;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "froglight-facet")]
+    pub use crate::facet::with::SnbtTemplate;
     #[cfg(feature = "facet")]
     pub use crate::facet::{
         deserialize::{DeserializeSnbt, functions::*},

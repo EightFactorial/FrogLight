@@ -34,7 +34,7 @@ froglight-packet = { workspace = true }
 froglight-physics = { workspace = true }
 froglight-player = { workspace = true }
 froglight-registry = { workspace = true }
-froglight-snbt = { features = ["nbt", "facet"], workspace = true }
+froglight-snbt = { features = ["nbt", "facet", "froglight-facet"], workspace = true }
 froglight-text = { features = ["nbt", "facet"], workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
