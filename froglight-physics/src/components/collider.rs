@@ -18,7 +18,7 @@ use crate::prelude::*;
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
-#[cfg_attr(feature = "bevy", require(Position, Rotation, CollidingWith, PrevCollider))]
+#[cfg_attr(feature = "bevy", require(Position, Rotation, OnGround, CollidingWith, PrevCollider))]
 pub struct Collider {
     /// The minimum corner of this [`Collider`].
     pub min: Vec3A,

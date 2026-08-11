@@ -1,10 +1,89 @@
+#![expect(clippy::into_iter_without_iter, reason = "Ignored")]
+
 use crate::types::indexed::{
     compound::IndexedCompound,
     core::{IndexCore, NbtAccess, Ref},
     list::{IndexedList, ValueList},
-    reference::IndexableValue,
+    reference::{IndexableValue, ValueReference},
     types::{IndexedListType, IndexedMapType},
 };
+
+pub struct ListValueIter<'data, A: NbtAccess, C: IndexCore<A>>
+where
+    ValueList<'data, A, C>: Clone,
+{
+    list: ValueList<'data, A, C>,
+    index: usize,
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A>> ListValueIter<'data, A, C>
+where
+    ValueList<'data, A, C>: Clone,
+{
+    /// Create a new [`ListValueIter`] from the given [`ValueList`].
+    #[inline]
+    #[must_use]
+    pub const fn new(list: ValueList<'data, A, C>) -> Self { ListValueIter { list, index: 0 } }
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A>> Iterator for ListValueIter<'data, A, C>
+where
+    ValueList<'data, A, C>: Clone,
+{
+    type Item = ValueReference<'data, A, C>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let entry = self.list.clone().get(self.index)?;
+        self.index += 1;
+
+        Some(entry)
+    }
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A>> ExactSizeIterator for ListValueIter<'data, A, C>
+where
+    ValueList<'data, A, C>: Clone,
+{
+    fn len(&self) -> usize { self.list.len() - self.index }
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A>> IntoIterator for ValueList<'data, A, C>
+where
+    ListValueIter<'data, A, C>: Iterator,
+    ValueList<'data, A, C>: Clone,
+{
+    type IntoIter = ListValueIter<'data, A, C>;
+    type Item = <Self::IntoIter as Iterator>::Item;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter { ListValueIter::new(self) }
+}
+
+impl<'data, A: NbtAccess, C: IndexCore<A>> IntoIterator for &'data ValueList<'data, A, C>
+where
+    ListValueIter<'data, A, C>: Iterator,
+    ValueList<'data, A, C>: Copy,
+{
+    type IntoIter = ListValueIter<'data, A, C>;
+    type Item = <Self::IntoIter as Iterator>::Item;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter { ListValueIter::new(*self) }
+}
+impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
+    for &'data mut ValueList<'data, A, C>
+where
+    ListValueIter<'data, A, C>: Iterator,
+    ValueList<'data, A, C>: Copy,
+{
+    type IntoIter = ListValueIter<'data, A, C>;
+    type Item = <Self::IntoIter as Iterator>::Item;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter { ListValueIter::new(*self) }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /// An iterator over the entries in an [`IndexedList`].
 pub struct ListOwnedIter<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A>>

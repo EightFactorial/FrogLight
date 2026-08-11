@@ -45,6 +45,9 @@ impl Plugin for PhysicsPlugin {
         app.register_type::<Collider>().register_type::<PrevCollider>();
         app.register_into_type_conversion::<Collider, PrevCollider>();
 
+        app.register_type::<OnGround>().register_type::<PrevOnGround>();
+        app.register_into_type_conversion::<OnGround, PrevOnGround>();
+
         app.register_type::<EntityCollisions>().init_resource::<EntityCollisions>();
         app.register_type::<CollidingWith>();
 
@@ -62,15 +65,20 @@ impl PhysicsPlugin {
         match entities.get(entity_id) {
             Ok(entity) => {
                 if let Some(bundle) = entity.get::<EntityBundle>() {
-                    // Insert `Collider` and preserve `Position` and `Rotation` (added if missing).
-                    // Forcefully overwrite `Velocity` and `Acceleration` to `ZERO`.
+                    // Insert `Collider` and preserve `Position`, `Rotation` (added if missing).
+                    // Forcefully overwrite `Velocity` and `Acceleration` to `ZERO`
+                    // and `OnGround` to `false`.
                     let mut collider = Collider::new_entity(*bundle.metadata().aabb());
                     if let Some(pos) = entity.get::<Position>() {
                         collider.set_center(pos.to_vec3a());
                     }
 
-                    let mut commands = commands.entity(entity_id);
-                    commands.insert((collider, Velocity::ZERO, Acceleration::ZERO));
+                    commands.entity(entity_id).insert((
+                        collider,
+                        OnGround::FALSE,
+                        Velocity::ZERO,
+                        Acceleration::ZERO,
+                    ));
                 } else {
                     #[cfg(feature = "tracing")]
                     tracing::error!(target: "froglight_physics", "Failed to add Collider to Entity {entity_id}, missing EntityBundle component?");
@@ -176,6 +184,7 @@ impl PhysicsPlugin {
     /// - [`Rotation`] -> [`PrevRotation`]
     /// - [`Velocity`] -> [`PrevVelocity`]
     /// - [`Collider`] -> [`PrevCollider`]
+    /// - [`OnGround`] -> [`PrevOnGround`]
     #[expect(clippy::missing_panics_doc, reason = "Components are dense, so `unwrap` is ok.")]
     pub fn update_prev_components(
         mut accel: Query<(&Acceleration, &mut PrevAcceleration)>,
@@ -183,6 +192,7 @@ impl PhysicsPlugin {
         mut rot: Query<(&Rotation, &mut PrevRotation)>,
         mut vel: Query<(&Velocity, &mut PrevVelocity)>,
         mut col: Query<(&Collider, &mut PrevCollider)>,
+        mut gnd: Query<(&OnGround, &mut PrevOnGround)>,
     ) {
         ComputeTaskPool::get().scope::<_, ()>(|scope| {
             scope.spawn(async {
@@ -214,9 +224,17 @@ impl PhysicsPlugin {
                 }
             });
 
-            for (col, prev) in col.contiguous_iter_mut().unwrap() {
-                for (col, prev) in col.iter().zip(prev) {
-                    *prev = PrevCollider::new_col(*col);
+            scope.spawn(async {
+                for (col, prev) in col.contiguous_iter_mut().unwrap() {
+                    for (col, prev) in col.iter().zip(prev) {
+                        *prev = PrevCollider::new_col(*col);
+                    }
+                }
+            });
+
+            for (gnd, prev) in gnd.contiguous_iter_mut().unwrap() {
+                for (gnd, prev) in gnd.iter().zip(prev) {
+                    *prev = PrevOnGround::new(**gnd);
                 }
             }
         });

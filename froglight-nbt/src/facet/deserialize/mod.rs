@@ -2,18 +2,19 @@
 
 use alloc::{borrow::Cow, string::String, vec::Vec};
 
-use facet::{Def, Facet, HeapValue, Partial, SequenceType, Type, UserType};
-use facet_path::PathStep;
-use facet_solver::{KeyResult, Solver};
+use facet::{Facet, HeapValue, Partial, Type, UserType};
 use froglight_facet_iter::{
     ReaderError,
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
+    solver::tree::{TreeMap, navigate, solve_enum},
 };
 
 use crate::{
     prelude::*,
     types::indexed::{
+        compound::IndexedCompound,
         core::{IndexCore, Ref, SliceCore},
+        entry::IndexedValue,
         list::ValueList,
         reference::ValueReference,
     },
@@ -88,19 +89,16 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = nbt.as_value();
-                value = navigate_nbt(item.partial(), value)?;
+                let value = navigate::<IndexedNbtSlice, BORROW>(item.partial(), nbt.as_value())?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = nbt.as_value();
-                value = navigate_nbt(&partial, value)?;
+                let value = navigate::<IndexedNbtSlice, BORROW>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let variant = solve_enum_variant(&partial, value)?;
-                    let (index, _) = partial.find_variant(variant).unwrap();
+                    let (index, _variant) = solve_enum::<IndexedNbtSlice, BORROW>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial))
                 } else if let ValueReference::Compound(value) = &value {
@@ -140,19 +138,16 @@ pub fn deserialize_borrowed_core<'facet>(
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value = nbt.as_value();
-                value = navigate_nbt(item.partial(), value)?;
+                let value = navigate::<IndexedNbtSlice, true>(item.partial(), nbt.as_value())?;
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let mut value = nbt.as_value();
-                value = navigate_nbt(&partial, value)?;
+                let value = navigate::<IndexedNbtSlice, true>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let variant = solve_enum_variant(&partial, value)?;
-                    let (index, _) = partial.find_variant(variant).unwrap();
+                    let (index, _variant) = solve_enum::<IndexedNbtSlice<'_>, _>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
@@ -165,205 +160,6 @@ pub fn deserialize_borrowed_core<'facet>(
             }
         }
     }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-#[allow(clippy::too_many_lines, reason = "Complex logic function")]
-fn navigate_nbt<'nbt, 'core, const BORROWED: bool>(
-    partial: &Partial<'_, BORROWED>,
-    mut value: ValueReference<'nbt, Ref, SliceCore<'core, Ref>>,
-) -> Result<ValueReference<'nbt, Ref, SliceCore<'core, Ref>>, ReaderError> {
-    let path = partial.path();
-    let mut step_iter = path.steps().iter();
-
-    let mut shape = partial.root_shape();
-    while let Some(step) = step_iter.next() {
-        match step {
-            PathStep::Field(index) => match shape.ty {
-                Type::User(UserType::Struct(ty)) => {
-                    // Get the current nbt value as a compound.
-                    let compound = value.as_compound().ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get compound for struct {:?}",
-                            shape.type_name()
-                        ))
-                    })?;
-
-                    // Get the field with the given index.
-                    let field = ty.fields.get(*index as usize).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get field with index {index} in struct {:?}",
-                            shape.type_name()
-                        ))
-                    })?;
-
-                    // Get the entry with the given field name.
-                    let entry = compound.get(field.effective_name()).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get field with name {:?}",
-                            field.effective_name()
-                        ))
-                    })?;
-
-                    // Update the shape and value.
-                    shape = field.shape();
-                    value = entry.into_value();
-                }
-
-                Type::User(UserType::Enum(ty)) => {
-                    let variant = solve_enum_variant(partial, value)?;
-                    let variant =
-                        ty.variants.iter().find(|v| v.name == variant).ok_or_else(|| {
-                            ReaderError::from_string(alloc::format!(
-                                "Failed to get variant with name {:?} in enum {:?}",
-                                variant,
-                                shape.type_name()
-                            ))
-                        })?;
-
-                    // Get the field with the given index.
-                    let field = variant.data.fields.get(*index as usize).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get field with index {index} in struct {:?}",
-                            shape.type_name()
-                        ))
-                    })?;
-
-                    // Update the shape.
-                    shape = field.shape();
-                }
-
-                _ => todo!(),
-            },
-
-            PathStep::Variant(index) => match shape.ty {
-                Type::User(UserType::Enum(ty)) => {
-                    let variant = ty.variants.get(*index as usize).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get variant with index {index} in enum {:?}",
-                            shape.type_name()
-                        ))
-                    })?;
-
-                    let Some(PathStep::Field(index)) = step_iter.next() else {
-                        return Err(ReaderError::from_string(alloc::format!(
-                            "Failed to get field index for variant {:?} in enum {:?}",
-                            variant.name,
-                            shape.type_name()
-                        )));
-                    };
-
-                    // Get the field with the given index.
-                    let field = variant.data.fields.get(*index as usize).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get field with index {index} in struct {:?}",
-                            shape.type_name()
-                        ))
-                    })?;
-
-                    // Update the shape.
-                    shape = field.shape();
-                }
-                _ => todo!(),
-            },
-
-            PathStep::Index(index) => {
-                let list = value.as_list().ok_or_else(|| {
-                    ReaderError::from_string(alloc::format!(
-                        "Failed to get list for type {:?}",
-                        shape.type_name()
-                    ))
-                })?;
-
-                let item = list.get(*index as usize).ok_or_else(|| {
-                    ReaderError::from_string(alloc::format!(
-                        "Failed to get list item with index {index} for type {:?}",
-                        shape.type_name()
-                    ))
-                })?;
-
-                // Update the shape and value.
-                value = item;
-                match (shape.def, shape.ty) {
-                    (Def::Array(def), _) => shape = def.t,
-                    (Def::List(def), _) => shape = def.t,
-                    (Def::Slice(def), _) => shape = def.t,
-                    (_, Type::Sequence(SequenceType::Array(ty))) => shape = ty.t,
-                    (_, Type::Sequence(SequenceType::Slice(ty))) => shape = ty.t,
-                    _ => Err(ReaderError::from_string(alloc::format!(
-                        "Failed to get list item type for list type {:?}",
-                        shape.type_name()
-                    )))?,
-                }
-            }
-
-            _ => todo!(),
-        }
-    }
-
-    Ok(value)
-}
-
-fn solve_enum_variant<const BORROWED: bool>(
-    partial: &Partial<'_, BORROWED>,
-    value: ValueReference<'_, Ref, SliceCore<'_, Ref>>,
-) -> Result<&'static str, ReaderError> {
-    fn collect_nbt_keys<'data>(
-        value: ValueReference<'data, Ref, SliceCore<'_, Ref>>,
-        depth: &mut Vec<Cow<'data, str>>,
-        list: &mut Vec<(Vec<Cow<'data, str>>, Cow<'data, str>)>,
-    ) {
-        match value {
-            ValueReference::Compound(compound) => {
-                for entry in compound {
-                    let (name, value) = entry.pair();
-                    let name = name.get().to_utf8();
-                    list.push((depth.clone(), name.clone()));
-
-                    depth.push(name);
-                    collect_nbt_keys(value.into_value(), depth, list);
-                    let _ = depth.pop();
-                }
-            }
-            ValueReference::List(ValueList::Compound(compounds)) => {
-                for compound in compounds {
-                    collect_nbt_keys(ValueReference::Compound(compound), depth, list);
-                }
-            }
-            _ => {}
-        }
-    }
-
-    // Create a solver for the enum variant.
-    let schema = froglight_facet_iter::cache::schema::schema_for(partial.shape())
-        .map_err(ReaderError::other)?;
-    let mut solver = Solver::new(schema);
-
-    // Collect all the keys in the nbt value.
-    let mut key_list = Vec::new();
-    collect_nbt_keys(value, &mut Vec::new(), &mut key_list);
-
-    // Solve the enum variant using the collected keys.
-    let mut solution = None;
-    for (path, key) in key_list {
-        let path: Vec<_> = path.iter().map(AsRef::as_ref).collect();
-        if let KeyResult::Solved(resolution) = solver.probe_key(path.as_slice(), key.as_ref()) {
-            solution = Some(resolution.resolution());
-            break;
-        }
-    }
-
-    // If no solution was found, return an error.
-    let solution = solution.ok_or_else(|| {
-        ReaderError::from_string(alloc::format!(
-            "Failed to find a solution for enum {:?}",
-            partial.shape().type_name()
-        ))
-    })?;
-
-    // Return the variant name from the solution.
-    Ok(solution.variant_selections().first().unwrap().variant_name)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -455,6 +251,61 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
     }
 
     todo!()
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl TreeMap for IndexedNbtSlice<'_> {
+    type Key<'data> = Cow<'data, str>;
+    type List<'data, 'core: 'data> = ValueList<'data, Ref, SliceCore<'core, Ref>>;
+    type Map<'data, 'core: 'data> = IndexedCompound<'data, Ref, SliceCore<'core, Ref>>;
+    type Value<'data, 'core: 'data> = ValueReference<'data, Ref, SliceCore<'core, Ref>>;
+
+    fn value_is_map(value: &Self::Value<'_, '_>) -> bool {
+        matches!(value, ValueReference::Compound(..))
+    }
+
+    fn value_is_list(value: &Self::Value<'_, '_>) -> bool {
+        matches!(value, ValueReference::List(..))
+    }
+
+    fn value_map<'data, 'core: 'data>(
+        value: Self::Value<'data, 'core>,
+    ) -> Option<Self::Map<'data, 'core>> {
+        if let ValueReference::Compound(value) = value { Some(value) } else { None }
+    }
+
+    fn map_get<'data, 'core: 'data>(
+        map: Self::Map<'data, 'core>,
+        key: &str,
+    ) -> Option<Self::Value<'data, 'core>> {
+        map.get(key).map(IndexedValue::into_value)
+    }
+
+    fn map_iter<'data, 'core: 'data>(
+        map: Self::Map<'data, 'core>,
+    ) -> impl IntoIterator<Item = (Self::Key<'data>, Self::Value<'data, 'core>)> {
+        map.into_iter().map(|entry| (entry.name().get().to_utf8(), entry.value().into_value()))
+    }
+
+    fn value_list<'data, 'core: 'data>(
+        value: Self::Value<'data, 'core>,
+    ) -> Option<Self::List<'data, 'core>> {
+        if let ValueReference::List(value) = value { Some(value) } else { None }
+    }
+
+    fn list_get<'data, 'core: 'data>(
+        list: Self::List<'data, 'core>,
+        index: usize,
+    ) -> Option<Self::Value<'data, 'core>> {
+        list.get(index)
+    }
+
+    fn list_iter<'data, 'core: 'data>(
+        list: Self::List<'data, 'core>,
+    ) -> impl IntoIterator<Item = Self::Value<'data, 'core>> {
+        list.into_iter()
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

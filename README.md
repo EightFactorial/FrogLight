@@ -34,7 +34,7 @@ Support for Minecraft versions is enabled using features.
 | 26.1.x     | `v26_1` |
 | ~~26.2.x~~ | `v26_2` |
 
-<sup> Note: 26.2 was built from a snapshot and has not been updated! </sup>
+<sup> Note: 26.2 was built from a snapshot and is not functional! </sup>
 
 If you are writing a library on top of FrogLight, consider putting version-specific behavior behind features.
 
@@ -46,7 +46,7 @@ First, create a new Rust project and add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-bevy = { version = "0.18" }
+bevy = { version = "0.19" }
 froglight = { git = "https://github.com/EightFactorial/FrogLight.git", features = ["bevy", "v26_1"] }
 ```
 

@@ -17,13 +17,13 @@ pub(crate) struct ReflectSession {
 }
 
 impl ReflectSession {
-    /// Trigger the insert hook for the given entity.
+    /// Trigger the `on_insert` hook for the given entity.
     #[track_caller]
     pub(crate) fn on_insert(&self, entity: Entity, world: DeferredWorld) {
         (self.insert_fn)(world, entity, MaybeLocation::caller());
     }
 
-    /// Trigger the discard hook for the given entity.
+    /// Trigger the `on_discard` hook for the given entity.
     #[track_caller]
     pub(crate) fn on_discard(&self, entity: Entity, world: DeferredWorld) {
         (self.discard_fn)(world, entity, MaybeLocation::caller());

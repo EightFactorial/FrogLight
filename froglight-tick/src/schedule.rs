@@ -147,18 +147,18 @@ impl RunTickLoop {
     }
 
     fn insert_disable_timer<'scope>(
-        entity: EntityRef<'_>,
+        entity: EntityRef<'scope>,
         disabled: &'scope Mutex<EntityHashSet>,
         spawner: &'scope Scope<'scope, '_, ()>,
         world: &'scope World,
     ) {
-        // Disable all entities in the `SessionInstance` if present.
+        // Disable all entities in the `SessionInstance`.
         #[cfg(feature = "froglight")]
         if entity.contains::<SessionInstance>() {
             Self::insert_disable_instance(entity, disabled, spawner, world);
         }
 
-        // Disable all children if present.
+        // Disable all children of the `Parent`.
         if entity.contains::<Children>() {
             Self::insert_disable_children(entity, disabled, spawner, world);
         }
@@ -166,13 +166,13 @@ impl RunTickLoop {
 
     #[cfg(feature = "froglight")]
     fn insert_disable_instance<'scope>(
-        entity: EntityRef<'_>,
+        entity: EntityRef<'scope>,
         disabled: &'scope Mutex<EntityHashSet>,
         spawner: &'scope Scope<'scope, '_, ()>,
         world: &'scope World,
     ) {
         let Some(instance) = entity.get::<SessionInstance>() else { return };
-        if instance.entity_count() == 0 {
+        if instance.entity_map().is_empty() {
             return;
         }
 
@@ -190,7 +190,7 @@ impl RunTickLoop {
     }
 
     fn insert_disable_children<'scope>(
-        entity: EntityRef<'_>,
+        entity: EntityRef<'scope>,
         disabled: &'scope Mutex<EntityHashSet>,
         spawner: &'scope Scope<'scope, '_, ()>,
         world: &'scope World,

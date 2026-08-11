@@ -374,10 +374,10 @@ impl BotPlugin {
                         // ClientboundPlayEvent::DisguisedChat() => todo!(),
                         // ClientboundPlayEvent::DiskSpaceWarning() => todo!(),
                         ClientboundPlayEvent::EntityEvent() => {}
-                        ClientboundPlayEvent::EntityPosition(entity_id, data, _on_ground) => {
+                        ClientboundPlayEvent::EntityPosition(entity_id, data, on_ground) => {
                             let entity_id = *entity_id;
                             let data = *data;
-                            // let _on_ground = *on_ground;
+                            let on_ground = *on_ground;
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else {
@@ -416,10 +416,9 @@ impl BotPlugin {
                                         .as_vec3a();
                             }
 
-                            // if let Some(mut ground) =
-                            // entity.get_mut::<OnGround>() {
-                            //     ground.0 = on_ground;
-                            // }
+                            if let Some(mut ground) = entity.get_mut::<OnGround>() {
+                                ground.0 = on_ground;
+                            }
                         });
                         }
                         // ClientboundPlayEvent::Explode() => todo!(),
@@ -590,10 +589,9 @@ impl BotPlugin {
                                 (*rotation.yaw_mut(), *rotation.pitch_mut()) = angle.into_degrees();
                             }
 
-                            // if let Some(mut on_ground) =
-                            // entity.get_mut::<OnGround>() {
-                            //     on_ground.0 = data.on_ground;
-                            // }
+                            if let Some(mut on_ground) = entity.get_mut::<OnGround>() {
+                                on_ground.0 = data.on_ground;
+                            }
                         });
                         }
                         // ClientboundPlayEvent::MoveMinecartTrack() => todo!(),
@@ -798,11 +796,11 @@ impl BotPlugin {
                         // ClientboundPlayEvent::TabList() => todo!(),
                         // ClientboundPlayEvent::TagQuery() => todo!(),
                         // ClientboundPlayEvent::TakeItemEntity() => todo!(),
-                        ClientboundPlayEvent::TeleportEntity(id, data, flags, _on_ground) => {
+                        ClientboundPlayEvent::TeleportEntity(id, data, flags, on_ground) => {
                             let id = *id;
                             let data = *data;
                             let flags = *flags;
-                            // let on_ground = *on_ground;
+                            let on_ground = *on_ground;
 
                             commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
                                 let Some(instance) = entity.get::<SessionInstance>() else { return };
@@ -819,15 +817,15 @@ impl BotPlugin {
                                     return;
                                 };
 
-                                if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
+                                if let Ok((mut position, mut rotation, mut velocity, mut ground)) = entity.get_components_mut::<(
                                     &mut Position,
                                     &mut Rotation,
                                     &mut Velocity,
-                                    // &mut OnGround,
+                                    &mut OnGround,
                                 )>(
                                 ) {
                                     data.apply_relative(&mut position, rotation.as_vec3a(), &mut velocity, &flags);
-                                    // ground.0 = on_ground;
+                                    ground.0 = on_ground;
                                 } else {
                                     error!(
                                         "Received TeleportEntity for Entity {target} without Transform, Velocity, or OnGround!"

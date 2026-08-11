@@ -157,7 +157,7 @@ impl PrevVelocity {
     /// Convert this [`PrevVelocity`] into an [`Velocity`].
     #[inline]
     #[must_use]
-    pub const fn to_accel(self) -> Velocity { self.0 }
+    pub const fn to_vel(self) -> Velocity { self.0 }
 
     /// Convert this [`PrevVelocity`] into a [`Vec3`].
     #[inline]

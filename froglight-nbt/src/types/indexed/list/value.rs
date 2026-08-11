@@ -6,7 +6,7 @@ use froglight_mutf8::prelude::MStr;
 
 use crate::types::indexed::{
     core::{IndexCore, Mut, NbtAccess, Ref},
-    list::IndexedList,
+    list::{IndexedList, iter::ListValueIter},
     reference::ValueReference,
     types::{IndexedListType, IndexedMapType},
 };
@@ -41,7 +41,7 @@ pub enum ValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
     LongArray(IndexedList<'data, [u64], A, C>),
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'data, A, C> {
+impl<'data, A: NbtAccess, C: IndexCore<A>> ValueList<'data, A, C> {
     /// Returns a [`ValueReference`](ValueReference) to the value at the given
     /// index, if it exists.
     #[must_use]
@@ -66,7 +66,10 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'data, A, 
     /// Returns a [`ValueReference`](ValueReference) to the value at the given
     /// index, if it exists.
     #[must_use]
-    pub fn get_ref(&self, index: usize) -> Option<ValueReference<'_, Ref, C>> {
+    pub fn get_ref(&self, index: usize) -> Option<ValueReference<'_, Ref, C>>
+    where
+        C: IndexCore<Ref>,
+    {
         match self {
             Self::Empty => None,
             Self::Byte(list) => list.get_indexed_ref(index).map(ValueReference::Byte),
@@ -108,6 +111,34 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> ValueList<'data, A, 
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.len() == 0 }
+
+    /// Return an iterator over the values in this list.
+    #[inline]
+    #[must_use]
+    pub const fn into_iter(self) -> ListValueIter<'data, A, C>
+    where
+        C: IndexCore<Ref>,
+        ValueList<'data, A, C>: Copy,
+    {
+        ListValueIter::new(self)
+    }
+
+    /// Return an owned iterator over the entries in this compound.
+    ///
+    /// # Note
+    ///
+    /// This function requires `Copy`, but the iterator only requires `Clone`!
+    ///
+    /// This is to prevent accidental `Clone`s, which can be very expensive.
+    #[inline]
+    #[must_use]
+    pub const fn iter(&self) -> ListValueIter<'data, A, C>
+    where
+        C: IndexCore<Ref>,
+        ValueList<'data, A, C>: Copy,
+    {
+        ListValueIter::new(*self)
+    }
 }
 
 impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for ValueList<'_, A, C> {

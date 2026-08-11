@@ -6,6 +6,9 @@ pub use acceleration::{Acceleration, PrevAcceleration};
 mod collider;
 pub use collider::{Collider, PrevCollider};
 
+mod onground;
+pub use onground::{OnGround, PrevOnGround};
+
 mod position;
 pub use position::{Position, PrevPosition};
 

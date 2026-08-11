@@ -94,7 +94,7 @@ impl SessionInstance {
     /// Get the dimension's [`Identifier`].
     #[inline]
     #[must_use]
-    pub const fn dimension(&self) -> Identifier<'_> { self.dimension.reborrow() }
+    pub const fn dimension(&self) -> &Identifier<'static> { &self.dimension }
 
     /// Get the maximum height of the world.
     #[inline]
@@ -126,13 +126,18 @@ impl SessionInstance {
     #[must_use]
     pub const fn version_items(&self) -> &'static ItemStorage { self.v_items }
 
+    /// Returns `true` if the given [`Entity`] is part of the instance.
+    #[inline]
+    #[must_use]
+    pub fn contains_entity(&self, entity: &Entity) -> bool { self.entity.contains(entity) }
+
+    /// Get a reference to the [`EntityHashSet`] of related entities.
+    #[inline]
+    #[must_use]
+    pub const fn entity_map(&self) -> &EntityHashSet { &self.entity }
+
     /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
     #[inline]
     #[must_use]
     pub fn iter_entity(&self) -> Iter<'_> { self.entity.iter() }
-
-    /// Returns the number of entities in the [`SessionInstance`].
-    #[inline]
-    #[must_use]
-    pub fn entity_count(&self) -> usize { self.entity.len() }
 }
