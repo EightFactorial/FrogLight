@@ -2,7 +2,7 @@ ALL_FEATURES := "all-features"
 DEF_FEATURES := "features=bevy,network,std"
 NO_FEATURES := "features=libm,once_cell --no-default-features"
 
-EXCLUDE := "exclude=froglight-codegen --exclude=froglight-api"
+EXCLUDE := "exclude=froglight-api,froglight-codegen"
 EXCLUDE_CODEGEN := "exclude=froglight-codegen"
 
 default:
@@ -48,12 +48,12 @@ inspect package="froglight":
 
 # Run all workspace tests
 test:
-    cargo nextest run --workspace --release --{{ ALL_FEATURES }} --{{ EXCLUDE }}
-    cargo test --doc --workspace --{{ ALL_FEATURES }} --{{ EXCLUDE }}
-    cargo nextest run --workspace --release --{{ DEF_FEATURES }} --{{ EXCLUDE }}
-    cargo test --doc --workspace --{{ DEF_FEATURES }} --{{ EXCLUDE }}
-    cargo nextest run --workspace --release --{{ NO_FEATURES }}  --{{ EXCLUDE }}
-    cargo test --doc --workspace --{{ NO_FEATURES }} --{{ EXCLUDE }}
+    cargo nextest run --workspace --release --{{ ALL_FEATURES }} --{{ EXCLUDE_CODEGEN }}
+    cargo test --doc --workspace --{{ ALL_FEATURES }} --{{ EXCLUDE_CODEGEN }}
+    cargo nextest run --workspace --release --{{ DEF_FEATURES }} --{{ EXCLUDE_CODEGEN }}
+    cargo test --doc --workspace --{{ DEF_FEATURES }} --{{ EXCLUDE_CODEGEN }}
+    cargo nextest run --workspace --release --{{ NO_FEATURES }}  --{{ EXCLUDE_CODEGEN }}
+    cargo test --doc --workspace --{{ NO_FEATURES }} --{{ EXCLUDE_CODEGEN }}
 
 # Build all profiles and compare their sizes
 buildsize:

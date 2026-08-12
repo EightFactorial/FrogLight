@@ -19,7 +19,7 @@ pub(super) fn parse<'data>(
     cursor.next_expect('{')?;
 
     // Empty compound
-    if cursor.trim_start().peek() == Some('}') {
+    if matches!(cursor.trim_start().peek(), Some('}') | None) {
         // SAFETY: We just built the compound
         let range = Range { start, end: start };
         return Ok(unsafe { ValueIndex::Compound(Index::new(range, ())) });
@@ -32,13 +32,13 @@ pub(super) fn parse<'data>(
 
         // ':'
         cursor.trim_start().next_expect(':')?;
+
         // Value
         let value =
             value::parse_value(cursor.trim_start(), compounds, lists, strings, entries, queue)?;
-
         entries.push(EntryIndex::new(name, value));
 
-        // ',' or '}'
+        // ',' or '}' / 'None'
         match cursor.trim_start().peek() {
             Some(',') => cursor.next(),
             Some('}') | None => break,

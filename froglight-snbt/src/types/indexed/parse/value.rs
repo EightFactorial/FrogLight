@@ -1,5 +1,4 @@
 #![allow(clippy::wildcard_imports, reason = "Cleanliness")]
-#![expect(clippy::match_wildcard_for_single_variants, reason = "Cleanliness")]
 #![expect(unused, reason = "WIP")]
 
 use alloc::{collections::VecDeque, string::String};
@@ -174,6 +173,8 @@ pub(super) fn parse_numeric(cursor: &mut Cursor<'_>) -> Result<ValueIndex, ()> {
                     cursor.next();
                     Ok(IntegerSignness::Signed)
                 }
+
+                Some(',') => Ok(IntegerSignness::None),
                 _ => Err(()),
             }
         } else {
@@ -259,148 +260,159 @@ pub(super) fn parse_integer(
     // If the string is long, enable multi-digit optimizations.
     let opt = if slice.len() >= 12 { &INTEGER_MULTIDIGIT_OPTIONS } else { &INTEGER_OPTIONS };
 
-    match radix {
-        IntegerRadix::Binary => match ty {
-            IntegerType::Byte => {
-                let _ = parse::<u8, &str, INTEGER_BINARY_FORMAT>(slice, opt).unwrap();
-
-                Ok(unsafe {
-                    ValueIndex::Byte(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+    match (ty, sign) {
+        (IntegerType::Byte, IntegerSignness::None | IntegerSignness::Unsigned) => {
+            match radix {
+                IntegerRadix::Binary => parse::<u8, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<u8, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<u8, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::Short => {
-                let _ = parse::<u16, &str, INTEGER_BINARY_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Short(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+            Ok(unsafe {
+                ValueIndex::Byte(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
+        (IntegerType::Byte, IntegerSignness::Signed) => {
+            match radix {
+                IntegerRadix::Binary => parse::<i8, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<i8, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<i8, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::None | IntegerType::Int => {
-                let _ = parse::<u32, &str, INTEGER_BINARY_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Int(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
-            }
-            IntegerType::Long => {
-                let _ = parse::<u64, &str, INTEGER_BINARY_FORMAT>(slice, opt).unwrap();
+            Ok(unsafe {
+                ValueIndex::Byte(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
 
-                Ok(unsafe {
-                    ValueIndex::Long(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+        (IntegerType::Short, IntegerSignness::None | IntegerSignness::Unsigned) => {
+            match radix {
+                IntegerRadix::Binary => parse::<u16, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<u16, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<u16, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            _ => Err(()),
-        },
-        IntegerRadix::Decimal => match ty {
-            IntegerType::Byte => {
-                let _ = parse::<u8, &str, INTEGER_DECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Byte(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+            Ok(unsafe {
+                ValueIndex::Short(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
+        (IntegerType::Short, IntegerSignness::Signed) => {
+            match radix {
+                IntegerRadix::Binary => parse::<i16, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<i16, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<i16, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::Short => {
-                let _ = parse::<u16, &str, INTEGER_DECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Short(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
-            }
-            IntegerType::None | IntegerType::Int => {
-                let _ = parse::<u32, &str, INTEGER_DECIMAL_FORMAT>(slice, opt).unwrap();
+            Ok(unsafe {
+                ValueIndex::Short(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
 
-                Ok(unsafe {
-                    ValueIndex::Int(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+        (
+            IntegerType::None | IntegerType::Int,
+            IntegerSignness::None | IntegerSignness::Unsigned,
+        ) => {
+            match radix {
+                IntegerRadix::Binary => parse::<u32, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<u32, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<u32, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::Long => {
-                let _ = parse::<u64, &str, INTEGER_DECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Long(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+            Ok(unsafe {
+                ValueIndex::Int(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
+        (IntegerType::None | IntegerType::Int, IntegerSignness::Signed) => {
+            match radix {
+                IntegerRadix::Binary => parse::<i32, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<i32, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<i32, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            _ => Err(()),
-        },
-        IntegerRadix::Hexadecimal => match ty {
-            IntegerType::Byte => {
-                let _ = parse::<u8, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Byte(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
-            }
-            IntegerType::Short => {
-                let _ = parse::<u16, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt).unwrap();
+            Ok(unsafe {
+                ValueIndex::Int(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
 
-                Ok(unsafe {
-                    ValueIndex::Short(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+        (IntegerType::Long, IntegerSignness::None | IntegerSignness::Unsigned) => {
+            match radix {
+                IntegerRadix::Binary => parse::<u64, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<u64, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<u64, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::None | IntegerType::Int => {
-                let _ = parse::<u32, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Int(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
+            Ok(unsafe {
+                ValueIndex::Long(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
+        (IntegerType::Long, IntegerSignness::Signed) => {
+            match radix {
+                IntegerRadix::Binary => parse::<i64, &str, INTEGER_BINARY_FORMAT>(slice, opt),
+                IntegerRadix::Decimal => parse::<i64, &str, INTEGER_DECIMAL_FORMAT>(slice, opt),
+                IntegerRadix::Hexadecimal => {
+                    parse::<i64, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt)
+                }
             }
-            IntegerType::Long => {
-                let _ = parse::<u64, &str, INTEGER_HEXADECIMAL_FORMAT>(slice, opt).unwrap();
+            .map_err(|_| ())?;
 
-                Ok(unsafe {
-                    ValueIndex::Long(Index::new_from(
-                        slice,
-                        start,
-                        IntegerDescription::new(radix, ty, sign, FALSE),
-                    ))
-                })
-            }
-            _ => Err(()),
-        },
+            Ok(unsafe {
+                ValueIndex::Long(Index::new_from(
+                    slice,
+                    start,
+                    IntegerDescription::new(radix, ty, sign, FALSE),
+                ))
+            })
+        }
+
+        _ => Err(()),
     }
 }
 
@@ -417,13 +429,13 @@ pub(super) fn parse_float(slice: &str, start: usize, ty: FloatType) -> Result<Va
 
     match ty {
         FloatType::Float => {
-            let _ = parse::<f32, &str, FLOAT_FORMAT>(slice, &FLOAT_OPTIONS).unwrap();
+            parse::<f32, &str, FLOAT_FORMAT>(slice, &FLOAT_OPTIONS).map_err(|_| ())?;
 
             let desc = FloatDescription::new(repr, ty);
             Ok(unsafe { ValueIndex::Float(Index::new_from(slice, start, desc)) })
         }
         FloatType::Double => {
-            let _ = parse::<f64, &str, FLOAT_FORMAT>(slice, &FLOAT_OPTIONS).unwrap();
+            parse::<f64, &str, FLOAT_FORMAT>(slice, &FLOAT_OPTIONS).map_err(|_| ())?;
 
             let desc = FloatDescription::new(repr, ty);
             Ok(unsafe { ValueIndex::Double(Index::new_from(slice, start, desc)) })

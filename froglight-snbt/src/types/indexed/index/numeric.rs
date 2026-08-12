@@ -250,6 +250,18 @@ impl IntegerValue {
         }
     }
 
+    /// Get this [`IntegerValue`] as a [`i8`].
+    #[must_use]
+    #[expect(clippy::cast_possible_wrap, reason = "Expected Behavior")]
+    pub const fn as_i8(self) -> i8 {
+        match self {
+            Self::Byte(v) => v as i8,
+            Self::Short(v) => v as i8,
+            Self::Int(v) => v as i8,
+            Self::Long(v) => v as i8,
+        }
+    }
+
     /// Get this [`IntegerValue`] as a [`u16`].
     #[must_use]
     pub const fn as_u16(self) -> u16 {
@@ -258,6 +270,18 @@ impl IntegerValue {
             Self::Short(v) => v,
             Self::Int(v) => v as u16,
             Self::Long(v) => v as u16,
+        }
+    }
+
+    /// Get this [`IntegerValue`] as a [`i16`].
+    #[must_use]
+    #[expect(clippy::cast_possible_wrap, reason = "Expected Behavior")]
+    pub const fn as_i16(self) -> i16 {
+        match self {
+            Self::Byte(v) => v as i16,
+            Self::Short(v) => v as i16,
+            Self::Int(v) => v as i16,
+            Self::Long(v) => v as i16,
         }
     }
 
@@ -272,6 +296,18 @@ impl IntegerValue {
         }
     }
 
+    /// Get this [`IntegerValue`] as a [`i32`].
+    #[must_use]
+    #[expect(clippy::cast_possible_wrap, reason = "Expected Behavior")]
+    pub const fn as_i32(self) -> i32 {
+        match self {
+            Self::Byte(v) => v as i32,
+            Self::Short(v) => v as i32,
+            Self::Int(v) => v as i32,
+            Self::Long(v) => v as i32,
+        }
+    }
+
     /// Get this [`IntegerValue`] as a [`u64`].
     #[must_use]
     pub const fn as_u64(self) -> u64 {
@@ -280,6 +316,18 @@ impl IntegerValue {
             Self::Short(v) => v as u64,
             Self::Int(v) => v as u64,
             Self::Long(v) => v,
+        }
+    }
+
+    /// Get this [`IntegerValue`] as a [`i64`].
+    #[must_use]
+    #[expect(clippy::cast_possible_wrap, reason = "Expected Behavior")]
+    pub const fn as_i64(self) -> i64 {
+        match self {
+            Self::Byte(v) => v as i64,
+            Self::Short(v) => v as i64,
+            Self::Int(v) => v as i64,
+            Self::Long(v) => v as i64,
         }
     }
 }
@@ -369,28 +417,63 @@ impl IndexableValue for Integer {
 
         // SAFETY: `Index` guarantees that this is valid.
         unsafe {
-            match desc.ty() {
+            match (desc.ty(), desc.signness()) {
                 // `IntegerType::Bool` is handled above.
-                IntegerType::Bool => core::hint::unreachable_unchecked(),
-                IntegerType::Byte => match desc.radix() {
-                    IntegerRadix::Binary => read_binary::<u8>(slice, options),
-                    IntegerRadix::Decimal => read_decimal::<u8>(slice, options),
-                    IntegerRadix::Hexadecimal => read_hexadecimal::<u8>(slice, options),
+                (IntegerType::Bool, _) => core::hint::unreachable_unchecked(),
+
+                (IntegerType::Byte, IntegerSignness::None | IntegerSignness::Unsigned) => {
+                    match desc.radix() {
+                        IntegerRadix::Binary => read_binary::<u8>(slice, options),
+                        IntegerRadix::Decimal => read_decimal::<u8>(slice, options),
+                        IntegerRadix::Hexadecimal => read_hexadecimal::<u8>(slice, options),
+                    }
+                }
+                (IntegerType::Byte, IntegerSignness::Signed) => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<i8>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<i8>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<i8>(slice, options),
                 },
-                IntegerType::Short => match desc.radix() {
-                    IntegerRadix::Binary => read_binary::<u16>(slice, options),
-                    IntegerRadix::Decimal => read_decimal::<u16>(slice, options),
-                    IntegerRadix::Hexadecimal => read_hexadecimal::<u16>(slice, options),
+
+                (IntegerType::Short, IntegerSignness::None | IntegerSignness::Unsigned) => {
+                    match desc.radix() {
+                        IntegerRadix::Binary => read_binary::<u16>(slice, options),
+                        IntegerRadix::Decimal => read_decimal::<u16>(slice, options),
+                        IntegerRadix::Hexadecimal => read_hexadecimal::<u16>(slice, options),
+                    }
+                }
+                (IntegerType::Short, IntegerSignness::Signed) => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<i16>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<i16>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<i16>(slice, options),
                 },
-                IntegerType::None | IntegerType::Int => match desc.radix() {
+
+                (
+                    IntegerType::None | IntegerType::Int,
+                    IntegerSignness::None | IntegerSignness::Unsigned,
+                ) => match desc.radix() {
                     IntegerRadix::Binary => read_binary::<u32>(slice, options),
                     IntegerRadix::Decimal => read_decimal::<u32>(slice, options),
                     IntegerRadix::Hexadecimal => read_hexadecimal::<u32>(slice, options),
                 },
-                IntegerType::Long => match desc.radix() {
-                    IntegerRadix::Binary => read_binary::<u64>(slice, options),
-                    IntegerRadix::Decimal => read_decimal::<u64>(slice, options),
-                    IntegerRadix::Hexadecimal => read_hexadecimal::<u64>(slice, options),
+                (IntegerType::None | IntegerType::Int, IntegerSignness::Signed) => {
+                    match desc.radix() {
+                        IntegerRadix::Binary => read_binary::<i32>(slice, options),
+                        IntegerRadix::Decimal => read_decimal::<i32>(slice, options),
+                        IntegerRadix::Hexadecimal => read_hexadecimal::<i32>(slice, options),
+                    }
+                }
+
+                (IntegerType::Long, IntegerSignness::None | IntegerSignness::Unsigned) => {
+                    match desc.radix() {
+                        IntegerRadix::Binary => read_binary::<u64>(slice, options),
+                        IntegerRadix::Decimal => read_decimal::<u64>(slice, options),
+                        IntegerRadix::Hexadecimal => read_hexadecimal::<u64>(slice, options),
+                    }
+                }
+                (IntegerType::Long, IntegerSignness::Signed) => match desc.radix() {
+                    IntegerRadix::Binary => read_binary::<i64>(slice, options),
+                    IntegerRadix::Decimal => read_decimal::<i64>(slice, options),
+                    IntegerRadix::Hexadecimal => read_hexadecimal::<i64>(slice, options),
                 },
             }
         }
@@ -475,34 +558,70 @@ impl From<u8> for IntegerValue {
     #[inline]
     fn from(value: u8) -> Self { Self::Byte(value) }
 }
+impl From<i8> for IntegerValue {
+    #[inline]
+    #[expect(clippy::cast_sign_loss, reason = "Expected Behavior")]
+    fn from(value: i8) -> Self { Self::Byte(value as u8) }
+}
 impl From<u16> for IntegerValue {
     #[inline]
     fn from(value: u16) -> Self { Self::Short(value) }
+}
+impl From<i16> for IntegerValue {
+    #[inline]
+    #[expect(clippy::cast_sign_loss, reason = "Expected Behavior")]
+    fn from(value: i16) -> Self { Self::Short(value as u16) }
 }
 impl From<u32> for IntegerValue {
     #[inline]
     fn from(value: u32) -> Self { Self::Int(value) }
 }
+impl From<i32> for IntegerValue {
+    #[inline]
+    #[expect(clippy::cast_sign_loss, reason = "Expected Behavior")]
+    fn from(value: i32) -> Self { Self::Int(value as u32) }
+}
 impl From<u64> for IntegerValue {
     #[inline]
     fn from(value: u64) -> Self { Self::Long(value) }
+}
+impl From<i64> for IntegerValue {
+    #[inline]
+    #[expect(clippy::cast_sign_loss, reason = "Expected Behavior")]
+    fn from(value: i64) -> Self { Self::Long(value as u64) }
 }
 
 impl From<IntegerValue> for u8 {
     #[inline]
     fn from(value: IntegerValue) -> Self { value.as_u8() }
 }
+impl From<IntegerValue> for i8 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_i8() }
+}
 impl From<IntegerValue> for u16 {
     #[inline]
     fn from(value: IntegerValue) -> Self { value.as_u16() }
+}
+impl From<IntegerValue> for i16 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_i16() }
 }
 impl From<IntegerValue> for u32 {
     #[inline]
     fn from(value: IntegerValue) -> Self { value.as_u32() }
 }
+impl From<IntegerValue> for i32 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_i32() }
+}
 impl From<IntegerValue> for u64 {
     #[inline]
     fn from(value: IntegerValue) -> Self { value.as_u64() }
+}
+impl From<IntegerValue> for i64 {
+    #[inline]
+    fn from(value: IntegerValue) -> Self { value.as_i64() }
 }
 
 // -------------------------------------------------------------------------------------------------

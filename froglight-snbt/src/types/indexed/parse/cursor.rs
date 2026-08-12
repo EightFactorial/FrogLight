@@ -126,11 +126,11 @@ impl<'data> Cursor<'data> {
         &mut self,
         mut pattern: P,
     ) -> &'data str {
-        let mut output = self.remaining();
+        let mut take_length = self.remaining().len();
 
         let mut last_a = '\0';
         let mut last_b = '\0';
-        for (index, char) in output.char_indices() {
+        for (index, char) in self.remaining().char_indices() {
             if pattern(char) {
                 // Calculate `index` based on `INCLUSIVE`.
                 let index = if INCLUSIVE { index + char.len_utf8() } else { index };
@@ -138,12 +138,12 @@ impl<'data> Cursor<'data> {
                 // If `ESCAPABLE`, break if the target isn't escaped.
                 // (If `last_a` is a backslash, then `last_b` must not be a backslash)
                 if ESCAPABLE && !((last_a == '\\') && (last_b != '\\')) {
-                    output = self.take_slice(index);
+                    take_length = index;
                     break;
                 }
                 // If not `ESCAPABLE`, break immediately.
                 if !ESCAPABLE {
-                    output = self.take_slice(index);
+                    take_length = index;
                     break;
                 }
             }
@@ -152,6 +152,6 @@ impl<'data> Cursor<'data> {
             (last_b, last_a) = (last_a, char);
         }
 
-        output
+        self.take_slice(take_length)
     }
 }

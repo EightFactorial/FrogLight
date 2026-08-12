@@ -3,7 +3,7 @@
 
 use alloc::string::String;
 
-use ::core::range::Range;
+use ::core::{fmt, range::Range};
 
 use crate::types::indexed::core::SliceCore;
 
@@ -108,4 +108,9 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
     pub fn into_owned(self) -> IndexedSnbt<core::CowCore<'static>> {
         IndexedSnbt::new(self.core.into_owned())
     }
+}
+
+impl<C: core::IndexCore> fmt::Debug for IndexedSnbt<C> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.root(), f) }
 }

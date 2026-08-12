@@ -5,7 +5,7 @@ use core::fmt;
 
 use crate::types::indexed::index::{
     Index, Indexable,
-    numeric::{Float, Integer},
+    numeric::{Float, Integer, IntegerSignness},
 };
 
 mod entry;
@@ -59,17 +59,61 @@ impl<'data, T: Referenceable + ?Sized> IndexedReference<'data, T> {
     }
 }
 
+impl<'data, T: Referenceable<Indexable = Integer> + ?Sized + 'data> IndexedReference<'data, T> {
+    /// Call the function based on the signness of the value.
+    ///
+    /// Try using with [`cast_signed`](u32::cast_signed) to convert the value to
+    /// a signed integer.
+    #[inline]
+    pub fn or_signed<R>(
+        self,
+        unsigned: impl FnOnce(T::Value<'data>) -> R,
+        signed: impl FnOnce(T::Value<'data>) -> R,
+    ) -> R {
+        match self.description().signness() {
+            IntegerSignness::None | IntegerSignness::Unsigned => unsigned(self.get()),
+            IntegerSignness::Signed => signed(self.get()),
+        }
+    }
+
+    /// Call the function based on the signness of the value.
+    ///
+    /// Can be used where the `argument` cannot be moved into either closure.
+    ///
+    /// Try using with [`cast_signed`](u32::cast_signed) to convert the value to
+    /// a signed integer.
+    #[inline]
+    pub fn or_signed_with<U, R>(
+        self,
+        argument: U,
+        unsigned: impl FnOnce(T::Value<'data>, U) -> R,
+        signed: impl FnOnce(T::Value<'data>, U) -> R,
+    ) -> R {
+        match self.description().signness() {
+            IntegerSignness::None | IntegerSignness::Unsigned => unsigned(self.get(), argument),
+            IntegerSignness::Signed => signed(self.get(), argument),
+        }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 macro_rules! impl_referenceable {
-    ( $ty:ty $(,)? => { $($tt:tt)* } ) => {
+    ( $ty:ty $(,)? => { $($ref_tt:tt)* }, => { $($dbg_tt:tt)* }, => { $($dsp_tt:tt)* } ) => {
         impl Referenceable for $ty {
-            $($tt)*
+            $($ref_tt)*
+        }
+
+        impl core::fmt::Debug for IndexedReference<'_, $ty> {
+            $($dbg_tt)*
+        }
+        impl core::fmt::Display for IndexedReference<'_, $ty> {
+            $($dsp_tt)*
         }
     };
-    ( $($ty:ty),+ $(,)? => $block:tt ) => {
+    ( $($ty:ty),+ $(,)? => $ref_block:tt, => $dbg_block:tt, => $dsp_block:tt ) => {
         $(
-            impl_referenceable! { $ty => $block }
+            impl_referenceable! { $ty => $ref_block, => $dbg_block, => $dsp_block }
         )+
     };
 }
@@ -85,6 +129,16 @@ impl_referenceable! {
             // SAFETY: `IndexedReference` guarantees that this is safe.
             unsafe { reference.index.read_value(reference.root).into() }
         }
+    },
+    => {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Debug::fmt(&self.get(), f)
+        }
+    },
+    => {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Display::fmt(&self.get(), f)
+        }
     }
 }
 
@@ -98,6 +152,16 @@ impl_referenceable! {
         fn get_value(reference: IndexedReference<'_, Self>) -> Self::Value<'_> {
             // SAFETY: `IndexedReference` guarantees that this is safe.
             unsafe { reference.index.read_value(reference.root).into() }
+        }
+    },
+    => {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            self.or_signed_with(f, |v, f| fmt::Debug::fmt(&v, f), |v, f| fmt::Debug::fmt(&v.cast_signed(), f))
+        }
+    },
+    => {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            self.or_signed_with(f, |v, f| fmt::Display::fmt(&v, f), |v, f| fmt::Display::fmt(&v.cast_signed(), f))
         }
     }
 }
@@ -113,6 +177,18 @@ impl_referenceable! {
             // SAFETY: `IndexedReference` guarantees that this is safe.
             unsafe { reference.index.read_value(reference.root).into() }
         }
+    },
+    => {
+        #[inline]
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Debug::fmt(&self.get(), f)
+        }
+    },
+    => {
+        #[inline]
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Display::fmt(&self.get(), f)
+        }
     }
 }
 
@@ -127,26 +203,22 @@ impl_referenceable! {
             // SAFETY: `IndexedReference` guarantees that this is safe.
             unsafe { reference.index.read_value(reference.root) }
         }
+    },
+    => {
+        #[inline]
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Debug::fmt(&self.get(), f)
+        }
+    },
+    => {
+        #[inline]
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            fmt::Display::fmt(&self.get(), f)
+        }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
-
-impl<T: Referenceable + ?Sized> fmt::Debug for IndexedReference<'_, T>
-where
-    for<'a> T::Value<'a>: fmt::Debug,
-{
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.get(), f) }
-}
-
-impl<T: Referenceable + ?Sized> fmt::Display for IndexedReference<'_, T>
-where
-    for<'a> T::Value<'a>: fmt::Display,
-{
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(&self.get(), f) }
-}
 
 impl<T: Referenceable + ?Sized> Clone for IndexedReference<'_, T> {
     #[inline]

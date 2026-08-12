@@ -1,0 +1,82 @@
+# Use `#` to denote comments
+# Use `=>` to denote tests
+
+# Test empty whitespace
+empty_whitespace_0 => {}
+empty_whitespace_1 => { }
+empty_whitespace_2 => {  }
+empty_whitespace_3 => {   }
+
+# Test entry whitespace
+entry_whitespace_0 => {a:0}
+entry_whitespace_1 => { a:0 }
+entry_whitespace_2 => {  a:0  }
+entry_whitespace_3 => { a:0}
+entry_whitespace_4 => {  a:0}
+entry_whitespace_5 => {a:0 }
+entry_whitespace_6 => {a:0  }
+
+# Test multiple entry whitespace
+entry2_whitespace_0 => {a:0,b:1}
+entry2_whitespace_1 => { a:0,b:1}
+entry2_whitespace_2 => {a:0, b:1}
+entry2_whitespace_3 => {a:0,b:1 }
+entry2_whitespace_4 => {a:0, b:1 }
+entry2_whitespace_5 => { a:0, b:1 }
+entry2_whitespace_6 => { a:0, b:1}
+
+# Test bool formats
+bool_bool_true => {a:true}
+bool_bool_false => {a:false}
+bool_byte_true => {a:bool(1b)}
+bool_byte_false => {a:bool(0b)}
+bool_ubyte_true => {a:bool(1ub)}
+bool_ubyte_false => {a:bool(0ub)}
+bool_sbyte_true => {a:bool(1sb)}
+bool_sbyte_false => {a:bool(0sb)}
+bool_int_true => {a:bool(1)}
+bool_int_false => {a:bool(0)}
+bool_uint_true => {a:bool(1ui)}
+bool_uint_false => {a:bool(0ui)}
+bool_sint_true => {a:bool(1si)}
+bool_sint_false => {a:bool(0si)}
+bool_long_true => {a:bool(1l)}
+bool_long_false => {a:bool(0l)}
+bool_ulong_true => {a:bool(1ul)}
+bool_ulong_false => {a:bool(0ul)}
+bool_slong_true => {a:bool(1sl)}
+bool_slong_false => {a:bool(0sl)}
+
+# Test byte (u8/i8) formats
+byte_min => {a:0b}
+byte_max => {a:255b}
+byte_umin => {a:0ub}
+byte_umax => {a:255ub}
+byte_smin => {a:-128sb}
+byte_smax => {a:127sb}
+
+# Test short (u16/i16) formats
+short_min => {a:0s}
+short_max => {a:65535s}
+short_umin => {a:0us}
+short_umax => {a:65535us}
+short_smin => {a:-32768ss}
+short_smax => {a:32767ss}
+
+# Test integer (u32/i32) formats
+integer_nmin => {a:0}
+integer_nmax => {a:4294967295}
+integer_min => {a:0i}
+integer_max => {a:4294967295i}
+integer_umin => {a:0ui}
+integer_umax => {a:4294967295ui}
+integer_smin => {a:-2147483648si}
+integer_smax => {a:2147483647si}
+
+# Test long (u64/i64) formats
+long_min => {a:0l}
+long_max => {a:18446744073709551615l}
+long_umin => {a:0ul}
+long_umax => {a:18446744073709551615ul}
+long_smin => {a:-9223372036854775808sl}
+long_smax => {a:9223372036854775807sl}
