@@ -17,12 +17,12 @@ mod value;
 pub use value::ValueList;
 
 /// A typed NBT List that is indexed by an [`IndexCore`].
-pub struct IndexedList<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> {
-    core: A::CORE<'data, C>,
+pub struct IndexedList<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> {
+    core: A::CORE<'index, C>,
     index: Index<T>,
 }
 
-impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, T, A, C> {
+impl<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> IndexedList<'index, T, A, C> {
     /// Create a new [`IndexedList`] from the given core and [`Index`].
     ///
     /// # Safety
@@ -30,15 +30,15 @@ impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data,
     /// The caller must ensure that the index is valid for the given core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: A::CORE<'data, C>, index: Index<T>) -> Self {
+    pub const unsafe fn new(core: A::CORE<'index, C>, index: Index<T>) -> Self {
         Self { core, index }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
-    IndexedList<'data, T, A, C>
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'index>
+    IndexedList<'index, T, A, C>
 {
     /// Get the length of the list.
     #[must_use]
@@ -64,7 +64,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
     /// or `None` if the index is out of bounds.
     #[inline]
     #[must_use]
-    pub fn get(self, index: usize) -> Option<T::Value<'data>> {
+    pub fn get(self, index: usize) -> Option<T::Value<'index>> {
         self.get_indexed(index).map(IndexedReference::get)
     }
 
@@ -79,7 +79,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
     /// Get an [`IndexedReference`] to the value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_indexed(self, index: usize) -> Option<IndexedReference<'data, T, A>> {
+    pub fn get_indexed(self, index: usize) -> Option<IndexedReference<'index, T, A>> {
         if index >= self.len() {
             return None;
         }
@@ -142,7 +142,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
     /// Return an iterator over the entries in the list.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> ListIter<'_, 'data, T, A, C>
+    pub const fn iter(&self) -> ListIter<'_, 'index, T, A, C>
     where
         C: IndexCore<Ref>,
     {
@@ -158,16 +158,16 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess, C: IndexCore<A> + 'data>
     /// This is to prevent accidental `Clone`s, which can be very expensive.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> ListOwnedIter<'data, T, A, C>
+    pub const fn into_iter(self) -> ListOwnedIter<'index, T, A, C>
     where
-        <A as NbtAccess>::CORE<'data, C>: Copy,
+        <A as NbtAccess>::CORE<'index, C>: Copy,
     {
         ListOwnedIter::new(self)
     }
 }
 
-impl<'data, T: IndexableValueMut + ?Sized, C: IndexCore<Mut> + 'data>
-    IndexedList<'data, T, Mut, C>
+impl<'index, T: IndexableValueMut + ?Sized, C: IndexCore<Mut> + 'index>
+    IndexedList<'index, T, Mut, C>
 {
     /// Get an [`IndexedReference`] to the value at the given index,
     /// or `None` if the index is out of bounds.
@@ -222,12 +222,12 @@ impl<'data, T: IndexableValueMut + ?Sized, C: IndexCore<Mut> + 'data>
     /// Get an iterator over the entries in the list.
     #[inline]
     #[must_use]
-    pub const fn iter_mut(&mut self) -> ListIter<'_, 'data, T, Mut, C> { ListIter::new(self) }
+    pub const fn iter_mut(&mut self) -> ListIter<'_, 'index, T, Mut, C> { ListIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedMapType, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedList<'index, IndexedMapType, A, C> {
     /// Get the length of the list.
     #[must_use]
     pub fn len(&self) -> usize {
@@ -242,7 +242,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedMap
     /// Get the value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get(self, index: usize) -> Option<IndexedCompound<'data, A, C>> {
+    pub fn get(self, index: usize) -> Option<IndexedCompound<'index, A, C>> {
         if index >= self.len() {
             return None;
         }
@@ -281,7 +281,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedMap
     /// Get an iterator over the entries in the list.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> ListIter<'_, 'data, IndexedMapType, A, C>
+    pub const fn iter(&self) -> ListIter<'_, 'index, IndexedMapType, A, C>
     where
         C: IndexCore<Ref>,
     {
@@ -297,15 +297,15 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedMap
     /// This is to prevent accidental `Clone`s, which can be very expensive.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> ListOwnedIter<'data, IndexedMapType, A, C>
+    pub const fn into_iter(self) -> ListOwnedIter<'index, IndexedMapType, A, C>
     where
-        <A as NbtAccess>::CORE<'data, C>: Copy,
+        <A as NbtAccess>::CORE<'index, C>: Copy,
     {
         ListOwnedIter::new(self)
     }
 }
 
-impl<'data, C: IndexCore<Mut> + 'data> IndexedList<'data, IndexedMapType, Mut, C> {
+impl<'index, C: IndexCore<Mut> + 'index> IndexedList<'index, IndexedMapType, Mut, C> {
     /// Get the value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
@@ -328,14 +328,14 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedList<'data, IndexedMapType, Mut, C
     #[inline]
     #[must_use]
     #[expect(clippy::iter_without_into_iter, reason = "Not correct")]
-    pub const fn iter_mut(&mut self) -> ListIter<'_, 'data, IndexedMapType, Mut, C> {
+    pub const fn iter_mut(&mut self) -> ListIter<'_, 'index, IndexedMapType, Mut, C> {
         ListIter::new(self)
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedListType, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedList<'index, IndexedListType, A, C> {
     /// Get the length of the list.
     #[must_use]
     pub fn len(&self) -> usize {
@@ -350,7 +350,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedLis
     /// Get the value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
-    pub fn get(self, index: usize) -> Option<ValueList<'data, A, C>> {
+    pub fn get(self, index: usize) -> Option<ValueList<'index, A, C>> {
         if index >= self.len() {
             return None;
         }
@@ -375,7 +375,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedLis
     /// Get an iterator over the entries in the list.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> ListIter<'_, 'data, IndexedListType, A, C>
+    pub const fn iter(&self) -> ListIter<'_, 'index, IndexedListType, A, C>
     where
         C: IndexCore<Ref>,
     {
@@ -391,15 +391,15 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedList<'data, IndexedLis
     /// This is to prevent accidental `Clone`s, which can be very expensive.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> ListOwnedIter<'data, IndexedListType, A, C>
+    pub const fn into_iter(self) -> ListOwnedIter<'index, IndexedListType, A, C>
     where
-        <A as NbtAccess>::CORE<'data, C>: Copy,
+        <A as NbtAccess>::CORE<'index, C>: Copy,
     {
         ListOwnedIter::new(self)
     }
 }
 
-impl<'data, C: IndexCore<Mut> + 'data> IndexedList<'data, IndexedListType, Mut, C> {
+impl<'index, C: IndexCore<Mut> + 'index> IndexedList<'index, IndexedListType, Mut, C> {
     /// Get a reference to value at the given index,
     /// or `None` if the index is out of bounds.
     #[must_use]
@@ -415,7 +415,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedList<'data, IndexedListType, Mut, 
     #[inline]
     #[must_use]
     #[allow(clippy::iter_without_into_iter, reason = "Not correct")]
-    pub const fn iter_mut(&mut self) -> ListIter<'_, 'data, IndexedListType, Mut, C> {
+    pub const fn iter_mut(&mut self) -> ListIter<'_, 'index, IndexedListType, Mut, C> {
         ListIter::new(self)
     }
 }
@@ -434,23 +434,29 @@ where
     }
 }
 
-impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedList<'data, T, A, C>
+impl<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> Clone
+    for IndexedList<'index, T, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
     fn clone(&self) -> Self { Self { core: self.core.clone(), index: self.index } }
 }
-impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedList<'data, T, A, C> where
-    <A as NbtAccess>::CORE<'data, C>: Copy
+impl<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> Copy
+    for IndexedList<'index, T, A, C>
+where
+    <A as NbtAccess>::CORE<'index, C>: Copy,
 {
 }
 
-impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq
-    for IndexedList<'data, T, A, C>
+impl<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> PartialEq
+    for IndexedList<'index, T, A, C>
 {
     fn eq(&self, other: &Self) -> bool {
         self.index == other.index
             && <C as IndexCore<A>>::root(&self.core) == <C as IndexCore<A>>::root(&other.core)
     }
 }
-impl<'data, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'data> Eq for IndexedList<'data, T, A, C> {}
+impl<'index, T: ?Sized, A: NbtAccess, C: IndexCore<A> + 'index> Eq
+    for IndexedList<'index, T, A, C>
+{
+}

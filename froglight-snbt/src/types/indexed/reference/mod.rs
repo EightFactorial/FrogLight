@@ -15,8 +15,8 @@ mod value;
 pub use value::ValueReference;
 
 /// A reference to an SNBT value.
-pub struct IndexedReference<'data, T: Referenceable + ?Sized> {
-    root: &'data str,
+pub struct IndexedReference<'index, T: Referenceable + ?Sized> {
+    root: &'index str,
     index: Index<T::Indexable>,
 }
 
@@ -34,7 +34,7 @@ pub trait Referenceable {
     fn get_value(reference: IndexedReference<'_, Self>) -> Self::Value<'_>;
 }
 
-impl<'data, T: Referenceable + ?Sized> IndexedReference<'data, T> {
+impl<'index, T: Referenceable + ?Sized> IndexedReference<'index, T> {
     /// Create a new [`IndexedReference`] with the given root and index.
     ///
     /// # Safety
@@ -42,14 +42,25 @@ impl<'data, T: Referenceable + ?Sized> IndexedReference<'data, T> {
     /// The caller must ensure the index is valid for the given root string.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(root: &'data str, index: Index<T::Indexable>) -> Self {
+    pub const unsafe fn new(root: &'index str, index: Index<T::Indexable>) -> Self {
         Self { root, index }
+    }
+
+    /// Upgrade the lifetime of the reference.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the same root string is used.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn upgrade(self, root: &str) -> IndexedReference<'_, T> {
+        IndexedReference { root, index: self.index }
     }
 
     /// Get the value of this reference.
     #[inline]
     #[must_use]
-    pub fn get(self) -> T::Value<'data> { T::get_value(self) }
+    pub fn get(self) -> T::Value<'index> { T::get_value(self) }
 
     /// Get a description of this value.
     #[inline]
@@ -59,7 +70,7 @@ impl<'data, T: Referenceable + ?Sized> IndexedReference<'data, T> {
     }
 }
 
-impl<'data, T: Referenceable<Indexable = Integer> + ?Sized + 'data> IndexedReference<'data, T> {
+impl<'index, T: Referenceable<Indexable = Integer> + ?Sized + 'index> IndexedReference<'index, T> {
     /// Call the function based on the signness of the value.
     ///
     /// Try using with [`cast_signed`](u32::cast_signed) to convert the value to
@@ -67,8 +78,8 @@ impl<'data, T: Referenceable<Indexable = Integer> + ?Sized + 'data> IndexedRefer
     #[inline]
     pub fn or_signed<R>(
         self,
-        unsigned: impl FnOnce(T::Value<'data>) -> R,
-        signed: impl FnOnce(T::Value<'data>) -> R,
+        unsigned: impl FnOnce(T::Value<'index>) -> R,
+        signed: impl FnOnce(T::Value<'index>) -> R,
     ) -> R {
         match self.description().signness() {
             IntegerSignness::None | IntegerSignness::Unsigned => unsigned(self.get()),
@@ -86,8 +97,8 @@ impl<'data, T: Referenceable<Indexable = Integer> + ?Sized + 'data> IndexedRefer
     pub fn or_signed_with<U, R>(
         self,
         argument: U,
-        unsigned: impl FnOnce(T::Value<'data>, U) -> R,
-        signed: impl FnOnce(T::Value<'data>, U) -> R,
+        unsigned: impl FnOnce(T::Value<'index>, U) -> R,
+        signed: impl FnOnce(T::Value<'index>, U) -> R,
     ) -> R {
         match self.description().signness() {
             IntegerSignness::None | IntegerSignness::Unsigned => unsigned(self.get(), argument),

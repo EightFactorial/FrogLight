@@ -10,7 +10,7 @@ use crate::types::indexed::{
     types::IndexedListType,
 };
 
-impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'index> IndexedValue<'index, A, C> {
     /// Return a reference to the stored value.
     #[must_use]
     pub fn as_value(&self) -> ValueReference<'_, Ref, C> {
@@ -58,7 +58,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
 
     /// Return the stored value.
     #[must_use]
-    pub fn into_value(self) -> ValueReference<'data, Ref, C> {
+    pub fn into_value(self) -> ValueReference<'index, Ref, C> {
         match self.index {
             ValueIndex::Byte(index) => ValueReference::Byte(unsafe {
                 let root = <C as IndexCore<A>>::root(A::into_core(self.core));
@@ -112,7 +112,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     }
 }
 
-impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
+impl<'index, C: IndexCore<Mut> + 'index> IndexedValue<'index, Mut, C> {
     /// Return a reference to the stored value.
     #[must_use]
     pub fn as_value_mut(&mut self) -> ValueReference<'_, Mut, C> {
@@ -170,7 +170,7 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
 
 macro_rules! create_fns {
     (@ref $($as_ident:ident $(& $into_ident:ident)?: $ty:ty => $variant:ident),*) => {
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValue<'data, A, C> {
+        impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedValue<'index, A, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
@@ -187,7 +187,7 @@ macro_rules! create_fns {
                     #[inline]
                     #[must_use]
                     #[doc = concat!("Return the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                    pub fn $into_ident(self) -> Option<<$ty as IndexableValue>::Value<'data>> {
+                    pub fn $into_ident(self) -> Option<<$ty as IndexableValue>::Value<'index>> {
                         if let ValueIndex::$variant(value) = self.index {
                             let root = <C as IndexCore<A>>::root(A::into_core(self.core));
                             Some(unsafe { IndexedReference::<$ty, Ref>::new(root, value) }.get())
@@ -200,7 +200,7 @@ macro_rules! create_fns {
         }
     };
     (@mut $($ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
+        impl<'index, C: IndexCore<Mut> + 'index> IndexedValue<'index, Mut, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a mutable reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
@@ -246,7 +246,7 @@ create_fns! {
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'index> IndexedValue<'index, A, C> {
     /// Return a reference to the stored value if it is of type
     /// [`IndexedCompound`], else `None`.
     #[must_use]
@@ -261,7 +261,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     /// Return the stored value if it is of type [`IndexedCompound`], else
     /// `None`.
     #[must_use]
-    pub fn into_compound(self) -> Option<IndexedCompound<'data, A, C>> {
+    pub fn into_compound(self) -> Option<IndexedCompound<'index, A, C>> {
         if let ValueIndex::Compound(value) = self.index {
             Some(unsafe { IndexedCompound::<A, C>::new(self.core, value.value()) })
         } else {
@@ -283,7 +283,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     /// Return the stored value if it is of type [`IndexedValueList`], else
     /// `None`.
     #[must_use]
-    pub fn into_list(self) -> Option<ValueList<'data, A, C>> {
+    pub fn into_list(self) -> Option<ValueList<'index, A, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list::<C, A>(self.core, index))
         } else {
@@ -292,7 +292,7 @@ impl<'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'data> IndexedValue
     }
 }
 
-impl<'data, C: IndexCore<Mut> + 'data> IndexedValue<'data, Mut, C> {
+impl<'index, C: IndexCore<Mut> + 'index> IndexedValue<'index, Mut, C> {
     /// Return a mutable reference to the stored value if it is of type
     /// [`IndexedCompound`], else else `None`.
     pub fn as_compound_mut(&mut self) -> Option<IndexedCompound<'_, Mut, C>> {

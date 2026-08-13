@@ -32,7 +32,7 @@ impl<C: core::IndexCore> IndexedSnbt<C> {
     /// structure.
     #[inline]
     #[must_use]
-    pub fn root(&self) -> compound::IndexedCompound<'_, C> {
+    pub fn as_compound(&self) -> compound::IndexedCompound<'_, C> {
         let range = Range { start: 0, end: 1 };
         let index = unsafe { self.core.get_entries(range).get_unchecked(0) };
         debug_assert!(matches!(index.value(), entry::ValueIndex::Compound(..)));
@@ -45,9 +45,24 @@ impl<C: core::IndexCore> IndexedSnbt<C> {
     /// structure as a [`ValueReference`](reference::ValueReference).
     #[inline]
     #[must_use]
-    pub fn root_value(&self) -> reference::ValueReference<'_, C> {
-        reference::ValueReference::Compound(self.root())
+    pub fn as_value(&self) -> reference::ValueReference<'_, C> {
+        reference::ValueReference::Compound(self.as_compound())
     }
+
+    /// Get the root SNBT string.
+    #[inline]
+    #[must_use]
+    pub fn as_root(&self) -> &str { self.core.root() }
+
+    /// Get the root SNBT string.
+    ///
+    /// With certain [`IndexCore`](core::IndexCore)s (notably [`SliceCore`]),
+    /// this may allow for longer borrows.
+    ///
+    /// See [`IndexedReference::upgrade`](reference::IndexedReference::upgrade).
+    #[inline]
+    #[must_use]
+    pub fn as_str(&self) -> C::RootLong<'_> { self.core.root_long() }
 }
 
 impl<'data> IndexedSnbt<core::SliceCore<'data>> {
@@ -112,5 +127,7 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
 
 impl<C: core::IndexCore> fmt::Debug for IndexedSnbt<C> {
     #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.root(), f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.as_compound(), f)
+    }
 }

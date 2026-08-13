@@ -5,42 +5,42 @@ use crate::types::indexed::{
 };
 
 /// An iterator over the entries in an [`IndexedCompound`].
-pub struct CompoundOwnedIter<'data, A: NbtAccess, C: IndexCore<A>>
+pub struct CompoundOwnedIter<'index, A: NbtAccess, C: IndexCore<A>>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
-    compound: IndexedCompound<'data, A, C>,
+    compound: IndexedCompound<'index, A, C>,
     index: usize,
 }
 
-impl<'data, C: IndexCore<A>, A: NbtAccess> CompoundOwnedIter<'data, A, C>
+impl<'index, C: IndexCore<A>, A: NbtAccess> CompoundOwnedIter<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
     /// Create a new [`CompoundOwnedIter`] from the given [`IndexedCompound`].
     #[inline]
     #[must_use]
-    pub const fn new(compound: IndexedCompound<'data, A, C>) -> Self {
+    pub const fn new(compound: IndexedCompound<'index, A, C>) -> Self {
         CompoundOwnedIter { compound, index: 0 }
     }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A>> IntoIterator for IndexedCompound<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A>> IntoIterator for IndexedCompound<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
-    type IntoIter = CompoundOwnedIter<'data, A, C>;
-    type Item = IndexedEntry<'data, A, C>;
+    type IntoIter = CompoundOwnedIter<'index, A, C>;
+    type Item = IndexedEntry<'index, A, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { CompoundOwnedIter::new(self) }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A>> Iterator for CompoundOwnedIter<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A>> Iterator for CompoundOwnedIter<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
-    type Item = IndexedEntry<'data, A, C>;
+    type Item = IndexedEntry<'index, A, C>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let entry = self.compound.clone().get_index(self.index)?;
@@ -49,9 +49,9 @@ where
         Some(entry)
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A>> ExactSizeIterator for CompoundOwnedIter<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A>> ExactSizeIterator for CompoundOwnedIter<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
     fn len(&self) -> usize { self.compound.len() - self.index }
 }
@@ -59,36 +59,36 @@ where
 // -------------------------------------------------------------------------------------------------
 
 /// An iterator over the entries in an [`IndexedCompound`].
-pub struct CompoundIter<'iter, 'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> {
-    compound: &'iter IndexedCompound<'data, A, C>,
+pub struct CompoundIter<'iter, 'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> {
+    compound: &'iter IndexedCompound<'index, A, C>,
     index: usize,
 }
 
-impl<'iter, 'data, C: IndexCore<Ref> + IndexCore<A>, A: NbtAccess>
-    CompoundIter<'iter, 'data, A, C>
+impl<'iter, 'index, C: IndexCore<Ref> + IndexCore<A>, A: NbtAccess>
+    CompoundIter<'iter, 'index, A, C>
 {
     /// Create a new [`CompoundIter`] from the given [`IndexedCompound`].
     #[inline]
     #[must_use]
-    pub const fn new(compound: &'iter IndexedCompound<'data, A, C>) -> Self {
+    pub const fn new(compound: &'iter IndexedCompound<'index, A, C>) -> Self {
         CompoundIter { compound, index: 0 }
     }
 }
 
-impl<'iter, 'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
-    for &'iter IndexedCompound<'data, A, C>
+impl<'iter, 'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
+    for &'iter IndexedCompound<'index, A, C>
 {
-    type IntoIter = CompoundIter<'iter, 'data, A, C>;
+    type IntoIter = CompoundIter<'iter, 'index, A, C>;
     type Item = IndexedEntry<'iter, Ref, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
 #[allow(clippy::into_iter_without_iter, reason = "Ignored")]
-impl<'iter, 'data, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
-    for &'iter mut IndexedCompound<'data, A, C>
+impl<'iter, 'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> IntoIterator
+    for &'iter mut IndexedCompound<'index, A, C>
 {
-    type IntoIter = CompoundIter<'iter, 'data, A, C>;
+    type IntoIter = CompoundIter<'iter, 'index, A, C>;
     type Item = IndexedEntry<'iter, Ref, C>;
 
     #[inline]

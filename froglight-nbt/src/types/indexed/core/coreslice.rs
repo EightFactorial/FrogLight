@@ -13,13 +13,13 @@ use crate::types::indexed::{
 
 /// An [`IndexCore`] for borrowed NBT data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SliceCore<'data, A: NbtAccess> {
-    pub(crate) root: A::SLICE<'data>,
+pub struct SliceCore<'core, A: NbtAccess> {
+    pub(crate) root: A::SLICE<'core>,
     pub(crate) entries: Vec<EntryIndex>,
     pub(crate) ranges: Vec<Range<usize>>,
 }
 
-impl<'data, A: NbtAccess> SliceCore<'data, A> {
+impl<'core, A: NbtAccess> SliceCore<'core, A> {
     /// Create a new [`SliceCore`] with the given NBT slice, entries, and
     /// ranges.
     ///
@@ -29,7 +29,7 @@ impl<'data, A: NbtAccess> SliceCore<'data, A> {
     #[inline]
     #[must_use]
     pub const unsafe fn new(
-        root: A::SLICE<'data>,
+        root: A::SLICE<'core>,
         entries: Vec<EntryIndex>,
         ranges: Vec<Range<usize>>,
     ) -> Self {
@@ -40,7 +40,7 @@ impl<'data, A: NbtAccess> SliceCore<'data, A> {
     /// into a [`SliceCore<'_, Ref>`](Ref).
     #[inline]
     #[must_use]
-    pub fn into_ref(self) -> SliceCore<'data, Ref> {
+    pub fn into_ref(self) -> SliceCore<'core, Ref> {
         SliceCore { root: A::into_ref(self.root), entries: self.entries, ranges: self.ranges }
     }
 }
@@ -129,7 +129,14 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
     }
 }
 
-impl IndexCored for SliceCore<'_, Ref> {
+impl<'core> IndexCored for SliceCore<'core, Ref> {
+    type RootLong<'a>
+        = &'core [u8]
+    where
+        Self: 'a;
+
+    fn root_long(&self) -> Self::RootLong<'_> { self.root }
+
     #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,
@@ -156,6 +163,13 @@ impl IndexCored for SliceCore<'_, Ref> {
 }
 
 impl IndexCored for SliceCore<'_, Mut> {
+    type RootLong<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    fn root_long(&self) -> Self::RootLong<'_> { self.root }
+
     #[cfg(feature = "froglight-facet")]
     fn serialize_unnamed(
         item: SerializeItem<'_, '_>,

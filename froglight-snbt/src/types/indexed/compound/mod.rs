@@ -12,12 +12,12 @@ mod iter;
 use iter::CompoundIter;
 
 /// An SNBT Compound that is indexed by an [`IndexCore`].
-pub struct IndexedCompound<'data, C: IndexCore> {
-    core: &'data C,
+pub struct IndexedCompound<'index, C: IndexCore> {
+    core: &'index C,
     range: Range<usize>,
 }
 
-impl<'data, C: IndexCore> IndexedCompound<'data, C> {
+impl<'index, C: IndexCore> IndexedCompound<'index, C> {
     /// Create a new [`IndexedCompound`] from a range and core.
     ///
     /// # Safety
@@ -26,7 +26,7 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: &'data C, range: Range<usize>) -> Self { Self { core, range } }
+    pub const unsafe fn new(core: &'index C, range: Range<usize>) -> Self { Self { core, range } }
 
     /// Get the [`EntryIndexes`](EntryIndex) of this compound.
     #[inline]
@@ -49,7 +49,7 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     /// Return a reference to the value matching the `key`, if it is present,
     /// else `None`.
     #[must_use]
-    pub fn get<K: PartialEq<str> + ?Sized>(self, key: &K) -> Option<ValueReference<'data, C>> {
+    pub fn get<K: PartialEq<str> + ?Sized>(self, key: &K) -> Option<ValueReference<'index, C>> {
         self.entries()
             .iter()
             .find(|e| key == unsafe { e.name().read_value(self.core.root()) })
@@ -60,14 +60,14 @@ impl<'data, C: IndexCore> IndexedCompound<'data, C> {
     ///
     /// Returns `None` if the index is out of bounds.
     #[must_use]
-    pub fn get_index(self, index: usize) -> Option<EntryReference<'data, C>> {
+    pub fn get_index(self, index: usize) -> Option<EntryReference<'index, C>> {
         self.entries().get(index).map(|e| unsafe { e.into_ref(self.core) })
     }
 
     /// Create an iterator over this compound.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> CompoundIter<'data, C> { CompoundIter::new(self) }
+    pub const fn into_iter(self) -> CompoundIter<'index, C> { CompoundIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------

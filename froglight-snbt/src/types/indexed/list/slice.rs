@@ -9,19 +9,19 @@ use crate::types::indexed::{
 };
 
 /// A slice of values indexed by an [`IndexCore`].
-pub struct IndexedSlice<'data, C: IndexCore, T: Referenceable>
+pub struct IndexedSlice<'index, C: IndexCore, T: Referenceable>
 where
     T::Indexable: IndexableValue,
 {
-    core: &'data C,
+    core: &'index C,
     range: Range<usize>,
     _phantom: PhantomData<T>,
 }
 
-impl<'data, C: IndexCore, T: Referenceable + 'data> IndexedSlice<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> IndexedSlice<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
     /// Create a new [`IndexedSlice`] from a range and core.
     ///
@@ -31,7 +31,7 @@ where
     /// core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: &'data C, range: Range<usize>) -> Self {
+    pub const unsafe fn new(core: &'index C, range: Range<usize>) -> Self {
         Self { core, range, _phantom: PhantomData }
     }
 
@@ -46,7 +46,7 @@ where
     /// Get a value by it's index.
     ///
     /// Returns `None` if the index is out of bounds.
-    pub fn get(&self, index: usize) -> Option<T::Value<'data>> {
+    pub fn get(&self, index: usize) -> Option<T::Value<'index>> {
         self.get_value(index).map(IntegerValue::into)
     }
 
@@ -75,30 +75,30 @@ where
     /// Create an iterator over this slice.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> SliceIter<'data, C, T> { SliceIter::new(self) }
+    pub const fn into_iter(self) -> SliceIter<'index, C, T> { SliceIter::new(self) }
 
     /// Get this slice as an [`IndexedList`].
     #[inline]
     #[must_use]
-    pub const fn as_list(&self) -> IndexedList<'data, C> {
+    pub const fn as_list(&self) -> IndexedList<'index, C> {
         unsafe { IndexedList::new(self.core, self.range) }
     }
 
     /// Convert this slice into an [`IndexedList`].
     #[inline]
     #[must_use]
-    pub const fn into_list(self) -> IndexedList<'data, C> {
+    pub const fn into_list(self) -> IndexedList<'index, C> {
         unsafe { IndexedList::new(self.core, self.range) }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, C: IndexCore, T: Referenceable + 'data> fmt::Debug for IndexedSlice<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> fmt::Debug for IndexedSlice<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    T::Value<'data>: fmt::Debug,
-    IntegerValue: Into<T::Value<'data>>,
+    T::Value<'index>: fmt::Debug,
+    IntegerValue: Into<T::Value<'index>>,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_list().entries(self).finish()

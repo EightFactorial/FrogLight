@@ -15,13 +15,13 @@ use crate::types::indexed::{
 
 /// An [`IndexCore`] for Copy-On-Write NBT data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CowCore<'data> {
-    pub(crate) root: Cow<'data, [u8]>,
+pub struct CowCore<'core> {
+    pub(crate) root: Cow<'core, [u8]>,
     pub(crate) entries: Vec<EntryIndex>,
     pub(crate) ranges: Vec<Range<usize>>,
 }
 
-impl<'data> CowCore<'data> {
+impl<'core> CowCore<'core> {
     /// Create a new [`CowCore`] with the given NBT slice, entries, and ranges.
     ///
     /// # Safety
@@ -30,7 +30,7 @@ impl<'data> CowCore<'data> {
     #[inline]
     #[must_use]
     pub const unsafe fn new(
-        root: Cow<'data, [u8]>,
+        root: Cow<'core, [u8]>,
         entries: Vec<EntryIndex>,
         ranges: Vec<Range<usize>>,
     ) -> Self {
@@ -84,11 +84,11 @@ impl<'data> CowCore<'data> {
     }
 }
 
-impl<'data> CowCore<'data> {
+impl<'core> CowCore<'core> {
     /// Create a new [`CowCore`] from the given [`SliceCore`](super::SliceCore).
     #[inline]
     #[must_use]
-    pub fn from_slice<A: NbtAccess>(core: super::SliceCore<'data, A>) -> Self {
+    pub fn from_slice<A: NbtAccess>(core: super::SliceCore<'core, A>) -> Self {
         unsafe { Self::new(Cow::Borrowed(A::into_ref(core.root)), core.entries, core.ranges) }
     }
 
@@ -165,6 +165,13 @@ impl IndexCore<Mut> for CowCore<'_> {
 }
 
 impl IndexCored for CowCore<'_> {
+    type RootLong<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    fn root_long(&self) -> Self::RootLong<'_> { self.root.as_ref() }
+
     #[cfg(feature = "froglight-facet")]
     fn deserialize_named<'facet, const BORROW: bool>(
         item: DeserializeItem<'facet, BORROW>,

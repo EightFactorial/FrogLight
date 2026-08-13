@@ -8,12 +8,12 @@ use crate::types::indexed::{
 };
 
 /// A reference to an SNBT entry.
-pub struct EntryReference<'data, C: IndexCore> {
-    name: IndexedReference<'data, String>,
-    value: ValueReference<'data, C>,
+pub struct EntryReference<'index, C: IndexCore> {
+    name: IndexedReference<'index, String>,
+    value: ValueReference<'index, C>,
 }
 
-impl<'data, C: IndexCore> EntryReference<'data, C> {
+impl<'index, C: IndexCore> EntryReference<'index, C> {
     /// Create a new [`EntryReference`] with the given index and core.
     ///
     /// # Safety
@@ -21,7 +21,7 @@ impl<'data, C: IndexCore> EntryReference<'data, C> {
     /// The caller must ensure the [`EntryIndex`] is valid for the given core.
     #[inline]
     #[must_use]
-    pub unsafe fn new(core: &'data C, entry: EntryIndex) -> Self {
+    pub unsafe fn new(core: &'index C, entry: EntryIndex) -> Self {
         // SAFETY: The caller ensures that this is safe.
         unsafe {
             Self {
@@ -34,17 +34,17 @@ impl<'data, C: IndexCore> EntryReference<'data, C> {
     /// Get the [`IndexedReference`] to the name of this entry.
     #[inline]
     #[must_use]
-    pub const fn name(self) -> IndexedReference<'data, String> { self.name }
+    pub const fn name(self) -> IndexedReference<'index, String> { self.name }
 
     /// Get the [`ValueReference`] to the value of this entry.
     #[inline]
     #[must_use]
-    pub const fn value(self) -> ValueReference<'data, C> { self.value }
+    pub const fn value(self) -> ValueReference<'index, C> { self.value }
 
     /// Get the [`IndexedReference`] and [`ValueReference`] of this entry.
     #[inline]
     #[must_use]
-    pub const fn pair(self) -> (IndexedReference<'data, String>, ValueReference<'data, C>) {
+    pub const fn pair(self) -> (IndexedReference<'index, String>, ValueReference<'index, C>) {
         (self.name(), self.value())
     }
 }

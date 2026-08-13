@@ -11,12 +11,12 @@ mod slice;
 pub use slice::IndexedSlice;
 
 /// A list of values indexed by an [`IndexCore`].
-pub struct IndexedList<'data, C: IndexCore> {
-    core: &'data C,
+pub struct IndexedList<'index, C: IndexCore> {
+    core: &'index C,
     range: Range<usize>,
 }
 
-impl<'data, C: IndexCore> IndexedList<'data, C> {
+impl<'index, C: IndexCore> IndexedList<'index, C> {
     /// Create a new [`IndexedList`] with the given core and range.
     ///
     /// # Safety
@@ -24,7 +24,7 @@ impl<'data, C: IndexCore> IndexedList<'data, C> {
     /// The caller must ensure that the range is valid for the core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: &'data C, range: Range<usize>) -> Self { Self { core, range } }
+    pub const unsafe fn new(core: &'index C, range: Range<usize>) -> Self { Self { core, range } }
 
     /// Get the [`EntryIndexes`](EntryIndex) of this list.
     #[inline]
@@ -38,7 +38,7 @@ impl<'data, C: IndexCore> IndexedList<'data, C> {
     ///
     /// Returns `None` if the index is out of bounds.
     #[must_use]
-    pub fn get(&self, index: usize) -> Option<ValueReference<'data, C>> {
+    pub fn get(&self, index: usize) -> Option<ValueReference<'index, C>> {
         self.entries()
             .get(index)
             .map(|entry| unsafe { ValueReference::new(self.core, entry.value()) })
@@ -57,7 +57,7 @@ impl<'data, C: IndexCore> IndexedList<'data, C> {
     /// Create an iterator over this list.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> ListIter<'data, C> { ListIter::new(self) }
+    pub const fn into_iter(self) -> ListIter<'index, C> { ListIter::new(self) }
 }
 
 // -------------------------------------------------------------------------------------------------

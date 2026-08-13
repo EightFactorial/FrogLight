@@ -5,22 +5,22 @@ use crate::types::indexed::{
 };
 
 /// An iterator over an [`IndexedCompound`].
-pub struct CompoundIter<'data, C: IndexCore> {
-    compound: IndexedCompound<'data, C>,
+pub struct CompoundIter<'index, C: IndexCore> {
+    compound: IndexedCompound<'index, C>,
     index: usize,
 }
 
-impl<'data, C: IndexCore> CompoundIter<'data, C> {
+impl<'index, C: IndexCore> CompoundIter<'index, C> {
     /// Create a new [`CompoundIter`] over the given compound.
     #[inline]
     #[must_use]
-    pub const fn new(compound: IndexedCompound<'data, C>) -> Self { Self { compound, index: 0 } }
+    pub const fn new(compound: IndexedCompound<'index, C>) -> Self { Self { compound, index: 0 } }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, C: IndexCore> Iterator for CompoundIter<'data, C> {
-    type Item = EntryReference<'data, C>;
+impl<'index, C: IndexCore> Iterator for CompoundIter<'index, C> {
+    type Item = EntryReference<'index, C>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -34,23 +34,23 @@ impl<C: IndexCore> ExactSizeIterator for CompoundIter<'_, C> {
     fn len(&self) -> usize { self.compound.entries().len() - self.index }
 }
 
-impl<'data, C: IndexCore> IntoIterator for IndexedCompound<'data, C> {
-    type IntoIter = CompoundIter<'data, C>;
-    type Item = EntryReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for IndexedCompound<'index, C> {
+    type IntoIter = CompoundIter<'index, C>;
+    type Item = EntryReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { CompoundIter::new(self) }
 }
-impl<'data, C: IndexCore> IntoIterator for &IndexedCompound<'data, C> {
-    type IntoIter = CompoundIter<'data, C>;
-    type Item = EntryReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for &IndexedCompound<'index, C> {
+    type IntoIter = CompoundIter<'index, C>;
+    type Item = EntryReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { CompoundIter::new(*self) }
 }
-impl<'data, C: IndexCore> IntoIterator for &mut IndexedCompound<'data, C> {
-    type IntoIter = CompoundIter<'data, C>;
-    type Item = EntryReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for &mut IndexedCompound<'index, C> {
+    type IntoIter = CompoundIter<'index, C>;
+    type Item = EntryReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { CompoundIter::new(*self) }

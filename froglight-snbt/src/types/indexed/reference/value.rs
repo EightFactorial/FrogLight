@@ -12,43 +12,43 @@ use crate::types::indexed::{
 };
 
 /// A reference to an SNBT value.
-pub enum ValueReference<'data, C: IndexCore> {
+pub enum ValueReference<'index, C: IndexCore> {
     /// A [`bool`] value.
-    Bool(IndexedReference<'data, bool>),
+    Bool(IndexedReference<'index, bool>),
     /// A [`u8`] value.
-    Byte(IndexedReference<'data, u8>),
+    Byte(IndexedReference<'index, u8>),
     /// A [`u16`] value.
-    Short(IndexedReference<'data, u16>),
+    Short(IndexedReference<'index, u16>),
     /// A [`u32`] value.
-    Int(IndexedReference<'data, u32>),
+    Int(IndexedReference<'index, u32>),
     /// A [`u64`] value.
-    Long(IndexedReference<'data, u64>),
+    Long(IndexedReference<'index, u64>),
     /// A [`f32`] value.
-    Float(IndexedReference<'data, f32>),
+    Float(IndexedReference<'index, f32>),
     /// A [`f64`] value.
-    Double(IndexedReference<'data, f64>),
+    Double(IndexedReference<'index, f64>),
     /// A slice of [`u8`] values.
-    ByteArray(IndexedSlice<'data, C, u8>),
+    ByteArray(IndexedSlice<'index, C, u8>),
     /// A [`String`] value.
-    String(IndexedReference<'data, String>),
+    String(IndexedReference<'index, String>),
     /// A list of values.
-    List(IndexedList<'data, C>),
+    List(IndexedList<'index, C>),
     /// A compound of named entries.
-    Compound(IndexedCompound<'data, C>),
+    Compound(IndexedCompound<'index, C>),
     /// A slice of [`u32`] values.
-    IntArray(IndexedSlice<'data, C, u32>),
+    IntArray(IndexedSlice<'index, C, u32>),
     /// A slice of [`u64`] values.
-    LongArray(IndexedSlice<'data, C, u64>),
+    LongArray(IndexedSlice<'index, C, u64>),
 }
 
-impl<'data, C: IndexCore> ValueReference<'data, C> {
+impl<'index, C: IndexCore> ValueReference<'index, C> {
     /// Create a new [`ValueReference`] from the given core and index.
     ///
     /// # Safety
     ///
     /// The caller must ensure the index is valid for the given core.
     #[must_use]
-    pub unsafe fn new(core: &'data C, value: ValueIndex) -> Self {
+    pub unsafe fn new(core: &'index C, value: ValueIndex) -> Self {
         match value {
             ValueIndex::Bool(index) => {
                 Self::Bool(unsafe { IndexedReference::new(core.root(), index) })
@@ -120,11 +120,11 @@ macro_rules! create_fns {
     (
         $($ident:ident: $ty:ty => $variant:ident),*
     ) => {
-        impl<'data, C: IndexCore> ValueReference<'data, C> {
+        impl<'index, C: IndexCore> ValueReference<'index, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub const fn $ident(self) -> Option<IndexedReference<'data, $ty>> {
+                pub const fn $ident(self) -> Option<IndexedReference<'index, $ty>> {
                     if let Self::$variant(value) = self {
                         Some(value)
                     } else {
@@ -147,7 +147,7 @@ create_fns! {
     as_string: String => String
 }
 
-impl<'data, C: IndexCore> ValueReference<'data, C> {
+impl<'index, C: IndexCore> ValueReference<'index, C> {
     /// Return the stored value as a [`bool`] if it is of an integer or boolean
     /// type, else `None`.
     #[must_use]
@@ -190,35 +190,35 @@ impl<'data, C: IndexCore> ValueReference<'data, C> {
     /// Return a reference to the stored value if it is of type [`IndexedList`],
     /// else `None`.
     #[must_use]
-    pub const fn as_list(self) -> Option<IndexedList<'data, C>> {
+    pub const fn as_list(self) -> Option<IndexedList<'index, C>> {
         if let Self::List(value) = self { Some(value) } else { None }
     }
 
     /// Return a reference to the stored value if it is of type
     /// [`IndexedCompound`], else `None`.
     #[must_use]
-    pub const fn as_compound(self) -> Option<IndexedCompound<'data, C>> {
+    pub const fn as_compound(self) -> Option<IndexedCompound<'index, C>> {
         if let Self::Compound(value) = self { Some(value) } else { None }
     }
 
     /// Return a reference to the stored value if it is of type [`IndexedSlice`]
     /// of [`u8`], else `None`.
     #[must_use]
-    pub const fn as_byte_array(self) -> Option<IndexedSlice<'data, C, u8>> {
+    pub const fn as_byte_array(self) -> Option<IndexedSlice<'index, C, u8>> {
         if let Self::ByteArray(value) = self { Some(value) } else { None }
     }
 
     /// Return a reference to the stored value if it is of type [`IndexedSlice`]
     /// of [`u32`], else `None`.
     #[must_use]
-    pub const fn as_int_array(self) -> Option<IndexedSlice<'data, C, u32>> {
+    pub const fn as_int_array(self) -> Option<IndexedSlice<'index, C, u32>> {
         if let Self::IntArray(value) = self { Some(value) } else { None }
     }
 
     /// Return a reference to the stored value if it is of type [`IndexedSlice`]
     /// of [`u64`], else `None`.
     #[must_use]
-    pub const fn as_long_array(self) -> Option<IndexedSlice<'data, C, u64>> {
+    pub const fn as_long_array(self) -> Option<IndexedSlice<'index, C, u64>> {
         if let Self::LongArray(value) = self { Some(value) } else { None }
     }
 }

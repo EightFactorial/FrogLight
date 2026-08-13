@@ -12,12 +12,12 @@ use crate::types::indexed::{
 };
 
 /// An SNBT entry that is indexed by an [`IndexCore`].
-pub struct IndexedEntry<'data, C: IndexCore> {
-    core: &'data C,
+pub struct IndexedEntry<'index, C: IndexCore> {
+    core: &'index C,
     index: EntryIndex,
 }
 
-impl<'data, C: IndexCore> IndexedEntry<'data, C> {
+impl<'index, C: IndexCore> IndexedEntry<'index, C> {
     /// Create a new [`IndexedEntry`] from the given core and index.
     ///
     /// # Safety
@@ -25,12 +25,12 @@ impl<'data, C: IndexCore> IndexedEntry<'data, C> {
     /// The caller must ensure that the index is valid for the given core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: &'data C, index: EntryIndex) -> Self { Self { core, index } }
+    pub const unsafe fn new(core: &'index C, index: EntryIndex) -> Self { Self { core, index } }
 
     /// Get the name of this entry.
     #[inline]
     #[must_use]
-    pub fn name(self) -> IndexedReference<'data, String> {
+    pub fn name(self) -> IndexedReference<'index, String> {
         // SAFETY: `IndexedEntry` guarantees that this is safe.
         unsafe { IndexedReference::new(self.core.root(), self.index.name()) }
     }
@@ -38,7 +38,7 @@ impl<'data, C: IndexCore> IndexedEntry<'data, C> {
     /// Get the value of this entry.
     #[inline]
     #[must_use]
-    pub fn value(self) -> ValueReference<'data, C> {
+    pub fn value(self) -> ValueReference<'index, C> {
         // SAFETY: `IndexedEntry` guarantees that this is safe.
         unsafe { ValueReference::new(self.core, self.index.value()) }
     }
@@ -46,7 +46,7 @@ impl<'data, C: IndexCore> IndexedEntry<'data, C> {
     /// Get the name and value pair of this entry.
     #[inline]
     #[must_use]
-    pub fn pair(self) -> (IndexedReference<'data, String>, ValueReference<'data, C>) {
+    pub fn pair(self) -> (IndexedReference<'index, String>, ValueReference<'index, C>) {
         (self.name(), self.value())
     }
 }
@@ -78,12 +78,12 @@ impl<C: IndexCore> Eq for IndexedEntry<'_, C> {}
 // -------------------------------------------------------------------------------------------------
 
 /// An SNBT value that is indexed by an [`IndexCore`].
-pub struct IndexedValue<'data, C: IndexCore> {
-    core: &'data C,
+pub struct IndexedValue<'index, C: IndexCore> {
+    core: &'index C,
     index: ValueIndex,
 }
 
-impl<'data, C: IndexCore> IndexedValue<'data, C> {
+impl<'index, C: IndexCore> IndexedValue<'index, C> {
     /// Create a new [`IndexedValue`] from the given core and index.
     ///
     /// # Safety
@@ -91,11 +91,11 @@ impl<'data, C: IndexCore> IndexedValue<'data, C> {
     /// The caller must ensure that the index is valid for the given core.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(core: &'data C, index: ValueIndex) -> Self { Self { core, index } }
+    pub const unsafe fn new(core: &'index C, index: ValueIndex) -> Self { Self { core, index } }
 
     /// Get the value of this entry.
     #[must_use]
-    pub fn get(&self) -> ValueReference<'data, C> {
+    pub fn get(&self) -> ValueReference<'index, C> {
         // SAFETY: `IndexedValue` guarantees that this is safe.
         unsafe { ValueReference::new(self.core, self.index) }
     }
@@ -103,11 +103,11 @@ impl<'data, C: IndexCore> IndexedValue<'data, C> {
 
 macro_rules! create_fns {
     ($($ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, C: IndexCore + 'data> IndexedValue<'data, C> {
+        impl<'index, C: IndexCore + 'index> IndexedValue<'index, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $ident(&self) -> Option<IndexedReference<'data, $ty>> {
+                pub fn $ident(&self) -> Option<IndexedReference<'index, $ty>> {
                     if let ValueIndex::$variant(value) = self.index {
                         Some(unsafe { IndexedReference::<$ty>::new(self.core.root(), value) })
                     } else {

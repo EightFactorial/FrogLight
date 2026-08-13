@@ -12,40 +12,40 @@ use crate::types::indexed::{
 };
 
 /// An NBT List that is indexed by an [`IndexCore`].
-pub enum ValueList<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
+pub enum ValueList<'index, A: NbtAccess, C: IndexCore<A> + 'index> {
     /// An empty list.
     Empty,
     /// A [`u8`] value.
-    Byte(IndexedList<'data, u8, A, C>),
+    Byte(IndexedList<'index, u8, A, C>),
     /// A [`u16`] value.
-    Short(IndexedList<'data, u16, A, C>),
+    Short(IndexedList<'index, u16, A, C>),
     /// A [`u32`] value.
-    Int(IndexedList<'data, u32, A, C>),
+    Int(IndexedList<'index, u32, A, C>),
     /// A [`u64`] value.
-    Long(IndexedList<'data, u64, A, C>),
+    Long(IndexedList<'index, u64, A, C>),
     /// A [`f32`] value.
-    Float(IndexedList<'data, f32, A, C>),
+    Float(IndexedList<'index, f32, A, C>),
     /// A [`f64`] value.
-    Double(IndexedList<'data, f64, A, C>),
+    Double(IndexedList<'index, f64, A, C>),
     /// A [`u8`] array.
-    ByteArray(IndexedList<'data, [u8], A, C>),
+    ByteArray(IndexedList<'index, [u8], A, C>),
     /// An [`MStr`] string.
-    String(IndexedList<'data, MStr, A, C>),
+    String(IndexedList<'index, MStr, A, C>),
     /// A list of values.
-    List(IndexedList<'data, IndexedListType, A, C>),
+    List(IndexedList<'index, IndexedListType, A, C>),
     /// A compound of named entries.
-    Compound(IndexedList<'data, IndexedMapType, A, C>),
+    Compound(IndexedList<'index, IndexedMapType, A, C>),
     /// A [`u32`] array.
-    IntArray(IndexedList<'data, [u32], A, C>),
+    IntArray(IndexedList<'index, [u32], A, C>),
     /// A [`u64`] array.
-    LongArray(IndexedList<'data, [u64], A, C>),
+    LongArray(IndexedList<'index, [u64], A, C>),
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A>> ValueList<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A>> ValueList<'index, A, C> {
     /// Returns a [`ValueReference`](ValueReference) to the value at the given
     /// index, if it exists.
     #[must_use]
-    pub fn get(self, index: usize) -> Option<ValueReference<'data, A, C>> {
+    pub fn get(self, index: usize) -> Option<ValueReference<'index, A, C>> {
         match self {
             Self::Empty => None,
             Self::Byte(list) => list.get_indexed(index).map(ValueReference::Byte),
@@ -115,10 +115,10 @@ impl<'data, A: NbtAccess, C: IndexCore<A>> ValueList<'data, A, C> {
     /// Return an iterator over the values in this list.
     #[inline]
     #[must_use]
-    pub const fn into_iter(self) -> ListValueIter<'data, A, C>
+    pub const fn into_iter(self) -> ListValueIter<'index, A, C>
     where
         C: IndexCore<Ref>,
-        ValueList<'data, A, C>: Copy,
+        ValueList<'index, A, C>: Copy,
     {
         ListValueIter::new(self)
     }
@@ -132,10 +132,10 @@ impl<'data, A: NbtAccess, C: IndexCore<A>> ValueList<'data, A, C> {
     /// This is to prevent accidental `Clone`s, which can be very expensive.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> ListValueIter<'data, A, C>
+    pub const fn iter(&self) -> ListValueIter<'index, A, C>
     where
         C: IndexCore<Ref>,
-        ValueList<'data, A, C>: Copy,
+        ValueList<'index, A, C>: Copy,
     {
         ListValueIter::new(*self)
     }
@@ -161,10 +161,10 @@ impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for ValueList<'_
     }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for ValueList<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Clone for ValueList<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
-    <A as NbtAccess>::SLICE<'data>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
+    <A as NbtAccess>::SLICE<'index>: Clone,
 {
     fn clone(&self) -> Self {
         match self {
@@ -185,14 +185,14 @@ where
         }
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for ValueList<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Copy for ValueList<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Copy,
-    <A as NbtAccess>::SLICE<'data>: Copy,
+    <A as NbtAccess>::CORE<'index, C>: Copy,
+    <A as NbtAccess>::SLICE<'index>: Copy,
 {
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for ValueList<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> PartialEq for ValueList<'index, A, C> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Byte(l0), Self::Byte(r0)) => l0 == r0,
@@ -211,17 +211,17 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for ValueList<'data
         }
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for ValueList<'data, A, C> {}
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Eq for ValueList<'index, A, C> {}
 
 // -------------------------------------------------------------------------------------------------
 
 macro_rules! create_fns {
     (@ref $($as_ident:ident & $into_ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> ValueList<'data, A, C> {
+        impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> ValueList<'index, A, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a reference to the stored list if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $as_ident(&self) -> Option<&IndexedList<'data, $ty, A, C>> {
+                pub fn $as_ident(&self) -> Option<&IndexedList<'index, $ty, A, C>> {
                     if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {
@@ -231,7 +231,7 @@ macro_rules! create_fns {
 
                 #[must_use]
                 #[doc = concat!("Return a the stored list if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $into_ident(self) -> Option<IndexedList<'data, $ty, A, C>> {
+                pub fn $into_ident(self) -> Option<IndexedList<'index, $ty, A, C>> {
                     if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {
@@ -242,16 +242,16 @@ macro_rules! create_fns {
         }
 
         $(
-            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> From<IndexedList<'data, $ty, A, C>> for ValueList<'data, A, C> {
-                fn from(value: IndexedList<'data, $ty, A, C>) -> Self {
+            impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> From<IndexedList<'index, $ty, A, C>> for ValueList<'index, A, C> {
+                fn from(value: IndexedList<'index, $ty, A, C>) -> Self {
                     ValueList::$variant(value)
                 }
             }
 
-            impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> TryFrom<ValueList<'data, A, C>> for IndexedList<'data, $ty, A, C> {
-                type Error = ValueList<'data, A, C>;
+            impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> TryFrom<ValueList<'index, A, C>> for IndexedList<'index, $ty, A, C> {
+                type Error = ValueList<'index, A, C>;
 
-                fn try_from(value: ValueList<'data, A, C>) -> Result<Self, Self::Error> {
+                fn try_from(value: ValueList<'index, A, C>) -> Result<Self, Self::Error> {
                     if let ValueList::$variant(value) = value {
                         Ok(value)
                     } else {
@@ -262,11 +262,11 @@ macro_rules! create_fns {
         )*
     };
     (@mut $($ident:ident: $ty:ty => $variant:ident),*) => {
-        impl<'data, C: IndexCore<Mut> + 'data> ValueList<'data, Mut, C> {
+        impl<'index, C: IndexCore<Mut> + 'index> ValueList<'index, Mut, C> {
             $(
                 #[must_use]
                 #[doc = concat!("Return a mutable reference to the stored value if it is of type [`", stringify!($ty), "`], else `None`.")]
-                pub fn $ident(&mut self) -> Option<&mut IndexedList<'data, $ty, Mut, C>> {
+                pub fn $ident(&mut self) -> Option<&mut IndexedList<'index, $ty, Mut, C>> {
                     if let ValueList::$variant(value) = self {
                         Some(value)
                     } else {

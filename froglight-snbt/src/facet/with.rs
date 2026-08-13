@@ -62,15 +62,13 @@ impl<'_f, T: Facet<'_f>> FacetBorrowedTemplate for SnbtTemplate<'_f, T> {
         reader: &mut Reader<'facet>,
     ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
         let len = decode_u32_from(reader)? as usize;
-        let content = reader.read(len)?;
-        let content = str::from_utf8(content).map_err(ReaderError::other)?;
+        let content = str::from_utf8(reader.read(len)?).map_err(ReaderError::other)?;
+
+        let snbt = IndexedSnbtSlice::new_ref(content)
+            .map_err(|()| ReaderError::from_str("Invalid SNBT"))?;
 
         item.scoped(|partial| {
-            let snbt = IndexedSnbtSlice::new_ref(content)
-                .map_err(|()| ReaderError::from_str("Invalid SNBT"))?;
-
-            // TODO: Do some lifetime trickery and use `deserialize_borrowed_core`.
-            let mut core = super::deserialize::deserialize_owned_core(&snbt);
+            let mut core = super::deserialize::deserialize_borrowed_core(&snbt);
             let de = Deserializer::new(partial, false, &mut core, Some("snbt"));
 
             de.complete().map_err(|err| {

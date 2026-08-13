@@ -90,15 +90,25 @@ impl<C: IndexCored> IndexedNbt<C> {
     #[must_use]
     pub const unsafe fn core_mut(&mut self) -> &mut C { &mut self.core }
 
-    /// Get the raw NBT data as a byte slice.
+    /// Get the root NBT slice.
     #[inline]
     #[must_use]
-    pub fn as_slice(&self) -> &[u8]
+    pub fn as_root(&self) -> &[u8]
     where
         C: IndexCore<Ref>,
     {
         self.core.root()
     }
+
+    /// Get the root NBT slice.
+    ///
+    /// With certain [`IndexCore`](core::IndexCore)s (notably [`SliceCore`]),
+    /// this may allow for longer borrows.
+    ///
+    /// See [`IndexedReference::upgrade`](reference::IndexedReference::upgrade).
+    #[inline]
+    #[must_use]
+    pub fn as_slice(&self) -> C::RootLong<'_> { self.core.root_long() }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -319,15 +329,15 @@ impl Default for IndexedNbt<CowCore<'_>> {
 }
 
 impl<C: IndexCore<Ref>> PartialEq for IndexedNbt<C> {
-    fn eq(&self, other: &Self) -> bool { self.as_slice() == other.as_slice() }
+    fn eq(&self, other: &Self) -> bool { self.core().root() == other.core().root() }
 }
 impl<C: IndexCore<Ref>> Eq for IndexedNbt<C> {}
 
 impl<C: IndexCore<Ref>> AsRef<[u8]> for IndexedNbt<C> {
     #[inline]
-    fn as_ref(&self) -> &[u8] { self.as_slice() }
+    fn as_ref(&self) -> &[u8] { self.core().root() }
 }
 impl<C: IndexCore<Ref>> Borrow<[u8]> for IndexedNbt<C> {
     #[inline]
-    fn borrow(&self) -> &[u8] { self.as_slice() }
+    fn borrow(&self) -> &[u8] { self.core().root() }
 }

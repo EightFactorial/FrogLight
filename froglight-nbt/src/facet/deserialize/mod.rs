@@ -8,6 +8,7 @@ use froglight_facet_iter::{
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
     solver::tree::{TreeMap, naviate_field, navigate_tree, solve_enum},
 };
+use froglight_mutf8::prelude::*;
 
 use crate::{
     prelude::*,
@@ -148,6 +149,65 @@ pub fn deserialize_borrowed_core<'facet>(
                     value = naviate_field::<IndexedNbtSlice>(field, value);
                 }
 
+                macro_rules! match_type {
+                    ( @slice $($ty:ty $(as $ty_cast:ty)? => $ty_fn:ident),* ) => {
+                        $(
+                            if item.is_type::<$ty>() {
+                                let value = value.$ty_fn().ok_or_else(|| {
+                                    ReaderError::from_string(alloc::format!(
+                                        "Failed to deserialize value: expected {:?}", stringify!($ty)
+                                    ))
+                                })?;
+
+                                // SAFETY: The lifetime is upgraded using the original NBT slice.
+                                let slice = unsafe { value.upgrade(nbt.as_slice()).get() };
+
+                                return item.set::<$ty>(slice).map(Item::Item);
+                            }
+                        )*
+                    };
+                }
+
+                match_type! {
+                    @slice
+                    &[u8] => as_byte_array,
+                    &[u32] => as_int_array,
+                    &[u64] => as_long_array
+                }
+
+                if item.is_type::<&MStr>() || item.is_type::<Cow<'_, MStr>>() {
+                    let value = value.as_string().ok_or_else(|| {
+                        ReaderError::from_str("Failed to deserialize value: expected String")
+                    })?;
+
+                    // SAFETY: The lifetime is upgraded using the original NBT slice.
+                    let mstr = unsafe { value.upgrade(nbt.as_slice()).get() };
+
+                    if item.is_type::<&MStr>() {
+                        return item.set::<&MStr>(mstr).map(Item::Item);
+                    } else if item.is_type::<Cow<'_, MStr>>() {
+                        return item.set::<Cow<'_, MStr>>(Cow::Borrowed(mstr)).map(Item::Item);
+                    }
+                } else if item.is_type::<&str>() || item.is_type::<Cow<'_, str>>() {
+                    let value = value.as_string().ok_or_else(|| {
+                        ReaderError::from_str("Failed to deserialize value: expected String")
+                    })?;
+
+                    // SAFETY: The lifetime is upgraded using the original NBT slice.
+                    let str = unsafe { value.upgrade(nbt.as_slice()).get().to_utf8() };
+
+                    if item.is_type::<&str>() {
+                        return match str {
+                            Cow::Borrowed(str) => item.set::<&str>(str).map(Item::Item),
+                            Cow::Owned(..) => Err(ReaderError::from_str(
+                                "Could not borrow MUTF-8 as UTF-8, consider using `&MStr` or `Cow<'_ str>` instead.",
+                            )),
+                        };
+                    } else if item.is_type::<Cow<'_, str>>() {
+                        return item.set::<Cow<'_, str>>(str).map(Item::Item);
+                    }
+                }
+
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
@@ -227,12 +287,30 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
         f64 => as_double
     }
 
-    if item.is_type::<String>() {
+    if item.is_type::<MString>() || item.is_type::<Cow<'_, MStr>>() {
         let value = value
             .as_string()
             .ok_or_else(|| ReaderError::from_str("Failed to deserialize value: expected String"))?;
 
-        return item.set::<String>(String::from(value.get()));
+        let mstr = value.get().to_mstring();
+
+        if item.is_type::<MString>() {
+            return item.set::<MString>(mstr);
+        } else if item.is_type::<Cow<'_, MStr>>() {
+            return item.set::<Cow<'_, MStr>>(Cow::Owned(mstr));
+        }
+    } else if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() {
+        let value = value
+            .as_string()
+            .ok_or_else(|| ReaderError::from_str("Failed to deserialize value: expected String"))?;
+
+        let str = value.get().to_utf8().into_owned();
+
+        if item.is_type::<String>() {
+            return item.set::<String>(str);
+        } else if item.is_type::<Cow<'_, str>>() {
+            return item.set::<Cow<'_, str>>(Cow::Owned(str));
+        }
     }
 
     match_type! {
@@ -251,10 +329,10 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
 // -------------------------------------------------------------------------------------------------
 
 impl TreeMap for IndexedNbtSlice<'_> {
-    type Key<'data> = Cow<'data, str>;
-    type List<'data, 'core: 'data> = ValueList<'data, Ref, SliceCore<'core, Ref>>;
-    type Map<'data, 'core: 'data> = IndexedCompound<'data, Ref, SliceCore<'core, Ref>>;
-    type Value<'data, 'core: 'data> = ValueReference<'data, Ref, SliceCore<'core, Ref>>;
+    type Key<'index> = Cow<'index, str>;
+    type List<'index, 'core: 'index> = ValueList<'index, Ref, SliceCore<'core, Ref>>;
+    type Map<'index, 'core: 'index> = IndexedCompound<'index, Ref, SliceCore<'core, Ref>>;
+    type Value<'index, 'core: 'index> = ValueReference<'index, Ref, SliceCore<'core, Ref>>;
 
     fn value_is_map(value: &Self::Value<'_, '_>) -> bool {
         matches!(value, ValueReference::Compound(..))
@@ -264,45 +342,43 @@ impl TreeMap for IndexedNbtSlice<'_> {
         matches!(value, ValueReference::List(..))
     }
 
-    fn value_map<'data, 'core: 'data>(
-        value: Self::Value<'data, 'core>,
-    ) -> Option<Self::Map<'data, 'core>> {
+    fn value_map<'index, 'core: 'index>(
+        value: Self::Value<'index, 'core>,
+    ) -> Option<Self::Map<'index, 'core>> {
         if let ValueReference::Compound(value) = value { Some(value) } else { None }
     }
 
-    fn map_contains<'data, 'core: 'data>(map: &Self::Map<'data, 'core>, key: &str) -> bool {
-        map.get_ref(key).is_some()
-    }
+    fn map_contains(map: &Self::Map<'_, '_>, key: &str) -> bool { map.get_ref(key).is_some() }
 
-    fn map_get<'data, 'core: 'data>(
-        map: Self::Map<'data, 'core>,
+    fn map_get<'index, 'core: 'index>(
+        map: Self::Map<'index, 'core>,
         key: &str,
-    ) -> Option<Self::Value<'data, 'core>> {
+    ) -> Option<Self::Value<'index, 'core>> {
         map.get(key).map(IndexedValue::into_value)
     }
 
-    fn map_iter<'data, 'core: 'data>(
-        map: Self::Map<'data, 'core>,
-    ) -> impl IntoIterator<Item = (Self::Key<'data>, Self::Value<'data, 'core>)> {
+    fn map_iter<'index, 'core: 'index>(
+        map: Self::Map<'index, 'core>,
+    ) -> impl IntoIterator<Item = (Self::Key<'index>, Self::Value<'index, 'core>)> {
         map.into_iter().map(|entry| (entry.name().get().to_utf8(), entry.value().into_value()))
     }
 
-    fn value_list<'data, 'core: 'data>(
-        value: Self::Value<'data, 'core>,
-    ) -> Option<Self::List<'data, 'core>> {
+    fn value_list<'index, 'core: 'index>(
+        value: Self::Value<'index, 'core>,
+    ) -> Option<Self::List<'index, 'core>> {
         if let ValueReference::List(value) = value { Some(value) } else { None }
     }
 
-    fn list_get<'data, 'core: 'data>(
-        list: Self::List<'data, 'core>,
+    fn list_get<'index, 'core: 'index>(
+        list: Self::List<'index, 'core>,
         index: usize,
-    ) -> Option<Self::Value<'data, 'core>> {
+    ) -> Option<Self::Value<'index, 'core>> {
         list.get(index)
     }
 
-    fn list_iter<'data, 'core: 'data>(
-        list: Self::List<'data, 'core>,
-    ) -> impl IntoIterator<Item = Self::Value<'data, 'core>> {
+    fn list_iter<'index, 'core: 'index>(
+        list: Self::List<'index, 'core>,
+    ) -> impl IntoIterator<Item = Self::Value<'index, 'core>> {
         list.into_iter()
     }
 }

@@ -8,22 +8,22 @@ use crate::types::indexed::{
 };
 
 /// An iterator over an [`IndexedList`].
-pub struct ListIter<'data, C: IndexCore> {
-    list: IndexedList<'data, C>,
+pub struct ListIter<'index, C: IndexCore> {
+    list: IndexedList<'index, C>,
     index: usize,
 }
 
-impl<'data, C: IndexCore> ListIter<'data, C> {
+impl<'index, C: IndexCore> ListIter<'index, C> {
     /// Create a new [`ListIter`] over the given list.
     #[inline]
     #[must_use]
-    pub const fn new(list: IndexedList<'data, C>) -> Self { Self { list, index: 0 } }
+    pub const fn new(list: IndexedList<'index, C>) -> Self { Self { list, index: 0 } }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, C: IndexCore> Iterator for ListIter<'data, C> {
-    type Item = ValueReference<'data, C>;
+impl<'index, C: IndexCore> Iterator for ListIter<'index, C> {
+    type Item = ValueReference<'index, C>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -37,23 +37,23 @@ impl<C: IndexCore> ExactSizeIterator for ListIter<'_, C> {
     fn len(&self) -> usize { self.list.entries().len() - self.index }
 }
 
-impl<'data, C: IndexCore> IntoIterator for IndexedList<'data, C> {
-    type IntoIter = ListIter<'data, C>;
-    type Item = ValueReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for IndexedList<'index, C> {
+    type IntoIter = ListIter<'index, C>;
+    type Item = ValueReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { ListIter::new(self) }
 }
-impl<'data, C: IndexCore> IntoIterator for &IndexedList<'data, C> {
-    type IntoIter = ListIter<'data, C>;
-    type Item = ValueReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for &IndexedList<'index, C> {
+    type IntoIter = ListIter<'index, C>;
+    type Item = ValueReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { ListIter::new(*self) }
 }
-impl<'data, C: IndexCore> IntoIterator for &mut IndexedList<'data, C> {
-    type IntoIter = ListIter<'data, C>;
-    type Item = ValueReference<'data, C>;
+impl<'index, C: IndexCore> IntoIterator for &mut IndexedList<'index, C> {
+    type IntoIter = ListIter<'index, C>;
+    type Item = ValueReference<'index, C>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { ListIter::new(*self) }
@@ -62,32 +62,32 @@ impl<'data, C: IndexCore> IntoIterator for &mut IndexedList<'data, C> {
 // -------------------------------------------------------------------------------------------------
 
 /// An iterator over an [`IndexedSlice`].
-pub struct SliceIter<'data, C: IndexCore, T: Referenceable + 'data>
+pub struct SliceIter<'index, C: IndexCore, T: Referenceable + 'index>
 where
     T::Indexable: IndexableValue,
 {
-    slice: IndexedSlice<'data, C, T>,
+    slice: IndexedSlice<'index, C, T>,
     index: usize,
 }
 
-impl<'data, C: IndexCore, T: Referenceable + 'data> SliceIter<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> SliceIter<'index, C, T>
 where
     T::Indexable: IndexableValue,
 {
     /// Create a new [`SliceIter`] over the given slice.
     #[inline]
     #[must_use]
-    pub const fn new(slice: IndexedSlice<'data, C, T>) -> Self { Self { slice, index: 0 } }
+    pub const fn new(slice: IndexedSlice<'index, C, T>) -> Self { Self { slice, index: 0 } }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<'data, C: IndexCore, T: Referenceable + 'data> Iterator for SliceIter<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> Iterator for SliceIter<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
-    type Item = T::Value<'data>;
+    type Item = T::Value<'index>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -96,44 +96,45 @@ where
         value
     }
 }
-impl<'data, C: IndexCore, T: Referenceable + 'data> ExactSizeIterator for SliceIter<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> ExactSizeIterator for SliceIter<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
     #[inline]
     fn len(&self) -> usize { self.slice.entries().len() - self.index }
 }
 
-impl<'data, C: IndexCore, T: Referenceable + 'data> IntoIterator for IndexedSlice<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> IntoIterator for IndexedSlice<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
-    type IntoIter = SliceIter<'data, C, T>;
-    type Item = T::Value<'data>;
+    type IntoIter = SliceIter<'index, C, T>;
+    type Item = T::Value<'index>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { SliceIter::new(self) }
 }
-impl<'data, C: IndexCore, T: Referenceable + 'data> IntoIterator for &IndexedSlice<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> IntoIterator for &IndexedSlice<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
-    type IntoIter = SliceIter<'data, C, T>;
-    type Item = T::Value<'data>;
+    type IntoIter = SliceIter<'index, C, T>;
+    type Item = T::Value<'index>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { SliceIter::new(*self) }
 }
-impl<'data, C: IndexCore, T: Referenceable + 'data> IntoIterator for &mut IndexedSlice<'data, C, T>
+impl<'index, C: IndexCore, T: Referenceable + 'index> IntoIterator
+    for &mut IndexedSlice<'index, C, T>
 where
     T::Indexable: IndexableValue,
-    IntegerValue: Into<T::Value<'data>>,
+    IntegerValue: Into<T::Value<'index>>,
 {
-    type IntoIter = SliceIter<'data, C, T>;
-    type Item = T::Value<'data>;
+    type IntoIter = SliceIter<'index, C, T>;
+    type Item = T::Value<'index>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { SliceIter::new(*self) }

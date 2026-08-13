@@ -8,14 +8,22 @@ use crate::types::indexed::{
 };
 
 /// TODO
-pub struct CowCore<'data> {
-    pub(crate) root: Cow<'data, str>,
+pub struct CowCore<'core> {
+    pub(crate) root: Cow<'core, str>,
     pub(crate) entries: Box<[EntryIndex]>,
 }
 
 impl IndexCore for CowCore<'_> {
+    type RootLong<'a>
+        = &'a str
+    where
+        Self: 'a;
+
     #[inline]
     fn root(&self) -> &str { self.root.as_ref() }
+
+    #[inline]
+    fn root_long(&self) -> Self::RootLong<'_> { self.root.as_ref() }
 
     #[inline]
     unsafe fn get_entries(&self, range: Range<usize>) -> &[EntryIndex] {
@@ -24,7 +32,7 @@ impl IndexCore for CowCore<'_> {
     }
 }
 
-impl<'data> CowCore<'data> {
+impl<'core> CowCore<'core> {
     /// Create a new [`CowCore`] with the given root and entries.
     ///
     /// # Safety
@@ -32,7 +40,7 @@ impl<'data> CowCore<'data> {
     /// The caller must ensure that the entry list is valid for the root string.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(root: &'data str, entries: Box<[EntryIndex]>) -> Self {
+    pub const unsafe fn new(root: &'core str, entries: Box<[EntryIndex]>) -> Self {
         Self { root: Cow::Borrowed(root), entries }
     }
 
@@ -41,7 +49,7 @@ impl<'data> CowCore<'data> {
     /// This does not modify the contents.
     #[inline]
     #[must_use]
-    pub fn from_slice(core: SliceCore<'data>) -> Self {
+    pub fn from_slice(core: SliceCore<'core>) -> Self {
         Self { root: Cow::Borrowed(core.root), entries: core.entries }
     }
 

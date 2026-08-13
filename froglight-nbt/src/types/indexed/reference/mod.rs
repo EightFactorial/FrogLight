@@ -13,12 +13,12 @@ mod value;
 pub use value::ValueReference;
 
 /// A type that accessed via an [`Index`].
-pub struct IndexedReference<'data, T: IndexableValue + ?Sized, A: NbtAccess> {
-    slice: A::SLICE<'data>,
+pub struct IndexedReference<'index, T: IndexableValue + ?Sized, A: NbtAccess> {
+    slice: A::SLICE<'index>,
     index: Index<T>,
 }
 
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'data, T, A> {
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'index, T, A> {
     /// Create a new [`IndexedReference`] from the given slice and index.
     ///
     /// # Safety
@@ -26,14 +26,25 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> IndexedReference<'data, T,
     /// The caller must ensure that the index is valid for the given slice.
     #[inline]
     #[must_use]
-    pub const unsafe fn new(slice: A::SLICE<'data>, index: Index<T>) -> Self {
+    pub const unsafe fn new(slice: A::SLICE<'index>, index: Index<T>) -> Self {
         Self { slice, index }
+    }
+
+    /// Upgrade the lifetime of the reference.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the same slice is used.
+    #[inline]
+    #[must_use]
+    pub unsafe fn upgrade(self, slice: A::SLICE<'_>) -> IndexedReference<'_, T, A> {
+        IndexedReference { slice, index: self.index }
     }
 
     /// Convert this reference into the value it holds.
     #[inline]
     #[must_use]
-    pub fn get(self) -> T::Value<'data> {
+    pub fn get(self) -> T::Value<'index> {
         // SAFETY: `IndexedReference` guarantees that this is safe
         unsafe { T::get(A::into_ref(self.slice), self.index) }
     }
@@ -55,14 +66,14 @@ impl<T: IndexableValueMut + ?Sized> IndexedReference<'_, T, Mut> {
     }
 }
 
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Clone for IndexedReference<'data, T, A>
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess> Clone for IndexedReference<'index, T, A>
 where
-    <A as NbtAccess>::SLICE<'data>: Clone,
+    <A as NbtAccess>::SLICE<'index>: Clone,
 {
     fn clone(&self) -> Self { Self { slice: self.slice.clone(), index: self.index } }
 }
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Copy for IndexedReference<'data, T, A> where
-    <A as NbtAccess>::SLICE<'data>: Copy
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess> Copy for IndexedReference<'index, T, A> where
+    <A as NbtAccess>::SLICE<'index>: Copy
 {
 }
 
@@ -74,14 +85,14 @@ where
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(&self.get_ref(), f) }
 }
 
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> PartialEq for IndexedReference<'data, T, A>
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess> PartialEq for IndexedReference<'index, T, A>
 where
-    A::SLICE<'data>: PartialEq,
+    A::SLICE<'index>: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool { self.index == other.index && self.slice == other.slice }
 }
-impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Eq for IndexedReference<'data, T, A> where
-    A::SLICE<'data>: PartialEq
+impl<'index, T: IndexableValue + ?Sized, A: NbtAccess> Eq for IndexedReference<'index, T, A> where
+    A::SLICE<'index>: PartialEq
 {
 }
 
@@ -96,7 +107,7 @@ impl<'data, T: IndexableValue + ?Sized, A: NbtAccess> Eq for IndexedReference<'d
 /// correct, otherwise it will cause incorrect and undefined behavior.
 pub unsafe trait IndexableValue: sealed::Sealed {
     /// The type of value that is accessed via an [`Index`].
-    type Value<'data>: Sized;
+    type Value<'index>: Sized;
 
     /// Whether a list's index is an index into the data slice,
     /// or an index into the list of entry ranges.

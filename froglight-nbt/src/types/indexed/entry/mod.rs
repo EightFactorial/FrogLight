@@ -13,25 +13,25 @@ use crate::types::indexed::{
 pub(super) mod value;
 
 /// An NBT entry that is indexed by an [`IndexCore`].
-pub struct IndexedEntry<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-    core: A::CORE<'data, C>,
+pub struct IndexedEntry<'index, A: NbtAccess, C: IndexCore<A> + 'index> {
+    core: A::CORE<'index, C>,
     index: EntryIndex,
 }
 
 /// An NBT value that is indexed by an [`IndexCore`].
-pub struct IndexedValue<'data, A: NbtAccess, C: IndexCore<A> + 'data> {
-    core: A::CORE<'data, C>,
+pub struct IndexedValue<'index, A: NbtAccess, C: IndexCore<A> + 'index> {
+    core: A::CORE<'index, C>,
     index: ValueIndex,
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedEntry<'index, A, C> {
     /// Create a new [`IndexedEntry`] from the given core and index.
     ///
     /// # Safety
     ///
     /// The caller must ensure that `index` is a valid index for `core`.
     #[inline]
-    pub const unsafe fn new(core: A::CORE<'data, C>, index: EntryIndex) -> Self {
+    pub const unsafe fn new(core: A::CORE<'index, C>, index: EntryIndex) -> Self {
         Self { core, index }
     }
 
@@ -45,7 +45,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     #[inline]
     #[must_use]
     pub const unsafe fn new_pair(
-        core: A::CORE<'data, C>,
+        core: A::CORE<'index, C>,
         name: Index<MStr>,
         value: ValueIndex,
     ) -> Self {
@@ -56,7 +56,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     /// Get the name of this entry.
     #[inline]
     #[must_use]
-    pub fn name(self) -> IndexedReference<'data, MStr, Ref>
+    pub fn name(self) -> IndexedReference<'index, MStr, Ref>
     where
         C: IndexCore<Ref>,
     {
@@ -80,7 +80,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     /// Get the [`IndexedValue`] of this entry.
     #[inline]
     #[must_use]
-    pub fn value(self) -> IndexedValue<'data, A, C> {
+    pub fn value(self) -> IndexedValue<'index, A, C> {
         // SAFETY: `IndexedEntry` ensures this is safe.
         unsafe { IndexedValue::<A, C>::new(self.core, self.index.value()) }
     }
@@ -99,7 +99,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     /// Get the name-value pair of this entry.
     #[inline]
     #[must_use]
-    pub fn pair(self) -> (IndexedReference<'data, MStr, Ref>, IndexedValue<'data, Ref, C>)
+    pub fn pair(self) -> (IndexedReference<'index, MStr, Ref>, IndexedValue<'index, Ref, C>)
     where
         C: IndexCore<Ref>,
     {
@@ -136,7 +136,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     /// Convert this [`IndexedEntry`] into one that uses [`Ref`] access.
     #[inline]
     #[must_use]
-    pub fn into_ref(self) -> IndexedEntry<'data, Ref, C>
+    pub fn into_ref(self) -> IndexedEntry<'index, Ref, C>
     where
         C: IndexCore<Ref>,
     {
@@ -146,7 +146,7 @@ impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedEntry<'data, A, C> {
     }
 }
 
-impl<'data, C: IndexCore<Mut> + 'data> IndexedEntry<'data, Mut, C> {
+impl<'index, C: IndexCore<Mut> + 'index> IndexedEntry<'index, Mut, C> {
     /// Get the [`IndexedValue`] of this entry.
     #[inline]
     #[must_use]
@@ -156,14 +156,14 @@ impl<'data, C: IndexCore<Mut> + 'data> IndexedEntry<'data, Mut, C> {
     }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> IndexedValue<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedValue<'index, A, C> {
     /// Create a new [`IndexedValue`] from the given core and index.
     ///
     /// # Safety
     ///
     /// The caller must ensure that `index` is a valid index for `core`.
     #[inline]
-    pub const unsafe fn new(core: A::CORE<'data, C>, index: ValueIndex) -> Self {
+    pub const unsafe fn new(core: A::CORE<'index, C>, index: ValueIndex) -> Self {
         Self { core, index }
     }
 }
@@ -184,46 +184,46 @@ impl<A: NbtAccess, C: IndexCore<Ref> + IndexCore<A>> fmt::Debug for IndexedEntry
     }
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedEntry<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Clone for IndexedEntry<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
     fn clone(&self) -> Self { Self { core: self.core.clone(), index: self.index } }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedEntry<'data, A, C> where
-    <A as NbtAccess>::CORE<'data, C>: Copy
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Copy for IndexedEntry<'index, A, C> where
+    <A as NbtAccess>::CORE<'index, C>: Copy
 {
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Clone for IndexedValue<'data, A, C>
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Clone for IndexedValue<'index, A, C>
 where
-    <A as NbtAccess>::CORE<'data, C>: Clone,
+    <A as NbtAccess>::CORE<'index, C>: Clone,
 {
     fn clone(&self) -> Self { Self { core: self.core.clone(), index: self.index } }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Copy for IndexedValue<'data, A, C> where
-    <A as NbtAccess>::CORE<'data, C>: Copy
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Copy for IndexedValue<'index, A, C> where
+    <A as NbtAccess>::CORE<'index, C>: Copy
 {
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for IndexedEntry<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> PartialEq for IndexedEntry<'index, A, C> {
     fn eq(&self, other: &Self) -> bool {
         self.index == other.index
             && <C as IndexCore<A>>::root(&self.core) == <C as IndexCore<A>>::root(&other.core)
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for IndexedEntry<'data, A, C> where
-    <A as NbtAccess>::CORE<'data, C>: PartialEq
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Eq for IndexedEntry<'index, A, C> where
+    <A as NbtAccess>::CORE<'index, C>: PartialEq
 {
 }
 
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> PartialEq for IndexedValue<'data, A, C> {
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> PartialEq for IndexedValue<'index, A, C> {
     fn eq(&self, other: &Self) -> bool {
         self.index == other.index
             && <C as IndexCore<A>>::root(&self.core) == <C as IndexCore<A>>::root(&other.core)
     }
 }
-impl<'data, A: NbtAccess, C: IndexCore<A> + 'data> Eq for IndexedValue<'data, A, C> where
-    <A as NbtAccess>::CORE<'data, C>: PartialEq
+impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> Eq for IndexedValue<'index, A, C> where
+    <A as NbtAccess>::CORE<'index, C>: PartialEq
 {
 }

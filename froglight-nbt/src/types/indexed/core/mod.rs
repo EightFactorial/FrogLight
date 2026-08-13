@@ -109,6 +109,15 @@ impl<T: IndexCore<Mut>> IndexCore<Ref> for T {
 
 /// A trait for an index of NBT entries without an [`NbtAccess`] generic.
 pub trait IndexCored {
+    /// The long-lived root slice type.
+    type RootLong<'a>: Deref<Target = [u8]> + 'a
+    where
+        Self: 'a;
+
+    /// Get the long-lived root slice.
+    #[must_use]
+    fn root_long(&self) -> Self::RootLong<'_>;
+
     /// The [`WithFnAttr`] for this named NBT using this [`IndexCore`].
     #[cfg(feature = "froglight-facet")]
     const WITH_NAMED: WithFnAttr = WithFnAttr::using(
@@ -183,7 +192,7 @@ pub trait IndexCored {
 /// A trait for either [`Ref`] or [`Mut`] access.
 pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'static {
     /// The type of slice that NBT data is accessed through.
-    type SLICE<'data>: Deref<Target = [u8]> + 'data;
+    type SLICE<'core>: Deref<Target = [u8]> + 'core;
     /// The type of reference that the core is accessed through.
     type CORE<'a, C: IndexCore<Self> + ?Sized + 'a>: Deref<Target = C> + Sized + 'a;
 
@@ -211,7 +220,7 @@ pub trait NbtAccess: Debug + Default + Copy + Eq + Hash + sealed::Sealed + 'stat
 pub struct Ref;
 impl NbtAccess for Ref {
     type CORE<'a, C: IndexCore<Self> + ?Sized + 'a> = &'a C;
-    type SLICE<'data> = &'data [u8];
+    type SLICE<'core> = &'core [u8];
 
     #[inline]
     fn into_core<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> &C { core }
@@ -236,7 +245,7 @@ impl NbtAccess for Ref {
 pub struct Mut;
 impl NbtAccess for Mut {
     type CORE<'a, C: IndexCore<Self> + ?Sized + 'a> = &'a mut C;
-    type SLICE<'data> = &'data mut [u8];
+    type SLICE<'core> = &'core mut [u8];
 
     #[inline]
     fn into_core<C: IndexCore<Self> + ?Sized>(core: Self::CORE<'_, C>) -> &C { core }

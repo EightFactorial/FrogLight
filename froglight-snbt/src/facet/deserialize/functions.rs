@@ -4,10 +4,7 @@
 use facet::Facet;
 use froglight_facet_iter::deserialize::DeserializeError;
 
-use crate::{
-    facet::deserialize::DeserializeSnbt,
-    types::indexed::{IndexedSnbt, core::SliceCore},
-};
+use crate::{facet::deserialize::DeserializeSnbt, prelude::IndexedSnbtSlice};
 
 /// TODO
 ///
@@ -26,9 +23,7 @@ pub fn from_snbt_string<T: Facet<'static>>(string: &str) -> Result<T, Deserializ
 ///
 /// Returns an error if the value cannot be deserialized.
 #[inline(always)]
-pub fn from_snbt<T: Facet<'static>>(
-    snbt: &IndexedSnbt<SliceCore<'_>>,
-) -> Result<T, DeserializeError> {
+pub fn from_snbt<T: Facet<'static>>(snbt: &IndexedSnbtSlice<'_>) -> Result<T, DeserializeError> {
     <T as DeserializeSnbt>::from_snbt(snbt)
 }
 
@@ -39,7 +34,7 @@ pub fn from_snbt<T: Facet<'static>>(
 /// Returns an error if the value cannot be deserialized.
 #[inline(always)]
 pub fn from_snbt_borrowed<'facet, T: Facet<'facet>>(
-    snbt: &'facet IndexedSnbt<SliceCore<'facet>>,
+    snbt: &IndexedSnbtSlice<'facet>,
 ) -> Result<T, DeserializeError> {
     <T as DeserializeSnbt>::from_snbt_borrowed(snbt)
 }
