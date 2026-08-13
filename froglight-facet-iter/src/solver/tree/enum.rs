@@ -30,9 +30,17 @@ pub fn solve_enum<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
         if path.is_empty() {
             match solver.see_key(FieldKey::flat(String::from(key.as_ref()))) {
                 KeyResult::Ambiguous { fields } => {
+                    if !T::value_is_map(&value) {
+                        continue;
+                    }
+
                     satisfied.clear();
-                    for (_field, _score) in fields {
-                        todo!("TODO: Handle ambiguous fields");
+                    let map = T::value_map(value.clone()).unwrap();
+
+                    for (field, _score) in fields {
+                        if let Some(_value) = T::map_get(map.clone(), field.serialized_name) {
+                            satisfied.push(field);
+                        }
                     }
 
                     if let SatisfyResult::Solved(handle) = solver.satisfy(satisfied.as_slice()) {
@@ -48,23 +56,9 @@ pub fn solve_enum<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
             }
         } else {
             let path: Vec<_> = path.iter().map(AsRef::as_ref).collect();
-            match solver.probe_key(path.as_slice(), key.as_ref()) {
-                KeyResult::Ambiguous { fields } => {
-                    satisfied.clear();
-                    for (_field, _score) in fields {
-                        todo!("TODO: Handle ambiguous fields");
-                    }
-
-                    if let SatisfyResult::Solved(handle) = solver.satisfy(satisfied.as_slice()) {
-                        solution = Some(handle);
-                        break;
-                    }
-                }
-                KeyResult::Solved(handle) => {
-                    solution = Some(handle);
-                    break;
-                }
-                _ => {}
+            if let KeyResult::Solved(handle) = solver.probe_key(path.as_slice(), key.as_ref()) {
+                solution = Some(handle);
+                break;
             }
         }
     }

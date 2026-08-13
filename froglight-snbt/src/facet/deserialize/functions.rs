@@ -39,7 +39,7 @@ pub fn from_snbt<T: Facet<'static>>(
 /// Returns an error if the value cannot be deserialized.
 #[inline(always)]
 pub fn from_snbt_borrowed<'facet, T: Facet<'facet>>(
-    snbt: &IndexedSnbt<SliceCore<'facet>>,
+    snbt: &'facet IndexedSnbt<SliceCore<'facet>>,
 ) -> Result<T, DeserializeError> {
     <T as DeserializeSnbt>::from_snbt_borrowed(snbt)
 }

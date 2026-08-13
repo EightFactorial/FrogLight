@@ -6,7 +6,7 @@ use facet::{Facet, HeapValue, Partial, Type, UserType};
 use froglight_facet_iter::{
     ReaderError,
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
-    solver::tree::{TreeMap, navigate, solve_enum},
+    solver::tree::{TreeMap, naviate_field, navigate_tree, solve_enum},
 };
 
 use crate::{
@@ -89,13 +89,17 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let value = navigate::<IndexedNbtSlice, BORROW>(item.partial(), nbt.as_value())?;
+                let mut value =
+                    navigate_tree::<IndexedNbtSlice, BORROW>(item.partial(), nbt.as_value())?;
+                if let Some(field) = item.field() {
+                    value = naviate_field::<IndexedNbtSlice>(field, value);
+                }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate::<IndexedNbtSlice, BORROW>(&partial, nbt.as_value())?;
+                let value = navigate_tree::<IndexedNbtSlice, BORROW>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let (index, _variant) = solve_enum::<IndexedNbtSlice, BORROW>(&partial, value)?;
@@ -138,13 +142,17 @@ pub fn deserialize_borrowed_core<'facet>(
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let value = navigate::<IndexedNbtSlice, true>(item.partial(), nbt.as_value())?;
+                let mut value =
+                    navigate_tree::<IndexedNbtSlice, true>(item.partial(), nbt.as_value())?;
+                if let Some(field) = item.field() {
+                    value = naviate_field::<IndexedNbtSlice>(field, value);
+                }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate::<IndexedNbtSlice, true>(&partial, nbt.as_value())?;
+                let value = navigate_tree::<IndexedNbtSlice, true>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let (index, _variant) = solve_enum::<IndexedNbtSlice<'_>, _>(&partial, value)?;
@@ -166,7 +174,7 @@ pub fn deserialize_borrowed_core<'facet>(
 
 fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
     item: DeserializeItem<'facet, BORROWED>,
-    mut value: ValueReference<'_, Ref, C>,
+    value: ValueReference<'_, Ref, C>,
 ) -> Result<DeserializeItem<'facet, BORROWED>, ReaderError> {
     macro_rules! match_type {
         ( @int $($ty:ty => $ty_fn:ident),* ) => {
@@ -204,19 +212,6 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
             )*
         };
     }
-
-    value = match value {
-        ValueReference::Compound(compound) => compound
-            .get(item.field().unwrap().effective_name())
-            .ok_or_else(|| {
-                ReaderError::from_string(alloc::format!(
-                    "Failed to deserialize value: Compound missing \"{}\" field",
-                    item.field().unwrap().effective_name()
-                ))
-            })?
-            .into_value(),
-        _ => value,
-    };
 
     match_type! {
         @int
@@ -273,6 +268,10 @@ impl TreeMap for IndexedNbtSlice<'_> {
         value: Self::Value<'data, 'core>,
     ) -> Option<Self::Map<'data, 'core>> {
         if let ValueReference::Compound(value) = value { Some(value) } else { None }
+    }
+
+    fn map_contains<'data, 'core: 'data>(map: &Self::Map<'data, 'core>, key: &str) -> bool {
+        map.get_ref(key).is_some()
     }
 
     fn map_get<'data, 'core: 'data>(

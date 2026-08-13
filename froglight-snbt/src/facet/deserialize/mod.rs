@@ -1,12 +1,12 @@
 //! TODO
 
-use alloc::{string::String, vec::Vec};
+use alloc::{borrow::Cow, string::String, vec::Vec};
 
 use facet::{Facet, HeapValue, Partial, Type, UserType};
 use froglight_facet_iter::{
     ReaderError,
     deserialize::{DeserializeError, DeserializeItem, Deserializer, Item},
-    solver::tree::{TreeMap, solve_enum, navigate},
+    solver::tree::{TreeMap, naviate_field, navigate_tree, solve_enum},
 };
 
 use crate::types::indexed::{
@@ -53,7 +53,8 @@ pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
     /// # Errors
     ///
     /// Returns an error if the deserialization fails.
-    fn from_snbt_borrowed(snbt: &IndexedSnbtSlice<'facet>) -> Result<Self, DeserializeError>;
+    fn from_snbt_borrowed(snbt: &'facet IndexedSnbtSlice<'facet>)
+    -> Result<Self, DeserializeError>;
 }
 
 impl<'facet, T: Facet<'facet> + Sized> DeserializeSnbt<'facet> for T {
@@ -69,7 +70,9 @@ impl<'facet, T: Facet<'facet> + Sized> DeserializeSnbt<'facet> for T {
     }
 
     #[inline]
-    fn from_snbt_borrowed(snbt: &IndexedSnbtSlice<'facet>) -> Result<Self, DeserializeError> {
+    fn from_snbt_borrowed(
+        snbt: &'facet IndexedSnbtSlice<'facet>,
+    ) -> Result<Self, DeserializeError> {
         let plan = froglight_facet_iter::cache::typeplan::typeplan::<T>()?;
         let value = deserialize_borrowed(Partial::alloc_with_plan(plan)?, snbt)?;
         Ok(value.materialize::<T>()?)
@@ -101,14 +104,17 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let value =
-                    navigate::<IndexedSnbtSlice, BORROW>(item.partial(), snbt.root_value())?;
+                let mut value =
+                    navigate_tree::<IndexedSnbtSlice, BORROW>(item.partial(), snbt.root_value())?;
+                if let Some(field) = item.field() {
+                    value = naviate_field::<IndexedSnbtSlice>(field, value);
+                }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate::<IndexedSnbtSlice, BORROW>(&partial, snbt.root_value())?;
+                let value = navigate_tree::<IndexedSnbtSlice, BORROW>(&partial, snbt.root_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let (index, _variant) =
@@ -132,10 +138,10 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
 #[inline(never)]
 fn deserialize_borrowed<'facet>(
     partial: Partial<'facet, true>,
-    nbt: &IndexedSnbtSlice<'facet>,
+    snbt: &'facet IndexedSnbtSlice<'facet>,
 ) -> Result<HeapValue<'facet, true>, DeserializeError> {
     // Create and complete the deserializer.
-    let mut core = deserialize_borrowed_core(nbt);
+    let mut core = deserialize_borrowed_core(snbt);
 
     let de = Deserializer::new(partial, false, &mut core, Some("snbt"));
     de.complete()?.build().map_err(DeserializeError::from)
@@ -147,18 +153,38 @@ fn deserialize_borrowed<'facet>(
 #[inline(always)]
 #[allow(clippy::inline_always, reason = "Performance")]
 pub fn deserialize_borrowed_core<'facet>(
-    nbt: &IndexedSnbtSlice<'facet>,
+    snbt: &'facet IndexedSnbtSlice<'facet>,
 ) -> impl FnMut(Item<'facet, true>) -> Result<Item<'facet, true>, ReaderError> {
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let value = navigate::<IndexedSnbtSlice, true>(item.partial(), nbt.root_value())?;
+                let mut value =
+                    navigate_tree::<IndexedSnbtSlice, true>(item.partial(), snbt.root_value())?;
+                if let Some(field) = item.field() {
+                    value = naviate_field::<IndexedSnbtSlice>(field, value);
+                }
+
+                if item.is_type::<&str>() || item.is_type::<Cow<'_, str>>() {
+                    let value = value.as_string().ok_or_else(|| {
+                        ReaderError::from_str("Failed to deserialize value: expected String")
+                    })?;
+
+                    let string = value.get();
+
+                    if item.is_type::<&str>() {
+                        return item.set::<&str>(string).map(Item::Item);
+                    } else if item.is_type::<Cow<'_, str>>() {
+                        return item.set::<Cow<'_, str>>(Cow::Borrowed(string)).map(Item::Item);
+                    }
+
+                    todo!()
+                }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate::<IndexedSnbtSlice, true>(&partial, nbt.root_value())?;
+                let value = navigate_tree::<IndexedSnbtSlice, true>(&partial, snbt.root_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
                     let (index, _variant) = solve_enum::<IndexedSnbtSlice, true>(&partial, value)?;
@@ -180,7 +206,7 @@ pub fn deserialize_borrowed_core<'facet>(
 
 fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
     item: DeserializeItem<'facet, BORROWED>,
-    mut value: ValueReference<'_, C>,
+    value: ValueReference<'_, C>,
 ) -> Result<DeserializeItem<'facet, BORROWED>, ReaderError> {
     macro_rules! match_type {
         ( @int $($ty:ty => $ty_fn:ident),* ) => {
@@ -192,8 +218,9 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
                         ))
                     })?;
 
-                    #[allow(clippy::cast_possible_wrap, reason = "Ignored")]
+                    #[allow(trivial_casts, reason = "Ignored")]
                     #[allow(trivial_numeric_casts, reason = "Ignored")]
+                    #[allow(clippy::cast_possible_wrap, reason = "Ignored")]
                     return item.set::<$ty>(value.get() as _);
                 }
             )*
@@ -219,20 +246,9 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
         };
     }
 
-    value = match value {
-        ValueReference::Compound(compound) => {
-            compound.get(item.field().unwrap().effective_name()).ok_or_else(|| {
-                ReaderError::from_string(alloc::format!(
-                    "Failed to deserialize value: Compound missing \"{}\" field",
-                    item.field().unwrap().effective_name()
-                ))
-            })?
-        }
-        _ => value,
-    };
-
     match_type! {
         @int
+        bool => as_bool,
         u8 => as_byte,
         i8 => as_byte,
         u16 => as_short,
@@ -245,12 +261,20 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
         f64 => as_double
     }
 
-    if item.is_type::<String>() {
+    if item.is_type::<String>() || item.is_type::<Cow<'_, str>>() {
         let value = value
             .as_string()
             .ok_or_else(|| ReaderError::from_str("Failed to deserialize value: expected String"))?;
 
-        return item.set::<String>(String::from(value.get()));
+        let string = String::from(value.get());
+
+        if item.is_type::<String>() {
+            return item.set::<String>(string);
+        } else if item.is_type::<Cow<'_, str>>() {
+            return item.set::<Cow<'_, str>>(Cow::Owned(string));
+        }
+
+        todo!()
     }
 
     match_type! {
@@ -263,7 +287,7 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
         Vec<i64> as i64 => as_long_array
     }
 
-    todo!()
+    todo!("Unhandled type: {:?}", item.shape().type_name())
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -286,6 +310,10 @@ impl TreeMap for IndexedSnbtSlice<'_> {
         value: Self::Value<'data, 'core>,
     ) -> Option<Self::Map<'data, 'core>> {
         if let ValueReference::Compound(value) = value { Some(value) } else { None }
+    }
+
+    fn map_contains<'data, 'core: 'data>(map: &Self::Map<'data, 'core>, key: &str) -> bool {
+        map.get(key).is_some()
     }
 
     fn map_get<'data, 'core: 'data>(

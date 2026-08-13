@@ -1,6 +1,7 @@
 //! TODO
+#![expect(clippy::match_same_arms, reason = "Ignored")]
 
-use facet::{Def, KnownPointer, Partial, SequenceType, Type, UserType};
+use facet::{Def, KnownPointer, Partial, PointerType, SequenceType, Type, UserType};
 use smallvec::SmallVec;
 
 use crate::{
@@ -520,7 +521,11 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
             Type::User(..) => todo!(),
 
-            Type::Pointer(..) => todo!(),
+            // Just pass it to the core for deserialization.
+            Type::Pointer(PointerType::Reference(..)) => {
+                self.stack.push(StackItem::Item(desc));
+                Ok(self)
+            }
 
             _ => todo!("Unsupported type `{}`", self.partial.shape()),
         }

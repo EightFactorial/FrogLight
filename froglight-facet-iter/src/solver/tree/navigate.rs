@@ -1,6 +1,6 @@
 #![allow(clippy::too_many_lines, reason = "Complex logic function")]
 
-use facet::{Def, Partial, SequenceType, Type, UserType};
+use facet::{Def, Field, Partial, SequenceType, Type, UserType};
 use facet_path::PathStep;
 
 use crate::{
@@ -13,7 +13,7 @@ use crate::{
 /// # Errors
 ///
 /// Returns an error if the navigation fails.
-pub fn navigate<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
+pub fn navigate_tree<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
     partial: &Partial<'_, BORROW>,
     mut value: T::Value<'data, 'core>,
 ) -> Result<T::Value<'data, 'core>, ReaderError> {
@@ -133,9 +133,27 @@ pub fn navigate<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
                 }
             }
 
-            _ => todo!(),
+            PathStep::Deref => {}
+
+            other => todo!("Unhandled navigation step: {other:?}"),
         }
     }
 
     Ok(value)
+}
+
+/// Navigate to a single field in a value tree.
+///
+/// If the field does not exist, the original value is returned.
+pub fn naviate_field<'data, 'core: 'data, T: TreeMap>(
+    field: &'static Field,
+    value: T::Value<'data, 'core>,
+) -> T::Value<'data, 'core> {
+    if let Some(map) = T::value_map(value.clone())
+        && let Some(entry) = T::map_get(map, field.effective_name())
+    {
+        return entry;
+    }
+
+    value
 }

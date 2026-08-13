@@ -4,7 +4,7 @@ mod r#enum;
 pub use r#enum::solve_enum;
 
 mod navigate;
-pub use navigate::navigate;
+pub use navigate::{naviate_field, navigate_tree};
 
 /// A trait for tree-like structures with key-value pairs.
 pub trait TreeMap: Sized {
@@ -14,9 +14,9 @@ pub trait TreeMap: Sized {
     type Value<'data, 'core: 'data>: Clone;
 
     /// The type of map.
-    type Map<'data, 'core: 'data>;
+    type Map<'data, 'core: 'data>: Clone;
     /// The type of list.
-    type List<'data, 'core: 'data>;
+    type List<'data, 'core: 'data>: Clone;
 
     /// Whether the given value is a map.
     fn value_is_map(value: &Self::Value<'_, '_>) -> bool;
@@ -28,6 +28,9 @@ pub trait TreeMap: Sized {
     fn value_map<'data, 'core: 'data>(
         value: Self::Value<'data, 'core>,
     ) -> Option<Self::Map<'data, 'core>>;
+
+    /// Returns whether the given map contains the specified key.
+    fn map_contains<'data, 'core: 'data>(map: &Self::Map<'data, 'core>, key: &str) -> bool;
 
     /// Get a value from a map by key.
     fn map_get<'data, 'core: 'data>(
