@@ -50,7 +50,7 @@ facet-json = { default-features = false, version = "=0.50.0-rc.5" }
 facet-path = { default-features = false, version = "=0.50.0-rc.5" }
 facet-solver = { default-features = false, version = "=0.50.0-rc.5" }
 facet-toml = { default-features = false, version = "=0.50.0-rc.5" }
-facet-value = { default-features = false, version = "=0.50.0-rc.5" }
+facet-value = { default-features = false, version = "=0.50.0-rc.7" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.2" }
