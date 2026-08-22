@@ -15,7 +15,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-async_zip = { features = ["full", "tokio"], version = "0.0.18" }
+async_zip = { features = ["full", "tokio"], version = "0.0.19" }
 cafebabe = { features = ["threadsafe"], version = "0.9" }
 chrono = { features = ["clock", "std"], version = "0.4"}
 convert_case = { version = "=0.10" }
