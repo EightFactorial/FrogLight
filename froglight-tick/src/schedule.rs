@@ -56,8 +56,11 @@ pub enum TickSchedule {
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
 pub struct RunTickLoop;
 
+/// A cache of the enabled and disabled entities.
+///
+/// Saved between runs of [`RunTickLoop`].
 #[derive(Debug, Default, Resource)]
-struct TickCache {
+pub struct TickCache {
     enabled: EntityHashMap<u32>,
     disabled: Mutex<EntityHashSet>,
     finished: Vec<Entity>,
@@ -66,49 +69,44 @@ struct TickCache {
 impl RunTickLoop {
     /// A [`System`] that runs the [`TickSchedule`]s in order.
     ///
-    /// Ticks all [`TickTimer`]s and executes them the required number of ticks.
-    ///
-    /// Disabled [`TickTimer`]s and their children are temporarily marked
-    /// [`TickDisabled`].
-    pub fn run_tick(world: &mut World) {
-        world.init_resource::<TickCache>();
-        world.resource_scope::<TickCache, ()>(|world, mut cache| {
-            let TickCache { enabled, disabled, finished } = &mut *cache;
+    /// Ticks all [`TickTimer`]s and executes the required number of ticks,
+    /// progressively disabling timers that have finished ticking.
+    pub fn run_tick(world: &mut World, mut cache: Local<TickCache>) {
+        let TickCache { enabled, disabled, finished } = &mut *cache;
 
-            // TODO: Set a maximum delta time and/or tick count.
-            let delta = world.resource::<Time<Real>>().delta();
-            for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
-                timer.tick(delta);
-                enabled.insert(entity, timer.times_finished_this_tick());
-            }
+        // Clear the caches.
+        enabled.clear();
+        disabled.get_mut().clear();
+        finished.clear();
 
-            // Get the maximum tick count of the timers (or return if none).
-            let Some(ticks) = enabled.values().max() else { return };
+        // TODO: Set a maximum delta time and/or tick count.
+        let delta = world.resource::<Time<Real>>().delta();
+        for (entity, mut timer) in world.query::<(Entity, &mut TickTimer)>().iter_mut(world) {
+            timer.tick(delta);
+            enabled.insert(entity, timer.times_finished_this_tick());
+        }
 
-            // Run the tick schedule for each tick.
-            for iteration in 0..*ticks {
-                // Disable all non-ticking entities.
-                Self::insert_disable(iteration, enabled, disabled, finished, world);
-                // Stop if there are no enabled timers left.
-                if enabled.is_empty() {
-                    break;
-                }
+        // Get the maximum tick count of the timers, or 1 if there are no timers.
+        let ticks = enabled.values().max().copied().unwrap_or(u32::from(enabled.is_empty()));
 
-                // Run all `TickSchedule`s.
-                let _ = world.try_run_schedule(TickSchedule::TickFirst);
-                let _ = world.try_run_schedule(TickSchedule::PreTick);
-                let _ = world.try_run_schedule(TickSchedule::Tick);
-                let _ = world.try_run_schedule(TickSchedule::PostTick);
-                let _ = world.try_run_schedule(TickSchedule::TickLast);
-            }
+        // Run the tick schedule for each tick.
+        for iteration in 0..ticks {
+            // Disable all non-ticking entities.
+            Self::insert_disable(iteration, enabled, disabled, finished, world);
 
-            // Re-enable all previously disabled entities.
-            Self::remove_disable(world);
+            // Run all `TickSchedule`s.
+            world.flush();
+            let _ = world.try_run_schedule(TickSchedule::TickFirst);
+            let _ = world.try_run_schedule(TickSchedule::PreTick);
+            let _ = world.try_run_schedule(TickSchedule::Tick);
+            let _ = world.try_run_schedule(TickSchedule::PostTick);
+            let _ = world.try_run_schedule(TickSchedule::TickLast);
+        }
 
-            // Clear the cache for reuse.
-            enabled.clear();
-            disabled.get_mut().clear();
-        });
+        // Re-enable all previously disabled entities.
+        if ticks != 0 {
+            Self::remove_disable(disabled, world);
+        }
     }
 
     fn insert_disable(
@@ -213,15 +211,13 @@ impl RunTickLoop {
         }
     }
 
-    fn remove_disable(world: &mut World) {
-        world.resource_scope::<TickDisabledSet, ()>(|world, mut disabled| {
-            for entity in disabled.drain() {
-                if let Ok(mut entity) = world.get_entity_mut(entity)
-                    && entity.contains::<TickDisabled>()
-                {
-                    entity.remove::<TickDisabled>();
-                }
+    fn remove_disable(disabled: &mut Mutex<EntityHashSet>, world: &mut World) {
+        for entity in disabled.get_mut().drain() {
+            if let Ok(mut entity) = world.get_entity_mut(entity) {
+                entity.remove::<TickDisabled>();
             }
-        });
+        }
+
+        world.resource_mut::<TickDisabledSet>().clear();
     }
 }

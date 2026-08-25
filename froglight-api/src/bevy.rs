@@ -20,7 +20,7 @@ impl Plugin for ApiPlugin {
         #[cfg(feature = "resolver")]
         {
             #[cfg(feature = "tracing")]
-            tracing::debug!(target: "froglight-api", "Initializing the default Hickory-based resolver");
+            tracing::debug!(target: "froglight_api", "Initializing the default Hickory-based resolver");
 
             app.insert_resource(DnsResolver::hickory());
         }
@@ -32,7 +32,7 @@ impl Plugin for ApiPlugin {
             use ureq::{Agent, config::Config, unversioned::transport::DefaultConnector};
 
             #[cfg(feature = "tracing")]
-            tracing::debug!(target: "froglight-api", "Initializing the default ureq-based HTTP client");
+            tracing::debug!(target: "froglight_api", "Initializing the default ureq-based HTTP client");
 
             let agent = Agent::with_parts(Config::default(), DefaultConnector::default(), resolver);
             app.world_mut().insert_resource(HttpClient::new(agent));
