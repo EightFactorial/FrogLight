@@ -275,19 +275,19 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             let mut with = false;
 
             if let Some(attrs) = desc.field_attr() {
-                for attr in attrs.iter().filter(|attr| attr.ns == self.namespace) {
+                for attr in attrs.iter().filter(|attr| attr.ns() == self.namespace) {
                     // #[facet(mc::variable)]
-                    var |= attr.key == "variable";
+                    var |= attr.key() == "variable";
                     // #[facet(mc::with = ...)]
-                    with |= attr.key == "with";
+                    with |= attr.key() == "with";
                 }
             }
             for attr in self.partial.shape().attributes {
-                if attr.ns == self.namespace {
+                if attr.ns() == self.namespace {
                     // #[facet(mc::variable)]
-                    var |= attr.key == "variable";
+                    var |= attr.key() == "variable";
                     // #[facet(mc::with = ...)]
-                    with |= attr.key == "with";
+                    with |= attr.key() == "with";
                 }
             }
 
@@ -468,7 +468,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     .shape()
                     .attributes
                     .iter()
-                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                    .any(|attr| attr.ns() == self.namespace && attr.key() == "variable_inner")
                 {
                     desc.is_variable()
                 } else {
@@ -487,7 +487,7 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                     .shape()
                     .attributes
                     .iter()
-                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                    .any(|attr| attr.ns() == self.namespace && attr.key() == "variable_inner")
                 {
                     desc.is_variable()
                 } else {

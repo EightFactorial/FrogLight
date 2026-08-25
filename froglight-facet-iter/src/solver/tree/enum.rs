@@ -36,7 +36,6 @@ pub fn solve_enum<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
 
                     satisfied.clear();
                     let map = T::value_map(value.clone()).unwrap();
-
                     for (field, _score) in fields {
                         if let Some(_value) = T::map_get(map.clone(), field.serialized_name) {
                             satisfied.push(field);

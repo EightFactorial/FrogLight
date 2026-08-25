@@ -14,7 +14,8 @@ use crate::types::indexed::core::IndexedSnbtSlice;
 ///
 /// ```rust
 /// use facet::*;
-/// use froglight_nbt::facet::with::SnbtTemplate;
+/// use froglight_facet::prelude::*;
+/// use froglight_snbt::prelude::*;
 ///
 /// #[derive(Facet)]
 /// #[facet(mc::with = SnbtTemplate::<MyStruct>::WITH)]
@@ -23,6 +24,15 @@ use crate::types::indexed::core::IndexedSnbtSlice;
 /// }
 /// ```
 pub struct SnbtTemplate<'facet, T: Facet<'facet>>(PhantomData<&'facet T>);
+
+impl<'facet, T: Facet<'facet>> SnbtTemplate<'facet, T> {
+    /// A [`WithFnAttr`] to be used with
+    /// `#[derive(Facet)]` in a `#[facet(mc::with = ...)]`
+    /// attribute.
+    ///
+    /// See [`FacetTemplate`] for more details and an example.
+    pub const WITH: WithFnAttr = Self::WITH_BORROW;
+}
 
 // -------------------------------------------------------------------------------------------------
 

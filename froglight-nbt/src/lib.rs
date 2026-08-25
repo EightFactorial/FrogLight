@@ -13,17 +13,20 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "froglight-facet")]
-    pub use crate::facet::with::NbtTemplate;
-    #[cfg(feature = "facet")]
-    pub use crate::facet::{
-        deserialize::{DeserializeNbt, functions::*},
-        serialize::{SerializeNbt, functions::*},
-    };
+    pub use crate::facet::froglight_facet::NbtTemplate;
     pub use crate::types::{
         indexed::{
             IndexedNbt,
             core::{IndexedNbtCow, IndexedNbtSlice},
         },
         structured::Nbt,
+    };
+    #[cfg(feature = "facet")]
+    pub use crate::{
+        self as nbt,
+        facet::{
+            deserialize::{DeserializeNbt, functions::*},
+            serialize::{SerializeNbt, functions::*},
+        },
     };
 }

@@ -19,7 +19,7 @@ pub mod prelude {
         self as mc,
         custom::OptionTemplate,
         deserialize::varint::{decode_u32_from, decode_u64_from},
-        facet::{FacetBorrowedTemplate, FacetTemplate},
+        facet::{FacetBorrowedTemplate, FacetTemplate, WithFnAttr},
         serialize::varint::{encode_u32_into, encode_u64_into},
     };
 }

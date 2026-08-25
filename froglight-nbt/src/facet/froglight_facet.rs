@@ -14,7 +14,8 @@ use crate::types::indexed::core::{IndexCore, IndexedNbtSlice};
 ///
 /// ```rust
 /// use facet::*;
-/// use froglight_nbt::facet::with::NbtTemplate;
+/// use froglight_facet::prelude::*;
+/// use froglight_nbt::prelude::*;
 ///
 /// #[derive(Facet)]
 /// #[facet(mc::with = NbtTemplate::<MyStruct>::WITH_NAMED)]

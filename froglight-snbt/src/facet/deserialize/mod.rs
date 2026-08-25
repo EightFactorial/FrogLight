@@ -104,21 +104,19 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value =
-                    navigate_tree::<IndexedSnbtSlice, BORROW>(item.partial(), snbt.root_value())?;
+                let mut value = navigate_tree::<Snbt, BORROW>(item.partial(), snbt.root_value())?;
                 if let Some(field) = item.field() {
-                    value = naviate_field::<IndexedSnbtSlice>(field, value);
+                    value = naviate_field::<Snbt>(field, value);
                 }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate_tree::<IndexedSnbtSlice, BORROW>(&partial, snbt.root_value())?;
+                let value = navigate_tree::<Snbt, BORROW>(&partial, snbt.root_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let (index, _variant) =
-                        solve_enum::<IndexedSnbtSlice, BORROW>(&partial, value)?;
+                    let (index, _variant) = solve_enum::<Snbt, BORROW>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
@@ -158,10 +156,9 @@ pub fn deserialize_borrowed_core<'facet>(
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value =
-                    navigate_tree::<IndexedSnbtSlice, true>(item.partial(), snbt.root_value())?;
+                let mut value = navigate_tree::<Snbt, true>(item.partial(), snbt.root_value())?;
                 if let Some(field) = item.field() {
-                    value = naviate_field::<IndexedSnbtSlice>(field, value);
+                    value = naviate_field::<Snbt>(field, value);
                 }
 
                 if item.is_type::<&str>() || item.is_type::<Cow<'_, str>>() {
@@ -176,18 +173,16 @@ pub fn deserialize_borrowed_core<'facet>(
                     } else if item.is_type::<Cow<'_, str>>() {
                         return item.set::<Cow<'_, str>>(Cow::Borrowed(string)).map(Item::Item);
                     }
-
-                    todo!()
                 }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate_tree::<IndexedSnbtSlice, true>(&partial, snbt.root_value())?;
+                let value = navigate_tree::<Snbt, true>(&partial, snbt.root_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let (index, _variant) = solve_enum::<IndexedSnbtSlice, true>(&partial, value)?;
+                    let (index, _variant) = solve_enum::<Snbt, true>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
@@ -292,7 +287,9 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore>(
 
 // -------------------------------------------------------------------------------------------------
 
-impl TreeMap for IndexedSnbtSlice<'_> {
+struct Snbt;
+
+impl TreeMap for Snbt {
     type Key<'data> = &'data str;
     type List<'data, 'core: 'data> = IndexedList<'data, SliceCore<'core>>;
     type Map<'data, 'core: 'data> = IndexedCompound<'data, SliceCore<'core>>;

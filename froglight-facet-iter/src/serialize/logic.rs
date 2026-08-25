@@ -111,19 +111,19 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             let mut with = false;
 
             if let Some(attrs) = item.field_attr() {
-                for attr in attrs.iter().filter(|attr| attr.ns == self.namespace) {
+                for attr in attrs.iter().filter(|attr| attr.ns() == self.namespace) {
                     // #[facet(mc::variable)]
-                    var |= attr.key == "variable";
+                    var |= attr.key() == "variable";
                     // #[facet(mc::with = ...)]
-                    with |= attr.key == "with";
+                    with |= attr.key() == "with";
                 }
             }
             for attr in item.shape().attributes {
-                if attr.ns == self.namespace {
+                if attr.ns() == self.namespace {
                     // #[facet(mc::variable)]
-                    var |= attr.key == "variable";
+                    var |= attr.key() == "variable";
                     // #[facet(mc::with = ...)]
-                    with |= attr.key == "with";
+                    with |= attr.key() == "with";
                 }
             }
 
@@ -398,7 +398,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                     .shape()
                     .attributes
                     .iter()
-                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                    .any(|attr| attr.ns() == self.namespace && attr.key() == "variable_inner")
                 {
                     item.is_variable()
                 } else {
@@ -434,7 +434,7 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                     .shape()
                     .attributes
                     .iter()
-                    .any(|attr| attr.ns == self.namespace && attr.key == "variable_inner")
+                    .any(|attr| attr.ns() == self.namespace && attr.key() == "variable_inner")
                 {
                     item.is_variable()
                 } else {
