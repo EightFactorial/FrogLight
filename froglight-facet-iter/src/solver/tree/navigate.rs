@@ -26,7 +26,7 @@ pub fn navigate_tree<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
             PathStep::Field(index) => match shape.ty {
                 Type::User(UserType::Struct(ty)) => {
                     // Get the current value as a map.
-                    let map = T::value_map(value).ok_or_else(|| {
+                    let map = T::value_map(value.clone()).ok_or_else(|| {
                         ReaderError::from_string(alloc::format!(
                             "Failed to get compound for struct {:?}",
                             shape.type_name()
@@ -41,17 +41,22 @@ pub fn navigate_tree<'data, 'core: 'data, T: TreeMap, const BORROW: bool>(
                         ))
                     })?;
 
-                    // Get the entry with the given field name.
-                    let entry = T::map_get(map, field.effective_name()).ok_or_else(|| {
-                        ReaderError::from_string(alloc::format!(
-                            "Failed to get field with name {:?}",
-                            field.effective_name()
-                        ))
-                    })?;
+                    // If the field is not flattened,
+                    if !field.is_flattened() {
+                        // Get the entry with the given field name.
+                        let entry = T::map_get(map, field.effective_name()).ok_or_else(|| {
+                            ReaderError::from_string(alloc::format!(
+                                "Failed to get field with name {:?}",
+                                field.effective_name()
+                            ))
+                        })?;
 
-                    // Update the shape and value.
+                        // Update the value.
+                        value = entry;
+                    }
+
+                    // Update the shape.
                     shape = field.shape();
-                    value = entry;
                 }
 
                 Type::User(UserType::Enum(_ty)) => {

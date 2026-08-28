@@ -116,8 +116,8 @@ pub fn deserialize_owned_core<const BORROW: bool>(
         if let Some(attrs) = item.field_attr() {
             for attr in attrs {
                 // Run the custom deserializer.
-                if attr.ns.is_some_and(|ns| ns == "mc")
-                    && attr.key == "with"
+                if attr.ns().is_some_and(|ns| ns == "mc")
+                    && attr.key() == "with"
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
@@ -129,8 +129,8 @@ pub fn deserialize_owned_core<const BORROW: bool>(
         // Handle type attributes.
         for attr in item.shape_attr() {
             // Run the custom deserializer.
-            if attr.ns.is_some_and(|ns| ns == "mc")
-                && attr.key == "with"
+            if attr.ns().is_some_and(|ns| ns == "mc")
+                && attr.key() == "with"
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {
@@ -176,8 +176,8 @@ pub fn deserialize_borrowed_core<'facet>(
         if let Some(attrs) = item.field_attr() {
             for attr in attrs {
                 // Run the custom deserializer.
-                if attr.ns.is_some_and(|ns| ns == "mc")
-                    && attr.key == "with"
+                if attr.ns().is_some_and(|ns| ns == "mc")
+                    && attr.key() == "with"
                     && let Some(crate::facet::Attr::With(Some(with))) =
                         attr.get_as::<crate::facet::Attr>()
                 {
@@ -189,8 +189,8 @@ pub fn deserialize_borrowed_core<'facet>(
         // Handle type attributes.
         for attr in item.shape_attr() {
             // Run the custom deserializer.
-            if attr.ns.is_some_and(|ns| ns == "mc")
-                && attr.key == "with"
+            if attr.ns().is_some_and(|ns| ns == "mc")
+                && attr.key() == "with"
                 && let Some(crate::facet::Attr::With(Some(with))) =
                     attr.get_as::<crate::facet::Attr>()
             {

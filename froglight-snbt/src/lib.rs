@@ -14,14 +14,17 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "froglight-facet")]
-    pub use crate::facet::with::SnbtTemplate;
-    #[cfg(feature = "facet")]
-    pub use crate::facet::{
-        deserialize::{DeserializeSnbt, functions::*},
-        serialize::{SerializeSnbt, functions::*},
-    };
+    pub use crate::facet::froglight_facet::SnbtTemplate;
     pub use crate::types::indexed::{
         IndexedSnbt,
         core::{IndexedSnbtCow, IndexedSnbtSlice},
+    };
+    #[cfg(feature = "facet")]
+    pub use crate::{
+        self as snbt,
+        facet::{
+            deserialize::{DeserializeSnbt, functions::*},
+            serialize::{SerializeSnbt, functions::*},
+        },
     };
 }

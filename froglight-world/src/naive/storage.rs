@@ -179,7 +179,7 @@ impl ChunkStorage {
         let sections = unsafe {
             use alloc::alloc::Global;
 
-            let (ptr, len, cap, Global) = Vec::into_parts_with_alloc(sections);
+            let (ptr, len, cap, Global) = Vec::into_parts_with_allocator(sections);
             Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(ptr, len, cap, &Global)
         };
 
@@ -370,11 +370,11 @@ impl VecChunkStorage {
             /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
             /// offset.
             #[must_use]
-            pub fn new(sections: Vec<Section>, offset: i32) -> Self {
+            pub const fn new(sections: Vec<Section>, offset: i32) -> Self {
                 let sections = unsafe {
                     use alloc::alloc::Global;
 
-                    let (ptr, len, cap, Global) = Vec::into_parts_with_alloc(sections);
+                    let (ptr, len, cap, Global) = Vec::into_parts_with_allocator(sections);
                     Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(
                         ptr, len, cap, &Global,
                     )

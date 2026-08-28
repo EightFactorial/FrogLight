@@ -82,24 +82,47 @@ type Version = V26_1;
 
 impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
-        // Add systems for creating the bot and handling messages.
-        app.add_systems(Startup, BotPlugin::create_bot)
-            .add_systems(PreUpdate, NetworkPlugin::clientbound_messages)
-            .add_systems(
-                Update,
-                (BotPlugin::message_handler, BotPlugin::tick_runtime).ambiguous_with_all(),
+        // Create a bot on startup.
+        app.add_systems(Startup, BotPlugin::create_bot);
+
+        // Add systems that run per-tick.
+        app.add_systems(
+            PreTick,
+            (
+                // Receive clientbound packets.
+                NetworkPlugin::clientbound_messages,
+                // Update last-tick physics components.
+                PhysicsPlugin::update_prev_components,
             )
-            .add_systems(
-                PostUpdate,
-                (
-                    InstancePlugin::apply_blockedits,
-                    PhysicsPlugin::update_colliders,
-                    PhysicsPlugin::update_collisions.after(PhysicsPlugin::update_colliders),
-                    PhysicsPlugin::update_prev_components.after(PhysicsPlugin::update_colliders),
-                    (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
-                )
-                    .ambiguous_with_all(),
-            );
+                .ambiguous_with_all(),
+        )
+        .add_systems(
+            Tick,
+            // Handle clientbound packets.
+            BotPlugin::message_handler,
+        )
+        .add_systems(
+            PostTick,
+            (
+                // Apply block edits.
+                InstancePlugin::apply_blockedits,
+                // Update the positions of entity colliders and detect entity collisions.
+                (PhysicsPlugin::update_colliders, PhysicsPlugin::update_collisions).chain(),
+            )
+                .ambiguous_with_all(),
+        );
+
+        // Add systems that run per-frame.
+        app.add_systems(
+            PostUpdate,
+            (
+                // Log the tick runtime.
+                BotPlugin::log_tick_runtime,
+                // Send serverbound packets and poll connection states.
+                (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
+            )
+                .ambiguous_with_all(),
+        );
     }
 }
 
@@ -155,11 +178,15 @@ impl BotPlugin {
     }
 
     /// Log the amount of time to took to run a tick.
-    fn tick_runtime(diag: Res<DiagnosticsStore>, time: Res<Time>, mut timer: Local<Option<Timer>>) {
+    fn log_tick_runtime(
+        diag: Res<DiagnosticsStore>,
+        time: Res<Time>,
+        mut timer: Local<Option<Timer>>,
+    ) {
         const SECONDS_BETWEEN_LOGS: f32 = 10.0;
-
         let timer = timer
             .get_or_insert_with(|| Timer::from_seconds(SECONDS_BETWEEN_LOGS, TimerMode::Repeating));
+
         if timer.tick(time.delta()).just_finished()
             && let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
             && let Some(average) = diag.average()

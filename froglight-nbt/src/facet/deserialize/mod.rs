@@ -90,20 +90,19 @@ pub fn deserialize_owned_core<'facet, const BORROW: bool>(
     move |item: Item<'facet, BORROW>| -> Result<Item<'facet, BORROW>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value =
-                    navigate_tree::<IndexedNbtSlice, BORROW>(item.partial(), nbt.as_value())?;
+                let mut value = navigate_tree::<Nbt, BORROW>(item.partial(), nbt.as_value())?;
                 if let Some(field) = item.field() {
-                    value = naviate_field::<IndexedNbtSlice>(field, value);
+                    value = naviate_field::<Nbt>(field, value);
                 }
 
                 deserialize_value(item, value).map(Item::Item)
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate_tree::<IndexedNbtSlice, BORROW>(&partial, nbt.as_value())?;
+                let value = navigate_tree::<Nbt, BORROW>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let (index, _variant) = solve_enum::<IndexedNbtSlice, BORROW>(&partial, value)?;
+                    let (index, _variant) = solve_enum::<Nbt, BORROW>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial))
                 } else if let ValueReference::Compound(value) = &value {
@@ -143,10 +142,9 @@ pub fn deserialize_borrowed_core<'facet>(
     move |item: Item<'facet, true>| -> Result<Item<'facet, true>, ReaderError> {
         match item {
             Item::Item(item) => {
-                let mut value =
-                    navigate_tree::<IndexedNbtSlice, true>(item.partial(), nbt.as_value())?;
+                let mut value = navigate_tree::<Nbt, true>(item.partial(), nbt.as_value())?;
                 if let Some(field) = item.field() {
-                    value = naviate_field::<IndexedNbtSlice>(field, value);
+                    value = naviate_field::<Nbt>(field, value);
                 }
 
                 macro_rules! match_type {
@@ -212,10 +210,10 @@ pub fn deserialize_borrowed_core<'facet>(
             }
             #[expect(clippy::cast_possible_truncation, reason = "Ignored")]
             Item::Hint(.., partial) => {
-                let value = navigate_tree::<IndexedNbtSlice, true>(&partial, nbt.as_value())?;
+                let value = navigate_tree::<Nbt, true>(&partial, nbt.as_value())?;
 
                 if matches!(partial.shape().ty, Type::User(UserType::Enum(_))) {
-                    let (index, _variant) = solve_enum::<IndexedNbtSlice<'_>, _>(&partial, value)?;
+                    let (index, _variant) = solve_enum::<Nbt, _>(&partial, value)?;
 
                     Ok(Item::Hint(index as u32, partial)) // Enum Variant
                 } else if let ValueReference::Compound(value) = &value {
@@ -328,7 +326,9 @@ fn deserialize_value<'facet, const BORROWED: bool, C: IndexCore<Ref>>(
 
 // -------------------------------------------------------------------------------------------------
 
-impl TreeMap for IndexedNbtSlice<'_> {
+struct Nbt;
+
+impl TreeMap for Nbt {
     type Key<'index> = Cow<'index, str>;
     type List<'index, 'core: 'index> = ValueList<'index, Ref, SliceCore<'core, Ref>>;
     type Map<'index, 'core: 'index> = IndexedCompound<'index, Ref, SliceCore<'core, Ref>>;

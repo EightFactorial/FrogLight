@@ -19,3 +19,14 @@ pub use deserialize::functions::*;
 
 pub mod serialize;
 pub use serialize::functions::*;
+
+pub mod prelude {
+    //! Re-exports of common types, traits, and macros.
+
+    pub use crate::{
+        self as mc,
+        custom::OptionTemplate,
+        deserialize::{Deserialize, DeserializeError, functions::*},
+        serialize::{Serialize, SerializeError, functions::*},
+    };
+}

@@ -129,25 +129,16 @@ impl PhysicsPlugin {
             #[allow(clippy::used_underscore_binding, reason = "Used for tracing")]
             let _span = tracing::info_span!(target: "froglight_physics", "par_update_collisions", instance = %_entity).entered();
 
-            let mut entities = Vec::<&Entity>::with_capacity(instance.iter_entity().len());
-            entities.extend(instance.iter_entity());
+            for (current, a) in instance.iter_entity().enumerate() {
+                for b in instance.iter_entity().skip(current + 1) {
+                    // SAFETY: Checking that `a` and `b` are not equal.
+                    let pair = if a == b { continue } else { unsafe { UniqueEntityArray::from_array_unchecked([*a, *b]) } };
 
-            for (start, a) in entities.iter().enumerate() {
-                for b in entities.iter().skip(start + 1) {
-                    // Skip checking collisions with itself.
-                    if a == b {
-                        continue;
-                    }
-
-                    let (a, b) = (**a, **b);
-                    if let (Ok((_, collider_a)), Ok((_, collider_b))) =
-                        (collider_lens.get(a), collider_lens.get(b))
-                        && collider_a.intersects( collider_b)
+                    if let Ok([(_, collider_a), (_, collider_b)]) =
+                        collider_lens.get_many_unique(pair)
+                        && collider_a.intersects(collider_b)
                     {
-                        // SAFETY: Already checked that `a` and `b` are not equal.
-                        cache
-                            .lock()
-                            .push(unsafe { UniqueEntityArray::from_array_unchecked([a, b]) });
+                        cache.lock().push(pair);
                     }
                 }
             }
@@ -166,8 +157,8 @@ impl PhysicsPlugin {
                 && let Ok([(.., mut colliding_with_a), (.., mut colliding_with_b)]) =
                     colliders.get_many_unique_mut(pair)
             {
-                colliding_with_a.insert(a);
-                colliding_with_b.insert(b);
+                colliding_with_a.insert(b);
+                colliding_with_b.insert(a);
             }
         }
     }
