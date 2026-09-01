@@ -1,7 +1,8 @@
 //! TODO
 
+pub use froglight_common::types::*;
 use froglight_common::version::Version;
-pub use froglight_registry_template::{types::LazyLock, version_implement};
+pub use froglight_registry_template::version_implement;
 
 use crate::storage::BiomeStorage;
 

@@ -19,10 +19,17 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+glam = { workspace = true }
+
+# Optional dependencies
 bevy_reflect = { workspace = true, optional = true }
-facet = { features = ["alloc"], workspace = true, optional = true }
+critical-section = { workspace = true, optional = true }
+facet = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
-serde = { features = ["alloc", "derive"], workspace = true, optional = true }
+libm = { workspace = true, optional = true }
+once_cell = { workspace = true, optional = true }
+parking_lot = { workspace = true, optional = true }
+serde = { features = ["derive"], workspace = true, optional = true }
 
 # --- Features ---
 
@@ -30,16 +37,29 @@ serde = { features = ["alloc", "derive"], workspace = true, optional = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_reflect", "serde"]
+bevy = ["alloc", "dep:bevy_reflect"]
 # Enable `facet` support.
-facet = ["dep:facet", "dep:froglight-facet"]
+facet = ["dep:facet"]
+# Enable `froglight-facet` support.
+froglight-facet = ["dep:froglight-facet", "facet"]
 # Enable `serde` support.
-serde = ["dep:serde"]
+serde = ["dep:serde", "glam/serde", "parking_lot?/serde"]
 
+# Enable `critical-section` for `no_std` support.
+critical-section = ["dep:critical-section", "once_cell?/critical-section"]
+# Enable `libm` for `no_std` support.
+libm = ["dep:libm", "glam/nostd-libm"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["dep:once_cell"]
+# Enable `parking_lot`.
+parking_lot = ["dep:parking_lot", "facet?/lock_api", "once_cell?/parking_lot"]
+
+# Enable support for a global allocator
+alloc = ["facet?/alloc", "once_cell?/alloc", "serde?/alloc"]
 # Enable support for the standard library
-std = ["bevy_reflect?/std", "facet?/std", "froglight-facet?/std"]
+std = ["alloc", "bevy_reflect?/std", "facet?/std", "glam/std", "froglight-facet?/std", "once_cell?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly"]
+nightly = ["froglight-facet?/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

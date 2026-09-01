@@ -31,12 +31,12 @@ indexmap = { workspace = true }
 default = ["std"]
 
 # Enable `once_cell` for `no_std` support.
-once_cell = ["froglight-registry-template/once_cell"]
+once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "froglight-nbt/std", "froglight-registry-template/std", "indexmap/std"]
+std = ["foldhash/std", "froglight-common/std", "froglight-nbt/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-nbt/nightly", "froglight-registry-template/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-nbt/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

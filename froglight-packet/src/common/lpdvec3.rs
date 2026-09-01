@@ -11,9 +11,9 @@
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
 use facet::Facet;
+use froglight_common::crates::glam::{DVec3, Vec3, Vec3A};
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-use glam::{DVec3, Vec3, Vec3A};
 
 /// A variable-length [`DVec3`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -42,6 +42,10 @@ enum LpDVec3Inner {
 
 impl LpDVec3 {
     // <3 Azalea
+
+    #[cfg(not(any(feature = "std", feature = "libm")))]
+    const FEATURE_CHECK: () =
+        compile_error!("Either the `std` or `libm` feature must be enabled for `LpDVec3`.");
 
     /// Create a [`LpDVec3`] from a [`DVec3`].
     #[must_use]
@@ -132,7 +136,9 @@ impl LpDVec3 {
     #[inline]
     #[must_use]
     #[cfg(all(not(feature = "std"), feature = "libm"))]
-    fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
+    fn pack(val: f64) -> u64 {
+        froglight_common::crates::libm::round((val * 0.5 + 0.5) * 32766.) as u64
+    }
 
     /// Create a [`Vec3`] from a [`LpDVec3`].
     #[must_use]

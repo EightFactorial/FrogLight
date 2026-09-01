@@ -9,7 +9,7 @@ use core::{
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Peek;
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 
 use crate::{
     entity::{EntityAabb, EntityDataSet, GlobalEntityId, entity::EntityType},
@@ -19,7 +19,7 @@ use crate::{
 /// Metadata about an entity type.
 pub struct EntityMetadata {
     /// The string identifier of the entity.
-    identifier: Identifier<'static>,
+    identifier: &'static Ident,
     /// The [`GlobalEntityId`] assigned to this entity.
     global_id: GlobalEntityId,
     /// The default [`EntityDataSet`] for this entity type.
@@ -51,7 +51,7 @@ impl EntityMetadata {
     #[allow(clippy::too_many_arguments, reason = "Yes")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     pub const unsafe fn new<E: EntityType<V>, V: EntityVersion>(
-        identifier: Identifier<'static>,
+        identifier: &'static Ident,
         global_id: GlobalEntityId,
         size: [f32; 2],
         eye_height: f32,
@@ -77,7 +77,7 @@ impl EntityMetadata {
     /// Get the string identifier of this entity type.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+    pub const fn identifier(&self) -> &'static Ident { self.identifier }
 
     /// Get the [`GlobalEntityId`] of this entity type.
     #[must_use]
@@ -134,7 +134,7 @@ impl EntityMetadata {
 
 impl Debug for EntityMetadata {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("EntityMetadata").field(self.identifier()).finish_non_exhaustive()
+        f.debug_tuple("EntityMetadata").field(&self.identifier()).finish_non_exhaustive()
     }
 }
 

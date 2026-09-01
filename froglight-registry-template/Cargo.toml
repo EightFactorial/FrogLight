@@ -19,20 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-parking_lot = { workspace = true }
-
-# Optional dependencies
-once_cell = { features = ["critical-section", "parking_lot"], workspace = true, optional = true }
 
 # --- Features ---
 
 [features]
-default = ["std"]
-
-# Enable `once_cell` for `no_std` support.
-once_cell = ["dep:once_cell"]
-
-# Enable support for the standard library
-std = ["once_cell?/std"]
-# Enable optimizations using the nightly toolchain
-nightly = ["parking_lot/nightly"]

@@ -1,13 +1,9 @@
 use alloc::vec::Vec;
 use core::ops::Deref;
-#[cfg(feature = "std")]
-use std::sync::OnceLock;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
-use froglight_common::prelude::Identifier;
-#[cfg(not(feature = "std"))]
-use once_cell::sync::OnceCell as OnceLock;
+use froglight_common::{prelude::Identifier, types::OnceLock};
 
 #[cfg(feature = "bevy")]
 use crate::bevy::ReflectMenuGroup;

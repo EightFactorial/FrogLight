@@ -121,7 +121,7 @@ macro_rules! generate {
 
                 const METADATA: &'static $crate::block::BlockMetadata = {
                     static STATIC: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
-                        froglight_common::identifier::Identifier::new_static($string),
+                        froglight_common::identifier::Ident::new_static($string),
                         $crate::state::GlobalStateId::new($global),
                         $crate::state::RelativeStateId::new($default)
                     ) };

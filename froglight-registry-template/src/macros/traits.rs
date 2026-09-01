@@ -52,7 +52,7 @@ macro_rules! version_subtrait {
         #[doc = concat!("A [`", stringify!($const_ty), "`] for a [`Version`].")]
         pub trait $name: $($trait +)* Version {
             #[doc = concat!("The [`", stringify!($const_ty), "`] for this [`Version`].")]
-            const $const: &'static $crate::types::OnceLock<$const_ty>;
+            const $const: &'static ::froglight_common::types::OnceLock<$const_ty>;
 
             #[inline]
             #[must_use]
@@ -128,8 +128,8 @@ macro_rules! version_implement {
         }
     ) => {
         impl $name for $version {
-            const $const: &'static $crate::types::OnceLock<$const_ty> = {
-                static STATIC: $crate::types::OnceLock<$const_ty> = $crate::types::OnceLock::new();
+            const $const: &'static ::froglight_common::types::OnceLock<$const_ty> = {
+                static STATIC: ::froglight_common::types::OnceLock<$const_ty> = ::froglight_common::types::OnceLock::new();
                 &STATIC
             };
 

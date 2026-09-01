@@ -211,7 +211,7 @@ macro_rules! generate {
                     });
 
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
-                        froglight_common::identifier::Identifier::new_static($string),
+                        froglight_common::identifier::Ident::new_static($string),
                         $crate::state::GlobalBiomeId::new($global),
 
                         $foliage, $dry_foliage, $grass, $water, $precip, $temp, $downfall,

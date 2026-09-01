@@ -1,17 +1,15 @@
 use core::{any::TypeId, fmt::Debug};
 
-use froglight_common::prelude::Identifier;
-#[cfg(feature = "biome_data")]
-use froglight_registry_template::types::LazyLock;
+use froglight_common::prelude::*;
 
 #[cfg(feature = "biome_data")]
-use crate::biome::BiomeAttributeSet;
+use crate::{biome::BiomeAttributeSet, version::LazyLock};
 use crate::{biome::BiomeType, state::GlobalBiomeId, version::BiomeVersion};
 
 /// Metadata about a biome type.
 pub struct BiomeMetadata {
     /// The string identifier of the biome.
-    identifier: Identifier<'static>,
+    identifier: &'static Ident,
     /// The [`GlobalBiomeId`] assigned to this biome.
     global_id: GlobalBiomeId,
 
@@ -50,7 +48,7 @@ impl BiomeMetadata {
     #[must_use]
     #[expect(clippy::too_many_arguments, reason = "Yes")]
     pub const unsafe fn new<B: BiomeType<V>, V: BiomeVersion>(
-        identifier: Identifier<'static>,
+        identifier: &'static Ident,
         global_id: GlobalBiomeId,
         foliage_color: u32,
         dry_foliage_color: u32,
@@ -84,7 +82,7 @@ impl BiomeMetadata {
     /// Get the string identifier of this biome.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+    pub const fn identifier(&self) -> &'static Ident { self.identifier }
 
     /// Get the [`GlobalStateId`] of this biome.
     #[inline]
@@ -155,6 +153,6 @@ impl BiomeMetadata {
 
 impl Debug for BiomeMetadata {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_tuple("BiomeMetadata").field(self.identifier()).finish_non_exhaustive()
+        f.debug_tuple("BiomeMetadata").field(&self.identifier).finish_non_exhaustive()
     }
 }

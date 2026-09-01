@@ -18,10 +18,8 @@ use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
 use froglight_world::{
-    naive::{
-        NaiveChunk,
-        storage::{ArrayChunkStorage, ChunkStorage},
-    },
+    naive::storage::{ArrayChunkStorage, ChunkStorage},
+    prelude::*,
     section::{Section, SectionData, SectionPalette},
 };
 use smallvec::SmallVec;
@@ -308,7 +306,7 @@ impl BiomeType<TestVersion> for Plains {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
             BiomeMetadata::new::<Plains, TestVersion>(
-                Identifier::new_static("test:plains"),
+                Ident::new_static("test:plains"),
                 GlobalBiomeId::new(0),
                 0,
                 0,
@@ -334,7 +332,7 @@ impl BiomeType<TestVersion> for Forest {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
             BiomeMetadata::new::<Forest, TestVersion>(
-                Identifier::new_static("test:forest"),
+                Ident::new_static("test:forest"),
                 GlobalBiomeId::new(1),
                 0,
                 0,
@@ -422,7 +420,7 @@ impl BlockType<TestVersion> for Air {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Air, TestVersion>(
-                Identifier::new_static("test:air"),
+                Ident::new_static("test:air"),
                 GlobalStateId::new(0),
                 RelativeStateId::new(0),
             )
@@ -448,10 +446,10 @@ impl BlockType<TestVersion> for Stone {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            use froglight_common::prelude::Identifier;
+            use froglight_common::prelude::Ident;
 
             BlockMetadata::new::<Stone, TestVersion>(
-                Identifier::new_static("test:stone"),
+                Ident::new_static("test:stone"),
                 GlobalStateId::new(1),
                 RelativeStateId::new(0),
             )

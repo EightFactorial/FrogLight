@@ -3,7 +3,7 @@ use core::{
     fmt::{self, Debug},
 };
 
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 
 use crate::{
     item::{ComponentData, ItemType},
@@ -14,7 +14,7 @@ use crate::{
 /// Metadata about an item type.
 pub struct ItemMetadata {
     /// The string identifier of the item.
-    identifier: Identifier<'static>,
+    identifier: &'static Ident,
     /// The [`GlobalItemId`] assigned to this item.
     global_id: GlobalItemId,
 
@@ -36,7 +36,7 @@ impl ItemMetadata {
     /// [`ItemStorage`](crate::storage::ItemStorage) it will be used in.
     #[must_use]
     pub const unsafe fn new<I: ItemType<V>, V: ItemVersion>(
-        identifier: Identifier<'static>,
+        identifier: &'static Ident,
         global_id: GlobalItemId,
         default_data: ComponentData,
     ) -> Self {
@@ -52,7 +52,7 @@ impl ItemMetadata {
     /// Get the string identifier of this item.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+    pub const fn identifier(&self) -> &'static Ident { self.identifier }
 
     /// Get the [`GlobalItemId`] of this item.
     #[inline]
@@ -87,6 +87,6 @@ impl ItemMetadata {
 
 impl Debug for ItemMetadata {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("ItemMetadata").field(self.identifier()).finish_non_exhaustive()
+        f.debug_tuple("ItemMetadata").field(&self.identifier()).finish_non_exhaustive()
     }
 }

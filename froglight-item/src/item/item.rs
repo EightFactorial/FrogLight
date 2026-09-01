@@ -4,7 +4,7 @@ use core::{
     fmt::{self, Debug, Display},
 };
 
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 
 use crate::{
     item::{ComponentData, ComponentType, ItemMetadata},
@@ -74,7 +74,7 @@ impl Item {
     /// Get the string identifier of this item.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> Identifier<'static> { self.reference.identifier().reborrow() }
+    pub const fn identifier(&self) -> &'static Ident { self.reference.identifier() }
 
     /// Get the [`ItemMetadata`] of this item.
     #[inline]

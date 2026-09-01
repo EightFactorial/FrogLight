@@ -6,13 +6,9 @@ use core::{any::TypeId, fmt, ops::Range};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-use froglight_biome::{
-    biome::Biome, prelude::GlobalBiomeId, storage::BiomeStorage, version::BiomeVersion,
-};
-use froglight_block::{
-    block::Block, prelude::GlobalStateId, storage::BlockStorage, version::BlockVersion,
-};
-use froglight_common::prelude::Identifier;
+use froglight_biome::{prelude::*, storage::BiomeStorage};
+use froglight_block::{prelude::*, storage::BlockStorage};
+use froglight_common::prelude::*;
 use smallvec::SmallVec;
 
 use crate::{
@@ -267,7 +263,7 @@ impl Chunk {
 
         // Fallback to `minecraft:plains`, which is usually `0`.
         let fallback = new
-            .get_biome_by_identifier(&Identifier::new_static("minecraft:plains"))
+            .get_biome_by_identifier(Ident::new_static("minecraft:plains"))
             .map_or(0, |biome| biome.global_id().into_inner());
 
         let mut cache = SmallVec::<[(u32, u32); 15]>::new();
@@ -328,7 +324,7 @@ impl Chunk {
 
         // Fallback to `minecraft:stone`, which is usually `1`.
         let fallback = new_b
-            .get_block_by_identifier(&Identifier::new_static("minecraft:stone"))
+            .get_block_by_identifier(Ident::new_static("minecraft:stone"))
             .map_or(1, |biome| biome.global_id().into_inner());
 
         let mut cache = SmallVec::<[(u32, u32); 15]>::new();

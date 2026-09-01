@@ -1,6 +1,6 @@
 use core::{any::TypeId, fmt};
 
-use froglight_common::identifier::Identifier;
+use froglight_common::prelude::*;
 
 use crate::{
     attribute::{BlockAttribute, BlockAttributeBundle},
@@ -12,7 +12,7 @@ use crate::{
 /// Metadata about a block type.
 pub struct BlockMetadata {
     /// The string identifier of the block.
-    identifier: Identifier<'static>,
+    identifier: &'static Ident,
     /// The lowest [`GlobalStateId`] assigned to this block.
     base_global_id: GlobalStateId,
     /// The default [`RelativeStateId`] for this block.
@@ -42,7 +42,7 @@ impl BlockMetadata {
     /// Panics if the `default_state` is out of range for the block type.
     #[must_use]
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
-        identifier: Identifier<'static>,
+        identifier: &'static Ident,
         base_global_id: GlobalStateId,
         default_state: RelativeStateId,
     ) -> Self {
@@ -67,7 +67,7 @@ impl BlockMetadata {
     /// Get the string identifier of this block.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+    pub const fn identifier(&self) -> &'static Ident { self.identifier }
 
     /// Get the behavior of this block.
     #[inline]

@@ -3,7 +3,7 @@
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
-use froglight_common::identifier::Identifier;
+use froglight_common::prelude::*;
 use indexmap::{IndexMap, map::Entry};
 
 use crate::{
@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ItemStorage {
     version: TypeId,
-    metadata: IndexMap<Identifier<'static>, &'static ItemMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static ItemMetadata, RandomState>,
 }
 
 impl ItemStorage {
@@ -42,7 +42,7 @@ impl ItemStorage {
                 panic!("ItemMetadata version mismatch: expected {}", core::any::type_name::<V>());
             }
 
-            match identifiers.entry(meta.identifier().reborrow()) {
+            match identifiers.entry(meta.identifier()) {
                 Entry::Vacant(entry) => _ = entry.insert(*meta),
                 Entry::Occupied(..) => {
                     core::hint::cold_path();
@@ -70,7 +70,7 @@ impl ItemStorage {
     ///
     /// This is typically used by the registry.
     #[must_use]
-    pub fn get_item_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Item> {
+    pub fn get_item_by_identifier(&self, identifier: &Ident) -> Option<Item> {
         self.metadata.get(identifier).map(|meta| Item::new_from(meta))
     }
 
@@ -82,9 +82,7 @@ impl ItemStorage {
     /// Get the [`IndexMap`] metadata of this [`ItemStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(
-        &self,
-    ) -> &IndexMap<Identifier<'static>, &'static ItemMetadata, RandomState> {
+    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static ItemMetadata, RandomState> {
         &self.metadata
     }
 }

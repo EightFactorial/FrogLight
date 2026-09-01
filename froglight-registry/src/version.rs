@@ -1,7 +1,7 @@
 //! TODO
 
+pub use froglight_common::types::*;
 use froglight_common::version::Version;
-pub use froglight_registry_template::types::{LazyLock, RwLock};
 
 use crate::storage::RegistryStorage;
 

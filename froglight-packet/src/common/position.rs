@@ -4,10 +4,10 @@
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Facet;
+use froglight_common::crates::glam::{DVec3, Vec3, Vec3A};
 use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-use glam::{DVec3, Vec3, Vec3A};
 
 use crate::generated::v26_1::play::{
     MoveEntityPosRotS2CPacket, MoveEntityPosS2CPacket, MoveEntityRotS2CPacket,

@@ -3,7 +3,7 @@
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 use indexmap::{IndexMap, map::Entry};
 
 use crate::{
@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct BiomeStorage {
     version: TypeId,
-    metadata: IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static BiomeMetadata, RandomState>,
 }
 
 impl BiomeStorage {
@@ -43,7 +43,7 @@ impl BiomeStorage {
                 panic!("BiomeMetadata version mismatch: expected {}", core::any::type_name::<V>());
             }
 
-            match identifiers.entry(meta.identifier().reborrow()) {
+            match identifiers.entry(meta.identifier()) {
                 Entry::Vacant(entry) => _ = entry.insert(*meta),
                 Entry::Occupied(..) => {
                     core::hint::cold_path();
@@ -76,7 +76,7 @@ impl BiomeStorage {
     ///
     /// This is typically used by the registry.
     #[must_use]
-    pub fn get_biome_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Biome> {
+    pub fn get_biome_by_identifier(&self, identifier: &Ident) -> Option<Biome> {
         if let Some(meta) = self.metadata.get(identifier) {
             Some(Biome::new_from(meta))
         } else {
@@ -93,9 +93,7 @@ impl BiomeStorage {
     /// Get the [`IndexMap`] metadata of this [`BiomeStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(
-        &self,
-    ) -> &IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState> {
+    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static BiomeMetadata, RandomState> {
         &self.metadata
     }
 
@@ -104,7 +102,7 @@ impl BiomeStorage {
     #[must_use]
     pub fn metadata_mut(
         &mut self,
-    ) -> &mut IndexMap<Identifier<'static>, &'static BiomeMetadata, RandomState> {
+    ) -> &mut IndexMap<&'static Ident, &'static BiomeMetadata, RandomState> {
         &mut self.metadata
     }
 }

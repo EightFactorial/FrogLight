@@ -56,18 +56,18 @@ bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/be
 # Enable `facet` support.
 facet = ["dep:facet", "dep:froglight-facet", "froglight-common/facet"]
 # Enable `froglight-biome` support.
-froglight-biome = ["dep:froglight-biome", "dep:froglight-registry-template"]
+froglight-biome = ["dep:froglight-biome"]
 # Enable `froglight-block` support.
-froglight-block = ["dep:froglight-block", "dep:froglight-registry-template"]
+froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
 
 # Enable `libm` for `no_std` support.
-libm = ["glam/nostd-libm", "froglight-block?/libm"]
+libm = ["froglight-block?/libm", "froglight-common/libm"]
 # Enable `once_cell` for `no_std` support.
-once_cell = ["froglight-registry-template?/once_cell"]
+once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bit-vec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "froglight-registry-template?/std", "glam/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bit-vec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-registry-template?/nightly", "smallvec/specialization", "std"]
+nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "smallvec/specialization", "std"]

@@ -6,7 +6,7 @@ use core::{
     fmt::{self, Debug, Display},
 };
 
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 
 use crate::{state::GlobalBiomeId, storage::BiomeStorage, version::BiomeVersion};
 
@@ -39,7 +39,7 @@ impl Biome {
     /// Get the string identifier of this biome.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> Identifier<'static> { self.metadata.identifier().reborrow() }
+    pub const fn identifier(&self) -> &'static Ident { self.metadata.identifier() }
 
     /// Get the [`BiomeMetadata`] of this biome.
     #[inline]
@@ -74,7 +74,7 @@ impl Biome {
         }
 
         // Try the biome with a matching identifier and type.
-        if let Some(biome) = biomes.get_biome_by_identifier(&self.identifier())
+        if let Some(biome) = biomes.get_biome_by_identifier(self.identifier())
             && self.biome_ty() == biome.biome_ty()
         {
             return Some(biome);

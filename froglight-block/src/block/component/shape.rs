@@ -1,7 +1,9 @@
 use alloc::{borrow::Cow, vec};
 use core::ops::Add;
 
-use glam::DVec3;
+use froglight_common::crates::glam::DVec3;
+#[cfg(all(not(feature = "std"), feature = "libm"))]
+use froglight_common::crates::libm;
 
 /// Using larger epsilon to match original behavior.
 const EPSILON_F64: f64 = 1e-7;

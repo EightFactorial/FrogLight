@@ -104,7 +104,7 @@ macro_rules! generate {
             impl $crate::item::ItemType<$version> for $ident {
                 const METADATA: &'static $crate::item::ItemMetadata = {
                     static METADATA: $crate::item::ItemMetadata = unsafe { $crate::item::ItemMetadata::new::<$ident, $version>(
-                        froglight_common::identifier::Identifier::new_static($string),
+                        froglight_common::identifier::Ident::new_static($string),
                         $crate::state::GlobalItemId::new($global),
                         ComponentData::empty()
                     ) };

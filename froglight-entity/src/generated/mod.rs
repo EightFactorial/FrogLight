@@ -223,7 +223,7 @@ macro_rules! generate {
             impl $crate::entity::EntityType<$version> for $ident {
                 const METADATA: &'static $crate::entity::EntityMetadata = {
                     static METADATA: $crate::entity::EntityMetadata = unsafe { $crate::entity::EntityMetadata::new::<$ident, $version>(
-                        froglight_common::identifier::Identifier::new_static($string),
+                        froglight_common::identifier::Ident::new_static($string),
                         $crate::entity::GlobalEntityId::new($global),
                         [$width, $height],
                         $eye_height,

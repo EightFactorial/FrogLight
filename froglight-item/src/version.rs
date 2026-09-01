@@ -1,7 +1,8 @@
 //! TODO
 
+pub use froglight_common::types::{LazyLock, RwLock};
 use froglight_common::version::Version;
-pub use froglight_registry_template::{types::LazyLock, version_implement};
+pub use froglight_registry_template::version_implement;
 
 use crate::storage::ItemStorage;
 

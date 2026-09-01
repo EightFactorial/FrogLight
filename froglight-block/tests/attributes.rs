@@ -10,7 +10,7 @@ use froglight_block::{
     storage::BlockStorage,
     version::version_implement,
 };
-use froglight_common::prelude::{Identifier, Version};
+use froglight_common::prelude::*;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct TestVersion;
@@ -33,7 +33,7 @@ impl BlockType<TestVersion> for Air {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Air, TestVersion>(
-                Identifier::new_static("test:air"),
+                Ident::new_static("test:air"),
                 GlobalStateId::new(0),
                 RelativeStateId::new(0),
             )
@@ -58,7 +58,7 @@ impl BlockType<TestVersion> for Stone {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Stone, TestVersion>(
-                Identifier::new_static("test:stone"),
+                Ident::new_static("test:stone"),
                 GlobalStateId::new(1),
                 RelativeStateId::new(0),
             )
@@ -77,7 +77,7 @@ impl BlockType<TestVersion> for Dirt {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Dirt, TestVersion>(
-                Identifier::new_static("test:stone"),
+                Ident::new_static("test:stone"),
                 GlobalStateId::new(2),
                 RelativeStateId::new(0),
             )
@@ -98,7 +98,7 @@ impl BlockType<TestVersion> for Grass {
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
             BlockMetadata::new::<Grass, TestVersion>(
-                Identifier::new_static("test:grass"),
+                Ident::new_static("test:grass"),
                 GlobalStateId::new(3),
                 RelativeStateId::new(1),
             )

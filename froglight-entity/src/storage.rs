@@ -3,7 +3,7 @@
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 use indexmap::{IndexMap, map::Entry};
 
 use crate::{
@@ -15,7 +15,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct EntityStorage {
     version: TypeId,
-    metadata: IndexMap<Identifier<'static>, &'static EntityMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static EntityMetadata, RandomState>,
 }
 
 impl EntityStorage {
@@ -42,7 +42,7 @@ impl EntityStorage {
                 panic!("EntityMetadata version mismatch: expected {}", core::any::type_name::<V>());
             }
 
-            match identifiers.entry(meta.identifier().reborrow()) {
+            match identifiers.entry(meta.identifier()) {
                 Entry::Vacant(entry) => _ = entry.insert(*meta),
                 Entry::Occupied(..) => {
                     core::hint::cold_path();
@@ -72,7 +72,7 @@ impl EntityStorage {
     ///
     /// This is typically used by the registry.
     #[must_use]
-    pub fn get_entity_by_identifier(&self, identifier: &Identifier<'_>) -> Option<EntityBundle> {
+    pub fn get_entity_by_identifier(&self, identifier: &Ident) -> Option<EntityBundle> {
         self.metadata.get(identifier).map(|&meta| EntityBundle::new_from(meta))
     }
 
@@ -86,7 +86,7 @@ impl EntityStorage {
     #[must_use]
     pub const fn metadata(
         &self,
-    ) -> &IndexMap<Identifier<'static>, &'static EntityMetadata, RandomState> {
+    ) -> &IndexMap<&'static Ident, &'static EntityMetadata, RandomState> {
         &self.metadata
     }
 }

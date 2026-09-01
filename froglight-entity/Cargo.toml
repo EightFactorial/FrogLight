@@ -55,14 +55,14 @@ tracing = ["dep:tracing", "froglight-inventory/tracing", "froglight-player/traci
 tracing_ext = ["froglight-facet?/tracing", "froglight-inventory/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
-libm = ["bevy_math/nostd-libm", "glam/nostd-libm"]
+libm = ["bevy_math/nostd-libm", "froglight-common/libm", "glam/nostd-libm"]
 # Enable `once_cell` for `no_std` support.
-once_cell = ["froglight-inventory/once_cell", "froglight-registry-template/once_cell"]
+once_cell = ["froglight-common/once_cell", "froglight-inventory/once_cell"]
 
 # Enable support for the standard library
-std = ["facet?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-inventory/std", "froglight-player/std", "froglight-registry-template/std", "glam/std", "indexmap/std", "uuid/std"]
+std = ["facet?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "froglight-inventory/std", "froglight-player/std", "glam/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-inventory/nightly", "froglight-player/nightly", "froglight-registry-template/nightly"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "froglight-inventory/nightly", "froglight-player/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

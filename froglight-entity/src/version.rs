@@ -1,9 +1,9 @@
 //! TODO
 
 use froglight_common::prelude::*;
+pub use froglight_common::types::*;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-pub use froglight_registry_template::types::OnceLock;
 
 #[cfg(feature = "facet")]
 use crate::generated::datatype::EntityDataType;

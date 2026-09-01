@@ -3,7 +3,7 @@
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
-use froglight_common::prelude::Identifier;
+use froglight_common::prelude::*;
 use indexmap::{IndexMap, map::Entry};
 
 use crate::{
@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct BlockStorage {
     version: TypeId,
-    identifiers: IndexMap<Identifier<'static>, GlobalStateId, RandomState>,
+    identifiers: IndexMap<&'static Ident, GlobalStateId, RandomState>,
     metadata: &'static [&'static BlockMetadata],
 }
 
@@ -41,7 +41,7 @@ impl BlockStorage {
                 panic!("BlockMetadata version mismatch: expected {}", core::any::type_name::<V>());
             }
 
-            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier().reborrow()) {
+            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier()) {
                 entry.insert(meta.global_id_default());
             }
         }
@@ -92,7 +92,7 @@ impl BlockStorage {
     ///
     /// This is typically used by the inventory and registry.
     #[must_use]
-    pub fn get_block_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Block> {
+    pub fn get_block_by_identifier(&self, identifier: &Ident) -> Option<Block> {
         self.identifiers.get(identifier).and_then(|id| self.get_block_by_state(*id))
     }
 
