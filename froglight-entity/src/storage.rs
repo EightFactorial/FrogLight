@@ -4,7 +4,7 @@ use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
-use indexmap::IndexMap;
+use indexmap::{IndexMap, map::Entry};
 
 use crate::{
     entity::{EntityBundle, EntityMetadata, GlobalEntityId},
@@ -25,13 +25,30 @@ impl EntityStorage {
     ///
     /// The caller must ensure that all provided entity metadata has the correct
     /// global ids for this collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there are duplicate entity identifiers in the provided
+    /// metadata, or if any of the metadata belongs to a different
+    /// [`EntityVersion`].
     #[must_use]
     pub unsafe fn build<V: EntityVersion>(metadata: &[&'static EntityMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
-        for &meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+        for meta in metadata {
+            if !meta.is_version::<V>() {
+                core::hint::cold_path();
+                panic!("EntityMetadata version mismatch: expected {}", core::any::type_name::<V>());
+            }
+
+            match identifiers.entry(meta.identifier().reborrow()) {
+                Entry::Vacant(entry) => _ = entry.insert(*meta),
+                Entry::Occupied(..) => {
+                    core::hint::cold_path();
+                    panic!("EntityMetadata has duplicate identifier: {:?}", meta.identifier());
+                }
+            }
         }
 
         Self { version: TypeId::of::<V>(), metadata: identifiers }

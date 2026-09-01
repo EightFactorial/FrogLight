@@ -42,6 +42,7 @@ bevy_tasks = { default-features = false, version = "0.19" }
 bevy_time = { default-features = false, version = "0.19" }
 bevy_transform = { default-features = false, version = "0.19" }
 bevy_ui = { default-features = false, version = "0.19" }
+bevy_utils = { default-features = false, version = "0.19" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "=0.50.0-rc.7" }
@@ -53,7 +54,7 @@ facet-toml = { default-features = false, version = "=0.50.0-rc.7" }
 facet-value = { default-features = false, version = "=0.50.0-rc.7" }
 
 # Hashing & Cryptography Dependencies
-aes = { default-features = false, version = "0.9.2" }
+aes = { default-features = false, version = "0.9.3" }
 base64 = { default-features = false, version = "0.23.0" }
 cfb8 = { default-features = false, version = "0.9.1" }
 cipher = { default-features = false, version = "0.5.2" }
@@ -100,7 +101,7 @@ socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "^1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.3" }
-uuid = { default-features = false, version = "1.24" }
+uuid = { default-features = false, version = "1.26" }
 variadics_please = { default-features = false, version = "2.0" }
 yansi = { default-features = false, version = "1.0" }
 

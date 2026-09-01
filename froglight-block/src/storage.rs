@@ -1,13 +1,10 @@
 //! TODO
 
-use alloc::boxed::Box;
-#[cfg(feature = "nightly")]
-use alloc::{alloc::Allocator, vec::Vec};
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
-use indexmap::IndexMap;
+use indexmap::{IndexMap, map::Entry};
 
 use crate::{
     block::{Block, BlockMetadata},
@@ -20,76 +17,36 @@ use crate::{
 pub struct BlockStorage {
     version: TypeId,
     identifiers: IndexMap<Identifier<'static>, GlobalStateId, RandomState>,
-    #[cfg(feature = "nightly")]
-    metadata: Box<[&'static BlockMetadata], &'static (dyn Allocator + Send + Sync)>,
-    #[cfg(not(feature = "nightly"))]
-    metadata: Box<[&'static BlockMetadata]>,
+    metadata: &'static [&'static BlockMetadata],
 }
 
 impl BlockStorage {
     /// Build a new [`BlockStorage`] for the given [`BlockVersion`].
+    ///
     /// # Safety
     ///
     /// The caller must ensure that all provided block metadata has the correct
     /// global ids for this collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of the metadata belongs to a different [`BlockVersion`].
     #[must_use]
-    pub unsafe fn build<V: BlockVersion>(metadata: Box<[&'static BlockMetadata]>) -> Self {
-        // Create the identifier map.
+    pub unsafe fn build<V: BlockVersion>(metadata: &'static [&'static BlockMetadata]) -> Self {
         let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
-        for meta in &metadata {
-            identifiers.entry(meta.identifier().reborrow()).or_insert(meta.default_id());
+
+        for meta in metadata {
+            if !meta.is_version::<V>() {
+                core::hint::cold_path();
+                panic!("BlockMetadata version mismatch: expected {}", core::any::type_name::<V>());
+            }
+
+            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier().reborrow()) {
+                entry.insert(meta.global_id_default());
+            }
         }
-
-        #[cfg(feature = "nightly")]
-        let metadata = unsafe {
-            use alloc::alloc::Global;
-
-            let (ptr, Global) = Box::into_non_null_with_allocator(metadata);
-            Box::<_, &'static (dyn Allocator + Send + Sync)>::from_non_null_in(ptr, &Global)
-        };
 
         Self { version: TypeId::of::<V>(), identifiers, metadata }
-    }
-
-    /// Build a new [`BlockStorage`] for the given [`BlockVersion`].
-    ///
-    /// This will use the provided allocator for the blockstate metadata slice,
-    /// which will be quite large.
-    ///
-    /// [`V26_1`](froglight_common::version::V26_1) has about 30,000
-    /// blockstates, which is 240 kB of memory (120kB on 32-bit platforms).
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that all provided block metadata has the correct
-    /// global ids for this collection.
-    #[must_use]
-    #[cfg(feature = "nightly")]
-    pub unsafe fn build_using<
-        V: BlockVersion,
-        Iter: IntoIterator<Item = &'static BlockMetadata>,
-        A: Allocator + Send + Sync,
-    >(
-        iterator: Iter,
-        allocator: &'static A,
-    ) -> Self {
-        // Create the metadata vector with the provided allocator.
-        let iterator = iterator.into_iter();
-        let (lower_bound, upper_bound) = iterator.size_hint();
-        let mut metadata = Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
-            upper_bound.unwrap_or(lower_bound),
-            allocator,
-        );
-
-        // Create the identifier map.
-        // TODO: When `IndexMap` supports custom allocators, use it here as well.
-        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
-        for meta in iterator {
-            identifiers.entry(meta.identifier().reborrow()).or_insert(meta.default_id());
-            metadata.push(meta);
-        }
-
-        Self { version: TypeId::of::<V>(), identifiers, metadata: metadata.into_boxed_slice() }
     }
 
     /// Get the default [`Block`] for a given [`GlobalBlockId`].
@@ -117,13 +74,14 @@ impl BlockStorage {
     #[must_use]
     pub fn get_block_by_state(&self, id: GlobalStateId) -> Option<Block> {
         let metadata = self.metadata.get(id.into_inner() as usize)?;
-        let state = id.into_inner().saturating_sub(metadata.base_id().into_inner());
+        let state = id.into_inner().saturating_sub(metadata.global_id_base().into_inner());
         let state = RelativeStateId::new(u16::try_from(state).ok()?);
 
         if state.into_inner() < metadata.state_count() {
             // SAFETY: We just checked if the state is valid for this metadata.
             Some(unsafe { Block::new_unchecked(state, metadata) })
         } else {
+            core::hint::cold_path();
             None
         }
     }
@@ -141,7 +99,7 @@ impl BlockStorage {
     /// Get the [`BlockMetadata`] of this [`BlockStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(&self) -> &[&'static BlockMetadata] { &self.metadata }
+    pub const fn metadata(&self) -> &[&'static BlockMetadata] { self.metadata }
 
     /// Get the [`TypeId`] of the [`Version`] this storage is for.
     #[inline]

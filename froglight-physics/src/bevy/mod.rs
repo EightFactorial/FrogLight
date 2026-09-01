@@ -102,7 +102,7 @@ impl PhysicsPlugin {
     /// # Note
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
-    pub fn update_colliders(colliders: Query<(&Position, &mut Collider)>) {
+    pub fn update_colliders(colliders: Query<(&Position, &mut Collider), Changed<Position>>) {
         colliders.par_iter_inner().for_each(|(pos, mut collider)| {
             collider.set_center(pos.to_vec3a());
         });
@@ -115,50 +115,44 @@ impl PhysicsPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn update_collisions(
-        instances: Query<(Entity, &SessionInstance)>,
-        mut colliders: Query<(Entity, &Collider, &mut CollidingWith)>,
-        mut collisions: ResMut<EntityCollisions>,
+        instances: Query<&SessionInstance>,
+        mut collider: Query<(Entity, Ref<Collider>, &mut CollidingWith)>,
+        mut collision: ResMut<EntityCollisions>,
         mut cache: Local<Mutex<Vec<UniqueEntityArray<2>>>>,
     ) {
-        let collider_lens = colliders.transmute_lens::<(Entity, &Collider)>();
-        let collider_lens = collider_lens.query_inner();
-
         // Calculate all collisions in parallel.
-        instances.par_iter().for_each(|(_entity, instance)| {
-            #[cfg(feature = "tracing")]
-            #[allow(clippy::used_underscore_binding, reason = "Used for tracing")]
-            let _span = tracing::info_span!(target: "froglight_physics", "par_update_collisions", instance = %_entity).entered();
+        let collider_lens = collider.transmute_lens::<(Entity, Ref<Collider>)>();
+        instances.par_iter().for_each(|instance| {
+            let mut local = Vec::with_capacity(instance.entity_map().len());
+            let collider_query = collider_lens.query_inner();
+            local.extend(collider_query.iter_many_unique(instance.entity_map()));
 
-            for (current, a) in instance.iter_entity().enumerate() {
-                for b in instance.iter_entity().skip(current + 1) {
-                    // SAFETY: Checking that `a` and `b` are not equal.
-                    let pair = if a == b { continue } else { unsafe { UniqueEntityArray::from_array_unchecked([*a, *b]) } };
-
-                    if let Ok([(_, collider_a), (_, collider_b)]) =
-                        collider_lens.get_many_unique(pair)
-                        && collider_a.intersects(collider_b)
-                    {
-                        cache.lock().push(pair);
+            for (a, collider_a) in local.iter().filter(|(_, collider_a)| collider_a.is_changed()) {
+                for (b, collider_b) in local.iter().filter(|(b, _)| a != b) {
+                    if collider_a.intersects(collider_b) {
+                        // SAFETY: `a` and `b` are guaranteed to be different.
+                        cache
+                            .lock()
+                            .push(unsafe { UniqueEntityArray::from_array_unchecked([*a, *b]) });
                     }
                 }
             }
         });
 
         // Clear all existing collisions.
-        collisions.clear();
-        for (_, _, mut colliding_with) in colliders.iter_mut() {
+        collision.clear();
+        for (_, _, mut colliding_with) in collider.iter_mut() {
             colliding_with.clear();
         }
 
         // Insert all new collisions.
         for pair in cache.get_mut().drain(..) {
-            let [a, b] = pair.into_inner();
-            if collisions.push_pair(a, b)
-                && let Ok([(.., mut colliding_with_a), (.., mut colliding_with_b)]) =
-                    colliders.get_many_unique_mut(pair)
+            if collision.push_arr(pair)
+                && let Ok([(.., mut with_a), (.., mut with_b)]) = collider.get_many_unique_mut(pair)
             {
-                colliding_with_a.insert(b);
-                colliding_with_b.insert(a);
+                let [a, b] = pair.into_inner();
+                with_a.insert(b);
+                with_b.insert(a);
             }
         }
     }

@@ -466,10 +466,10 @@ froglight_block::version::version_implement! {
         const BLOCKS: BlockStorage;
         fn new_blocks() => {
             unsafe {
-                BlockStorage::build::<Self>(Box::new([
+                BlockStorage::build::<Self>(&[
                     Air::METADATA,
                     Stone::METADATA,
-                ]))
+                ])
             }
         }
     }

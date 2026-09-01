@@ -66,8 +66,10 @@ fn minimal_plugins() -> PluginGroupBuilder {
         //
         // # Note
         //
-        // This runs the main loop four times per tick, which is plenty for this example.
+        // This runs the main loop four times per (default) tick, which is plenty.
         // If you are doing something timing sensitive, don't do this.
+        //
+        // This also makes ticks take longer as they have more events to process.
         .set(ScheduleRunnerPlugin::run_loop(Duration::from_millis(5)))
 }
 
@@ -99,7 +101,7 @@ impl Plugin for BotPlugin {
         .add_systems(
             Tick,
             // Handle clientbound packets.
-            BotPlugin::message_handler,
+            BotPlugin::message_handler.ambiguous_with_all(),
         )
         .add_systems(
             PostTick,
@@ -178,20 +180,11 @@ impl BotPlugin {
     }
 
     /// Log the amount of time to took to run a tick.
-    fn log_tick_runtime(
-        diag: Res<DiagnosticsStore>,
-        time: Res<Time>,
-        mut timer: Local<Option<Timer>>,
-    ) {
-        const SECONDS_BETWEEN_LOGS: f32 = 10.0;
-        let timer = timer
-            .get_or_insert_with(|| Timer::from_seconds(SECONDS_BETWEEN_LOGS, TimerMode::Repeating));
-
-        if timer.tick(time.delta()).just_finished()
-            && let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
+    fn log_tick_runtime(diag: Res<DiagnosticsStore>) {
+        if let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
             && let Some(average) = diag.average()
         {
-            info!("Tick Runtime: {average:.3}{}", diag.suffix);
+            trace!("Tick Runtime: {average:.3}{}", diag.suffix);
         }
     }
 
@@ -208,7 +201,7 @@ impl BotPlugin {
     #[allow(clippy::match_same_arms, reason = "Example")]
     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
     fn message_handler(
-        bot: Query<EntityRef, (With<ClientConnection>, Without<IsResource>)>,
+        bot: Query<Entity, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
         mut commands: Commands,
     ) {
@@ -232,7 +225,7 @@ impl BotPlugin {
                             {
                                 let ident = bundle.identifier();
                                 let entity = commands.spawn((
-                                    PartOfInstance::new(bot.id()),
+                                    PartOfInstance::new(bot),
                                     data.entity_id,
                                     data.entity_uuid,
                                     bundle,
@@ -263,32 +256,32 @@ impl BotPlugin {
                             let blockpos = *blockpos;
                             let block_id = *block_id;
 
-                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
-                            let Some(instance) = entity.get::<SessionInstance>() else {
-                                error!("Received BlockUpdate but bot doesn't have a SessionInstance!");
-                                return;
-                            };
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
+                                let Some(instance) = entity.get::<SessionInstance>() else {
+                                    error!("Received BlockUpdate but bot doesn't have a SessionInstance!");
+                                    return;
+                                };
 
-                            let Some(block) = instance.version_blocks().get_block_by_state(block_id) else {
-                                error!("Received BlockUpdate with unknown BlockState \"{}\"!", block_id.into_inner());
-                                return;
-                            };
+                                let Some(block) = instance.version_blocks().get_block_by_state(block_id) else {
+                                    error!("Received BlockUpdate with unknown BlockState \"{}\"!", block_id.into_inner());
+                                    return;
+                                };
 
-                            debug!(
-                                "Received BlockUpdate \"{}\" at {blockpos}: {:?}",
-                                block.identifier(),
-                                block.get_attributes().collect::<Vec<_>>()
-                            );
-
-                            let Some(mut queue) = entity.get_mut::<BlockEditQueue>() else {
-                                error!(
-                                    "Received BlockUpdate but bot doesn't have a BlockEditQueue!"
+                                debug!(
+                                    "Received BlockUpdate \"{}\" at {blockpos}: {:?}",
+                                    block.identifier(),
+                                    block.get_attributes().collect::<Vec<_>>()
                                 );
-                                return;
-                            };
 
-                            queue.push(blockpos, block);
-                        });
+                                let Some(mut queue) = entity.get_mut::<BlockEditQueue>() else {
+                                    error!(
+                                        "Received BlockUpdate but bot doesn't have a BlockEditQueue!"
+                                    );
+                                    return;
+                                };
+
+                                queue.push(blockpos, block);
+                            });
                         }
                         // ClientboundPlayEvent::BossEvent() => todo!(),
                         ClientboundPlayEvent::BundleDelimiter => {}
@@ -297,7 +290,7 @@ impl BotPlugin {
                         ClientboundPlayEvent::ChunkBatchFinished(size) => {
                             debug!("Received ChunkBatchFinished: {size} chunks");
 
-                            commands.entity(bot.id()).queue(|mut entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(|mut entity: EntityWorldMut<'_>| {
                                 let entity_id = entity.id();
                                 entity.resource_mut::<Messages<ServerboundMessage>>().write(
                                     ServerboundMessage::new(
@@ -318,7 +311,7 @@ impl BotPlugin {
                             let chunkpos = *chunkpos;
                             let chunk_data = chunk_data.clone();
 
-                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
                                 let bot_id = entity.id();
                                 let Some(instance) = entity.get::<SessionInstance>() else {
                                     error!("Received ChunkWithLight but bot doesn't have a SessionInstance!");
@@ -406,7 +399,7 @@ impl BotPlugin {
                             let data = *data;
                             let on_ground = *on_ground;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else {
                                 error!("Received EntityPosition but bot doesn't have a SessionInstance!");
                                 return
@@ -452,7 +445,7 @@ impl BotPlugin {
                         ClientboundPlayEvent::ForgetChunk(chunkpos) => {
                             let chunkpos = *chunkpos;
 
-                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
                                 if let Some(mut queue) = entity.get_mut::<BlockEditQueue>()  {
                                     queue.remove(&chunkpos);
                                 }
@@ -497,27 +490,23 @@ impl BotPlugin {
                             info!("Received KeepAlive: {id}");
 
                             let id = *id;
-                            commands.entity(bot.id()).queue(
-                                move |mut entity: EntityWorldMut<'_>| {
-                                    let entity_id = entity.id();
-                                    entity.resource_mut::<Messages<ServerboundMessage>>().write(
-                                        ServerboundMessage::new(
-                                            entity_id,
-                                            ServerboundPlayEvent::KeepAlive(id),
-                                        ),
-                                    );
-                                },
-                            );
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundPlayEvent::KeepAlive(id),
+                                    ),
+                                );
+                            });
                         }
                         // ClientboundPlayEvent::LevelEvent() => todo!(),
                         // ClientboundPlayEvent::LevelParticles() => todo!(),
                         ClientboundPlayEvent::LightUpdate(_chunkpos, _light_data) => {}
                         ClientboundPlayEvent::Login(login) => {
                             info!(
-                                "Joining as Entity {} ({:?}) in \"{}\"!",
-                                bot.id(),
-                                login.player_id.0,
-                                login.spawn_info.dimension
+                                "Joining as Entity {bot} ({:?}) in \"{}\"!",
+                                login.player_id.0, login.spawn_info.dimension
                             );
                             debug!("Login Info: {login:#?}");
 
@@ -557,24 +546,31 @@ impl BotPlugin {
                             };
 
                             // Insert the bot's initial components.
-                            let profile = bot.get::<PlayerProfile>().unwrap();
-                            commands.entity(bot.id()).insert((
-                                SessionInstance::new::<Version>(
-                                    login.spawn_info.dimension.clone(),
-                                    height_max,
-                                    height_min,
-                                ),
-                                PartOfInstance::new(bot.id()),
-                                BlockEditQueue::new(),
-                                TickTimer::default(),
-                                login.player_id,
-                                EntityUuid::new(*profile.uuid()),
-                                EntityBundle::new::<entity::Player, Version>(),
-                                Position::ZERO,
-                                Rotation::IDENTITY,
-                                Velocity::ZERO,
-                                Acceleration::ZERO,
-                            ));
+                            let player_id = login.player_id;
+                            let dimension = login.spawn_info.dimension.clone();
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
+                                let (entities, mut commands) =
+                                    entity.into_world_mut().entities_and_commands();
+
+                                let profile =
+                                    entities.get(bot).unwrap().get::<PlayerProfile>().unwrap();
+
+                                commands.entity(bot).insert((
+                                    SessionInstance::new::<Version>(
+                                        dimension, height_max, height_min,
+                                    ),
+                                    PartOfInstance::new(bot),
+                                    BlockEditQueue::new(),
+                                    TickTimer::default_20tps(),
+                                    player_id,
+                                    EntityUuid::new(*profile.uuid()),
+                                    EntityBundle::new::<entity::Player, Version>(),
+                                    Position::ZERO,
+                                    Rotation::IDENTITY,
+                                    Velocity::ZERO,
+                                    Acceleration::ZERO,
+                                ));
+                            });
                         }
                         // ClientboundPlayEvent::MapItemData() => todo!(),
                         // ClientboundPlayEvent::MerchantOffers() => todo!(),
@@ -584,7 +580,7 @@ impl BotPlugin {
                         | ClientboundPlayEvent::MoveEntityRot(data) => {
                             let data = *data;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
                             let Some(instance) = entity.get::<SessionInstance>() else { return };
                             let Some(target) = instance.get_id(&data.entity_id) else {
                                 error!(
@@ -630,17 +626,15 @@ impl BotPlugin {
                             info!("Received Ping: {id}");
 
                             let id = *id;
-                            commands.entity(bot.id()).queue(
-                                move |mut entity: EntityWorldMut<'_>| {
-                                    let entity_id = entity.id();
-                                    entity.resource_mut::<Messages<ServerboundMessage>>().write(
-                                        ServerboundMessage::new(
-                                            entity_id,
-                                            ServerboundPlayEvent::Pong(id),
-                                        ),
-                                    );
-                                },
-                            );
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
+                                let entity_id = entity.id();
+                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                    ServerboundMessage::new(
+                                        entity_id,
+                                        ServerboundPlayEvent::Pong(id),
+                                    ),
+                                );
+                            });
                         }
                         // ClientboundPlayEvent::PlayerAbilities() => todo!(),
                         // ClientboundPlayEvent::PlayerChat() => todo!(),
@@ -655,7 +649,7 @@ impl BotPlugin {
                             let data = *data;
                             let flags = *flags;
 
-                            commands.entity(bot.id()).queue(move |mut entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
                                 // Set the player's position/rotation/velocity.
                                 if let Ok((mut position, mut rotation, mut velocity)) = entity.get_components_mut::<(
                                     &mut Position,
@@ -688,12 +682,11 @@ impl BotPlugin {
                         // ClientboundPlayEvent::RecipeBookSettings() => todo!(),
                         ClientboundPlayEvent::RemoveEntities(entities) => {
                             let removed = entities.clone();
-                            let bot_id = bot.id();
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
                                 let (entities, mut commands) = entity.into_world_mut().entities_and_commands();
 
-                                let Ok(bot) = entities.get(bot_id) else { return };
+                                let Ok(bot) = entities.get(bot) else { return };
                                 let Some(instance) = bot.get::<SessionInstance>() else {
                                     error!(
                                         "Received RemoveEntities but bot doesn't have a SessionInstance!"
@@ -741,58 +734,58 @@ impl BotPlugin {
                                 continue;
                             };
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
-                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
+                                let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.get_id(&id) {
-                                let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
-                                    error!(
-                                        "Received SetEntityData for Entity {target} that doesn't exist!"
-                                    );
-                                    return;
-                                };
+                                if let Some(target) = instance.get_id(&id) {
+                                    let Ok(mut entity) = entity.into_world_mut().get_entity_mut(target) else {
+                                        error!(
+                                            "Received SetEntityData for Entity {target} that doesn't exist!"
+                                        );
+                                        return;
+                                    };
 
-                                if let Some(bundle) = entity.get::<EntityBundle>().cloned()
-                                    && let Ok(bundle) = bundle.with_dataset(dataset)
-                                {
-                                    trace!("Adding to Entity {} ({}):", entity.id(), id.0);
-                                    bundle.inspect_reflect(|ty| {
-                                        trace!("    - {}", ty.reflect_short_type_path());
-                                    });
+                                    if let Some(bundle) = entity.get::<EntityBundle>().cloned()
+                                        && let Ok(bundle) = bundle.with_dataset(dataset)
+                                    {
+                                        trace!("Adding to Entity {} ({}):", entity.id(), id.0);
+                                        bundle.inspect_reflect(|ty| {
+                                            trace!("    - {}", ty.reflect_short_type_path());
+                                        });
 
-                                    entity.insert(bundle);
+                                        entity.insert(bundle);
+                                    } else {
+                                        error!(
+                                            "Received SetEntityData for Entity {target} without EntityBundle!"
+                                        );
+                                    }
                                 } else {
-                                    error!(
-                                        "Received SetEntityData for Entity {target} without EntityBundle!"
-                                    );
+                                    error!("Received SetEntityData for unknown EntityId {}!", id.0);
                                 }
-                            } else {
-                                error!("Received SetEntityData for unknown EntityId {}!", id.0);
-                            }
-                        });
+                            });
                         }
                         // ClientboundPlayEvent::SetEntityLink() => todo!(),
                         ClientboundPlayEvent::SetEntityMotion(id, delta) => {
                             let id = *id;
                             let delta = *delta;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
-                            let Some(instance) = entity.get::<SessionInstance>() else { return };
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
+                                let Some(instance) = entity.get::<SessionInstance>() else { return };
 
-                            if let Some(target) = instance.get_id(&id) {
-                                if let Some(mut velocity) =
-                                    entity.into_world_mut().get_mut::<Velocity>(target)
-                                {
-                                    **velocity += delta.as_vec3a();
+                                if let Some(target) = instance.get_id(&id) {
+                                    if let Some(mut velocity) =
+                                        entity.into_world_mut().get_mut::<Velocity>(target)
+                                    {
+                                        **velocity += delta.as_vec3a();
+                                    } else {
+                                        error!(
+                                            "Received SetEntityMotion for Entity {target} without Velocity!"
+                                        );
+                                    }
                                 } else {
-                                    error!(
-                                        "Received SetEntityMotion for Entity {target} without Velocity!"
-                                    );
+                                    error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
                                 }
-                            } else {
-                                error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
-                            }
-                        });
+                            });
                         }
                         // ClientboundPlayEvent::SetEquipment() => todo!(),
                         // ClientboundPlayEvent::SetExperience() => todo!(),
@@ -813,7 +806,7 @@ impl BotPlugin {
                         // ClientboundPlayEvent::SoundEntity() => todo!(),
                         ClientboundPlayEvent::StartConfiguration => {
                             info!("Reconfiguring...");
-                            let mut commands = commands.entity(bot.id());
+                            let mut commands = commands.entity(bot);
 
                             commands.remove::<SessionInstance>();
                         }
@@ -829,7 +822,7 @@ impl BotPlugin {
                             let flags = *flags;
                             let on_ground = *on_ground;
 
-                            commands.entity(bot.id()).queue(move |entity: EntityWorldMut<'_>| {
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
                                 let Some(instance) = entity.get::<SessionInstance>() else { return };
                                 let Some(target) = instance.get_id(&id) else {
                                     error!("Received SetEntityMotion for unknown EntityId {}!", id.0);
@@ -1109,37 +1102,40 @@ impl BotPlugin {
                             profile.uuid().as_hyphenated()
                         );
 
-                        if let Some(existing) = bot.get::<PlayerProfile>()
-                            && (existing.username() != profile.username()
-                                || existing.uuid() != profile.uuid())
-                        {
-                            warn!(
-                                "Bot using \"{}\" ({}) was changed to \"{}\" ({})!",
-                                existing.username(),
-                                existing.uuid().as_hyphenated(),
-                                profile.username(),
-                                profile.uuid().as_hyphenated()
-                            );
-                        }
+                        let profile = profile.clone();
 
-                        commands
-                            .entity(bot.entity())
-                            .insert((profile.username().clone(), profile.clone()))
-                            .queue(|mut entity: EntityWorldMut<'_>| {
-                                let entity_id = entity.id();
-                                entity.resource_mut::<Messages<ServerboundMessage>>().write(
-                                    ServerboundMessage::new(
-                                        entity_id,
-                                        ServerboundLoginEvent::AcknowledgeLogin,
-                                    ),
+                        commands.entity(bot).queue(move |mut entity: EntityWorldMut<'_>| {
+                            if let Some(existing) = entity.get::<PlayerProfile>()
+                                && ((existing.username() != profile.username())
+                                    || (existing.uuid() != profile.uuid()))
+                            {
+                                warn!(
+                                    "Bot using \"{}\" ({}) was changed to \"{}\" ({})!",
+                                    existing.username(),
+                                    existing.uuid().as_hyphenated(),
+                                    profile.username(),
+                                    profile.uuid().as_hyphenated()
                                 );
-                            });
+                            }
+
+                            entity.insert((profile.username().clone(), profile));
+
+                            let entity_id = entity.id();
+                            entity.resource_mut::<Messages<ServerboundMessage>>().write(
+                                ServerboundMessage::new(
+                                    entity_id,
+                                    ServerboundLoginEvent::AcknowledgeLogin,
+                                ),
+                            );
+                        });
                     }
                     other => warn!("Unhandled Event: {other:?}"),
                 },
 
                 // Can't receive a status event since the bot attempted to login.
-                ClientboundEventEnum::Status(_) => unreachable!(),
+                ClientboundEventEnum::Status(_) => {
+                    unreachable!("Bot attempted to login, not check the server status");
+                }
             }
         }
     }

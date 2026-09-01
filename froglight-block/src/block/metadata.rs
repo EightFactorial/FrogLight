@@ -80,19 +80,19 @@ impl BlockMetadata {
     ///
     /// This is not equivalent to the block's default state!
     #[must_use]
-    pub const fn base_id(&self) -> GlobalStateId { self.base_global_id }
-
-    /// Get the default [`StateId`] for this block.
-    #[must_use]
-    pub const fn state_default(&self) -> RelativeStateId { self.default_state }
+    pub const fn global_id_base(&self) -> GlobalStateId { self.base_global_id }
 
     /// Get the default [`GlobalStateId`] of this block.
     #[must_use]
-    pub const fn default_id(&self) -> GlobalStateId {
+    pub const fn global_id_default(&self) -> GlobalStateId {
         let base_global = self.base_global_id.into_inner();
         let default_state = self.default_state.into_inner() as u32;
         GlobalStateId::new(base_global + default_state)
     }
+
+    /// Get the default [`StateId`] for this block.
+    #[must_use]
+    pub const fn state_default(&self) -> RelativeStateId { self.default_state }
 
     /// Get the number of [`StateId`]s for this block.
     ///

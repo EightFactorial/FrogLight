@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "nightly", feature(duration_millis_float))]
 #![no_std]
 
 extern crate alloc;

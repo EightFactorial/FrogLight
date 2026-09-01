@@ -93,14 +93,22 @@ impl RunTickLoop {
         for iteration in 0..ticks {
             // Disable all non-ticking entities.
             Self::insert_disable(iteration, enabled, disabled, finished, world);
+            world.flush();
+
+            #[cfg(feature = "bevy_diagnostic")]
+            let _ = world
+                .run_system_cached(crate::diagnostic::TickMeasurementPlugin::start_measurement);
 
             // Run all `TickSchedule`s.
-            world.flush();
             let _ = world.try_run_schedule(TickSchedule::TickFirst);
             let _ = world.try_run_schedule(TickSchedule::PreTick);
             let _ = world.try_run_schedule(TickSchedule::Tick);
             let _ = world.try_run_schedule(TickSchedule::PostTick);
             let _ = world.try_run_schedule(TickSchedule::TickLast);
+
+            #[cfg(feature = "bevy_diagnostic")]
+            let _ =
+                world.run_system_cached(crate::diagnostic::TickMeasurementPlugin::end_measurement);
         }
 
         // Re-enable all previously disabled entities.

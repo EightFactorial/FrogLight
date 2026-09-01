@@ -3,7 +3,7 @@
 use core::ops::{Deref, DerefMut};
 
 use bevy_ecs::{
-    entity::{EntityHashMap, EntityHashSet},
+    entity::{EntityHashMap, EntityHashSet, UniqueEntityArray},
     lifecycle::HookContext,
     prelude::*,
     world::DeferredWorld,
@@ -31,6 +31,14 @@ impl EntityCollisions {
         result |= self.0.entry(entity_a).or_default().insert(entity_b);
         result |= self.0.entry(entity_b).or_default().insert(entity_a);
         result
+    }
+
+    /// Push a pair of entities into the collision map.
+    ///
+    /// Returns `true` if the entities were not previously colliding.
+    #[inline]
+    pub fn push_arr(&mut self, pair: UniqueEntityArray<2>) -> bool {
+        self.push_pair(pair[0], pair[1])
     }
 
     /// Remove a pair of entities from the collision map.

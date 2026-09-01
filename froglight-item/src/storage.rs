@@ -1,11 +1,10 @@
 //! TODO
 
-use alloc::vec::Vec;
 use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::identifier::Identifier;
-use indexmap::IndexMap;
+use indexmap::{IndexMap, map::Entry};
 
 use crate::{
     item::{Item, ItemMetadata},
@@ -27,13 +26,29 @@ impl ItemStorage {
     ///
     /// The caller must ensure that all provided block metadata has the correct
     /// global ids for this collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there are duplicate item identifiers in the provided metadata,
+    /// or if any of the metadata belongs to a different [`ItemVersion`].
     #[must_use]
-    pub unsafe fn build<V: ItemVersion>(metadata: Vec<&'static ItemMetadata>) -> Self {
+    pub unsafe fn build<V: ItemVersion>(metadata: &[&'static ItemMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
         for meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+            if !meta.is_version::<V>() {
+                core::hint::cold_path();
+                panic!("ItemMetadata version mismatch: expected {}", core::any::type_name::<V>());
+            }
+
+            match identifiers.entry(meta.identifier().reborrow()) {
+                Entry::Vacant(entry) => _ = entry.insert(*meta),
+                Entry::Occupied(..) => {
+                    core::hint::cold_path();
+                    panic!("ItemMetadata has duplicate identifier: {:?}", meta.identifier());
+                }
+            }
         }
 
         Self { version: TypeId::of::<V>(), metadata: identifiers }

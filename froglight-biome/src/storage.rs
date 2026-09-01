@@ -4,7 +4,7 @@ use core::any::TypeId;
 
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
-use indexmap::IndexMap;
+use indexmap::{IndexMap, map::Entry};
 
 use crate::{
     biome::{Biome, BiomeMetadata},
@@ -26,13 +26,30 @@ impl BiomeStorage {
     ///
     /// The caller must ensure that all provided biome metadata has the correct
     /// global ids for this collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there are duplicate biome identifiers in the provided
+    /// metadata, or if any of the metadata belongs to a different
+    /// [`BiomeVersion`].
     #[must_use]
     pub unsafe fn build<V: BiomeVersion>(metadata: &[&'static BiomeMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
-        for &meta in metadata {
-            identifiers.entry(meta.identifier().reborrow()).insert_entry(meta);
+        for meta in metadata {
+            if !meta.is_version::<V>() {
+                core::hint::cold_path();
+                panic!("BiomeMetadata version mismatch: expected {}", core::any::type_name::<V>());
+            }
+
+            match identifiers.entry(meta.identifier().reborrow()) {
+                Entry::Vacant(entry) => _ = entry.insert(*meta),
+                Entry::Occupied(..) => {
+                    core::hint::cold_path();
+                    panic!("BiomeMetadata has duplicate identifier: {:?}", meta.identifier());
+                }
+            }
         }
 
         Self { version: TypeId::of::<V>(), metadata: identifiers }
@@ -45,7 +62,12 @@ impl BiomeStorage {
     /// This is typically used by the registry and world.
     #[must_use]
     pub fn get_biome_by_id(&self, id: GlobalBiomeId) -> Option<Biome> {
-        self.metadata.get_index(id.into_inner() as usize).map(|(_, meta)| Biome::new_from(meta))
+        if let Some((_, meta)) = self.metadata.get_index(id.into_inner() as usize) {
+            Some(Biome::new_from(meta))
+        } else {
+            core::hint::cold_path();
+            None
+        }
     }
 
     /// Get the [`Biome`] for a given [`Identifier`].
@@ -55,7 +77,12 @@ impl BiomeStorage {
     /// This is typically used by the registry.
     #[must_use]
     pub fn get_biome_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Biome> {
-        self.metadata.get(identifier).map(|meta| Biome::new_from(meta))
+        if let Some(meta) = self.metadata.get(identifier) {
+            Some(Biome::new_from(meta))
+        } else {
+            core::hint::cold_path();
+            None
+        }
     }
 
     /// Get the [`TypeId`] of the [`Version`] this storage is for.

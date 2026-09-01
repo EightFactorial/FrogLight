@@ -280,6 +280,7 @@ impl Chunk {
                 cache.push((id, biome.global_id().into_inner()));
                 biome.global_id().into_inner()
             } else {
+                core::hint::cold_path();
                 fallback
             }
         };
@@ -340,6 +341,7 @@ impl Chunk {
                 cache.push((id, blocks.global_id().into_inner()));
                 blocks.global_id().into_inner()
             } else {
+                core::hint::cold_path();
                 fallback
             }
         };

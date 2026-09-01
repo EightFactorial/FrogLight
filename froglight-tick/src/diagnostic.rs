@@ -5,9 +5,7 @@ use std::time::Instant;
 use bevy_app::{App, Plugin};
 use bevy_diagnostic::{Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic};
 use bevy_ecs::prelude::*;
-use bevy_reflect::Reflect;
-
-use crate::prelude::*;
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
 /// A [`Plugin`] that...
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,20 +13,22 @@ pub struct TickMeasurementPlugin;
 
 impl Plugin for TickMeasurementPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(TickInstant(Instant::now()));
-        app.register_diagnostic(Diagnostic::new(Self::TICK_RUNTIME).with_suffix("ms"));
-
-        app.add_systems(TickFirst, Self::tick_start_instant);
-        app.add_systems(TickLast, Self::tick_end_duration);
+        app.register_diagnostic(Self::create_diagnostic());
+        app.init_resource::<TickInstant>();
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
+/// A wrapper around an [`Instant`].
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, Resource, Reflect)]
-#[reflect(Debug, Clone, PartialEq, Resource)]
-struct TickInstant(Instant);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Resource, Reflect)]
+#[reflect(Debug, Default, Clone, PartialEq, Resource)]
+pub struct TickInstant(Instant);
+
+impl Default for TickInstant {
+    fn default() -> Self { Self(Instant::now()) }
+}
 
 impl TickMeasurementPlugin {
     /// The [`DiagnosticPath`] for the "tick_runtime" diagnostic.
@@ -37,21 +37,26 @@ impl TickMeasurementPlugin {
     /// milliseconds.
     pub const TICK_RUNTIME: DiagnosticPath =
         DiagnosticPath::const_new("froglight_tick/tick_runtime");
+    /// The suffix for the [`TICK_RUNTIME`] diagnostic.
+    pub const TICK_RUNTIME_SUFFIX: &'static str = "ms";
 
-    /// A [`System`] for adding [`TICK_RUNTIME`] measurements.
-    fn tick_start_instant(mut instant: ResMut<TickInstant>) { instant.0 = Instant::now(); }
+    /// Creates the default [`TICK_RUNTIME`] [`Diagnostic`].
+    #[must_use]
+    pub fn create_diagnostic() -> Diagnostic {
+        Diagnostic::new(Self::TICK_RUNTIME)
+            .with_suffix(Self::TICK_RUNTIME_SUFFIX)
+            .with_max_history_length(50)
+            .with_smoothing_factor(0.0)
+    }
 
-    /// A [`System`] for adding [`TICK_RUNTIME`] measurements.
-    fn tick_end_duration(instant: Res<TickInstant>, mut diag: Diagnostics) {
-        const MILLIS_PER_SEC: f64 = 1_000.0;
-        const NANOS_PER_MILLI: f64 = 1_000_000.0;
+    /// A [`System`] for starting [`TICK_RUNTIME`] measurements.
+    pub fn start_measurement(mut instant: ResMut<TickInstant>) { instant.0 = Instant::now(); }
 
-        diag.add_measurement(&Self::TICK_RUNTIME, || {
-            let elapsed = instant.0.elapsed();
-
-            // Mimic `Duration::as_millis_f64`
-            (elapsed.as_secs_f64() * MILLIS_PER_SEC)
-                + (f64::from(elapsed.subsec_nanos()) / NANOS_PER_MILLI)
-        });
+    /// A [`System`] for ending [`TICK_RUNTIME`] measurements.
+    pub fn end_measurement(instant: Res<TickInstant>, mut diag: Diagnostics) {
+        #[cfg(feature = "nightly")]
+        diag.add_measurement(&Self::TICK_RUNTIME, || instant.0.elapsed().as_millis_f64());
+        #[cfg(not(feature = "nightly"))]
+        diag.add_measurement(&Self::TICK_RUNTIME, || instant.0.elapsed().as_secs_f64() * 1000.0);
     }
 }

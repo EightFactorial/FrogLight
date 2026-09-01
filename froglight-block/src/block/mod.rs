@@ -95,7 +95,7 @@ impl Block {
     /// This is only useful for comparing blocks of the same version.
     #[must_use]
     pub fn global_id(&self) -> GlobalStateId {
-        let base = self.metadata.base_id().into_inner();
+        let base = self.metadata.global_id_base().into_inner();
         let state = u32::from(self.state.into_inner());
         GlobalStateId::new(base + state)
     }
