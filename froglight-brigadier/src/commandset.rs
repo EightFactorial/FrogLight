@@ -1,14 +1,18 @@
 //! TODO
 
-use alloc::{borrow::Cow, boxed::Box};
-use core::{error::Error, fmt};
+use alloc::{borrow::Cow, boxed::Box, sync::Arc};
+use core::{any::TypeId, error::Error, fmt};
 
 use bevy_ecs::{prelude::*, system::SystemId};
 use bevy_reflect::{prelude::*, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
-use crate::{argument::ArgumentParseError, bundle::ArgumentBundle, prelude::GameCommandCtx};
+use crate::{
+    argument::ArgumentParseError,
+    bundle::{ArgumentBundle, BundleWrapper, ExecutableParser},
+    prelude::GameCommandCtx,
+};
 
 /// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Resource, Reflect)]
@@ -148,38 +152,27 @@ impl fmt::Display for CommandExecuteError<'_> {
 // -------------------------------------------------------------------------------------------------
 
 /// Information about a command in the [`GameCommandSet`].
-#[derive(Clone, Copy)]
-#[allow(clippy::type_complexity, reason = "dyn Fn trait")]
+#[derive(Clone)]
+#[allow(dead_code, reason = "May be used in the future")]
 struct CommandInfo {
-    runner: &'static (
-                 dyn for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), CommandExecuteError<'a>>
-                     + Send
-                     + Sync
-             ),
+    system_id: Entity,
+    bundle_type: TypeId,
+    executor: Arc<dyn ExecutableParser>,
 }
 
 impl CommandInfo {
     /// Create a new [`CommandInfo`] for the given root node and system.
+    #[inline]
     #[must_use]
     fn new<B: ArgumentBundle>(
-        data: B::BundleData,
-        system: SystemId<GameCommandCtx<B>, ()>,
+        settings: B::BundleData,
+        system_id: SystemId<GameCommandCtx<B>, ()>,
     ) -> Self {
-        #[expect(clippy::type_complexity, reason = "Required...")]
-        let runner: Box<
-            dyn for<'a> Fn(Entity, &'a str, &mut World) -> Result<(), CommandExecuteError<'a>>
-                + Send
-                + Sync,
-        > = Box::new(move |entity: Entity, arguments: &str, world: &mut World| {
-            // Parse the `BundleData` from the command.
-            let input =
-                B::bundle_from_string(arguments, &data).map_err(CommandExecuteError::Parse)?;
-
-            // Run the system with the Entity and `BundleData` as input.
-            world.run_system_with(system, (entity, input)).map_err(CommandExecuteError::execute)
-        });
-
-        Self { runner: Box::leak(runner) }
+        Self {
+            system_id: system_id.entity(),
+            bundle_type: TypeId::of::<B>(),
+            executor: BundleWrapper::<B>::new_executor(settings),
+        }
     }
 
     /// Run this command.
@@ -190,11 +183,11 @@ impl CommandInfo {
     #[inline]
     fn run<'a>(
         &self,
-        entity: Entity,
+        caller: Entity,
         arguments: &'a str,
         world: &mut World,
     ) -> Result<(), CommandExecuteError<'a>> {
-        (self.runner)(entity, arguments, world)
+        self.executor.system_runner(caller, arguments, self.system_id, world)
     }
 }
 
