@@ -22,14 +22,14 @@ impl Plugin for InventoryPlugin {
     }
 
     fn finish(&self, app: &mut App) {
-        if GlobalInventory::initialized() {
+        if GlobalInventory::is_initialized() {
             #[cfg(feature = "tracing")]
-            tracing::debug!(target: "froglight_inventory", "The `GlobalInventory` is already initialized, skipping `TypeRegistry`!");
+            tracing::debug!(target: "froglight_inventory::bevy", "The `GlobalInventory` is already initialized, skipping `TypeRegistry`!");
             return;
         }
 
         #[cfg(feature = "tracing")]
-        tracing::debug!(target: "froglight_inventory", "Checking the `TypeRegistry` for inventory menus...");
+        tracing::debug!(target: "froglight_inventory::bevy", "Checking the `TypeRegistry` for inventory menus...");
 
         // Collect all `MenuGroup`s from the `TypeRegistry`,
         // excluding the `GlobalInventory` itself.
@@ -39,24 +39,23 @@ impl Plugin for InventoryPlugin {
                 && group.type_id() != TypeId::of::<GlobalInventory>()
             {
                 #[cfg(feature = "tracing")]
-                tracing::debug!(target: "froglight_inventory", "Found inventory menu {:?}", group.identifier().as_str());
-                init.push(group.as_inner().clone());
+                tracing::debug!(target: "froglight_inventory::bevy", "Found inventory menu {:?}", group.identifier().as_str());
+                init.push(**group);
             }
         }
 
         // Initialize the `GlobalInventory` with the collected groups.
         if GlobalInventory::try_initialize(init).is_ok() {
             #[cfg(feature = "tracing")]
-            tracing::debug!(target: "froglight_inventory", "Initialized the `GlobalInventory`");
+            tracing::debug!(target: "froglight_inventory::bevy", "Initialized the `GlobalInventory`");
         } else {
             #[cfg(feature = "tracing")]
-            tracing::error!(target: "froglight_inventory", "Failed to initialize the `GlobalInventory`, were there duplicate menus?");
+            tracing::error!(target: "froglight_inventory::bevy", "Failed to initialize the `GlobalInventory`!?");
 
-            // Exit the app if initialization fails in debug mode.
             #[cfg(debug_assertions)]
             {
                 #[cfg(feature = "tracing")]
-                tracing::warn!(target: "froglight_inventory", "Triggering debug app exit...");
+                tracing::warn!(target: "froglight_inventory::bevy", "Sending AppExit...");
                 app.world_mut().write_message(bevy_app::AppExit::error());
             }
         }

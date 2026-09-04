@@ -515,7 +515,8 @@ impl BotPlugin {
                             let dimensions =
                                 registry.get_nbt_by_identifier("minecraft:dimension_type");
 
-                            // Get the dimension's "min_y" and "logical_height" values.
+                            // Get the dimension's "min_y" and "logical_height"
+                            // values.
                             #[expect(clippy::cast_possible_wrap, reason = "Desired")]
                             let (height_max, height_min) = if let Some(dimensions) = dimensions
                                 && let Some(dim) =
@@ -903,7 +904,8 @@ impl BotPlugin {
                     ClientboundConfigEvent::CustomPayload(identifier, _) => {
                         info!("Received CustomPayload: \"{identifier}\"");
 
-                        // Use this as the trigger to send the client information packet
+                        // Use this as the trigger to send the client
+                        // information packet
                         if identifier == "minecraft:brand" {
                             info!("Sending client information...");
 

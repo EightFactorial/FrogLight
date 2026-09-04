@@ -5,8 +5,7 @@ use core::{any::TypeId, error::Error, fmt};
 
 use bevy_ecs::{prelude::*, system::SystemId};
 use bevy_reflect::{prelude::*, std_traits::ReflectDefault};
-use foldhash::fast::RandomState;
-use indexmap::IndexMap;
+use froglight_common::types::IndexMap;
 
 use crate::{
     argument::ArgumentParseError,
@@ -17,7 +16,7 @@ use crate::{
 /// A set of commands that can be executed by entities.
 #[derive(Default, Clone, Resource, Reflect)]
 #[reflect(opaque, Default, Clone, Resource)]
-pub struct GameCommandSet(IndexMap<Cow<'static, str>, CommandInfo, RandomState>);
+pub struct GameCommandSet(IndexMap<Cow<'static, str>, CommandInfo>);
 
 impl GameCommandSet {
     /// Create a new empty [`GameCommandSet`].

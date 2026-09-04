@@ -6,7 +6,7 @@ use core::any::TypeId;
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
-use froglight_common::identifier::Identifier;
+use froglight_common::prelude::*;
 
 use crate::menu::{GlobalInventory, MenuGroup, MenuGroupType};
 
@@ -18,10 +18,15 @@ pub use storage::InventoryStorage;
 /// Uses internal plugins to manage slots and menus.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component, opaque))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Default, Clone, PartialEq, Component))]
 pub struct Inventory {
-    menus: &'static MenuGroup,
+    menus: MenuGroup,
     storage: InventoryStorage,
+}
+
+impl Default for Inventory {
+    #[inline]
+    fn default() -> Self { Self::new() }
 }
 
 impl Inventory {
@@ -35,8 +40,13 @@ impl Inventory {
     /// Create a new, empty [`Inventory`] of the given [`MenuGroupType`].
     #[inline]
     #[must_use]
-    pub const fn new_using<G: MenuGroupType>() -> Self {
-        Self { menus: G::GROUP, storage: InventoryStorage::new() }
+    pub const fn new_using<G: MenuGroupType>() -> Self { Self::new_from(MenuGroup::new::<G>()) }
+
+    /// Create a new, empty [`Inventory`] using the given [`MenuGroup`].
+    #[inline]
+    #[must_use]
+    pub const fn new_from(menus: MenuGroup) -> Self {
+        Self { menus, storage: InventoryStorage::new() }
     }
 }
 
@@ -48,7 +58,7 @@ impl Inventory {
     /// This is only useful for debugging purposes.
     #[inline]
     #[must_use]
-    pub fn group_identifier(inv: &Inventory) -> &Identifier<'static> { inv.menus.identifier() }
+    pub fn group_identifier(inv: &Inventory) -> &'static Ident { inv.menus.identifier() }
 
     /// Get the [`TypeId`] of this inventory's [`MenuGroup`].
     ///
@@ -61,8 +71,3 @@ impl Inventory {
 }
 
 // -------------------------------------------------------------------------------------------------
-
-impl Default for Inventory {
-    #[inline]
-    fn default() -> Self { Self::new() }
-}

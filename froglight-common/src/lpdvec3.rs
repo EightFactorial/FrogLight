@@ -11,7 +11,7 @@
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
 use facet::Facet;
-#[cfg(feature = "facet")]
+#[cfg(feature = "froglight-facet")]
 use froglight_facet::facet::prelude::*;
 #[cfg(feature = "glam")]
 use glam::{DVec3, Vec3, Vec3A};
@@ -21,7 +21,7 @@ use glam::{DVec3, Vec3, Vec3A};
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(Facet), facet(opaque))]
-#[cfg_attr(feature = "facet", facet(mc::with = LpDVec3::WITH))]
+#[cfg_attr(feature = "froglight-facet", facet(mc::with = LpDVec3::WITH))]
 pub struct LpDVec3(LpDVec3Inner);
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -254,7 +254,7 @@ impl LpDVec3 {
 
 // -------------------------------------------------------------------------------------------------
 
-#[cfg(feature = "facet")]
+#[cfg(feature = "froglight-facet")]
 impl FacetTemplate for LpDVec3 {
     fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
         match item.get::<Self>()?.0 {

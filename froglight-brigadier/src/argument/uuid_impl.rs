@@ -1,5 +1,5 @@
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
-use uuid::Uuid;
+use froglight_common::crates::uuid::Uuid;
 
 use super::{ArgumentParseError, ArgumentParser};
 
