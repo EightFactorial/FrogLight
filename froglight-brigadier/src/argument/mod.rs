@@ -31,7 +31,7 @@ pub trait ArgumentParser: Sized + 'static {
     /// Returns an error if the input string could not be parsed.
     fn parse<'a>(
         input: &'a str,
-        data: &Self::Data,
+        settings: &Self::Data,
     ) -> Result<(Self, &'a str), ArgumentParseError<'a>>;
 }
 
