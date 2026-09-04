@@ -4,7 +4,7 @@ use core::ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
-use glam::{EulerRot, Quat, Vec3A};
+use froglight_common::crates::glam::{EulerRot, Quat, Vec3A};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

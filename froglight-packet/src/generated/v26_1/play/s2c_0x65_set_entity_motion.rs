@@ -2,11 +2,10 @@
 //!
 //! @manual packet for "minecraft:set_entity_motion"
 
+use froglight_common::lpdvec3::LpDVec3;
 use froglight_entity::prelude::EntityId;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
-
-use crate::common::lpdvec3::LpDVec3;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]

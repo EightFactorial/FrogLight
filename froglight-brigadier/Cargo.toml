@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-brigadier"
@@ -32,8 +31,6 @@ lexical = { features = ["format", "parse"], workspace = true }
 variadics_please = { workspace = true }
 
 # Optional dependencies
-glam = { workspace = true, optional = true }
-libm = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
@@ -49,16 +46,16 @@ required-features = ["tracing"]
 default = ["std"]
 
 # Enable `glam` support.
-glam = ["dep:glam", "bevy_reflect/glam"]
+glam = ["bevy_reflect/glam", "froglight-common/glam"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 # Enable `uuid` support.
 uuid = ["dep:uuid", "bevy_reflect/uuid"]
 
 # Enable `libm` for `no_std` support.
-libm = ["dep:libm", "glam/nostd-libm"]
+libm = ["froglight-common/libm"]
 
 # Enable support for the standard library
-std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "froglight-common/std", "glam?/std", "indexmap/std", "lexical/std", "uuid?/std"]
+std = ["bevy_app/std", "bevy_ecs/std", "bevy_reflect/std", "froglight-common/std", "indexmap/std", "lexical/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly"]

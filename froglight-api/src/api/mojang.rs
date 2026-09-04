@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 use facet::Facet;
+use froglight_common::crates::uuid::Uuid;
 use froglight_player::{
     prelude::{PlayerProfile, Username},
     profile::ProfileProperty,
 };
-use uuid::Uuid;
 
 use crate::{
     api::{ApiError, NetworkApi},

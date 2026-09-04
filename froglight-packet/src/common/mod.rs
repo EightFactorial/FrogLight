@@ -7,7 +7,6 @@ pub mod handshake;
 pub mod known_packs;
 pub mod light_data;
 pub mod login;
-pub mod lpdvec3;
 pub mod position;
 pub mod registry;
 pub mod spawn_info;

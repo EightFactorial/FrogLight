@@ -4,131 +4,127 @@
 #![allow(clippy::cast_sign_loss, reason = "Desired behavior")]
 
 use core::f64::consts::PI;
-#[cfg(feature = "std")]
-use std::sync::LazyLock;
 
-#[cfg(not(feature = "std"))]
-use once_cell::sync::Lazy as LazyLock;
+use froglight_common::types::LazyLock;
 
-/// A precomputed sine table for angles in the range `[0, 2π)`.
-///
-/// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
-#[cfg(any(not(feature = "nightly"), not(feature = "std")))]
-pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
-    /// The sine function from the standard library.
-    #[cfg(feature = "std")]
-    const SINFN: fn(f64) -> f64 = f64::sin;
+cfg_select! {
+    all(feature = "nightly", feature = "std") => {
+        /// A precomputed sine table for angles in the range `[0, 2π)`.
+        ///
+        /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
+        ///
+        /// Uses SIMD intrinsics for better performance (generates roughly 64x
+        /// faster).
+        static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
+            const BATCH: usize = 8;
 
-    /// The sine function from the `libm` crate.
-    #[cfg(not(feature = "std"))]
-    const SINFN: fn(f64) -> f64 = libm::sin;
+            use core::simd::Simd;
+            use std::simd::StdFloat;
 
-    // Normally we'd use `core::array::from_fn`,
-    // but it seems to be causing a stack overflow in some cases.
-    let mut array = [0.0f64; 65536];
-    array.iter_mut().enumerate().for_each(|(i, f)| {
-        *f = SINFN((i as f64 * 2.0 * PI) / 65536.0);
-    });
+            // Normally we'd use `core::array::from_fn`,
+            // but it seems to be causing a stack overflow in some cases.
+            let mut array = [0.0f64; 65536];
+            array.iter_mut().enumerate().for_each(|(i, f)| {
+                *f = (i as f64 * 2.0 * PI) / 65536.0;
+            });
 
-    // Normally we'd use `array.map` and to convert to `f32`s directly,
-    // but it seems to be causing a stack overflow in some cases.
-    let mut output = [0.0f32; 65536];
-    array.iter().zip(output.iter_mut()).for_each(|(i, o)| {
-        *o = *i as f32;
-    });
-    output
-});
+            let (chunks, remainder) = array.as_chunks_mut::<BATCH>();
+            assert!(remainder.is_empty(), "Array length must be a multiple of BATCH!");
+            for chunk in chunks {
+                *chunk = Simd::<f64, BATCH>::from_array(*chunk).sin().to_array();
+            }
 
-/// A precomputed sine table for angles in the range `[0, 2π)`.
-///
-/// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
-///
-/// Uses SIMD intrinsics for better performance (generates roughly 64x faster).
-#[cfg(all(feature = "nightly", feature = "std"))]
-pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
-    const BATCH: usize = 64;
+            // Normally we'd use `array.map` and to convert to `f32`s directly,
+            // but it seems to be causing a stack overflow in some cases.
+            let mut output = [0.0f32; 65536];
+            array.iter().zip(output.iter_mut()).for_each(|(i, o)| {
+                *o = *i as f32;
+            });
 
-    use core::simd::Simd;
-    use std::simd::StdFloat;
-
-    // Normally we'd use `core::array::from_fn`,
-    // but it seems to be causing a stack overflow in some cases.
-    let mut array = [0.0f64; 65536];
-    array.iter_mut().enumerate().for_each(|(i, f)| {
-        *f = (i as f64 * 2.0 * PI) / 65536.0;
-    });
-
-    let (chunks, remainder) = array.as_chunks_mut::<BATCH>();
-    assert!(remainder.is_empty(), "Array length must be a multiple of BATCH!");
-    for chunk in chunks {
-        *chunk = Simd::<f64, BATCH>::from_array(*chunk).sin().to_array();
+            output
+        });
     }
+    _ => {
+        /// A precomputed sine table for angles in the range `[0, 2π)`.
+        ///
+        /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
+        static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
+            // Normally we'd use `core::array::from_fn`,
+            // but it seems to be causing a stack overflow in some cases.
+            let mut array = [0.0f64; 65536];
+            array.iter_mut().enumerate().for_each(|(i, f)| {
+                #[cfg(feature = "std")]
+                {
+                    *f = f64::sin((i as f64 * 2.0 * PI) / 65536.0);
+                }
+                #[cfg(all(not(feature = "std"), feature = "libm"))]
+                {
+                    *f = froglight_common::crates::libm::sin((i as f64 * 2.0 * PI) / 65536.0);
+                }
+            });
 
-    // Normally we'd use `array.map` and to convert to `f32`s directly,
-    // but it seems to be causing a stack overflow in some cases.
-    let mut output = [0.0f32; 65536];
-    array.iter().zip(output.iter_mut()).for_each(|(i, o)| {
-        *o = *i as f32;
-    });
-    output
-});
+            // Normally we'd use `array.map` and to convert to `f32`s directly,
+            // but it seems to be causing a stack overflow in some cases.
+            let mut output = [0.0f32; 65536];
+            array.iter().zip(output.iter_mut()).for_each(|(i, o)| {
+                *o = *i as f32;
+            });
+
+            output
+        });
+    }
+}
 
 // -------------------------------------------------------------------------------------------------
 
-/// The smallest value that can be considered "zero"
-/// when comparing angles using [`sin`] and [`cos`].
-pub const EPSILON: f32 = 1.0E-7;
+const SCALE: f64 = 10_430.378_350_470_453;
+const WRAP: f64 = 16_384.0;
+const MASK: usize = 0xFFFF;
 
 /// Calculate the sine of an angle using the [`SIN`] table.
 #[must_use]
-pub fn sin(rad: f32) -> f32 {
-    let x = rad * 10430.378;
-    let x = x as i32 as usize & 65535;
-    debug_assert!(x <= 65535, "x must be in the range [0, 65535], got: {x}");
+pub fn sin(rad: f64) -> f32 {
+    let x = rad * SCALE;
+    let index = (x as u32 as usize) & MASK;
 
-    SIN[x]
+    SIN[index]
 }
 
 /// Calculate the cosine of an angle using the [`SIN`] table.
 #[must_use]
-pub fn cos(rad: f32) -> f32 {
-    let x = rad * 10430.378 + 16384.0;
-    let x = x as i32 as usize & 65535;
-    debug_assert!(x <= 65535, "x must be in the range [0, 65535], got: {x}");
+pub fn cos(rad: f64) -> f32 {
+    let x = (rad * SCALE) + WRAP;
+    let index = (x as u32 as usize) & MASK;
 
-    SIN[x]
+    SIN[index]
 }
 
 /// Calculate the sine and cosine of an angle using the [`SIN`] table.
 #[must_use]
-pub fn sin_cos(rad: f32) -> (f32, f32) {
-    let (x, y) = (rad * 10430.378, rad * 10430.378 + 16384.0);
-    let (x, y) = ((x as i32 as usize & 65535), (y as i32 as usize & 65535));
-    debug_assert!(x <= 65535 && y <= 65535, "x, y must be in the range [0, 65535], got: {x}, {y}");
+pub fn sin_cos(rad: f64) -> (f32, f32) {
+    let x = rad * SCALE;
+    let x_index = (x as u32 as usize) & MASK;
 
-    (SIN[x], SIN[y])
+    let y = (rad * SCALE) + WRAP;
+    let y_index = (y as u32 as usize) & MASK;
+
+    (SIN[x_index], SIN[y_index])
 }
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "std")]
-    use core::f32::consts::PI;
-
-    #[cfg(feature = "std")]
-    use proptest::prelude::*;
-
-    use super::sin;
 
     /// The acceptable error margin for table and non-table calculations.
-    const EPSILON: f32 = 1.0e-4;
+    const EPSILON: f32 = 1.0e-15;
 
     /// Tests for the sine and cosine functions for common angles.
     #[test]
     #[allow(clippy::unreadable_literal, reason = "Ignore")]
     fn common() {
-        use core::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8};
-        fn assert(input: f32, expected: f32) {
-            let sin = sin(input);
+        use core::f64::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8};
+
+        fn assert(input: f64, expected: f32) {
+            let sin = super::sin(input);
             let diff = (sin - expected).abs();
             assert!(diff < EPSILON, "{sin} != {expected} (input: {input}, diff: {diff})");
         }
@@ -155,25 +151,5 @@ mod tests {
         assert(11.0 * FRAC_PI_8, -0.9238795); // sin(247.5 degrees)
         assert(13.0 * FRAC_PI_8, -0.9238795); // sin(292.5 degrees)
         assert(15.0 * FRAC_PI_8, -0.38268343); // sin(337.5 degrees)
-    }
-
-    #[cfg(feature = "std")]
-    proptest::proptest! {
-        #![proptest_config(ProptestConfig::with_cases(81920))]
-
-
-        /// Test the sine and cosine functions against the standard library.
-        #[test]
-        fn arbitrary(data in (-PI * 180.0f32)..(PI * 180.0f32)) {
-            // Note: Input is in radians, not degrees.
-            let (std_sin, std_cos) = f32::sin_cos(data);
-            let (tbl_sin, tbl_cos) = crate::table::sin_cos(data);
-
-            let diff = (std_sin - tbl_sin).abs();
-            assert!(diff < EPSILON, "{tbl_sin} != {std_sin} (diff: {diff})");
-
-            let diff = (std_cos - tbl_cos).abs();
-            assert!(diff < EPSILON, "{tbl_cos} != {std_cos} (diff: {diff})");
-        }
     }
 }

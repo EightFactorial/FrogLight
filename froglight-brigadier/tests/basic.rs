@@ -3,6 +3,7 @@
 
 use bevy::{log::LogPlugin, prelude::*};
 use froglight_brigadier::{argument::StringType, bevy::BrigadierPlugin, prelude::*};
+use froglight_common::crates::glam;
 
 #[test]
 fn basic() -> AppExit {

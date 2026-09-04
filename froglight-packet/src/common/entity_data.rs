@@ -1,6 +1,7 @@
 //! TODO
 #![allow(missing_docs, reason = "TODO")]
 
+use froglight_common::lpdvec3::LpDVec3;
 use froglight_entity::prelude::{EntityId, EntityUuid};
 #[cfg(feature = "facet")]
 use froglight_entity::{
@@ -10,7 +11,7 @@ use froglight_entity::{
 #[cfg(feature = "facet")]
 use froglight_facet::{self as mc, deserialize::DeserializeError};
 
-use crate::common::{lpdvec3::LpDVec3, unsized_buffer::UnsizedBuffer};
+use crate::common::unsized_buffer::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]

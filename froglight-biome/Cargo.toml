@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-biome"
@@ -19,10 +18,8 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-foldhash = { workspace = true }
-froglight-common = { workspace = true }
+froglight-common = { features = ["indexmap"], workspace = true }
 froglight-registry-template = { workspace = true }
-indexmap = { workspace = true }
 
 # Optional dependencies
 facet = { features = ["alloc"], workspace = true, optional = true }
@@ -44,9 +41,9 @@ facet = ["dep:facet", "froglight-common/facet", "dep:froglight-facet"]
 once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["facet?/std", "facet-value?/std", "foldhash/std", "froglight-common/std", "froglight-facet?/std", "indexmap/std"]
+std = ["facet?/std", "facet-value?/std", "froglight-common/std", "froglight-facet?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly"]
+nightly = ["froglight-common/nightly", "froglight-facet?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

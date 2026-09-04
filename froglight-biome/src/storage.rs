@@ -2,9 +2,11 @@
 
 use core::any::TypeId;
 
-use foldhash::fast::RandomState;
-use froglight_common::prelude::*;
-use indexmap::{IndexMap, map::Entry};
+use froglight_common::{
+    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
+    prelude::*,
+    types::IndexMap,
+};
 
 use crate::{
     biome::{Biome, BiomeMetadata},
@@ -16,7 +18,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct BiomeStorage {
     version: TypeId,
-    metadata: IndexMap<&'static Ident, &'static BiomeMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static BiomeMetadata>,
 }
 
 impl BiomeStorage {
@@ -93,16 +95,14 @@ impl BiomeStorage {
     /// Get the [`IndexMap`] metadata of this [`BiomeStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static BiomeMetadata, RandomState> {
+    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static BiomeMetadata> {
         &self.metadata
     }
 
     /// Get the mutable [`IndexMap`] metadata of this [`BiomeStorage`].
     #[inline]
     #[must_use]
-    pub fn metadata_mut(
-        &mut self,
-    ) -> &mut IndexMap<&'static Ident, &'static BiomeMetadata, RandomState> {
+    pub fn metadata_mut(&mut self) -> &mut IndexMap<&'static Ident, &'static BiomeMetadata> {
         &mut self.metadata
     }
 }

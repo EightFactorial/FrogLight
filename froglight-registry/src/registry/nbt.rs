@@ -1,17 +1,15 @@
 use core::ops::Deref;
 
-use foldhash::fast::RandomState;
-use froglight_common::identifier::Identifier;
+use froglight_common::{prelude::*, types::IndexMap};
 use froglight_nbt::types::indexed::{
     compound::IndexedCompound,
     core::{CowCore, IndexedNbtCow, Ref},
 };
-use indexmap::IndexMap;
 
 /// A map of [`Identifier`]s to [`NbtInnerMap`]s.
-pub type NbtMap = IndexMap<Identifier<'static>, NbtInnerMap, RandomState>;
+pub type NbtMap = IndexMap<Identifier<'static>, NbtInnerMap>;
 /// A map of [`Identifier`]s to [`IndexedNbtCow`]s.
-pub type NbtInnerMap = IndexMap<Identifier<'static>, IndexedNbtCow<'static>, RandomState>;
+pub type NbtInnerMap = IndexMap<Identifier<'static>, IndexedNbtCow<'static>>;
 
 /// A reference to a [`Nbt`] and it's associated values.
 #[derive(Debug, Clone)]

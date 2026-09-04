@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-item"

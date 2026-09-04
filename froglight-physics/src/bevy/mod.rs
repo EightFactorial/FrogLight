@@ -7,9 +7,9 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::entity::EntityNotSpawnedError;
 use bevy_ecs::{entity::UniqueEntityArray, prelude::*, world::DeferredWorld};
 use bevy_tasks::ComputeTaskPool;
+use froglight_common::types::Mutex;
 use froglight_entity::{bevy::EntityBundleEvent, prelude::EntityBundle};
 use froglight_instance::prelude::SessionInstance;
-use parking_lot::Mutex;
 
 use crate::prelude::*;
 

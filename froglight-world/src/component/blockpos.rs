@@ -9,10 +9,12 @@ use core::{
 };
 
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy_reflect::Reflect;
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
+use froglight_common::crates::glam::IVec3;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::{WithFnAttr, prelude::*};
-use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

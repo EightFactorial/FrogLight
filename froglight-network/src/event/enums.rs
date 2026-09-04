@@ -4,7 +4,7 @@
 use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_block::state::GlobalStateId;
-use froglight_common::prelude::Identifier;
+use froglight_common::{lpdvec3::LpDVec3, prelude::Identifier};
 use froglight_entity::prelude::EntityId;
 use froglight_packet::common::{
     chunk_data::RawChunkData,
@@ -14,7 +14,6 @@ use froglight_packet::common::{
     known_packs::KnownResourcePack,
     light_data::RawLightData,
     login::{LoginHelloContent, PlayLoginContent},
-    lpdvec3::LpDVec3,
     position::{EntityPositionRotationData, EntityPositionUpdateData, EntityRelativeFlags},
     registry::RegistryDataEntry,
     unsized_buffer::UnsizedBuffer,

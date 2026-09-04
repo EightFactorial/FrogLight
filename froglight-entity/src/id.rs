@@ -9,11 +9,11 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 use facet::Facet;
+use froglight_common::crates::uuid::Uuid;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// An identifier for an entity.
 #[repr(transparent)]

@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-common"
@@ -19,17 +18,18 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-glam = { workspace = true }
-
-# Optional dependencies
 bevy_reflect = { workspace = true, optional = true }
 critical-section = { workspace = true, optional = true }
 facet = { workspace = true, optional = true }
+foldhash = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
+glam = { workspace = true, optional = true }
+indexmap = { workspace = true, optional = true }
 libm = { workspace = true, optional = true }
 once_cell = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
+uuid = { workspace = true, optional = true }
 
 # --- Features ---
 
@@ -43,23 +43,30 @@ facet = ["dep:facet"]
 # Enable `froglight-facet` support.
 froglight-facet = ["dep:froglight-facet", "facet"]
 # Enable `serde` support.
-serde = ["dep:serde", "glam/serde", "parking_lot?/serde"]
+serde = ["dep:serde", "glam?/serde", "indexmap?/serde", "parking_lot?/serde", "uuid?/serde"]
+
+# Enable `indexmap` support.
+indexmap = ["alloc", "dep:indexmap", "dep:foldhash", "facet?/indexmap"]
+# Enable `glam`.
+glam = ["dep:glam"]
+# Enable `parking_lot`.
+parking_lot = ["dep:parking_lot", "facet?/lock_api", "once_cell?/parking_lot"]
+# Enable `uuid` support.
+uuid = ["bevy_reflect?/uuid", "dep:uuid", "facet?/uuid"]
 
 # Enable `critical-section` for `no_std` support.
 critical-section = ["dep:critical-section", "once_cell?/critical-section"]
 # Enable `libm` for `no_std` support.
-libm = ["dep:libm", "glam/nostd-libm"]
+libm = ["dep:libm", "glam?/nostd-libm"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["dep:once_cell"]
-# Enable `parking_lot`.
-parking_lot = ["dep:parking_lot", "facet?/lock_api", "once_cell?/parking_lot"]
 
 # Enable support for a global allocator
 alloc = ["facet?/alloc", "once_cell?/alloc", "serde?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_reflect?/std", "facet?/std", "glam/std", "froglight-facet?/std", "once_cell?/std"]
+std = ["alloc", "bevy_reflect?/std", "critical-section?/std", "facet?/std", "foldhash?/std", "froglight-facet?/std", "glam?/std", "indexmap?/std", "once_cell?/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "parking_lot?/nightly"]
+nightly = ["foldhash?/nightly", "froglight-facet?/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

@@ -36,7 +36,7 @@ generate! {
     as_optional_block_state => OptionalBlockState(EntityBlockState),
     as_optional_component => OptionalComponent(Option<()>),
     as_optional_global_pos => OptionalGlobalPos(Option<EntityGlobalPosition>),
-    as_optional_living_entity_reference => OptionalLivingEntityReference(Option<uuid::Uuid>),
+    as_optional_living_entity_reference => OptionalLivingEntityReference(Option<Uuid>),
     as_optional_unsigned_int => OptionalUnsignedInt(EntityOptionalVarInt),
     as_painting_variant => PaintingVariant(()),
     as_particle => Particle(()),

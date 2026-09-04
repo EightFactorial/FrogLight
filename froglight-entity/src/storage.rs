@@ -2,9 +2,11 @@
 
 use core::any::TypeId;
 
-use foldhash::fast::RandomState;
-use froglight_common::prelude::*;
-use indexmap::{IndexMap, map::Entry};
+use froglight_common::{
+    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
+    prelude::*,
+    types::IndexMap,
+};
 
 use crate::{
     entity::{EntityBundle, EntityMetadata, GlobalEntityId},
@@ -15,7 +17,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct EntityStorage {
     version: TypeId,
-    metadata: IndexMap<&'static Ident, &'static EntityMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static EntityMetadata>,
 }
 
 impl EntityStorage {
@@ -84,9 +86,7 @@ impl EntityStorage {
     /// Get the [`IndexMap`] metadata of this [`EntityStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(
-        &self,
-    ) -> &IndexMap<&'static Ident, &'static EntityMetadata, RandomState> {
+    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static EntityMetadata> {
         &self.metadata
     }
 }

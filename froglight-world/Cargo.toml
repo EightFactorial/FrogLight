@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-world"
@@ -24,8 +23,7 @@ froglight-biome = { features = ["biome_data"], workspace = true }
 
 [dependencies]
 bit-vec = { workspace = true }
-froglight-common = { workspace = true }
-glam = { workspace = true }
+froglight-common = { features = ["glam", "parking_lot"], workspace = true }
 smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
 # Optional dependencies
@@ -52,7 +50,7 @@ harness = false
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:froglight-facet", "froglight-common/facet"]
 # Enable `froglight-biome` support.
@@ -60,7 +58,7 @@ froglight-biome = ["dep:froglight-biome"]
 # Enable `froglight-block` support.
 froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
-serde = ["dep:serde", "smallvec/serde"]
+serde = ["dep:serde", "froglight-common/serde", "smallvec/serde"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block?/libm", "froglight-common/libm"]

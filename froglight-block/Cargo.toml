@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-block"
@@ -23,10 +22,8 @@ criterion = { features = ["default", "html_reports"], workspace = true }
 rand = { features = ["default"], workspace = true }
 
 [dependencies]
-foldhash = { workspace = true }
-froglight-common = { workspace = true }
+froglight-common = { features = ["glam", "indexmap"], workspace = true }
 froglight-registry-template = { workspace = true }
-indexmap = { workspace = true }
 variadics_please = { workspace = true }
 
 # Optional dependencies
@@ -58,9 +55,9 @@ libm = ["froglight-common/libm"]
 once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "froglight-facet?/std", "indexmap/std"]
+std = ["froglight-common/std", "froglight-facet?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-facet?/nightly"]
+nightly = ["froglight-common/nightly", "froglight-facet?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

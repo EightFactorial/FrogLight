@@ -1,8 +1,8 @@
 //! API extensions for [`froglight_player`].
 
 use facet::Facet;
+use froglight_common::crates::uuid::Uuid;
 use froglight_player::{prelude::*, profile::ProfilePropertyItem};
-use uuid::Uuid;
 
 use crate::{
     api::{ApiError, ClientApi},

@@ -2,9 +2,11 @@
 
 use core::any::TypeId;
 
-use foldhash::fast::RandomState;
-use froglight_common::prelude::*;
-use indexmap::{IndexMap, map::Entry};
+use froglight_common::{
+    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
+    prelude::*,
+    types::IndexMap,
+};
 
 use crate::{
     block::{Block, BlockMetadata},
@@ -16,7 +18,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct BlockStorage {
     version: TypeId,
-    identifiers: IndexMap<&'static Ident, GlobalStateId, RandomState>,
+    identifiers: IndexMap<&'static Ident, GlobalStateId>,
     metadata: &'static [&'static BlockMetadata],
 }
 

@@ -1,9 +1,9 @@
 use async_trait::async_trait;
-use foldhash::fast::FixedState;
+use froglight_common::{
+    crates::{foldhash::fast::FixedState, uuid::Uuid},
+    types::{IndexMap, RwLock},
+};
 use froglight_player::{profile::PlayerProfile, username::Username};
-use indexmap::IndexMap;
-use parking_lot::RwLock;
-use uuid::Uuid;
 
 use crate::{
     api::{ApiError, NetworkApi},
@@ -27,14 +27,14 @@ impl Offline {
     /// The [`Offline`] API endpoint for querying usernames by UUID.
     const USERNAME_ENDPOINT: &'static RwLock<IndexMap<Uuid, Username, FixedState>> = {
         static STATIC: RwLock<IndexMap<Uuid, Username, FixedState>> =
-            RwLock::new(IndexMap::with_hasher(FixedState::with_seed(4)));
+            RwLock::new(IndexMap::with_hasher(FixedState::with_seed(63)));
 
         &STATIC
     };
     /// The [`Offline`] API endpoint for querying UUIDs by username.
     const UUID_ENDPOINT: &'static RwLock<IndexMap<Username, Uuid, FixedState>> = {
         static STATIC: RwLock<IndexMap<Username, Uuid, FixedState>> =
-            RwLock::new(IndexMap::with_hasher(FixedState::with_seed(5)));
+            RwLock::new(IndexMap::with_hasher(FixedState::with_seed(127)));
 
         &STATIC
     };

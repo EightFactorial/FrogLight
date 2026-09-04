@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-registry"
@@ -19,11 +18,9 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-foldhash = { workspace = true }
-froglight-common = { workspace = true }
+froglight-common = { features = ["indexmap"], workspace = true }
 froglight-nbt = { workspace = true }
 froglight-registry-template = { workspace = true }
-indexmap = { workspace = true }
 
 # --- Features ---
 
@@ -34,9 +31,9 @@ default = ["std"]
 once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["foldhash/std", "froglight-common/std", "froglight-nbt/std", "indexmap/std"]
+std = ["froglight-common/std", "froglight-nbt/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-nbt/nightly"]
+nightly = ["froglight-common/nightly", "froglight-nbt/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

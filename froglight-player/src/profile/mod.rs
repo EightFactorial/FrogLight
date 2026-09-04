@@ -6,7 +6,7 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::username::Username;
@@ -22,8 +22,9 @@ pub use property::*;
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", component(on_add = Self::add_hook))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct PlayerProfile {
     /// The player's [`Uuid`].

@@ -7,7 +7,7 @@ use bevy_reflect::{
     Reflect, ReflectDeserialize, ReflectSerialize,
     std_traits::{ReflectAdd, ReflectAddAssign, ReflectDefault, ReflectSub, ReflectSubAssign},
 };
-use glam::{Vec3, Vec3A};
+use froglight_common::crates::glam::{Vec3, Vec3A};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

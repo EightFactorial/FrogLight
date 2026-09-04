@@ -6,9 +6,9 @@ use froglight_api::{
     player::PlayerTextureProperty,
     prelude::*,
 };
+use froglight_common::crates::uuid::Uuid;
 use froglight_player::prelude::Username;
 use ureq::{Agent, config::Config, unversioned::transport::DefaultConnector};
-use uuid::Uuid;
 
 fn api() -> (ClientApi, HttpClient) {
     #[cfg(feature = "bevy")]

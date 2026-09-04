@@ -18,8 +18,10 @@ use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
 use froglight_world::{
-    naive::storage::{ArrayChunkStorage, ChunkStorage},
-    prelude::*,
+    naive::{
+        NaiveChunk,
+        storage::{ArrayChunkStorage, ChunkStorage},
+    },
     section::{Section, SectionData, SectionPalette},
 };
 use smallvec::SmallVec;
@@ -34,11 +36,7 @@ macro_rules! create {
                     0,
                     0,
                     $($tt)*,
-                    SectionData::new_unchecked(
-                        0,
-                        SectionPalette::Single(0),
-                        BitVec::new_general(),
-                    ),
+                    SectionData::empty(),
                 )
             }),
         ))))
@@ -49,11 +47,7 @@ macro_rules! create {
                 Section::new_unchecked(
                     0,
                     0,
-                    SectionData::new_unchecked(
-                        0,
-                        SectionPalette::Single(0),
-                        BitVec::new_general(),
-                    ),
+                    SectionData::empty(),
                     $($tt)*,
                 )
             }),
@@ -63,16 +57,7 @@ macro_rules! create {
 
 #[divan::bench]
 fn contains_single_best(b: Bencher) {
-    // An empty section with no blocks.
-    let single = create! {
-        @blocks
-        SectionData::new_unchecked(
-            0,
-            SectionPalette::Single(0),
-            BitVec::new_general(),
-        )
-    };
-
+    let single = NaiveChunk::new_empty_large();
     b.bench(|| {
         black_box(single.contains_raw_block(0));
     });
@@ -80,16 +65,7 @@ fn contains_single_best(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_worst(b: Bencher) {
-    // An empty section with no blocks.
-    let single = create! {
-        @blocks
-        SectionData::new_unchecked(
-            0,
-            SectionPalette::Single(0),
-            BitVec::new_general(),
-        )
-    };
-
+    let single = NaiveChunk::new_empty_large();
     b.bench(|| {
         black_box(single.contains_raw_block(1));
     });
@@ -97,16 +73,7 @@ fn contains_single_worst(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_best_iter(b: Bencher) {
-    // An empty section with no blocks.
-    let single = create! {
-        @blocks
-        SectionData::new_unchecked(
-            0,
-            SectionPalette::Single(0),
-            BitVec::new_general(),
-        )
-    };
-
+    let single = NaiveChunk::new_empty_large();
     b.bench(|| {
         black_box(single.iter_raw_blocks().any(|id| id == 0));
     });
@@ -114,16 +81,7 @@ fn contains_single_best_iter(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_worst_iter(b: Bencher) {
-    // An empty section with no blocks.
-    let single = create! {
-        @blocks
-        SectionData::new_unchecked(
-            0,
-            SectionPalette::Single(0),
-            BitVec::new_general(),
-        )
-    };
-
+    let single = NaiveChunk::new_empty_large();
     b.bench(|| {
         black_box(single.iter_raw_blocks().any(|id| id == 1));
     });

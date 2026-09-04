@@ -7,11 +7,11 @@ use core::fmt;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
+use froglight_common::crates::glam::U8Vec2;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::WithFnAttr;
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-use glam::U8Vec2;
 
 use crate::{
     CHUNK_LENGTH, CHUNK_WIDTH, SECTION_HEIGHT, component::SectionBlockPos, prelude::BlockPos,

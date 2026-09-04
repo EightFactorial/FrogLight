@@ -1,13 +1,11 @@
 use alloc::vec::Vec;
 
-use foldhash::fast::RandomState;
-use froglight_common::identifier::Identifier;
-use indexmap::IndexMap;
+use froglight_common::{prelude::*, types::IndexMap};
 
 /// A map of [`Identifier`]s to [`TagInnerMap`]s.
-pub type TagMap = IndexMap<Identifier<'static>, TagInnerMap, RandomState>;
+pub type TagMap = IndexMap<Identifier<'static>, TagInnerMap>;
 /// A map of [`Identifier`]s to [`Vec<u32>`]s.
-pub type TagInnerMap = IndexMap<Identifier<'static>, Vec<u32>, RandomState>;
+pub type TagInnerMap = IndexMap<Identifier<'static>, Vec<u32>>;
 
 /// A reference to a [`Tag`] and it's associated values.
 #[derive(Debug, Clone)]

@@ -1,10 +1,6 @@
 #[cfg(feature = "bevy")]
-use bevy_math::bounding::Aabb3d;
-#[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-use glam::Vec3;
-#[cfg(feature = "bevy")]
-use glam::Vec3A;
+use froglight_common::crates::glam::Vec3;
 
 /// An axis-aligned bounding box (AABB) for an entity.
 ///
@@ -50,18 +46,4 @@ impl EntityAabb {
     #[inline]
     #[must_use]
     pub const fn eye_height(&self) -> f32 { self.eye_height }
-
-    /// Create an [`Aabb3d`] from this [`EntityAabb`].
-    #[must_use]
-    #[cfg(feature = "bevy")]
-    pub const fn into_aabb(self) -> Aabb3d {
-        let Self { min, max, .. } = self;
-        Aabb3d { min: Vec3A::new(min.x, min.y, min.z), max: Vec3A::new(max.x, max.y, max.z) }
-    }
-}
-
-#[cfg(feature = "bevy")]
-impl From<EntityAabb> for Aabb3d {
-    #[inline]
-    fn from(value: EntityAabb) -> Self { value.into_aabb() }
 }

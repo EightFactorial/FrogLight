@@ -3,10 +3,8 @@
 use alloc::vec::Vec;
 use core::any::TypeId;
 
-use foldhash::fast::RandomState;
-use froglight_common::identifier::Identifier;
+use froglight_common::{crates::foldhash::fast::RandomState, prelude::*, types::IndexMap};
 use froglight_nbt::prelude::IndexedNbtCow;
-use indexmap::IndexMap;
 
 use crate::{
     registry::{NbtMap, NbtRef, TagMap, TagRef},

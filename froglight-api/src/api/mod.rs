@@ -16,8 +16,8 @@ use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use facet::Span;
 use facet_format::{DeserializeErrorKind, ParseError};
 use facet_json::{DeserializeError, JsonError};
+use froglight_common::crates::uuid::Uuid;
 use froglight_player::prelude::{PlayerProfile, Username};
-use uuid::Uuid;
 
 use crate::client::{HttpClient, HttpError};
 

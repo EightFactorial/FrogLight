@@ -1,10 +1,10 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+#[cfg(feature = "serde")]
+use froglight_common::crates::serde::{Deserialize, Serialize};
 use froglight_common::prelude::Identifier;
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
@@ -18,8 +18,9 @@ use crate::{
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct MaybePartialProfile {
     /// The player's profile data.
@@ -37,8 +38,9 @@ pub struct MaybePartialProfile {
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize), serde(untagged))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde", untagged))]
 #[cfg_attr(feature = "facet", derive(facet::Facet), facet(untagged))]
 pub enum ProfileType {
     /// A [`PartialPlayerProfile`].
@@ -57,8 +59,9 @@ impl Default for ProfileType {
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct PartialPlayerProfile {
     /// The player's username.
@@ -76,8 +79,9 @@ pub struct PartialPlayerProfile {
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct PartialPlayerSkin<'a> {
     /// The player's skin texture.

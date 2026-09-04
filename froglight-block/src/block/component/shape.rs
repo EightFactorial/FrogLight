@@ -6,7 +6,7 @@ use froglight_common::crates::glam::DVec3;
 use froglight_common::crates::libm;
 
 /// Using larger epsilon to match original behavior.
-const EPSILON_F64: f64 = 1e-7;
+const EPSILON: f64 = 1e-7;
 
 /// The shape of a block, defined as zero or more [`BlockAabb`]s.
 #[derive(Debug, Clone, PartialEq)]
@@ -36,9 +36,9 @@ impl BlockShape<'_> {
     /// coordinates.
     #[must_use]
     pub const fn new(min: DVec3, max: DVec3) -> Self {
-        if (max.x - min.x).abs() > EPSILON_F64
-            && (max.y - min.y).abs() > EPSILON_F64
-            && (max.z - min.z).abs() > EPSILON_F64
+        if (max.x - min.x).abs() > EPSILON
+            && (max.y - min.y).abs() > EPSILON
+            && (max.z - min.z).abs() > EPSILON
         {
             BlockShape::None
         } else {
@@ -64,9 +64,7 @@ impl BlockShape<'_> {
     #[must_use]
     #[cfg(feature = "std")]
     pub const fn new_from_corners(a: DVec3, b: DVec3) -> Self {
-        if (a.x - b.x).abs() > EPSILON_F64
-            && (a.y - b.y).abs() > EPSILON_F64
-            && (a.z - b.z).abs() > EPSILON_F64
+        if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
         {
             BlockShape::None
         } else {
@@ -81,9 +79,7 @@ impl BlockShape<'_> {
     #[must_use]
     #[cfg(all(not(feature = "std"), feature = "libm"))]
     pub fn new_from_corners(a: DVec3, b: DVec3) -> Self {
-        if (a.x - b.x).abs() > EPSILON_F64
-            && (a.y - b.y).abs() > EPSILON_F64
-            && (a.z - b.z).abs() > EPSILON_F64
+        if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
         {
             BlockShape::None
         } else {
@@ -123,12 +119,12 @@ impl BlockShape<'_> {
         match self {
             BlockShape::None => true,
             BlockShape::Single(shape) => {
-                shape.min.x.abs() < EPSILON_F64
-                    && shape.min.y.abs() < EPSILON_F64
-                    && shape.min.z.abs() < EPSILON_F64
-                    && shape.max.x.abs() < EPSILON_F64
-                    && shape.max.y.abs() < EPSILON_F64
-                    && shape.max.z.abs() < EPSILON_F64
+                shape.min.x.abs() < EPSILON
+                    && shape.min.y.abs() < EPSILON
+                    && shape.min.z.abs() < EPSILON
+                    && shape.max.x.abs() < EPSILON
+                    && shape.max.y.abs() < EPSILON
+                    && shape.max.z.abs() < EPSILON
             }
             BlockShape::Collection(Cow::Borrowed(slice)) => slice.is_empty(),
             BlockShape::Collection(Cow::Owned(vec)) => vec.is_empty(),

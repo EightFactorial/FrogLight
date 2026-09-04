@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight-api"
@@ -25,14 +24,11 @@ tracing-subscriber = { workspace = true }
 
 [dependencies]
 async-trait = { workspace = true }
-facet = { features = ["std", "uuid"], workspace = true }
+facet = { features = ["std"], workspace = true }
 facet-format = { workspace = true }
 facet-json = { features = ["std"], workspace = true }
-foldhash = { features = ["std"], workspace = true }
+froglight-common = { features = ["facet", "indexmap", "parking_lot", "std", "uuid"], workspace = true }
 froglight-player = { features = ["facet", "std"], workspace = true }
-indexmap = { features = ["std"], workspace = true }
-parking_lot = { workspace = true }
-uuid = { features = ["std"], workspace = true }
 
 # Optional dependencies
 async-io = { workspace = true, optional = true }
@@ -73,13 +69,13 @@ reqwest = ["dep:reqwest"]
 ureq = ["dep:async-io", "dep:ureq"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-player/bevy"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-player/bevy"]
 # Enable `hickory-resolver` support.
 resolver = ["dep:async-io", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-player/tracing"]
+tracing = ["dep:tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["tracing"]
 
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "froglight-player/nightly", "parking_lot/nightly"]
+nightly = ["froglight-common/nightly", "froglight-player/nightly"]

@@ -4,10 +4,15 @@ use core::ops::{Deref, DerefMut};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
-use froglight_common::prelude::Identifier;
+pub(crate) use froglight_common::{
+    crates::{
+        glam::{IVec3, Vec3, Vec3A},
+        uuid::Uuid,
+    },
+    prelude::*,
+};
 #[cfg(feature = "facet")]
 use froglight_facet::facet::prelude::*;
-use glam::{IVec3, Vec3, Vec3A};
 
 /// A variable-length [`i32`].
 #[repr(transparent)]

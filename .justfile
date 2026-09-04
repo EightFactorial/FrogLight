@@ -57,10 +57,10 @@ test:
 
 # Build all profiles and compare their sizes
 buildsize:
-    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=dev
-    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=release
-    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=distribution
-    cargo build --example=frogbot --features=bevy,std,nightly,v26_1,v26_2 --profile=distribution-size
+    cargo build --example=frogbot --{{ DEF_FEATURES }} --features=nightly,v26_1,v26_2 --profile=dev
+    cargo build --example=frogbot --{{ DEF_FEATURES }} --features=nightly,v26_1,v26_2 --profile=release
+    cargo build --example=frogbot --{{ DEF_FEATURES }} --features=nightly,v26_1,v26_2 --profile=distribution
+    cargo build --example=frogbot --{{ DEF_FEATURES }} --features=nightly,v26_1,v26_2 --profile=distribution-size
     ls -lha target/*/examples/frogbot
 
 # Check all files for typos

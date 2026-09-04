@@ -1,6 +1,5 @@
 [package]
 edition = { workspace = true }
-homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
 name = "froglight"
@@ -48,6 +47,8 @@ tracing = ["froglight-internal/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["froglight-internal/tracing_ext", "tracing"]
 
+# Enable `critical-section` for `no_std` support.
+critical-section = ["froglight-internal/critical-section"]
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]
 # Enable `once_cell` for `no_std` support.

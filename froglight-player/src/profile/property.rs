@@ -7,34 +7,40 @@ use core::{
 #[cfg(feature = "facet")]
 use base64::prelude::*;
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "facet")]
 use facet::Span;
 #[cfg(feature = "facet")]
 use facet_format::{DeserializeErrorKind, ParseError, SerializeError};
 #[cfg(feature = "facet")]
 use facet_json::{DeserializeError, JsonSerializeError};
-use foldhash::fast::RandomState;
-use indexmap::IndexMap;
+use froglight_common::crates::foldhash::fast::RandomState;
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::{
+    crates::serde::{Deserialize, Serialize},
+    types::IndexMap,
+};
 
 /// A set of [`ProfileProperty`]s associated with a [`PlayerProfile`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize), serde(transparent))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde", transparent))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct ProfilePropertySet(IndexMap<String, ProfileProperty, RandomState>);
+pub struct ProfilePropertySet(IndexMap<String, ProfileProperty>);
 
 /// A property associated with a [`PlayerProfile`].
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-#[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct ProfileProperty {
     /// The value of the property.
@@ -53,7 +59,7 @@ impl ProfilePropertySet {
     /// Creates a new [`ProfilePropertySet`] from the given [`IndexMap`].
     #[inline]
     #[must_use]
-    pub const fn new_from(map: IndexMap<String, ProfileProperty, RandomState>) -> Self { Self(map) }
+    pub const fn new_from(map: IndexMap<String, ProfileProperty>) -> Self { Self(map) }
 
     /// Creates a new [`ProfilePropertySet`] with the given capacity.
     #[must_use]
@@ -121,18 +127,16 @@ impl ProfilePropertySet {
     /// Get a reference to the underlying [`IndexMap`] of properties.
     #[inline]
     #[must_use]
-    pub const fn as_map(&self) -> &IndexMap<String, ProfileProperty, RandomState> { &self.0 }
+    pub const fn as_map(&self) -> &IndexMap<String, ProfileProperty> { &self.0 }
 
     /// Get a mutable reference to the underlying [`IndexMap`] of properties.
     #[inline]
     #[must_use]
-    pub const fn as_map_mut(&mut self) -> &mut IndexMap<String, ProfileProperty, RandomState> {
-        &mut self.0
-    }
+    pub const fn as_map_mut(&mut self) -> &mut IndexMap<String, ProfileProperty> { &mut self.0 }
 }
 
 impl Deref for ProfilePropertySet {
-    type Target = IndexMap<String, ProfileProperty, RandomState>;
+    type Target = IndexMap<String, ProfileProperty>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { self.as_map() }

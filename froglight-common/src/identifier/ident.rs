@@ -275,11 +275,11 @@ impl Deref for Ident {
 
 impl PartialEq<str> for Ident {
     #[inline]
-    fn eq(&self, other: &str) -> bool { self.as_bytes() == other.as_bytes() }
+    fn eq(&self, other: &str) -> bool { self.as_str() == other }
 }
 impl PartialEq<Ident> for str {
     #[inline]
-    fn eq(&self, other: &Ident) -> bool { self.as_bytes() == other.as_bytes() }
+    fn eq(&self, other: &Ident) -> bool { self == other.as_str() }
 }
 
 impl PartialEq<[u8]> for Ident {
@@ -289,6 +289,17 @@ impl PartialEq<[u8]> for Ident {
 impl PartialEq<Ident> for [u8] {
     #[inline]
     fn eq(&self, other: &Ident) -> bool { self == other.as_bytes() }
+}
+
+#[cfg(feature = "alloc")]
+impl PartialEq<alloc::string::String> for Ident {
+    #[inline]
+    fn eq(&self, other: &alloc::string::String) -> bool { self.as_str() == other }
+}
+#[cfg(feature = "alloc")]
+impl PartialEq<Ident> for alloc::string::String {
+    #[inline]
+    fn eq(&self, other: &Ident) -> bool { self == other.as_str() }
 }
 
 impl fmt::Display for Ident {

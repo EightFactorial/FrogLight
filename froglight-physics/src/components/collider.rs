@@ -4,8 +4,8 @@ use core::ops::{Deref, DerefMut};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use froglight_common::crates::glam::Vec3A;
 use froglight_entity::prelude::EntityAabb;
-use glam::Vec3A;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
