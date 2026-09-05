@@ -1,23 +1,26 @@
 //! TODO
 
+use core::any::TypeId;
+
 use bevy_ecs::{
     component::Component,
     entity::{Entity, EntityHashSet, hash_set::Iter},
     reflect::ReflectComponent,
 };
 use bevy_reflect::Reflect;
-use foldhash::fast::FixedState;
 use froglight_biome::{storage::BiomeStorage, version::BiomeVersion};
 use froglight_block::{storage::BlockStorage, version::BlockVersion};
-use froglight_common::prelude::Identifier;
+use froglight_common::{crates::foldhash::fast::RandomState, prelude::Identifier, types::HashMap};
 use froglight_entity::{
     prelude::{EntityId, EntityUuid},
     storage::EntityStorage,
     version::EntityVersion,
 };
 use froglight_item::{storage::ItemStorage, version::ItemVersion};
-use froglight_world::prelude::ChunkPos;
-use hashbrown::HashMap;
+use froglight_world::{
+    component::{BlockPos, ChunkBlockPos},
+    prelude::ChunkPos,
+};
 
 pub(crate) mod data;
 pub(crate) mod hook;
@@ -38,9 +41,9 @@ pub struct SessionInstance {
     v_items: &'static ItemStorage,
 
     entity: EntityHashSet,
-    entity_id: HashMap<EntityId, Entity, FixedState>,
-    entity_uuid: HashMap<EntityUuid, Entity, FixedState>,
-    chunk_pos: HashMap<ChunkPos, Entity, FixedState>,
+    entity_id: HashMap<EntityId, Entity>,
+    entity_uuid: HashMap<EntityUuid, Entity>,
+    chunk_pos: HashMap<ChunkPos, Entity>,
 }
 
 impl SessionInstance {
@@ -51,16 +54,6 @@ impl SessionInstance {
         height_max: u32,
         height_min: i32,
     ) -> Self {
-        let bytes = dimension.as_str().as_bytes();
-        let mut seed_a = Self::create_seed(0, bytes);
-        let mut seed_b = Self::create_seed(2, bytes);
-        let mut seed_c = Self::create_seed(4, bytes);
-
-        // Fiddle with the seeds a bit.
-        seed_a ^= seed_c.rotate_left(8);
-        seed_b ^= seed_a.rotate_left(9);
-        seed_c ^= seed_b.rotate_left(10);
-
         Self {
             dimension,
             height_max_min: (height_max, height_min),
@@ -71,24 +64,10 @@ impl SessionInstance {
             v_items: V::items(),
 
             entity: EntityHashSet::new(),
-            entity_id: HashMap::with_hasher(FixedState::with_seed(seed_a)),
-            entity_uuid: HashMap::with_hasher(FixedState::with_seed(seed_b)),
-            chunk_pos: HashMap::with_hasher(FixedState::with_seed(seed_c)),
+            entity_id: HashMap::with_hasher(RandomState::default()),
+            entity_uuid: HashMap::with_hasher(RandomState::default()),
+            chunk_pos: HashMap::with_hasher(RandomState::default()),
         }
-    }
-
-    /// Create a [`u64`] seed from `bytes[index..index+7]`.
-    #[must_use]
-    const fn create_seed(index: usize, bytes: &[u8]) -> u64 {
-        let mut array = [0u8; 8];
-        let mut i = 0;
-
-        while i < 8 && i + index < bytes.len() {
-            array[i] = bytes[i + index];
-            i += 1;
-        }
-
-        u64::from_le_bytes(array)
     }
 
     /// Get the dimension's [`Identifier`].
@@ -106,37 +85,55 @@ impl SessionInstance {
     #[must_use]
     pub const fn height_min(&self) -> i32 { self.height_max_min.1 }
 
+    /// Convert a [`BlockPos`] into a [`ChunkBlockPos`] if it is within bounds.
+    ///
+    /// Moves from "world-space" to "chunk-space", where `0` is always the
+    /// bottom of the chunk.
+    #[inline]
+    #[must_use]
+    pub const fn get_chunkpos(&self, position: BlockPos) -> Option<ChunkBlockPos> {
+        ChunkBlockPos::try_from_blockpos(position, self.height_min())
+    }
+
     /// Get the [`BiomeStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_biomes(&self) -> &'static BiomeStorage { self.v_biomes }
+    pub const fn biomes(&self) -> &'static BiomeStorage { self.v_biomes }
 
     /// Get the [`BlockStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_blocks(&self) -> &'static BlockStorage { self.v_blocks }
+    pub const fn blocks(&self) -> &'static BlockStorage { self.v_blocks }
 
     /// Get the [`EntityStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_entities(&self) -> &'static EntityStorage { self.v_entities }
+    pub const fn entities(&self) -> &'static EntityStorage { self.v_entities }
 
     /// Get the [`ItemStorage`] for this [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub const fn version_items(&self) -> &'static ItemStorage { self.v_items }
+    pub const fn items(&self) -> &'static ItemStorage { self.v_items }
 
-    /// Returns `true` if the given [`Entity`] is part of the instance.
+    /// Returns `true` if the [`SessionInstance`] is of the given
+    /// [`Version`](froglight_common::version::Version) type.
     #[inline]
     #[must_use]
-    pub fn contains_entity(&self, entity: &Entity) -> bool { self.entity.contains(entity) }
+    pub fn is_version<V: 'static>(&self) -> bool { self.is_version_ty(TypeId::of::<V>()) }
 
-    /// Get a reference to the [`EntityHashSet`] of related entities.
+    /// Returns `true` if the [`SessionInstance`] is of the given
+    /// [`Version`](froglight_common::version::Version) type.
     #[inline]
     #[must_use]
-    pub const fn entity_map(&self) -> &EntityHashSet { &self.entity }
+    pub fn is_version_ty(&self, ty: TypeId) -> bool { self.v_biomes.version_ty() == ty }
 
-    /// Get an iterator over all [`Entity`]s in the [`SessionInstance`].
+    /// Get a reference to the [`EntityHashSet`] of owned [`Entities`](Entity).
+    #[inline]
+    #[must_use]
+    pub const fn entity_set(&self) -> &EntityHashSet { &self.entity }
+
+    /// Get an iterator over all [`Entities`](Entity) in the
+    /// [`SessionInstance`].
     #[inline]
     #[must_use]
     pub fn iter_entity(&self) -> Iter<'_> { self.entity.iter() }

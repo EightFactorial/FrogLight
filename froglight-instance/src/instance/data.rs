@@ -1,8 +1,8 @@
 use bevy_ecs::{component::Component, entity::Entity};
 use bevy_reflect::TypePath;
+use froglight_common::{crates::hashbrown::hash_map::Iter, types::HashMap};
 use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::ChunkPos;
-use hashbrown::hash_map::{HashMap, Iter};
 
 use crate::prelude::SessionInstance;
 
@@ -76,7 +76,7 @@ macro_rules! create_data {
             #[inline]
             #[must_use]
             #[doc = concat!("Get a reference to the [`HashMap`] of [`", stringify!($ty), "`]-[`Entity`] pairs in the [`SessionInstance`].")]
-            pub const fn $map_fn(&self) -> &HashMap<$ty, Entity, foldhash::fast::FixedState> { &self.$token }
+            pub const fn $map_fn(&self) -> &HashMap<$ty, Entity> { &self.$token }
 
             #[inline]
             #[must_use]

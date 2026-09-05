@@ -22,10 +22,12 @@ pub mod crates {
 
     #[cfg(feature = "critical-section")]
     pub use ::critical_section;
-    #[cfg(feature = "indexmap")]
+    #[cfg(any(feature = "hashbrown", feature = "indexmap"))]
     pub use ::foldhash;
     #[cfg(feature = "glam")]
     pub use ::glam;
+    #[cfg(feature = "hashbrown")]
+    pub use ::hashbrown;
     #[cfg(feature = "indexmap")]
     pub use ::indexmap;
     #[cfg(feature = "libm")]
@@ -93,10 +95,30 @@ pub mod types {
         _ => {}
     }
 
-    /// A type alias for an [`IndexMap`](indexmap::IndexMap) using
-    /// [`foldhash::fast::RandomState`] as the hasher.
+    // Prefer `hashbrown` HashMap/HashSet over `std`
+    cfg_select! {
+        feature = "hashbrown" => {
+            // pub use ::hashbrown::{HashMap, HashSet};
+
+            /// A re-export of [`hashbrown::HashMap`].
+            pub type HashMap<K, V, S = ::foldhash::fast::RandomState> =
+                ::hashbrown::HashMap<K, V, S>;
+            /// A re-export of [`hashbrown::HashSet`].
+            pub type HashSet<T, S = ::foldhash::fast::RandomState> = ::hashbrown::HashSet<T, S>;
+        }
+        feature = "std" => {
+            /// A re-export of [`std::collections::HashMap`].
+            pub type HashMap<K, V, S = ::std::hash::RandomState> =
+                ::std::collections::HashMap<K, V, S>;
+            /// A re-export of [`std::collections::HashSet`].
+            pub type HashSet<T, S = ::std::hash::RandomState> = ::std::collections::HashSet<T, S>;
+        }
+        _ => {}
+    }
+
+    /// A re-export of [`indexmap::IndexMap`].
     #[cfg(feature = "indexmap")]
-    pub type IndexMap<K, V, S = foldhash::fast::RandomState> = ::indexmap::IndexMap<K, V, S>;
+    pub type IndexMap<K, V, S = ::foldhash::fast::RandomState> = ::indexmap::IndexMap<K, V, S>;
 }
 
 pub mod prelude {

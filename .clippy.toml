@@ -15,6 +15,12 @@ disallowed-methods = [
   { path = "libm::sincos", reason = "Use `froglight_math::table::sin_cos` instead" },
 ]
 disallowed-types = [
+  # HashMap
+  { path = "std::collections::HashMap", reason = "Use `froglight_common::types::HashMap` instead" },
+  { path = "hashbrown::HashMap", reason = "Use `froglight_common::types::HashMap` instead" },
+  # HashSet
+  { path = "std::collections::HashSet", reason = "Use `froglight_common::types::HashSet` instead" },
+  { path = "hashbrown::HashSet", reason = "Use `froglight_common::types::HashSet` instead" },
   # LazyLock
   { path = "std::sync::LazyLock", reason = "Use `froglight_common::types::LazyLock` instead" },
   { path = "once_cell::sync::Lazy", reason = "Use `froglight_common::types::LazyLock` instead" },

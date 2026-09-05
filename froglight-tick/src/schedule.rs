@@ -179,7 +179,7 @@ impl RunTickLoop {
         world: &'scope World,
     ) {
         let Some(instance) = entity.get::<SessionInstance>() else { return };
-        if instance.entity_map().is_empty() {
+        if instance.entity_set().is_empty() {
             return;
         }
 

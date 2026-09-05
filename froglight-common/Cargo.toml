@@ -24,6 +24,7 @@ facet = { workspace = true, optional = true }
 foldhash = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
 glam = { workspace = true, optional = true }
+hashbrown = { workspace = true, optional = true }
 indexmap = { workspace = true, optional = true }
 libm = { workspace = true, optional = true }
 once_cell = { workspace = true, optional = true }
@@ -43,15 +44,17 @@ facet = ["dep:facet"]
 # Enable `froglight-facet` support.
 froglight-facet = ["dep:froglight-facet", "facet"]
 # Enable `serde` support.
-serde = ["dep:serde", "glam?/serde", "indexmap?/serde", "parking_lot?/serde", "uuid?/serde"]
+serde = ["dep:serde", "glam?/serde", "hashbrown?/serde", "indexmap?/serde", "parking_lot?/serde", "uuid?/serde"]
 
-# Enable `indexmap` support.
-indexmap = ["alloc", "dep:indexmap", "dep:foldhash", "facet?/indexmap"]
+# Enable `hashbrown`.
+hashbrown = ["alloc", "dep:foldhash", "dep:hashbrown"]
+# Enable `indexmap`.
+indexmap = ["alloc", "dep:indexmap", "hashbrown", "facet?/indexmap"]
 # Enable `glam`.
 glam = ["dep:glam"]
 # Enable `parking_lot`.
 parking_lot = ["dep:parking_lot", "facet?/lock_api", "once_cell?/parking_lot"]
-# Enable `uuid` support.
+# Enable `uuid`.
 uuid = ["bevy_reflect?/uuid", "dep:uuid", "facet?/uuid"]
 
 # Enable `critical-section` for `no_std` support.
@@ -66,7 +69,7 @@ alloc = ["facet?/alloc", "once_cell?/alloc", "serde?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_reflect?/std", "critical-section?/std", "facet?/std", "foldhash?/std", "froglight-facet?/std", "glam?/std", "indexmap?/std", "once_cell?/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash?/nightly", "froglight-facet?/nightly", "parking_lot?/nightly"]
+nightly = ["foldhash?/nightly", "hashbrown?/nightly", "froglight-facet?/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

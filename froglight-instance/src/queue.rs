@@ -7,10 +7,9 @@ use bevy_ecs::{
     system::Query,
 };
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
-use foldhash::fast::RandomState;
 use froglight_block::prelude::*;
+use froglight_common::{crates::foldhash::fast::RandomState, types::HashMap};
 use froglight_world::prelude::*;
-use hashbrown::HashMap;
 
 use crate::prelude::*;
 
@@ -18,7 +17,7 @@ use crate::prelude::*;
 #[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
 #[reflect(opaque, Debug, Default, Clone, PartialEq, Component)]
 pub struct BlockEditQueue {
-    queue: HashMap<ChunkPos, Vec<BlockEdit>, RandomState>,
+    queue: HashMap<ChunkPos, Vec<BlockEdit>>,
     is_empty: bool,
 }
 

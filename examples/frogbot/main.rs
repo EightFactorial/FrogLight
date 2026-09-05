@@ -258,7 +258,7 @@ impl BotPlugin {
                                     return;
                                 };
 
-                                let Some(block) = instance.version_blocks().get_block_by_state(block_id) else {
+                                let Some(block) = instance.blocks().get_block_by_state(block_id) else {
                                     error!("Received BlockUpdate with unknown BlockState \"{}\"!", block_id.into_inner());
                                     return;
                                 };
