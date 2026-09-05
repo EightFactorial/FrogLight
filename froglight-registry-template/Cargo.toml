@@ -17,6 +17,9 @@ workspace = true
 
 # --- Dependencies ---
 
+[dev-dependencies]
+froglight-common = { features = ["std"], workspace = true }
+
 [dependencies]
 
 # --- Features ---
