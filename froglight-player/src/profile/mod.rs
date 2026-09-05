@@ -1,10 +1,14 @@
 //! A player's [`PlayerProfile`]
 #![allow(clippy::unsafe_derive_deserialize, reason = "Triggered by deriving `facet` and `serde`")]
 
+use core::fmt;
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy_reflect::Reflect;
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
 use froglight_common::crates::serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -84,5 +88,11 @@ impl PlayerProfile {
             let username = profile.username().clone();
             world.commands().entity(ctx.entity).insert(username);
         }
+    }
+}
+
+impl fmt::Display for PlayerProfile {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({})", self.username, self.uuid.hyphenated())
     }
 }

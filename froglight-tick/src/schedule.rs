@@ -1,4 +1,5 @@
 //! TODO
+#![allow(clippy::disallowed_types, reason = "Does not import `froglight_common`")]
 
 use alloc::vec::Vec;
 

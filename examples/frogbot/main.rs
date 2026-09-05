@@ -148,11 +148,7 @@ impl BotPlugin {
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
         let connection = ClientConnection::new::<Version, FuturesLite, TcpStream>(stream, false);
 
-        info!(
-            "Attempting to login as \"{}\" ({})...",
-            profile.username(),
-            profile.uuid().as_hyphenated()
-        );
+        info!("Attempting to login as {profile}");
 
         // Add the profile to the Offline API.
         let api = ClientApi::offline();

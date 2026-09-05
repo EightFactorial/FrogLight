@@ -1,0 +1,30 @@
+disallowed-methods = [
+  # f32
+  { path = "f32::sin", reason = "Use `froglight_math::table::sin` instead" },
+  { path = "f32::cos", reason = "Use `froglight_math::table::cos` instead" },
+  { path = "f32::sin_cos", reason = "Use `froglight_math::table::sin_cos` instead" },
+  { path = "libm::sinf", reason = "Use `froglight_math::table::sin` instead" },
+  { path = "libm::cosf", reason = "Use `froglight_math::table::cos` instead" },
+  { path = "libm::sincosf", reason = "Use `froglight_math::table::sin_cos` instead" },
+  # f64
+  { path = "f64::sin", reason = "Use `froglight_math::table::sin` instead" },
+  { path = "f64::cos", reason = "Use `froglight_math::table::cos` instead" },
+  { path = "f64::sin_cos", reason = "Use `froglight_math::table::sin_cos` instead" },
+  { path = "libm::sin", reason = "Use `froglight_math::table::sin` instead" },
+  { path = "libm::cos", reason = "Use `froglight_math::table::cos` instead" },
+  { path = "libm::sincos", reason = "Use `froglight_math::table::sin_cos` instead" },
+]
+disallowed-types = [
+  # LazyLock
+  { path = "std::sync::LazyLock", reason = "Use `froglight_common::types::LazyLock` instead" },
+  { path = "once_cell::sync::Lazy", reason = "Use `froglight_common::types::LazyLock` instead" },
+  # Mutex
+  { path = "std::sync::Mutex", reason = "Use `froglight_common::types::Mutex` instead" },
+  { path = "parking_lot::Mutex", reason = "Use `froglight_common::types::Mutex` instead" },
+  # OnceLock
+  { path = "std::sync::OnceLock", reason = "Use `froglight_common::types::OnceLock` instead" },
+  { path = "once_cell::sync::OnceCell", reason = "Use `froglight_common::types::OnceLock` instead" },
+  # RwLock
+  { path = "std::sync::RwLock", reason = "Use `froglight_common::types::RwLock` instead" },
+  { path = "parking_lot::RwLock", reason = "Use `froglight_common::types::RwLock` instead" },
+]

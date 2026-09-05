@@ -172,37 +172,37 @@ impl PhysicsPlugin {
     /// - [`OnGround`] -> [`PrevOnGround`]
     #[expect(clippy::missing_panics_doc, reason = "Components are dense, so `unwrap` is ok.")]
     pub fn update_prev_components(
-        mut accel: Query<(&Acceleration, &mut PrevAcceleration)>,
-        mut pos: Query<(&Position, &mut PrevPosition)>,
-        mut rot: Query<(&Rotation, &mut PrevRotation)>,
-        mut vel: Query<(&Velocity, &mut PrevVelocity)>,
-        mut col: Query<(&Collider, &mut PrevCollider)>,
-        mut gnd: Query<(&OnGround, &mut PrevOnGround)>,
+        accel: Query<(&Acceleration, &mut PrevAcceleration)>,
+        pos: Query<(&Position, &mut PrevPosition)>,
+        rot: Query<(&Rotation, &mut PrevRotation)>,
+        vel: Query<(&Velocity, &mut PrevVelocity)>,
+        col: Query<(&Collider, &mut PrevCollider)>,
+        gnd: Query<(&OnGround, &mut PrevOnGround)>,
     ) {
         ComputeTaskPool::get().scope::<_, ()>(|scope| {
             scope.spawn(async {
-                for (accel, prev) in accel.contiguous_iter_mut().unwrap() {
+                for (accel, prev) in accel.contiguous_iter_inner().unwrap() {
                     for (accel, prev) in accel.iter().zip(prev) {
                         *prev = PrevAcceleration::new_accel(*accel);
                     }
                 }
             });
             scope.spawn(async {
-                for (pos, prev) in pos.contiguous_iter_mut().unwrap() {
+                for (pos, prev) in pos.contiguous_iter_inner().unwrap() {
                     for (pos, prev) in pos.iter().zip(prev) {
                         *prev = PrevPosition::new_pos(*pos);
                     }
                 }
             });
             scope.spawn(async {
-                for (rot, prev) in rot.contiguous_iter_mut().unwrap() {
+                for (rot, prev) in rot.contiguous_iter_inner().unwrap() {
                     for (rot, prev) in rot.iter().zip(prev) {
                         *prev = PrevRotation::new_rot(*rot);
                     }
                 }
             });
             scope.spawn(async {
-                for (vel, prev) in vel.contiguous_iter_mut().unwrap() {
+                for (vel, prev) in vel.contiguous_iter_inner().unwrap() {
                     for (vel, prev) in vel.iter().zip(prev) {
                         *prev = PrevVelocity::new_vel(*vel);
                     }
@@ -210,14 +210,14 @@ impl PhysicsPlugin {
             });
 
             scope.spawn(async {
-                for (col, prev) in col.contiguous_iter_mut().unwrap() {
+                for (col, prev) in col.contiguous_iter_inner().unwrap() {
                     for (col, prev) in col.iter().zip(prev) {
                         *prev = PrevCollider::new_col(*col);
                     }
                 }
             });
 
-            for (gnd, prev) in gnd.contiguous_iter_mut().unwrap() {
+            for (gnd, prev) in gnd.contiguous_iter_inner().unwrap() {
                 for (gnd, prev) in gnd.iter().zip(prev) {
                     *prev = PrevOnGround::new(**gnd);
                 }

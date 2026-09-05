@@ -4,21 +4,25 @@ use core::ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{
-    Reflect, ReflectDeserialize, ReflectSerialize,
+    Reflect,
     std_traits::{ReflectAdd, ReflectAddAssign, ReflectDefault, ReflectSub, ReflectSubAssign},
 };
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use froglight_common::crates::glam::{Vec3, Vec3A};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
 
 /// A position.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign))]
 #[cfg_attr(feature = "bevy", require(PrevPosition))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Position(Vec3A);
 
 impl Position {
@@ -137,10 +141,12 @@ where
 /// The previous tick's [`Position`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PrevPosition(Position);
 
 impl PrevPosition {
@@ -152,7 +158,7 @@ impl PrevPosition {
     /// Create a new [`PrevPosition`] from an [`Position`].
     #[inline]
     #[must_use]
-    pub const fn new_pos(accel: Position) -> Self { Self(accel) }
+    pub const fn new_pos(pos: Position) -> Self { Self(pos) }
 
     /// Convert this [`PrevPosition`] into an [`Position`].
     #[inline]

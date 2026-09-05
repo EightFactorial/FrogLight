@@ -21,14 +21,17 @@ workspace = true
 glam = { workspace = true }
 
 [dependencies]
-froglight-common = { features = ["glam"], workspace = true }
+froglight-common = { workspace = true }
 
 # --- Features ---
 
 [features]
 default = ["std"]
 
-# Enable `glam` for `no_std` support.
+# Enable `glam` support.
+glam = ["froglight-common/glam"]
+
+# Enable `critical-section` for `no_std` support.
 critical-section = ["froglight-common/critical-section"]
 # Enable `libm` for `no_std` support.
 libm = ["froglight-common/libm"]

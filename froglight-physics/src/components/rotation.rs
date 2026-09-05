@@ -3,21 +3,24 @@ use core::ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign};
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use froglight_common::crates::glam::{EulerRot, Quat, Vec3A};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
 
 /// A `yaw` and `pitch` rotation, in radians.
 ///
 /// Cannot be a [`Quat`] due to how rotations are handled.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", require(PrevRotation))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Rotation(Vec3A);
 
 impl Rotation {
@@ -109,10 +112,11 @@ impl SubAssign for Rotation {
 /// The previous tick's [`Rotation`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PrevRotation(Rotation);
 
 impl PrevRotation {
@@ -129,7 +133,7 @@ impl PrevRotation {
     /// Create a new [`PrevRotation`] from a [`Rotation`].
     #[inline]
     #[must_use]
-    pub const fn new_rot(rotation: Rotation) -> Self { Self(rotation) }
+    pub const fn new_rot(rot: Rotation) -> Self { Self(rot) }
 
     /// Get the `yaw` component.
     #[inline]

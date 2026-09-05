@@ -2,6 +2,7 @@
 #![allow(clippy::cast_precision_loss, reason = "Desired behavior")]
 #![allow(clippy::cast_possible_truncation, reason = "Desired behavior")]
 #![allow(clippy::cast_sign_loss, reason = "Desired behavior")]
+#![allow(clippy::disallowed_methods, reason = "Precomputed tables")]
 
 use core::f64::consts::PI;
 

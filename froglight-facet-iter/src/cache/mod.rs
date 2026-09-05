@@ -1,4 +1,5 @@
 //! TODO
+#![allow(clippy::disallowed_types, reason = "Does not import `froglight_common`")]
 
 cfg_select! {
     feature = "std" => {

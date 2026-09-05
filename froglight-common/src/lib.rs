@@ -1,6 +1,10 @@
 #![doc = include_str!("../README.md")]
-#![cfg_attr(feature = "nightly", feature(nonpoison_mutex, nonpoison_rwlock))]
-#![cfg_attr(feature = "nightly", allow(unused_features, reason = "Used if no `parking_lot`"))]
+#![allow(clippy::disallowed_types, reason = "This crate selects and re-exports common types")]
+#![cfg_attr(feature = "nightly", feature(core_float_math))]
+#![cfg_attr(
+    feature = "nightly",
+    allow(unused_features, reason = "`core_float_math` used if `no_std`")
+)]
 #![no_std]
 
 #[cfg(feature = "alloc")]
@@ -42,10 +46,20 @@ pub mod types {
     // Prefer `std` Lazy/Once over `once_cell`
     cfg_select! {
         feature = "std" => {
-            pub use std::sync::{LazyLock, OnceLock};
+            // pub use std::sync::{LazyLock, OnceLock};
+
+            /// A re-export of [`std::sync::LazyLock`].
+            pub type LazyLock<T, F = fn() -> T> = std::sync::LazyLock<T, F>;
+            /// A re-export of [`std::sync::OnceLock`].
+            pub type OnceLock<T> = std::sync::OnceLock<T>;
         }
         all(feature = "once_cell", feature = "critical-section") => {
-            pub use ::once_cell::sync::{Lazy as LazyLock, OnceCell as OnceLock};
+            // pub use ::once_cell::sync::{Lazy as LazyLock, OnceCell as OnceLock};
+
+            /// A re-export of [`once_cell::sync::Lazy`].
+            pub type LazyLock<T, F = fn() -> T> = ::once_cell::sync::Lazy<T, F>;
+            /// A re-export of [`once_cell::sync::OnceCell`].
+            pub type OnceLock<T> = ::once_cell::sync::OnceCell<T>;
         }
         _ => {}
     }
@@ -53,13 +67,28 @@ pub mod types {
     // Prefer `parking_lot` Mutex/RwLock over `std`
     cfg_select! {
         feature = "parking_lot" => {
-            pub use ::parking_lot::{Mutex, RwLock};
+            // pub use ::parking_lot::{Mutex, RwLock};
+
+            /// A re-export of [`parking_lot::Mutex`].
+            pub type Mutex<T> = ::parking_lot::Mutex<T>;
+            /// A re-export of [`parking_lot::RwLock`].
+            pub type RwLock<T> = ::parking_lot::RwLock<T>;
         }
         all(feature = "std", feature = "nightly") => {
-            pub use std::sync::nonpoison::{Mutex, RwLock};
+            // pub use std::sync::nonpoison::{Mutex, RwLock};
+
+            /// A re-export of [`std::sync::nonpoison::Mutex`].
+            pub type Mutex<T> = std::sync::nonpoison::Mutex<T>;
+            /// A re-export of [`std::sync::nonpoison::RwLock`].
+            pub type RwLock<T> = std::sync::nonpoison::RwLock<T>;
         }
         feature = "std" => {
-            pub use std::sync::{Mutex, RwLock};
+            // pub use std::sync::{Mutex, RwLock};
+
+            /// A re-export of [`std::sync::Mutex`].
+            pub type Mutex<T> = std::sync::Mutex<T>;
+            /// A re-export of [`std::sync::RwLock`].
+            pub type RwLock<T> = std::sync::RwLock<T>;
         }
         _ => {}
     }

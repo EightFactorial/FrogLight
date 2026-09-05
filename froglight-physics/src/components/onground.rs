@@ -3,18 +3,21 @@ use core::ops::{Deref, DerefMut};
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
 
 /// A OnGround vector.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", require(PrevOnGround))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct OnGround(pub bool);
 
 impl OnGround {
@@ -59,10 +62,11 @@ impl DerefMut for OnGround {
 /// The previous tick's [`OnGround`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PrevOnGround(OnGround);
 
 impl PrevOnGround {
@@ -74,7 +78,7 @@ impl PrevOnGround {
     /// Convert this [`PrevOnGround`] into an [`OnGround`].
     #[inline]
     #[must_use]
-    pub const fn to_onground(self) -> OnGround { self.0 }
+    pub const fn into_inner(self) -> OnGround { self.0 }
 }
 
 impl From<OnGround> for PrevOnGround {

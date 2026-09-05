@@ -1,5 +1,7 @@
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
 use froglight_common::crates::serde::{Deserialize, Serialize};
 use froglight_common::prelude::Identifier;

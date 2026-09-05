@@ -2,9 +2,9 @@
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::{entity::EntityHashMap, prelude::*};
+use froglight_common::types::Mutex;
 use froglight_entity::prelude::{EntityId, EntityUuid};
 use froglight_world::prelude::{ChunkPos, SharedChunk};
-use parking_lot::Mutex;
 
 use crate::{
     instance::{

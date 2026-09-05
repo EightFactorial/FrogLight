@@ -11,7 +11,9 @@ use core::{
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+use bevy_reflect::Reflect;
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
 use froglight_common::crates::serde::{Deserialize, Serialize};
 use md5::{Digest, Md5, digest::Update};

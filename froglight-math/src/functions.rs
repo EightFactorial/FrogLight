@@ -1,6 +1,7 @@
 //! Common mathematical functions.
 #![allow(clippy::unreadable_literal, reason = "It's actually more readable this way")]
 
+#[cfg(feature = "glam")]
 use froglight_common::crates::glam::{DMat2, DVec2, DVec3, DVec4};
 
 /// Convert degrees to radians.
@@ -106,6 +107,7 @@ pub const fn lerp(val: f64, start: f64, end: f64) -> f64 { start + val * (end - 
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_vec2(val: f64, range: DVec2) -> f64 { range.x + val * (range.y - range.x) }
 
 /// Linearly interpolate between two values,
@@ -157,6 +159,7 @@ pub const fn lerp_clamped(val: f64, start: f64, end: f64) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_vec2_clamped(val: f64, range: DVec2) -> f64 {
     if val < 0.0 {
         range.x
@@ -206,6 +209,7 @@ pub const fn lerp_inverse(val: f64, start: f64, end: f64) -> f64 { (val - start)
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_vec2_inverse(val: f64, range: DVec2) -> f64 {
     lerp_inverse(val, range.x, range.y)
 }
@@ -233,6 +237,7 @@ pub const fn lerp_vec2_inverse(val: f64, range: DVec2) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_bilinear(val: DVec2, start: DVec2, end: DVec2) -> f64 {
     lerp(val.y, lerp_vec2(val.x, start), lerp_vec2(val.x, end))
 }
@@ -262,6 +267,7 @@ pub const fn lerp_bilinear(val: DVec2, start: DVec2, end: DVec2) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_bilinear_mat2(val: DVec2, mat: DMat2) -> f64 {
     lerp_bilinear(val, mat.x_axis, mat.y_axis)
 }
@@ -290,6 +296,7 @@ pub const fn lerp_bilinear_mat2(val: DVec2, mat: DMat2) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn lerp_trilinear(val: DVec3, start: DVec4, end: DVec4) -> f64 {
     let a = DVec2::new(start.x, start.y);
     let b = DVec2::new(start.z, end.w);
@@ -323,6 +330,7 @@ pub const fn lerp_trilinear(val: DVec3, start: DVec4, end: DVec4) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn map_range(val: f64, from: DVec2, to: DVec2) -> f64 {
     lerp_vec2(lerp_vec2_inverse(val, from), to)
 }
@@ -348,6 +356,7 @@ pub const fn map_range(val: f64, from: DVec2, to: DVec2) -> f64 {
 /// ```
 #[inline]
 #[must_use]
+#[cfg(feature = "glam")]
 pub const fn map_range_clamped(val: f64, from: DVec2, to: DVec2) -> f64 {
     lerp_vec2_clamped(lerp_vec2_inverse(val, from), to)
 }

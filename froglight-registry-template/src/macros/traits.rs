@@ -20,12 +20,14 @@
 ///
 /// pub trait MyTraitExpanded: Version {
 ///     /// The [`u32`] for this [`Version`].
-///     const GLOBAL: &'static froglight_registry_template::types::OnceLock<u32>;
+///     const GLOBAL: &'static froglight_common::types::OnceLock<u32>;
 ///
 ///     /// Get the [`u32`] for this [`Version`].
 ///     #[inline]
 ///     #[must_use]
-///     fn global() -> &'static u32 { Self::GLOBAL.get_or_init(Self::new_value) }
+///     fn global() -> &'static u32 {
+///         <Self as MyTraitExpanded>::GLOBAL.get_or_init(<Self as MyTraitExpanded>::new_value)
+///     }
 ///
 ///     /// Create a new [`u32`] for this [`Version`].
 ///     ///
@@ -57,7 +59,7 @@ macro_rules! version_subtrait {
             #[inline]
             #[must_use]
             #[doc = concat!("Get the [`", stringify!($const_ty), "`] for this [`Version`].")]
-            fn $const_fn() -> &'static $const_ty { Self::$const.get_or_init(Self::$new_fn) }
+            fn $const_fn() -> &'static $const_ty { <Self as $name>::$const.get_or_init(<Self as $name>::$new_fn) }
 
             #[must_use]
             #[doc = concat!("Create a new [`", stringify!($const_ty), "`] for this [`Version`].")]
@@ -79,7 +81,7 @@ macro_rules! version_subtrait {
 /// ```rust
 /// use std::sync::Arc;
 /// use froglight_registry_template::{version_subtrait, version_implement};
-/// use froglight_registry_template::types::OnceLock;
+/// use froglight_common::types::OnceLock;
 ///
 /// pub trait Version {}
 ///
@@ -114,7 +116,7 @@ macro_rules! version_subtrait {
 ///
 ///     #[inline]
 ///     #[must_use]
-///     fn global() -> &'static u32 { <VersionB as MyTrait>::GLOBAL.get_or_init(Self::new_value) }
+///     fn global() -> &'static u32 { <Self as MyTrait>::GLOBAL.get_or_init(<Self as MyTrait>::new_value) }
 ///
 ///    #[must_use]
 ///     fn new_value() -> u32 { 42 }

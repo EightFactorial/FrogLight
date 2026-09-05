@@ -4,12 +4,14 @@ use core::ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{
-    Reflect, ReflectDeserialize, ReflectSerialize,
+    Reflect,
     std_traits::{ReflectAdd, ReflectAddAssign, ReflectDefault, ReflectSub, ReflectSubAssign},
 };
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use froglight_common::crates::glam::{Vec3, Vec3A};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
 
 #[cfg(feature = "bevy")]
 use crate::components::Acceleration;
@@ -17,11 +19,13 @@ use crate::components::Acceleration;
 /// A velocity vector.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign))]
 #[cfg_attr(feature = "bevy", require(Acceleration, PrevVelocity))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Velocity(Vec3A);
 
 impl Velocity {
@@ -137,10 +141,12 @@ where
 /// The previous tick's [`Velocity`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign, Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy", reflect(Add, AddAssign, Sub, SubAssign))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PrevVelocity(Velocity);
 
 impl PrevVelocity {
@@ -152,7 +158,7 @@ impl PrevVelocity {
     /// Create a new [`PrevVelocity`] from an [`Velocity`].
     #[inline]
     #[must_use]
-    pub const fn new_vel(accel: Velocity) -> Self { Self(accel) }
+    pub const fn new_vel(vel: Velocity) -> Self { Self(vel) }
 
     /// Convert this [`PrevVelocity`] into an [`Velocity`].
     #[inline]

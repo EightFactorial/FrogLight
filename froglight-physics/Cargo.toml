@@ -21,7 +21,7 @@ workspace = true
 froglight-block = { workspace = true }
 froglight-common = { features = ["glam", "parking_lot"], workspace = true }
 froglight-entity = { workspace = true }
-froglight-math = { workspace = true }
+froglight-math = { features = ["glam"], workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
 # Optional dependencies
@@ -31,7 +31,6 @@ bevy_reflect = { features = ["glam"], workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
 bevy_transform = { features = ["alloc", "bevy-support", "bevy_reflect"], workspace = true, optional = true }
 froglight-instance = { workspace = true, optional = true }
-serde = { features = ["derive"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Features ---
@@ -40,9 +39,9 @@ tracing = { workspace = true, optional = true }
 default = ["alloc", "std"]
 
 # Enable `bevy` support.
-bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_tasks", "dep:bevy_reflect", "dep:froglight-instance", "froglight-common/bevy", "froglight-entity/bevy", "froglight-world/bevy", "serde"]
+bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_tasks", "dep:bevy_reflect", "dep:froglight-instance", "froglight-common/bevy", "froglight-entity/bevy", "froglight-world/bevy"]
 # Enable `serde` support.
-serde = ["dep:serde", "froglight-common/serde"]
+serde = ["froglight-common/serde"]
 
 # Enable `libm` for `no_std` support.
 libm = ["bevy_transform?/libm", "froglight-block/libm", "froglight-common/libm", "froglight-entity/libm", "froglight-math/libm"]
@@ -52,8 +51,8 @@ once_cell = ["froglight-block/once_cell", "froglight-common/once_cell", "froglig
 tracing = ["dep:tracing", "froglight-entity/tracing", "froglight-instance?/tracing"]
 
 # Enable support for a global allocator
-alloc = ["froglight-common/alloc", "serde?/alloc"]
+alloc = ["froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bevy_transform?/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-instance?/std", "froglight-math/std", "froglight-world/std", "serde?/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bevy_transform?/std", "froglight-block/std", "froglight-common/std", "froglight-entity/std", "froglight-instance?/std", "froglight-math/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-instance?/nightly", "froglight-math/nightly", "froglight-world/nightly"]

@@ -3,22 +3,25 @@ use core::ops::{Deref, DerefMut};
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use froglight_common::crates::glam::Vec3A;
-use froglight_entity::prelude::EntityAabb;
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use froglight_common::crates::serde::{Deserialize, Serialize};
+use froglight_entity::prelude::EntityAabb;
 
 #[cfg(feature = "bevy")]
 use crate::prelude::*;
 
 /// An entity collider.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", require(Position, Rotation, OnGround, CollidingWith, PrevCollider))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Collider {
     /// The minimum corner of this [`Collider`].
     pub min: Vec3A,
@@ -145,10 +148,11 @@ impl Collider {
 /// The previous tick's [`Collider`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde"))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PrevCollider(Collider);
 
 impl PrevCollider {
@@ -172,7 +176,7 @@ impl PrevCollider {
     /// Create a new [`PrevCollider`] from a [`Collider`].
     #[inline]
     #[must_use]
-    pub const fn new_col(collider: Collider) -> Self { Self(collider) }
+    pub const fn new_col(col: Collider) -> Self { Self(col) }
 
     /// Get the minimum corner of this [`PrevCollider`].
     #[inline]

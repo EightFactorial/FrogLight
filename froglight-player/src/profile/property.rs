@@ -16,12 +16,9 @@ use facet::Span;
 use facet_format::{DeserializeErrorKind, ParseError, SerializeError};
 #[cfg(feature = "facet")]
 use facet_json::{DeserializeError, JsonSerializeError};
-use froglight_common::crates::foldhash::fast::RandomState;
 #[cfg(feature = "serde")]
-use froglight_common::{
-    crates::serde::{Deserialize, Serialize},
-    types::IndexMap,
-};
+use froglight_common::crates::serde::{Deserialize, Serialize};
+use froglight_common::{crates::foldhash::fast::RandomState, types::IndexMap};
 
 /// A set of [`ProfileProperty`]s associated with a [`PlayerProfile`].
 #[repr(transparent)]

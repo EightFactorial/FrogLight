@@ -1,4 +1,9 @@
+#![cfg_attr(feature = "nightly", feature(core_float_math))]
 #![cfg_attr(feature = "nightly", feature(portable_simd))]
+#![cfg_attr(
+    feature = "nightly",
+    allow(unused_features, reason = "`core_float_math` used if `no_std`")
+)]
 #![doc = include_str!("../README.md")]
 #![no_std]
 
@@ -8,9 +13,10 @@ extern crate alloc;
 extern crate std;
 
 pub mod functions;
+
 #[cfg(any(
     all(feature = "libm", feature = "once_cell", feature = "critical-section"),
-    feature = "std"
+    feature = "std",
 ))]
 pub mod table;
 
@@ -20,7 +26,7 @@ pub mod prelude {
     pub use crate::functions::*;
     #[cfg(any(
         all(feature = "libm", feature = "once_cell", feature = "critical-section"),
-        feature = "std"
+        feature = "std",
     ))]
-    pub use crate::table::*;
+    pub use crate::table::{cos, sin, sin_cos};
 }

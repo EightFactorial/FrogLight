@@ -45,7 +45,7 @@ impl LpDVec3 {
     // <3 Azalea
 
     cfg_select! {
-        feature = "std" => {
+        any(feature = "std", feature = "nightly") => {
             /// Create a [`LpDVec3`] from a [`DVec3`].
             #[inline]
             #[must_use]
@@ -85,7 +85,7 @@ impl LpDVec3 {
                 }
             }
         }
-        feature = "libm" => {
+        _ => {
             /// Create a [`LpDVec3`] from a [`DVec3`].
             #[inline]
             #[must_use]
@@ -125,30 +125,22 @@ impl LpDVec3 {
                 }
             }
         }
-        _ => {
-            /// Create a [`LpDVec3`] from a [`DVec3`].
-            #[must_use]
-            #[cfg(feature = "glam")]
-            pub fn new(_: DVec3) -> Self { unreachable!() }
-
-            /// Create a [`LpDVec3`] from a [`DVec3`].
-            #[must_use]
-            pub fn new_xyz(_: f64, _: f64, _: f64) -> Self { unreachable!() }
-        }
     }
 
     cfg_select! {
-        feature = "std" => {
+        any(feature = "std", feature = "nightly") => {
             /// Pack a [`f64`] into a [`u64`].
             #[inline]
             #[must_use]
-            const fn pack(val: f64) -> u64 { f64::round((val * 0.5 + 0.5) * 32766.) as u64 }
-
-            /// Unpack a [`u64`] into a [`f64`].
-            #[inline]
-            #[must_use]
-            const fn unpack(val: u64) -> f64 {
-                f64::min((val & 32767) as f64, 32766.) * 2. / 32766. - 1.
+            const fn pack(val: f64) -> u64 {
+                #[cfg(feature = "std")]
+                {
+                    f64::round((val * 0.5 + 0.5) * 32766.) as u64
+                }
+                #[cfg(all(not(feature = "std"), feature = "nightly"))]
+                {
+                    core::f64::math::round((val * 0.5 + 0.5) * 32766.) as u64
+                }
             }
         }
         feature = "libm" => {
@@ -156,31 +148,25 @@ impl LpDVec3 {
             #[inline]
             #[must_use]
             fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
-
-            /// Unpack a [`u64`] into a [`f64`].
-            #[inline]
-            #[must_use]
-            const fn unpack(val: u64) -> f64 {
-                f64::min((val & 32767) as f64, 32766.) * 2. / 32766. - 1.
-            }
         }
         _ => {
             /// Pack a [`f64`] into a [`u64`].
             #[inline]
             #[must_use]
             fn pack(_: f64) -> u64 {
-                compile_error!("Either the `std` or `libm` feature must be enabled for `LpDVec3`.");
-                unreachable!()
-            }
+                compile_error!(
+                    "Either the `std`, `nightly`, or `libm` feature must be enabled for `LpDVec3`."
+                );
 
-            /// Unpack a [`u64`] into a [`f64`].
-            #[inline]
-            #[must_use]
-            const fn unpack(val: u64) -> f64 {
-                f64::min((val & 32767) as f64, 32766.) * 2. / 32766. - 1.
+                unreachable!()
             }
         }
     }
+
+    /// Unpack a [`u64`] into a [`f64`].
+    #[inline]
+    #[must_use]
+    const fn unpack(val: u64) -> f64 { f64::min((val & 32767) as f64, 32766.) * 2. / 32766. - 1. }
 
     /// Handle `Nan` and out-of-range values.
     #[inline]
