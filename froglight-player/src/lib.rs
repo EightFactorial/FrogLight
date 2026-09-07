@@ -3,9 +3,6 @@
 
 extern crate alloc;
 
-#[cfg(feature = "bevy")]
-pub mod bevy;
-
 pub mod profile;
 pub mod username;
 

@@ -40,7 +40,7 @@ impl Plugin for InventoryPlugin {
             {
                 #[cfg(feature = "tracing")]
                 tracing::debug!(target: "froglight_inventory::bevy", "Found inventory menu {:?}", group.identifier().as_str());
-                init.push(**group);
+                init.push(group.as_inner());
             }
         }
 

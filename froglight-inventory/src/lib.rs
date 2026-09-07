@@ -9,6 +9,7 @@ extern crate std;
 pub mod bevy;
 pub mod inventory;
 pub mod menu;
+pub mod storage;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.

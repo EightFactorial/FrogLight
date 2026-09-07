@@ -216,31 +216,45 @@ impl BotPlugin {
                     match event {
                         // ClientboundPlayEvent::ActionBarText() => todo!(),
                         ClientboundPlayEvent::AddEntity(data) => {
-                            if let Some(bundle) =
-                                Version::entities().get_entity_by_id(data.entity_type.into())
-                            {
-                                let ident = bundle.identifier();
-                                let entity = commands.spawn((
-                                    PartOfInstance::new(bot),
-                                    data.entity_id,
-                                    data.entity_uuid,
-                                    bundle,
-                                    Position::new_xyz(
-                                        data.position_x as f32,
-                                        data.position_y as f32,
-                                        data.position_z as f32,
-                                    ),
-                                    Velocity::new(data.velocity.as_vec3a()),
-                                ));
+                            let data = data.clone();
 
-                                info!(
-                                    "Spawning Entity {} ({}) as \"{ident}\"",
-                                    entity.id(),
-                                    data.entity_id.0,
-                                );
-                            } else {
-                                error!("Unknown Entity Type {:?}!", data.entity_type);
-                            }
+                            commands.entity(bot).queue(move |entity: EntityWorldMut<'_>| {
+                                let Some(instance) = entity.get::<SessionInstance>() else {
+                                    error!(
+                                        "Received AddEntity but bot doesn't have a SessionInstance!"
+                                    );
+                                    return;
+                                };
+
+                                if let Some(entity_bundle) =
+                                    instance.entities().get_entity_by_id(data.entity_type.into())
+                                {
+                                    let instance = entity.id();
+                                    let mut spawned = entity.into_world_mut().spawn_empty();
+
+                                    info!(
+                                        "Spawning Entity {} ({}) as \"{}\"",
+                                        spawned.id(),
+                                        data.entity_id.0,
+                                        entity_bundle.identifier(),
+                                    );
+
+                                    spawned.insert((
+                                        PartOfInstance::new(instance),
+                                        data.entity_id,
+                                        data.entity_uuid,
+                                        entity_bundle,
+                                        Position::new_xyz(
+                                            data.position_x as f32,
+                                            data.position_y as f32,
+                                            data.position_z as f32,
+                                        ),
+                                        Velocity::new(data.velocity.as_vec3a()),
+                                    ));
+                                } else {
+                                    error!("Unknown Entity Type ({:?})!", data.entity_type);
+                                }
+                            });
                         }
                         // ClientboundPlayEvent::Animate() => todo!(),
                         // ClientboundPlayEvent::AwardStats() => todo!(),
@@ -264,8 +278,7 @@ impl BotPlugin {
                                 };
 
                                 debug!(
-                                    "Received BlockUpdate \"{}\" at {blockpos}: {:?}",
-                                    block.identifier(),
+                                    "Received BlockUpdate \"{block}\" at {blockpos}: {:?}",
                                     block.get_attributes().collect::<Vec<_>>()
                                 );
 

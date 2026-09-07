@@ -443,7 +443,7 @@ unsafe impl<'facet> Facet<'facet> for Identifier<'facet> {
             is_truthy: None,
         };
 
-        Shape::builder_for_sized::<Identifier<'facet>>("Identifier")
+        let mut builder = Shape::builder_for_sized::<Identifier<'facet>>("Identifier")
             .doc(&[" A namespaced identifier [`String`]."])
             .type_name(|_shape, f, _opts| ::core::fmt::Write::write_str(f, "Identifier"))
             .ty(Type::User(UserType::Opaque))
@@ -452,8 +452,20 @@ unsafe impl<'facet> Facet<'facet> for Identifier<'facet> {
             .type_ops_direct(&OPS)
             .eq()
             .send()
-            .sync()
-            .build()
+            .sync();
+
+        #[cfg(feature = "froglight-facet")]
+        {
+            use facet::Attr as FacetAttr;
+            use froglight_facet::facet::Attr as FrogAttr;
+
+            static ATTR: &FrogAttr = &FrogAttr::With(Some(Identifier::WITH_BORROW));
+            static SLICE: &[FacetAttr] = &[FacetAttr::new(Some("mc"), "with", ATTR)];
+
+            builder = builder.attributes(SLICE);
+        }
+
+        builder.build()
     };
 }
 

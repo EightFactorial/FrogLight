@@ -18,6 +18,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }
 
@@ -49,7 +50,7 @@ critical-section = ["froglight-common/critical-section"]
 once_cell = ["froglight-common/once_cell"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "facet?/std", "froglight-common/std", "froglight-facet?/std", "froglight-item/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "downcast-rs/std", "facet?/std", "froglight-common/std", "froglight-facet?/std", "froglight-item/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly", "froglight-facet?/nightly", "froglight-item/nightly"]
 

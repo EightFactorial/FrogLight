@@ -20,6 +20,8 @@ use facet::{
     Def, Facet, OxPtrMut, PtrConst, Shape, ShapeBuilder, Type, TypeOpsIndirect, UserType,
     VTableIndirect,
 };
+#[cfg(feature = "froglight-facet")]
+use froglight_facet::facet::prelude::*;
 
 use crate::identifier::IdentifierError;
 
@@ -458,16 +460,62 @@ unsafe impl Facet<'_> for Ident {
             is_truthy: Some(ident_truthy),
         };
 
-        ShapeBuilder::for_unsized::<Ident>("Ident")
+        let mut builder = ShapeBuilder::for_unsized::<Ident>("Ident")
             .ty(Type::User(UserType::Opaque))
             .def(Def::Scalar)
             .vtable_indirect(&VTABLE)
             .type_ops_indirect(&OPS)
             .eq()
             .send()
-            .sync()
-            .build()
+            .sync();
+
+        #[cfg(feature = "froglight-facet")]
+        {
+            use facet::Attr as FacetAttr;
+            use froglight_facet::facet::Attr as FrogAttr;
+
+            static ATTR: &FrogAttr = &FrogAttr::With(Some(Ident::WITH_BORROW));
+            static SLICE: &[FacetAttr] = &[FacetAttr::new(Some("mc"), "with", ATTR)];
+
+            builder = builder.attributes(SLICE);
+        }
+
+        builder.build()
     };
+}
+
+#[cfg(feature = "froglight-facet")]
+#[allow(clippy::cast_possible_truncation, reason = "Ignored")]
+impl FacetTemplate for Ident {
+    fn serialize(item: SerializeItem<'_, '_>, writer: &mut Writer<'_>) -> Result<(), WriterError> {
+        let item = item.get::<&Ident>()?;
+        encode_u32_into(item.as_str().len() as u32, writer)?;
+        writer.write_bytes(item.as_str().as_bytes())
+    }
+
+    fn deserialize<'facet, const BORROW: bool>(
+        _: DeserializeItem<'facet, BORROW>,
+        _: &mut Reader<'_>,
+    ) -> Result<DeserializeItem<'facet, BORROW>, ReaderError> {
+        Err(ReaderError::from_str("Cannot deserialize an owned `Ident`"))
+    }
+}
+
+#[cfg(feature = "froglight-facet")]
+#[allow(clippy::cast_possible_truncation, reason = "Ignored")]
+impl FacetBorrowedTemplate for Ident {
+    fn deserialize_borrowed<'facet>(
+        item: DeserializeItem<'facet, true>,
+        reader: &mut Reader<'facet>,
+    ) -> Result<DeserializeItem<'facet, true>, ReaderError> {
+        let len = decode_u32_from(reader)?;
+
+        let content = reader.read(len as usize)?;
+        let content = str::from_utf8(content).map_err(ReaderError::other)?;
+        let content = Ident::try_new(content).map_err(ReaderError::other)?;
+
+        item.set(content)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

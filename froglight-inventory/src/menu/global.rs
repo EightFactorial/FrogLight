@@ -4,10 +4,14 @@ use core::fmt;
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use froglight_common::{prelude::*, types::OnceLock};
+use froglight_item::item::Item;
 
 #[cfg(feature = "bevy")]
 use crate::bevy::ReflectMenuGroup;
-use crate::menu::{MenuGroup, MenuGroupType};
+use crate::{
+    menu::{InventoryError, MenuGroup, MenuType},
+    storage::InventoryStorage,
+};
 
 /// A [`MenuGroup`] containing all other [`MenuGroup`]s.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -18,7 +22,7 @@ pub struct GlobalInventory;
 // -------------------------------------------------------------------------------------------------
 
 /// A global map of all [`MenuGroup`]s, indexed by their [`TypeId`].
-static GLOBAL: OnceLock<Box<[MenuGroup]>> = OnceLock::new();
+static GLOBAL: OnceLock<Box<[&'static MenuGroup]>> = OnceLock::new();
 
 impl GlobalInventory {
     /// Check if the [`GlobalInventory`] has been initialized.
@@ -32,7 +36,7 @@ impl GlobalInventory {
     ///
     /// Returns the given groups if the [`GlobalInventory`] was already
     /// initialized, or if there were duplicate menu types.
-    pub fn try_initialize(init: Vec<MenuGroup>) -> Result<(), GlobalInventoryError> {
+    pub fn try_initialize(init: Vec<&'static MenuGroup>) -> Result<(), GlobalInventoryError> {
         // Check if it was already initialized.
         if GlobalInventory::is_initialized() {
             return Err(GlobalInventoryError::Initialized);
@@ -45,10 +49,9 @@ impl GlobalInventory {
                 if a.identifier() == b.identifier() {
                     tracing::warn!(
                         target: "froglight_inventory::global",
-                        "Found duplicate menu identifiers {} ({:?}) and {} ({:?})",
+                        "Found duplicate menu identifiers {}: \"{:?}\" and \"{:?}\"",
                         a.identifier(),
                         a.type_id(),
-                        b.identifier(),
                         b.type_id()
                     );
                 }
@@ -63,7 +66,7 @@ impl GlobalInventory {
                         b.type_id(),
                     );
 
-                    return Err(GlobalInventoryError::Duplicate(*b));
+                    return Err(GlobalInventoryError::Duplicate(b));
                 }
             }
         }
@@ -73,10 +76,61 @@ impl GlobalInventory {
             Err(..) => Err(GlobalInventoryError::Initialized),
         }
     }
+
+    /// Get the global list of [`MenuGroup`]s.
+    ///
+    /// Returns `None` if the [`GlobalInventory`] has not been initialized.
+    #[must_use]
+    pub fn get_global() -> Option<&'static [&'static MenuGroup]> { GLOBAL.get().map(|s| &**s) }
 }
 
-impl MenuGroupType for GlobalInventory {
+impl MenuType for GlobalInventory {
     const IDENTIFIER: &'static Ident = Ident::new_static("froglight:global");
+
+    fn get_slot(slot: u32, storage: &InventoryStorage) -> Result<&Item, InventoryError> {
+        let global = GlobalInventory::get_global().ok_or(InventoryError::NotReady)?;
+
+        for menu in global {
+            match menu.get_slot(slot, storage) {
+                Ok(item) => return Ok(item),
+                Err(InventoryError::InvalidSlot) => {}
+                Err(err) => return Err(err),
+            }
+        }
+
+        Err(InventoryError::InvalidSlot)
+    }
+
+    fn set_slot(
+        slot: u32,
+        item: &Item,
+        storage: &mut InventoryStorage,
+    ) -> Result<Item, InventoryError> {
+        let global = GlobalInventory::get_global().ok_or(InventoryError::NotReady)?;
+
+        for menu in global {
+            match menu.set_slot(slot, item, storage) {
+                Ok(item) => return Ok(item),
+                Err(InventoryError::InvalidSlot) => {}
+                Err(err) => return Err(err),
+            }
+        }
+
+        Err(InventoryError::InvalidSlot)
+    }
+
+    fn set_state(state: &Ident, storage: &mut InventoryStorage) -> Result<(), InventoryError> {
+        let global = GlobalInventory::get_global().ok_or(InventoryError::NotReady)?;
+
+        let mut result = Ok(());
+        for menu in global {
+            if let Err(err) = menu.set_state(state, storage) {
+                result = Err(err);
+            }
+        }
+
+        result
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -86,7 +140,7 @@ pub enum GlobalInventoryError {
     /// The [`GlobalInventory`] was already initialized.
     Initialized,
     /// A duplicate [`MenuGroup`] was found during initialization.
-    Duplicate(MenuGroup),
+    Duplicate(&'static MenuGroup),
 }
 
 impl core::error::Error for GlobalInventoryError {}
@@ -95,7 +149,7 @@ impl fmt::Display for GlobalInventoryError {
         match self {
             Self::Initialized => write!(f, "already initialized"),
             Self::Duplicate(group) => {
-                write!(f, "duplicate menu group found: \"{}\"", group.identifier)
+                write!(f, "duplicate menu group found: \"{}\"", group.identifier())
             }
         }
     }

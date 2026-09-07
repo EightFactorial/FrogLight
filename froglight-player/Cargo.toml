@@ -24,7 +24,6 @@ uuid = { features = ["md5", "v4"], workspace = true }
 base64 = { features = ["alloc"], workspace = true }
 
 # Optional dependencies
-bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 facet = { workspace = true, optional = true }
@@ -39,7 +38,7 @@ tracing = { workspace = true, optional = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:facet-format", "dep:facet-json", "froglight-common/facet", "dep:froglight-facet"]
 # Enable `serde` support.
@@ -49,6 +48,6 @@ serde = ["froglight-common/serde"]
 tracing = ["dep:tracing"]
 
 # Enable support for the standard library
-std = ["base64/std", "facet?/std", "facet-json?/std", "froglight-common/std", "froglight-facet?/std"]
+std = ["base64/std", "bevy_ecs?/std", "facet?/std", "facet-json?/std", "froglight-common/std", "froglight-facet?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly", "froglight-facet?/nightly"]

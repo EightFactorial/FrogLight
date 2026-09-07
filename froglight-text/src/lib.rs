@@ -5,8 +5,6 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "bevy")]
-pub mod bevy;
 pub mod text;
 pub mod yansi;
 

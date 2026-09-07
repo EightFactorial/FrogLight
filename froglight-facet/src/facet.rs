@@ -68,7 +68,7 @@ impl WithFnAttr {
     /// Create a new [`WithFns`] using the provided template type.
     #[inline]
     #[must_use]
-    pub const fn template<T: FacetTemplate>() -> Self {
+    pub const fn template<T: FacetTemplate + ?Sized>() -> Self {
         Self::using(T::serialize, T::deserialize::<false>, T::deserialize::<true>)
     }
 
@@ -225,7 +225,7 @@ pub type DeBorrowFn = for<'facet> fn(
 /// let deserialized: MyType = from_slice(&serialized).unwrap();
 /// assert_eq!(deserialized, MyType(42));
 /// ```
-pub trait FacetTemplate: Sized {
+pub trait FacetTemplate {
     /// A [`WithFnAttr`] to be used with
     /// `#[derive(Facet)]` in a `#[facet(mc::with = ...)]`
     /// attribute.

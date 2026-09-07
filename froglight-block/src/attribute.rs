@@ -185,6 +185,7 @@ macro_rules! implement {
                 )*
                 index
             }
+
             fn from_set_index(index: usize) -> Option<Self> {
                 if index >= usize::from(Self::TOTAL) {
                      None
@@ -204,6 +205,7 @@ macro_rules! implement {
                 }
             }
 
+            #[inline]
             fn get_attr<A: BlockAttribute>(&self) -> Option<A> {
                 let ($($T),*) = self;
                 $(
@@ -213,6 +215,8 @@ macro_rules! implement {
                 )*
                 None
             }
+
+            #[inline]
             fn set_attr<A: BlockAttribute>(&mut self, attr: A) -> Option<A> {
                 let ($($T),*) = self;
                 $(
@@ -226,6 +230,7 @@ macro_rules! implement {
                 None
             }
 
+            #[inline]
             fn get_attr_str(&self, mut index: usize) -> Option<&'static str> {
                 let ($($T),*) = self;
                 $(
@@ -237,6 +242,7 @@ macro_rules! implement {
                 None
             }
 
+            #[inline]
             fn set_attr_str(&mut self, mut index: usize, value: &str) -> Option<&'static str> {
                 let ($($T),*) = self;
                 $(
