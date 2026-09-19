@@ -12,6 +12,7 @@ pub mod modules {
     pub use froglight_brigadier as brigadier;
     pub use froglight_common as common;
     pub use froglight_entity as entity;
+    #[cfg(feature = "facet")]
     pub use froglight_facet as facet;
     #[cfg(feature = "bevy")]
     pub use froglight_instance as instance;
@@ -38,13 +39,15 @@ pub mod bevy;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "facet")]
+    pub use crate::modules::facet::prelude::*;
     #[cfg(feature = "network")]
     pub use crate::modules::{api::prelude::*, network::prelude::*};
     pub use crate::modules::{
         biome::prelude::*, block::prelude::*, common::prelude::*, entity::prelude::*,
-        facet::prelude::*, inventory::prelude::*, math::prelude::*, mutf8::prelude::*,
-        nbt::prelude::*, packet::prelude::*, physics::prelude::*, player::prelude::*,
-        registry::prelude::*, snbt::prelude::*, text::prelude::*, world::prelude::*,
+        inventory::prelude::*, math::prelude::*, mutf8::prelude::*, nbt::prelude::*,
+        packet::prelude::*, physics::prelude::*, player::prelude::*, registry::prelude::*,
+        snbt::prelude::*, text::prelude::*, world::prelude::*,
     };
     #[cfg(feature = "bevy")]
     pub use crate::{

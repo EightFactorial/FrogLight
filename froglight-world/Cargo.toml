@@ -68,4 +68,4 @@ once_cell = ["froglight-common/once_cell"]
 # Enable support for the standard library
 std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bit-vec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "smallvec/specialization", "std"]
+nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "froglight-facet?/nightly", "smallvec/specialization"]

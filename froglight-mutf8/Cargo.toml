@@ -65,11 +65,6 @@ default = ["std"]
 
 # Enable `facet` support.
 facet = ["alloc", "dep:facet", "dep:froglight-facet"]
-# Enable support for SIMD optimizations.
-simd = ["nightly"]
-# Force the use of the generic fallback SIMD implementation.
-# This is typically used for testing and debugging.
-simd_fallback = ["simd"]
 
 # Enable `tracing` support.
 tracing = ["dep:tracing"]

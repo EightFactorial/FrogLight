@@ -37,6 +37,7 @@ impl Plugin for TickPlugin {
         tracing::trace!(target: "froglight_tick", "{:#?}", schedules.as_ref());
 
         // Add `RunTickLoop::run_tick` system to the `RunTickLoop` schedule.
+        #[cfg(feature = "std")]
         app.add_systems(RunTickLoop, RunTickLoop::run_tick);
 
         // Add `TickCounter::increment_counter` to the `TickFirst` schedule.

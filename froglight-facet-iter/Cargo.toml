@@ -45,6 +45,8 @@ tracing = ["dep:tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["tracing"]
 
+# Enable `critical-section` for `no_std` support.
+critical-section = ["once_cell?/critical-section"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["dep:once_cell"]
 

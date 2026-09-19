@@ -8,7 +8,7 @@ extern crate alloc;
 extern crate std;
 
 #[doc(hidden)]
-#[cfg(feature = "simd")]
+#[cfg(feature = "nightly")]
 pub mod simd;
 
 pub mod custom;

@@ -4,7 +4,7 @@ macro_rules! create_decode {
     ($($fn:ident & $fn_from:ident : $ty:ty => $len:expr),*) => {
         $(
             cfg_select! {
-                feature = "simd" => {
+                feature = "nightly" => {
                     pub use crate::simd::varint::{$fn, $fn_from};
                 }
                 _ => {

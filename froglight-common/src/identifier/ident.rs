@@ -432,7 +432,7 @@ impl Reflect for &'static Ident {
 // -------------------------------------------------------------------------------------------------
 
 #[cfg(feature = "facet")]
-#[expect(clippy::inline_always, reason = "Ignored")]
+#[allow(unused_mut, reason = "May be used if feature are enabled")]
 unsafe impl Facet<'_> for Ident {
     const SHAPE: &'static Shape = &const {
         // Note: Copied from the facet `str` impl.
@@ -440,6 +440,7 @@ unsafe impl Facet<'_> for Ident {
 
         // Note: Copied from the facet `str` impl.
         #[inline(always)]
+        #[expect(clippy::inline_always, reason = "Ignored")]
         unsafe fn ident_truthy(value: PtrConst) -> bool {
             !unsafe { value.get::<Ident>() }.is_empty()
         }

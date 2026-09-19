@@ -27,6 +27,7 @@ pub mod plugins {
 pub struct FroglightPlugins;
 
 impl PluginGroup for FroglightPlugins {
+    #[allow(unused_mut, reason = "Used if features are enabled")]
     fn build(self) -> PluginGroupBuilder {
         let mut group = PluginGroupBuilder::start::<Self>();
 

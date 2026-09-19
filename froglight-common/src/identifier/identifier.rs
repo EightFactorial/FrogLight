@@ -425,6 +425,7 @@ impl Identifier<'_> {
 }
 
 #[cfg(feature = "facet")]
+#[allow(unused_mut, reason = "May be used if feature are enabled")]
 unsafe impl<'facet> Facet<'facet> for Identifier<'facet> {
     const SHAPE: &'static Shape = &const {
         const VTABLE: VTableDirect = facet::vtable_direct!(Identifier<'_> =>

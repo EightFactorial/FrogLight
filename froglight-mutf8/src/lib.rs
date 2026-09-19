@@ -1,5 +1,4 @@
 #![doc = include_str!("../README.md")]
-#![allow(unused_features, reason = "WIP")]
 #![cfg_attr(feature = "nightly", feature(portable_simd))]
 #![no_std]
 
@@ -8,7 +7,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "simd")]
+#[cfg(feature = "nightly")]
 pub mod simd;
 
 pub mod types;

@@ -4,7 +4,7 @@ macro_rules! create_encode {
     ($($fn:ident & $fn_into:ident : $ty:ty => $len:expr),*) => {
         $(
             cfg_select! {
-                feature = "simd" => {
+                feature = "nightly" => {
                     pub use crate::simd::varint::{$fn, $fn_into};
                 }
                 _ => {

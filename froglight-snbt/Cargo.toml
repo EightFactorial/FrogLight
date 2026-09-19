@@ -72,4 +72,4 @@ tracing_ext = ["tracing"]
 # Enable support for the standard library
 std = ["bitflags/std", "dep:regex-lite", "facet?/std", "facet-path?/std", "facet-solver?/std", "froglight-facet?/std", "froglight-facet-iter?/std", "froglight-mutf8?/std", "froglight-nbt?/std", "lexical/std", "memchr/std", "regex-lite/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8?/nightly", "froglight-mutf8?/simd", "froglight-nbt?/nightly", "smallvec/specialization"]
+nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8?/nightly", "froglight-mutf8?/nightly", "froglight-nbt?/nightly", "smallvec/specialization"]

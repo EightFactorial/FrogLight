@@ -324,7 +324,7 @@ macro_rules! mutf8 {
 // -------------------------------------------------------------------------------------------------
 
 cfg_select! {
-    feature = "simd" => {
+    feature = "nightly" => {
         pub use crate::simd::mutf8::{contains_4_byte_header, contains_null_or_4_byte_header};
     }
     _ => {

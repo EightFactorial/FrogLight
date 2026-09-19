@@ -22,7 +22,7 @@ fn main() {
 
     // Disable optimizations for AMD Zen 1 and 2 CPUs.
     if matches!(target_cpu.as_str(), "znver1" | "znver2") {
-        #[cfg(feature = "simd")]
+        #[cfg(feature = "nightly")]
         println!("cargo:warning=Disabling optimizations for current CPU!");
         println!("cargo:rustc-cfg=slow_bmi2");
     }

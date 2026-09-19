@@ -36,12 +36,14 @@ required-features = ["bevy", "default", "v26_1"]
 # --- Features ---
 
 [features]
-default = ["network", "std"]
+default = ["facet", "network", "std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
+# Enable `facet` support.
+facet = ["froglight-internal/facet"]
 # Enable networking support.
-network = ["froglight-internal/network", "std"]
+network = ["froglight-internal/network", "facet", "std"]
 # Enable `tracing` support.
 tracing = ["froglight-internal/tracing"]
 # Enable extended `tracing` support.
@@ -57,7 +59,7 @@ once_cell = ["froglight-internal/once_cell"]
 # Enable support for the standard library
 std = ["froglight-internal/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-internal/nightly", "std"]
+nightly = ["froglight-internal/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

@@ -55,16 +55,16 @@ default = ["std"]
 
 # Enable support for error reports.
 report = ["froglight-facet-iter/report", "std"]
-# Enable support for SIMD optimizations.
-simd = ["nightly"]
-# Force the use of the generic fallback SIMD implementation.
-# This is typically used for testing and debugging.
-simd_fallback = ["simd"]
 
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-facet-iter/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["tracing", "froglight-facet-iter/tracing_ext"]
+
+# Enable `critical-section` for `no_std` support.
+critical-section = ["froglight-facet-iter/critical-section"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["froglight-facet-iter/once_cell"]
 
 # Enable support for the standard library
 std = ["facet/std", "froglight-facet-iter/std", "simdutf8/std", "tracing?/std", "uuid/std"]

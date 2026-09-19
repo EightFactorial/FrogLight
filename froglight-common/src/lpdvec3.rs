@@ -84,6 +84,20 @@ impl LpDVec3 {
                     Self(LpDVec3Inner::Normal { a, b, c })
                 }
             }
+
+            /// Pack a [`f64`] into a [`u64`].
+            #[inline]
+            #[must_use]
+            const fn pack(val: f64) -> u64 {
+                #[cfg(feature = "std")]
+                {
+                    f64::round((val * 0.5 + 0.5) * 32766.) as u64
+                }
+                #[cfg(all(not(feature = "std"), feature = "nightly"))]
+                {
+                    core::f64::math::round((val * 0.5 + 0.5) * 32766.) as u64
+                }
+            }
         }
         _ => {
             /// Create a [`LpDVec3`] from a [`DVec3`].
@@ -124,41 +138,24 @@ impl LpDVec3 {
                     Self(LpDVec3Inner::Normal { a, b, c })
                 }
             }
-        }
-    }
 
-    cfg_select! {
-        any(feature = "std", feature = "nightly") => {
-            /// Pack a [`f64`] into a [`u64`].
-            #[inline]
-            #[must_use]
-            const fn pack(val: f64) -> u64 {
-                #[cfg(feature = "std")]
-                {
-                    f64::round((val * 0.5 + 0.5) * 32766.) as u64
+            cfg_select! {
+                feature = "libm" => {
+                    /// Pack a [`f64`] into a [`u64`].
+                    #[inline]
+                    #[must_use]
+                    fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
                 }
-                #[cfg(all(not(feature = "std"), feature = "nightly"))]
-                {
-                    core::f64::math::round((val * 0.5 + 0.5) * 32766.) as u64
+                _ => {
+                    /// Pack a [`f64`] into a [`u64`].
+                    #[must_use]
+                    fn pack(_: f64) -> u64 {
+                        compile_error!(
+                            "Either the `std`, `nightly`, or `libm` feature must be enabled for `LpDVec3`."
+                        );
+                        unreachable!();
+                    }
                 }
-            }
-        }
-        feature = "libm" => {
-            /// Pack a [`f64`] into a [`u64`].
-            #[inline]
-            #[must_use]
-            fn pack(val: f64) -> u64 { libm::round((val * 0.5 + 0.5) * 32766.) as u64 }
-        }
-        _ => {
-            /// Pack a [`f64`] into a [`u64`].
-            #[inline]
-            #[must_use]
-            fn pack(_: f64) -> u64 {
-                compile_error!(
-                    "Either the `std`, `nightly`, or `libm` feature must be enabled for `LpDVec3`."
-                );
-
-                unreachable!()
             }
         }
     }

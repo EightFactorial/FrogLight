@@ -9,12 +9,15 @@ use bevy_ecs::{
     schedule::ScheduleLabel,
 };
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(feature = "std")]
 use bevy_tasks::{ComputeTaskPool, Scope};
+#[cfg(feature = "std")]
 use bevy_time::{Real, Time};
-#[cfg(feature = "froglight")]
+#[cfg(all(feature = "froglight", feature = "std"))]
 use froglight_instance::prelude::SessionInstance;
 use parking_lot::Mutex;
 
+#[cfg(feature = "std")]
 use crate::{disable::TickDisabledSet, prelude::*};
 
 /// A set of [`Schedule`]s used to control the order of ticking systems.
@@ -52,6 +55,9 @@ pub enum TickSchedule {
 
 /// A [`Schedule`] that runs the [`TickSchedule`]s in order.
 ///
+/// The provided [`System`]s require the `std` feature to be enabled,
+/// otherwise you must implement your own.
+///
 /// [`Schedule`]: bevy_ecs::schedule::Schedule
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel, Reflect)]
 #[reflect(Debug, Default, Clone, PartialEq, Hash)]
@@ -59,14 +65,18 @@ pub struct RunTickLoop;
 
 /// A cache of the enabled and disabled entities.
 ///
-/// Saved between runs of [`RunTickLoop`].
+/// Cleared between runs of [`RunTickLoop`] to reuse allocations.
 #[derive(Debug, Default, Resource)]
 pub struct TickCache {
-    enabled: EntityHashMap<u32>,
-    disabled: Mutex<EntityHashSet>,
-    finished: Vec<Entity>,
+    /// The enabled timers and their remaining tick counts.
+    pub enabled: EntityHashMap<u32>,
+    /// The entities that have been disabled.
+    pub disabled: Mutex<EntityHashSet>,
+    /// The finished (and disabled) timers.
+    pub finished: Vec<Entity>,
 }
 
+#[cfg(feature = "std")]
 impl RunTickLoop {
     /// A [`System`] that runs the [`TickSchedule`]s in order.
     ///

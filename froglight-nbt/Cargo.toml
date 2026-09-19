@@ -63,4 +63,4 @@ tracing_ext = ["tracing"]
 # Enable support for the standard library
 std = ["facet?/std", "facet-path?/std", "facet-solver?/std", "froglight-facet?/std", "froglight-facet-iter?/std", "froglight-mutf8/std", "tracing?/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8/simd"]
+nightly = ["froglight-facet?/nightly", "froglight-facet-iter?/nightly", "froglight-mutf8/nightly"]

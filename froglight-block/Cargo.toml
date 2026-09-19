@@ -47,7 +47,7 @@ required-features = ["std"]
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["dep:facet", "froglight-common/facet", "dep:froglight-facet"]
+facet = ["dep:facet", "dep:froglight-facet", "froglight-common/facet"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-common/libm"]
