@@ -23,7 +23,7 @@ critical-section = { workspace = true, optional = true }
 facet = { workspace = true, optional = true }
 foldhash = { workspace = true, optional = true }
 froglight-facet = { workspace = true, optional = true }
-glam = { workspace = true, optional = true }
+glam = { features = ["f64", "i32", "u8"], workspace = true, optional = true }
 hashbrown = { workspace = true, optional = true }
 indexmap = { workspace = true, optional = true }
 libm = { workspace = true, optional = true }
