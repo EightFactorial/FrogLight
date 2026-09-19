@@ -13,8 +13,8 @@ use core::{borrow::Borrow, fmt, hash::Hash, ops::Deref, str::FromStr};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::{
-    ApplyError, FromReflect, FromType, GetTypeRegistration, OpaqueInfo, PartialReflect, Reflect,
-    ReflectCloneError, ReflectFromReflect, ReflectMut, ReflectOwned, ReflectRef, TypeInfo,
+    ApplyError, CreateTypeData, FromReflect, GetTypeRegistration, OpaqueInfo, PartialReflect,
+    Reflect, ReflectCloneError, ReflectFromReflect, ReflectMut, ReflectOwned, ReflectRef, TypeInfo,
     TypePath, TypeRegistration, Typed,
     utility::{NonGenericTypeCell, NonGenericTypeInfoCell},
 };
@@ -307,12 +307,12 @@ impl Typed for Identifier<'static> {
 impl GetTypeRegistration for Identifier<'static> {
     fn get_type_registration() -> TypeRegistration {
         let mut registration = TypeRegistration::of::<Self>();
-        registration.insert::<ReflectFromReflect>(FromType::<Self>::from_type());
+        registration.insert::<ReflectFromReflect>(CreateTypeData::<Self>::create_type_data(()));
 
         #[cfg(feature = "serde")]
         {
-            registration.insert::<ReflectSerialize>(FromType::<Self>::from_type());
-            registration.insert::<ReflectDeserialize>(FromType::<Self>::from_type());
+            registration.insert::<ReflectSerialize>(CreateTypeData::<Self>::create_type_data(()));
+            registration.insert::<ReflectDeserialize>(CreateTypeData::<Self>::create_type_data(()));
         }
 
         registration

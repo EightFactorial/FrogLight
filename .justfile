@@ -1,6 +1,6 @@
 ALL_FEATURES := "all-features"
 DEF_FEATURES := "features=bevy,network,std"
-NO_FEATURES := "features=libm,once_cell --no-default-features"
+NO_FEATURES := "features=critical-section,libm,once_cell --no-default-features"
 
 EXCLUDE := "exclude=froglight-api,froglight-codegen"
 EXCLUDE_CODEGEN := "exclude=froglight-codegen"

@@ -136,5 +136,5 @@ impl SessionInstance {
     /// [`SessionInstance`].
     #[inline]
     #[must_use]
-    pub fn iter_entity(&self) -> Iter<'_> { self.entity.iter() }
+    pub fn iter_entity(&self) -> Iter<'_, Entity> { self.entity.iter() }
 }

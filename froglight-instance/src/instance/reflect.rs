@@ -2,7 +2,7 @@ use bevy_ecs::{
     change_detection::MaybeLocation, entity::Entity, lifecycle::HookContext,
     relationship::RelationshipHookMode, world::DeferredWorld,
 };
-use bevy_reflect::FromType;
+use bevy_reflect::CreateTypeData;
 
 use crate::instance::{
     data::InstanceData,
@@ -32,8 +32,8 @@ impl ReflectSession {
 
 // -------------------------------------------------------------------------------------------------
 
-impl<T: InstanceData + Clone> FromType<T> for ReflectSession {
-    fn from_type() -> Self {
+impl<T: InstanceData + Clone> CreateTypeData<T> for ReflectSession {
+    fn create_type_data((): ()) -> Self {
         const HOOK_MODE: RelationshipHookMode = RelationshipHookMode::Run;
 
         Self {

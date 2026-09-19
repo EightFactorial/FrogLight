@@ -65,8 +65,9 @@ impl PhysicsPlugin {
         match entities.get(entity_id) {
             Ok(entity) => {
                 if let Some(bundle) = entity.get::<EntityBundle>() {
-                    // Insert `Collider` and preserve `Position`, `Rotation` (added if missing).
-                    // Forcefully overwrite `Velocity` and `Acceleration` to `ZERO`
+                    // Insert `Collider` and preserve `Position`, `Rotation`
+                    // (added if missing). Forcefully
+                    // overwrite `Velocity` and `Acceleration` to `ZERO`
                     // and `OnGround` to `false`.
                     let mut collider = Collider::new_entity(*bundle.metadata().aabb());
                     if let Some(pos) = entity.get::<Position>() {
@@ -125,7 +126,7 @@ impl PhysicsPlugin {
         instances.par_iter().for_each(|instance| {
             let mut local = Vec::with_capacity(instance.entity_set().len());
             let collider_query = collider_lens.query_inner();
-            local.extend(collider_query.iter_many_unique(instance.entity_set()));
+            local.extend(collider_query.iter_many_unique(instance.entity_set()).matched());
 
             for (a, collider_a) in local.iter().filter(|(_, collider_a)| collider_a.is_changed()) {
                 for (b, collider_b) in local.iter().filter(|(b, _)| a != b) {

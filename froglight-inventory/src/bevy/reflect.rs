@@ -1,6 +1,6 @@
 use core::ops::Deref;
 
-use bevy_reflect::{FromType, Reflect};
+use bevy_reflect::{CreateTypeData, Reflect};
 
 use crate::menu::{MenuGroup, MenuType};
 
@@ -22,9 +22,9 @@ impl ReflectMenuGroup {
     pub const fn as_inner(&self) -> &'static MenuGroup { self.0 }
 }
 
-impl<G: MenuType> FromType<G> for ReflectMenuGroup {
+impl<G: MenuType> CreateTypeData<G> for ReflectMenuGroup {
     #[inline]
-    fn from_type() -> Self { Self::new::<G>() }
+    fn create_type_data((): ()) -> Self { Self::new::<G>() }
 }
 
 // -------------------------------------------------------------------------------------------------

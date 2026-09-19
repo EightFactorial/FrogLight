@@ -149,7 +149,7 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     /// details.
     #[inline]
     #[must_use]
-    pub fn iter(&self) -> QueryManyIter<'_, 's, D, F, HashSetIter<'_>> {
+    pub fn iter(&self) -> QueryManyIter<'_, 's, D, F, HashSetIter<'_, Entity>> {
         self.query.iter_many(self.colliding.iter())
     }
 
@@ -163,7 +163,7 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
     /// for more details.
     #[inline]
     #[must_use]
-    pub fn iter_inner(self) -> QueryManyIter<'w, 's, D, F, HashSetIter<'w>> {
+    pub fn iter_inner(self) -> QueryManyIter<'w, 's, D, F, HashSetIter<'w, Entity>> {
         self.query.iter_many_inner(self.colliding.iter())
     }
 }
@@ -171,8 +171,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
 // -------------------------------------------------------------------------------------------------
 
 impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator for CollidingItem<'w, 's, D, F> {
-    type IntoIter = QueryManyIter<'w, 's, D, F, HashSetIter<'w>>;
-    type Item = D::Item<'w, 's>;
+    type IntoIter = QueryManyIter<'w, 's, D, F, HashSetIter<'w, Entity>>;
+    type Item = Result<D::Item<'w, 's>, QueryEntityError>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter_inner() }
@@ -181,8 +181,8 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator for CollidingIte
 impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
     for &'iter CollidingItem<'_, 's, D, F>
 {
-    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter>>;
-    type Item = D::Item<'iter, 's>;
+    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>;
+    type Item = Result<D::Item<'iter, 's>, QueryEntityError>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter() }
@@ -191,8 +191,8 @@ impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
 impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
     for &'iter mut CollidingItem<'_, 's, D, F>
 {
-    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter>>;
-    type Item = D::Item<'iter, 's>;
+    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>;
+    type Item = Result<D::Item<'iter, 's>, QueryEntityError>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter() }
