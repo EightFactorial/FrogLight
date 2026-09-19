@@ -70,10 +70,15 @@ impl DerefMut for OnGround {
 pub struct PrevOnGround(OnGround);
 
 impl PrevOnGround {
-    /// Create a new [`PrevOnGround`] from a [`Vec3A`].
+    /// Create a new [`PrevOnGround`] from a [`bool`].
     #[inline]
     #[must_use]
     pub const fn new(on_ground: bool) -> Self { Self(OnGround::new(on_ground)) }
+
+    /// Create a new [`PrevOnGround`] from an [`OnGround`].
+    #[inline]
+    #[must_use]
+    pub const fn new_on(on_ground: OnGround) -> Self { Self(on_ground) }
 
     /// Convert this [`PrevOnGround`] into an [`OnGround`].
     #[inline]

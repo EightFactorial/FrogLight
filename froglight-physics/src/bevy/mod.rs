@@ -171,8 +171,19 @@ impl PhysicsPlugin {
     /// - [`Velocity`] -> [`PrevVelocity`]
     /// - [`Collider`] -> [`PrevCollider`]
     /// - [`OnGround`] -> [`PrevOnGround`]
-    #[expect(clippy::missing_panics_doc, reason = "Components are dense, so `unwrap` is ok.")]
+    #[expect(clippy::type_complexity, reason = "Massive `Or` query filter")]
     pub fn update_prev_components(
+        any: Query<
+            (),
+            Or<(
+                Changed<Acceleration>,
+                Changed<Position>,
+                Changed<Rotation>,
+                Changed<Velocity>,
+                Changed<Collider>,
+                Changed<OnGround>,
+            )>,
+        >,
         accel: Query<(&Acceleration, &mut PrevAcceleration)>,
         pos: Query<(&Position, &mut PrevPosition)>,
         rot: Query<(&Rotation, &mut PrevRotation)>,
@@ -180,48 +191,35 @@ impl PhysicsPlugin {
         col: Query<(&Collider, &mut PrevCollider)>,
         gnd: Query<(&OnGround, &mut PrevOnGround)>,
     ) {
+        // If no relevant components have changed, skip the update.
+        if any.is_empty() {
+            return;
+        }
+
+        // Otherwise, update all previous components in parallel.
         ComputeTaskPool::get().scope::<_, ()>(|scope| {
-            scope.spawn(async {
-                for (accel, prev) in accel.contiguous_iter_inner().unwrap() {
-                    for (accel, prev) in accel.iter().zip(prev) {
-                        *prev = PrevAcceleration::new_accel(*accel);
-                    }
-                }
-            });
-            scope.spawn(async {
-                for (pos, prev) in pos.contiguous_iter_inner().unwrap() {
-                    for (pos, prev) in pos.iter().zip(prev) {
-                        *prev = PrevPosition::new_pos(*pos);
-                    }
-                }
-            });
-            scope.spawn(async {
-                for (rot, prev) in rot.contiguous_iter_inner().unwrap() {
-                    for (rot, prev) in rot.iter().zip(prev) {
-                        *prev = PrevRotation::new_rot(*rot);
-                    }
-                }
-            });
-            scope.spawn(async {
-                for (vel, prev) in vel.contiguous_iter_inner().unwrap() {
-                    for (vel, prev) in vel.iter().zip(prev) {
-                        *prev = PrevVelocity::new_vel(*vel);
-                    }
-                }
-            });
+            // Note: Cannot panic because components are considered "dense"
+            macro_rules! perform {
+                ($($query:expr => $fn:path),*) => {
+                    $(
+                        scope.spawn(async {
+                            $query.contiguous_iter_inner().unwrap().for_each(|(comp, prev)| {
+                                for (comp, prev) in comp.iter().zip(prev) {
+                                    *prev = $fn(*comp);
+                                }
+                            });
+                        });
+                    )*
+                };
+            }
 
-            scope.spawn(async {
-                for (col, prev) in col.contiguous_iter_inner().unwrap() {
-                    for (col, prev) in col.iter().zip(prev) {
-                        *prev = PrevCollider::new_col(*col);
-                    }
-                }
-            });
-
-            for (gnd, prev) in gnd.contiguous_iter_inner().unwrap() {
-                for (gnd, prev) in gnd.iter().zip(prev) {
-                    *prev = PrevOnGround::new(**gnd);
-                }
+            perform! {
+                accel => PrevAcceleration::new_accel,
+                pos => PrevPosition::new_pos,
+                rot => PrevRotation::new_rot,
+                vel => PrevVelocity::new_vel,
+                col => PrevCollider::new_col,
+                gnd => PrevOnGround::new_on
             }
         });
     }
