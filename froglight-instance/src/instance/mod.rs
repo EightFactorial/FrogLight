@@ -5,7 +5,9 @@ use core::any::TypeId;
 use bevy_ecs::{
     component::Component,
     entity::{Entity, EntityHashSet, hash_set::Iter},
+    lifecycle::HookContext,
     reflect::ReflectComponent,
+    world::DeferredWorld,
 };
 use bevy_reflect::Reflect;
 use froglight_biome::{storage::BiomeStorage, version::BiomeVersion};
@@ -26,7 +28,7 @@ pub(crate) mod data;
 pub(crate) mod hook;
 pub(crate) mod reflect;
 
-use crate::queue::BlockEditQueue;
+use crate::{queue::BlockEditQueue, relationship::PartOfInstance};
 
 /// An instance of a session.
 ///
@@ -34,6 +36,7 @@ use crate::queue::BlockEditQueue;
 #[derive(Debug, Clone, Component, Reflect)]
 #[reflect(opaque, Debug, Clone, Component)]
 #[require(BlockEditQueue)]
+#[component(on_insert = SessionInstance::insert_hook)]
 pub struct SessionInstance {
     dimension: Identifier<'static>,
     height_max_min: (u32, i32),
@@ -140,4 +143,20 @@ impl SessionInstance {
     #[inline]
     #[must_use]
     pub fn iter_entity(&self) -> Iter<'_, Entity> { self.entity.iter() }
+}
+
+impl SessionInstance {
+    /// Panic if a [`SessionInstance`] is inside another [`SessionInstance`].
+    fn insert_hook(mut world: DeferredWorld<'_>, ctx: HookContext) {
+        if let Some(part) = world.get::<PartOfInstance>(ctx.entity) {
+            assert_eq!(
+                ctx.entity,
+                part.instance(),
+                "Entity {} cannot have a `SessionInstance` as it is already part of one!",
+                ctx.entity
+            );
+        } else {
+            world.commands().entity(ctx.entity).insert(PartOfInstance::new(ctx.entity));
+        }
+    }
 }
