@@ -63,15 +63,65 @@ impl BlockEditQueue {
 
     /// Apply queued block edits to a [`SessionInstance`]'s [`SharedChunk`]s.
     ///
-    /// Automatically replaces the existing [`SharedChunk`]s with the modified
-    /// ones.
+    /// Returns an [`EntityHashMap`] containing the modified [`SharedChunk`]s.
     ///
     /// # Note
     ///
     /// If you're having issues with `chunks`,
-    /// you can use [`Query::reborrow`] to obtain ownership
-    /// and [`Query::transmute_lens`] to change it's values.
-    pub fn apply_to<F: QueryFilter>(
+    /// you can use [`Query::transmute_lens`] and [`Query::reborrow`].
+    pub fn apply_ref<F: QueryFilter>(
+        &mut self,
+        instance: &SessionInstance,
+        chunks: Query<&SharedChunk, F>,
+    ) -> EntityHashMap<SharedChunk> {
+        let mut output = EntityHashMap::new();
+
+        // Skip if the queue is empty.
+        if self.is_empty {
+            return output;
+        }
+
+        for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
+            if let Some(entity) = instance.get_chunk(chunk)
+                && let Ok(shared) = chunks.get(entity)
+            {
+                // Clone and apply edits.
+                let mut chunk = shared.clone_inner();
+                for BlockEdit { position, block } in edits.drain(..) {
+                    chunk.set_block(position, block);
+                }
+
+                // Store the modified chunk.
+                output.insert(entity, SharedChunk::new(chunk));
+            } else {
+                #[cfg(feature = "tracing")]
+                tracing::warn!(
+                    target: "froglight_instance",
+                    "Failed to apply edits to unknown Chunk ({}, {})",
+                    chunk.x(),
+                    chunk.z(),
+                );
+
+                // Drop edits for missing chunks.
+                edits.clear();
+            }
+        }
+
+        self.is_empty = true;
+
+        output
+    }
+
+    /// Apply queued block edits to a [`SessionInstance`]'s [`SharedChunk`]s.
+    ///
+    /// Modified the existing [`SharedChunk`]s, unless they are being used
+    /// elsewhere, in which case they will be cloned.
+    ///
+    /// # Note
+    ///
+    /// If you're having issues with `chunks`,
+    /// you can use [`Query::transmute_lens`] and [`Query::reborrow`].
+    pub fn apply_mut<F: QueryFilter>(
         &mut self,
         instance: &SessionInstance,
         mut chunks: Query<&mut SharedChunk, F>,
@@ -85,7 +135,7 @@ impl BlockEditQueue {
             if let Some(entity) = instance.get_chunk(chunk)
                 && let Ok(mut shared) = chunks.get_mut(entity)
             {
-                // Apply edits, cloning only if needed.
+                // Get mutably and apply edits, cloning only if needed.
                 let chunk = shared.make_mut();
                 for BlockEdit { position, block } in edits.drain(..) {
                     chunk.set_block(position, block);
@@ -105,54 +155,5 @@ impl BlockEditQueue {
         }
 
         self.is_empty = true;
-    }
-
-    /// Apply queued block edits to a [`SessionInstance`]'s [`SharedChunk`]s.
-    ///
-    /// Returns an [`EntityHashMap`] containing the modified [`SharedChunk`]s.
-    ///
-    /// # Note
-    ///
-    /// If you're having issues with `chunks`,
-    /// you can use [`Query::reborrow`] to obtain ownership
-    /// and [`Query::transmute_lens`] to change it's values.
-    pub fn apply_clone<F: QueryFilter>(
-        &mut self,
-        instance: &SessionInstance,
-        chunks: Query<&SharedChunk, F>,
-    ) -> EntityHashMap<SharedChunk> {
-        let mut output = EntityHashMap::new();
-
-        // Skip if the queue is empty.
-        if self.is_empty {
-            return output;
-        }
-
-        for (chunk, edits) in self.queue.iter_mut().filter(|(_, edits)| !edits.is_empty()) {
-            if let Some(entity) = instance.get_chunk(chunk)
-                && let Ok(shared) = chunks.get(entity)
-            {
-                // Clone, apply edits, and store the modified chunk.
-                let mut chunk = shared.clone_inner();
-                for BlockEdit { position, block } in edits.drain(..) {
-                    chunk.set_block(position, block);
-                }
-                output.insert(entity, SharedChunk::new(chunk));
-            } else {
-                #[cfg(feature = "tracing")]
-                tracing::warn!(
-                    target: "froglight_instance",
-                    "Failed to apply edits to unknown Chunk ({}, {})",
-                    chunk.x(),
-                    chunk.z(),
-                );
-
-                // Drop edits for missing chunks.
-                edits.clear();
-            }
-        }
-
-        self.is_empty = true;
-        output
     }
 }

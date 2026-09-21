@@ -159,7 +159,7 @@ impl BotPlugin {
         let login = LoginHelloContent::from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
-        let mut entity = world.spawn((api, profile, connection));
+        let mut entity = world.spawn((api, profile, connection, TickTimer::default_20tps()));
         entity.observe(BotPlugin::exit_on_despawn);
 
         // Send the handshake and login events.
@@ -180,7 +180,7 @@ impl BotPlugin {
         if let Some(diag) = diag.get(&TickMeasurementPlugin::TICK_RUNTIME)
             && let Some(average) = diag.average()
         {
-            trace!("Tick Runtime: {average:.3}{}", diag.suffix);
+            info!("Tick Runtime: {average:.3}{}", diag.suffix);
         }
     }
 
@@ -197,7 +197,7 @@ impl BotPlugin {
     #[allow(clippy::match_same_arms, reason = "Example")]
     #[allow(clippy::cast_possible_truncation, reason = "Ignored")]
     fn message_handler(
-        bot: Query<Entity, (With<ClientConnection>, Without<IsResource>)>,
+        bot: Populated<Entity, (With<ClientConnection>, Without<IsResource>)>,
         mut reader: MessageReader<ClientboundMessage>,
         mut commands: Commands,
     ) {
@@ -570,8 +570,6 @@ impl BotPlugin {
                                         dimension, height_max, height_min,
                                     ),
                                     PartOfInstance::new(bot),
-                                    BlockEditQueue::new(),
-                                    TickTimer::default_20tps(),
                                     player_id,
                                     EntityUuid::new(*profile.uuid()),
                                     EntityBundle::new::<entity::Player, Version>(),

@@ -97,14 +97,17 @@ impl RunTickLoop {
             enabled.insert(entity, timer.times_finished_this_tick());
         }
 
-        // Get the maximum tick count of the timers, or 1 if there are no timers.
-        let ticks = enabled.values().max().copied().unwrap_or(u32::from(enabled.is_empty()));
+        // Get the maximum tick count of the timers.
+        let ticks = enabled.values().max().copied().unwrap_or(0);
+        // Skip if there are no ticks to run.
+        if ticks == 0 {
+            return;
+        }
 
         // Run the tick schedule for each tick.
         for iteration in 0..ticks {
             // Disable all non-ticking entities.
             Self::insert_disable(iteration, enabled, disabled, finished, world);
-            world.flush();
 
             #[cfg(feature = "bevy_diagnostic")]
             let _ = world
@@ -123,9 +126,7 @@ impl RunTickLoop {
         }
 
         // Re-enable all previously disabled entities.
-        if ticks != 0 {
-            Self::remove_disable(disabled, world);
-        }
+        Self::remove_disable(disabled, world);
     }
 
     fn insert_disable(
@@ -161,6 +162,7 @@ impl RunTickLoop {
         let disabled = disabled.get_mut();
         world.resource_mut::<TickDisabledSet>().extend(disabled.iter().copied());
         world.commands().insert_batch(disabled.clone().into_iter().map(|e| (e, TickDisabled)));
+        world.flush();
     }
 
     fn insert_disable_timer<'scope>(
@@ -231,12 +233,13 @@ impl RunTickLoop {
     }
 
     fn remove_disable(disabled: &mut Mutex<EntityHashSet>, world: &mut World) {
-        for entity in disabled.get_mut().drain() {
-            if let Ok(mut entity) = world.get_entity_mut(entity) {
+        for entity in disabled.get_mut().iter() {
+            if let Ok(mut entity) = world.get_entity_mut(*entity) {
                 entity.remove::<TickDisabled>();
             }
         }
 
         world.resource_mut::<TickDisabledSet>().clear();
+        world.flush();
     }
 }

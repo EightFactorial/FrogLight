@@ -26,11 +26,14 @@ pub(crate) mod data;
 pub(crate) mod hook;
 pub(crate) mod reflect;
 
+use crate::queue::BlockEditQueue;
+
 /// An instance of a session.
 ///
 /// Tracks information about which entities belong to the session and more.
 #[derive(Debug, Clone, Component, Reflect)]
 #[reflect(opaque, Debug, Clone, Component)]
+#[require(BlockEditQueue)]
 pub struct SessionInstance {
     dimension: Identifier<'static>,
     height_max_min: (u32, i32),

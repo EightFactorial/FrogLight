@@ -54,11 +54,11 @@ impl InstancePlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn apply_blockedits(
-        query: Query<(&mut BlockEditQueue, &SessionInstance)>,
-        mut chunks: Query<&mut SharedChunk>,
+        query: Populated<(&mut BlockEditQueue, &SessionInstance)>,
+        mut chunks: Populated<&mut SharedChunk>,
     ) {
-        for (mut queue, instance) in query {
-            queue.apply_to(instance, chunks.reborrow());
+        for (mut queue, instance) in query.into_iter().filter(|(queue, _)| !queue.is_empty()) {
+            queue.apply_mut(instance, chunks.reborrow());
         }
     }
 
@@ -74,15 +74,17 @@ impl InstancePlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn par_apply_blockedits(
-        mut query: Query<(&mut BlockEditQueue, &SessionInstance)>,
-        mut chunks: Query<&mut SharedChunk>,
+        mut query: Populated<(&mut BlockEditQueue, &SessionInstance)>,
+        mut chunks: Populated<&mut SharedChunk>,
         mut cache: Local<Mutex<EntityHashMap<SharedChunk>>>,
     ) {
         // Apply all `BlockEditQueue`s in parallel.
         let chunks_readonly = chunks.as_readonly();
         query.par_iter_mut().for_each(|(mut queue, instance)| {
-            let modified = queue.apply_clone(instance, chunks_readonly);
-            cache.lock().extend(modified);
+            if !queue.is_empty() {
+                let modified = queue.apply_ref(instance, chunks_readonly);
+                cache.lock().extend(modified);
+            }
         });
 
         // Replace all `SharedChunk`s.

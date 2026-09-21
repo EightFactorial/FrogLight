@@ -38,7 +38,7 @@ impl NetworkPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn serverbound_messages(
-        query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
+        query: Populated<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut messages: ResMut<Messages<ServerboundMessage>>,
     ) {
         for message in messages.drain() {
@@ -73,7 +73,7 @@ impl NetworkPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn clientbound_messages(
-        query: Query<(EntityRef, &ClientConnection), Without<IsResource>>,
+        query: Populated<(EntityRef, &ClientConnection), Without<IsResource>>,
         mut writer: MessageWriter<ClientboundMessage>,
     ) {
         for (entity, conn) in &query {
@@ -101,7 +101,7 @@ impl NetworkPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn poll_connections(
-        mut query: Query<(Entity, &mut ClientConnection)>,
+        mut query: Populated<(Entity, &mut ClientConnection)>,
         mut commands: Commands,
     ) {
         for (entity, mut conn) in &mut query {

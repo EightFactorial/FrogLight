@@ -103,8 +103,8 @@ impl PhysicsPlugin {
     /// # Note
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
-    pub fn update_colliders(colliders: Query<(&Position, &mut Collider), Changed<Position>>) {
-        colliders.par_iter_inner().for_each(|(pos, mut collider)| {
+    pub fn update_colliders(colliders: Populated<(&Position, &mut Collider), Changed<Position>>) {
+        colliders.into_inner().par_iter_inner().for_each(|(pos, mut collider)| {
             collider.set_center(pos.to_vec3a());
         });
     }
@@ -116,8 +116,8 @@ impl PhysicsPlugin {
     ///
     /// This [`System`] is not scheduled by default! You must add it manually!
     pub fn update_collisions(
-        instances: Query<&SessionInstance>,
-        mut collider: Query<(Entity, Ref<Collider>, &mut CollidingWith)>,
+        instances: Populated<&SessionInstance>,
+        mut collider: Populated<(Entity, Ref<Collider>, &mut CollidingWith)>,
         mut collision: ResMut<EntityCollisions>,
         mut cache: Local<Mutex<Vec<UniqueEntityArray<2>>>>,
     ) {
@@ -173,7 +173,7 @@ impl PhysicsPlugin {
     /// - [`OnGround`] -> [`PrevOnGround`]
     #[expect(clippy::type_complexity, reason = "Massive `Or` query filter")]
     pub fn update_prev_components(
-        any: Query<
+        _: Populated<
             (),
             Or<(
                 Changed<Acceleration>,
@@ -191,11 +191,6 @@ impl PhysicsPlugin {
         col: Query<(&Collider, &mut PrevCollider)>,
         gnd: Query<(&OnGround, &mut PrevOnGround)>,
     ) {
-        // If no relevant components have changed, skip the update.
-        if any.is_empty() {
-            return;
-        }
-
         // Otherwise, update all previous components in parallel.
         ComputeTaskPool::get().scope::<_, ()>(|scope| {
             // Note: Cannot panic because components are considered "dense"
