@@ -7,9 +7,9 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "nightly")]
-pub mod simd;
-
+pub mod macros;
+#[doc(hidden)]
+pub mod operations;
 pub mod types;
 
 pub mod prelude {

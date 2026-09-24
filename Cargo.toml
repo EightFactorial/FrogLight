@@ -79,6 +79,7 @@ bitflags = { default-features = false, version = "2.13" }
 blocking = { default-features = false, version = "1.6" }
 critical-section = { default-features = false, version = "1.2.0" }
 downcast-rs = { default-features = false, version = "2.0" }
+fearless_simd = { default-features = false, version = "1.0" }
 futures-lite = { default-features = false, version = "^2.0" }
 glam = { default-features = false, version = "0.33" }
 hashbrown = { default-features = false, version = "0.17" }

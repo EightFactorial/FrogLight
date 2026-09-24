@@ -22,10 +22,12 @@ cesu8 = { version = "1.1" }
 criterion = { features = ["default", "html_reports"], workspace = true }
 pretty_assertions = { features = ["std"], workspace = true }
 rand = { workspace = true }
-simd_cesu8 = { features = ["default", "nightly"], version = "1.1" }
+simd_cesu8 = { features = ["default"], version = "1.1" }
 
 [dependencies]
 simdutf8 = { workspace = true }
+fearless_simd = { workspace = true }
+memchr = { workspace = true }
 
 # Optional dependencies
 facet = { workspace = true, optional = true }
@@ -44,7 +46,7 @@ harness = false
 
 [[bench]]
 name = "comparison"
-required-features = ["simd", "std"]
+required-features = ["std"]
 harness = false
 
 [[test]]
@@ -56,7 +58,7 @@ required-features = ["std"]
 
 [[test]]
 name = "verify_simd_cesu8"
-required-features = ["std", "simd", "nightly"]
+required-features = ["std"]
 
 # --- Features ---
 
@@ -64,14 +66,18 @@ required-features = ["std", "simd", "nightly"]
 default = ["std"]
 
 # Enable `facet` support.
-facet = ["alloc", "dep:facet", "dep:froglight-facet"]
-
+facet = ["alloc", "dep:facet"]
+# Enable `froglight-facet` support.
+froglight-facet = ["alloc", "dep:froglight-facet", "facet"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
+# Enable `libm` for `no_std` support.
+libm = ["fearless_simd/libm"]
+
 # Enable support for a global allocator
-alloc = ["facet?/alloc"]
+alloc = ["facet?/alloc", "memchr/alloc"]
 # Enable support for the standard library
-std = ["alloc", "facet?/std", "froglight-facet?/std", "simdutf8/std", "tracing?/std"]
+std = ["alloc", "facet?/std", "fearless_simd/std", "froglight-facet?/std", "memchr/std", "simdutf8/std", "tracing?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-facet?/nightly", "simdutf8/aarch64_neon_prefetch"]
+nightly = ["froglight-facet?/nightly", "simdutf8/aarch64_neon_prefetch", "simd_cesu8/nightly"]

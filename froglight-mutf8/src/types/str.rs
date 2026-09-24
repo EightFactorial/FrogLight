@@ -5,10 +5,12 @@ use alloc::{
     borrow::{Cow, ToOwned},
     boxed::Box,
 };
-use core::{borrow::Borrow, fmt, str::from_utf8 as from_utf8_core};
+use core::{borrow::Borrow, fmt};
 
-use simdutf8::basic::from_utf8 as from_utf8_simd;
+use fearless_simd::{Level, Simd, dispatch};
+use simdutf8::basic::Utf8Error;
 
+use crate::operations;
 #[cfg(feature = "alloc")]
 use crate::types::MString;
 
@@ -73,8 +75,22 @@ impl MStr {
     /// # Errors
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
+    #[inline]
     pub fn from_utf8(str: &str) -> Result<&Self, ()> {
-        if contains_null_or_4_byte_header(str.as_bytes()) {
+        dispatch!(Level::new(), simd => Self::from_utf8_simd(simd, str))
+    }
+
+    /// Creates a new [`MStr`] from a string slice.
+    ///
+    /// This is slightly faster than [`Self::from_mutf8`] because it can
+    /// skip the UTF-8 validation step.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the bytes are not valid MUTF-8.
+    #[doc(hidden)]
+    pub fn from_utf8_simd<S: Simd>(simd: S, str: &str) -> Result<&Self, ()> {
+        if operations::contains_null_or_4_byte_header::<S>(simd, str.as_bytes()) {
             Err(())
         } else {
             // SAFETY: The bytes were just checked to be valid MUTF-8.
@@ -88,7 +104,7 @@ impl MStr {
     ///
     /// Returns an error if the bytes are not valid MUTF-8.
     pub fn from_mutf8(bytes: &[u8]) -> Result<&Self, ()> {
-        from_utf8_simd(bytes).map_or_else(|_| Err(()), Self::from_utf8)
+        simdutf8::basic::from_utf8(bytes).map_or_else(|_| Err(()), Self::from_utf8)
     }
 
     /// Creates a [`str`] from a MUTF-8 string slice.
@@ -97,7 +113,7 @@ impl MStr {
     ///
     /// Returns an error if the bytes are not valid UTF-8.
     #[inline]
-    pub fn as_utf8(&self) -> Result<&str, ()> { from_utf8_simd(self.as_bytes()).map_err(|_| ()) }
+    pub fn as_utf8(&self) -> Result<&str, Utf8Error> { simdutf8::basic::from_utf8(self.as_bytes()) }
 
     /// Creates a new [`MStr`] from a string slice.
     ///
@@ -109,7 +125,7 @@ impl MStr {
     /// Returns `None` if the bytes are not valid MUTF-8.
     #[must_use]
     pub const fn const_from_utf8(str: &str) -> Option<&Self> {
-        if fallback::const_contains_null_or_4_byte_header(str.as_bytes()) {
+        if operations::contains::const_contains_null_or_4_byte_header(str.as_bytes()) {
             None
         } else {
             // SAFETY: The bytes were just checked to be valid MUTF-8.
@@ -127,7 +143,7 @@ impl MStr {
     /// Returns `None` if the bytes are not valid MUTF-8.
     #[must_use]
     pub const fn const_from_mutf8(bytes: &[u8]) -> Option<&Self> {
-        if let Ok(str) = from_utf8_core(bytes) { Self::const_from_utf8(str) } else { None }
+        if let Ok(str) = core::str::from_utf8(bytes) { Self::const_from_utf8(str) } else { None }
     }
 
     /// Creates a new [`MStr`] from a string slice.
@@ -140,10 +156,10 @@ impl MStr {
     /// Returns `None` if the bytes are not valid UTF-8.
     #[must_use]
     pub const fn const_to_utf8(&self) -> Option<&str> {
-        if fallback::const_contains_null_or_4_byte_header(self.as_bytes()) {
+        if operations::contains::const_contains_null_or_4_byte_header(self.as_bytes()) {
             None
         } else {
-            match from_utf8_core(self.as_bytes()) {
+            match core::str::from_utf8(self.as_bytes()) {
                 Ok(str) => Some(str),
                 Err(_) => None,
             }
@@ -190,10 +206,18 @@ impl MStr {
     #[inline]
     #[must_use]
     pub fn to_utf8(&self) -> Cow<'_, str> {
-        if let Ok(str) = self.as_utf8() {
+        dispatch!(Level::new(), simd => Self::to_utf8_simd(simd, self))
+    }
+
+    /// Converts the string slice into a [`String`](alloc::string::String),
+    /// only reallocating if the MUTF-8 is invalid UTF-8.
+    #[must_use]
+    #[doc(hidden)]
+    pub fn to_utf8_simd<S: Simd>(simd: S, str: &Self) -> Cow<'_, str> {
+        if let Ok(str) = str.as_utf8() {
             Cow::Borrowed(str)
         } else {
-            Cow::Owned(self.to_mstring().into_utf8())
+            Cow::Owned(operations::mutf8_to_utf8(simd, str))
         }
     }
 
@@ -299,87 +323,4 @@ unsafe impl facet::Facet<'_> for MStr {
             .sync()
             .build()
     };
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A `const` macro for creating [`MStr`] literals.
-///
-/// This should only be used for `const` and `static` items,
-/// as the methods on [`MStr`] and [`MString`] are generally faster.
-///
-/// # Panics
-///
-/// Panics if the string literal is not valid MUTF-8.
-#[macro_export]
-macro_rules! mutf8 {
-    ($str:literal) => {{
-        match $crate::prelude::MStr::const_from_utf8($str) {
-            Some(mstr) => mstr,
-            None => panic!(concat!("Invalid MUTF-8 string literal: `", $str, "`")),
-        }
-    }};
-}
-
-// -------------------------------------------------------------------------------------------------
-
-cfg_select! {
-    feature = "nightly" => {
-        pub use crate::simd::mutf8::{contains_4_byte_header, contains_null_or_4_byte_header};
-    }
-    _ => {
-        pub use fallback::{contains_4_byte_header, contains_null_or_4_byte_header};
-    }
-}
-
-#[doc(hidden)]
-pub mod fallback {
-    /// Returns `true` if the given slice contains any null bytes or 4-byte
-    /// UTF-8 headers.
-    #[must_use]
-    #[inline(always)]
-    #[expect(clippy::inline_always, reason = "Performance")]
-    pub fn contains_null_or_4_byte_header(bytes: &[u8]) -> bool {
-        bytes.iter().any(|b| *b == 0b0000_0000 || (*b & 0b1111_1000) == 0b1111_0000)
-    }
-
-    /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
-    #[must_use]
-    #[inline(always)]
-    #[expect(clippy::inline_always, reason = "Performance")]
-    pub fn contains_4_byte_header(bytes: &[u8]) -> bool {
-        bytes.iter().any(|b| (*b & 0b1111_1000) == 0b1111_0000)
-    }
-
-    /// Returns `true` if the given slice contains any null bytes or 4-byte
-    /// UTF-8 headers.
-    #[must_use]
-    #[inline(always)]
-    #[expect(clippy::inline_always, reason = "Performance")]
-    pub const fn const_contains_null_or_4_byte_header(bytes: &[u8]) -> bool {
-        let mut i = 0;
-        while i < bytes.len() {
-            let b = bytes[i];
-            if b == 0b0000_0000 || (b & 0b1111_1000) == 0b1111_0000 {
-                return true;
-            }
-            i += 1;
-        }
-        false
-    }
-
-    /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
-    #[must_use]
-    #[inline(always)]
-    #[expect(clippy::inline_always, reason = "Performance")]
-    pub const fn const_contains_4_byte_header(bytes: &[u8]) -> bool {
-        let mut i = 0;
-        while i < bytes.len() {
-            if (bytes[i] & 0b1111_1000) == 0b1111_0000 {
-                return true;
-            }
-            i += 1;
-        }
-        false
-    }
 }
