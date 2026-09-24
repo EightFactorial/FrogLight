@@ -53,10 +53,10 @@ default = ["std"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:facet-path", "dep:facet-solver", "dep:froglight-facet-iter", "froglight-mutf8/facet"]
 # Enable `froglight-facet` support.
-froglight-facet = ["dep:froglight-facet", "facet"]
+froglight-facet = ["dep:froglight-facet", "facet", "froglight-mutf8/froglight-facet"]
 
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-facet-iter?/tracing", "froglight-mutf8/tracing"]
+tracing = ["dep:tracing", "froglight-facet?/tracing", "froglight-facet-iter?/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["tracing"]
 

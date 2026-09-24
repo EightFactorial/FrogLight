@@ -54,7 +54,7 @@ default = ["facet", "network", "std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:froglight-brigadier", "dep:froglight-instance", "dep:froglight-tick", "froglight-api?/bevy", "froglight-common/bevy", "froglight-entity/bevy", "froglight-inventory/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-physics/bevy", "froglight-player/bevy", "froglight-text/bevy", "froglight-world/bevy"]
 # Enable `facet` support.
-facet = ["dep:froglight-facet", "froglight-common/froglight-facet", "froglight-nbt/froglight-facet", "froglight-packet/facet", "froglight-snbt/froglight-facet"]
+facet = ["dep:froglight-facet", "froglight-common/froglight-facet", "froglight-mutf8/froglight-facet", "froglight-nbt/froglight-facet", "froglight-packet/facet", "froglight-snbt/froglight-facet"]
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "facet", "std"]
 # Enable `tracing` support.
