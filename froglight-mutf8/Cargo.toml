@@ -27,7 +27,6 @@ simd_cesu8 = { features = ["default"], version = "1.1" }
 [dependencies]
 simdutf8 = { workspace = true }
 fearless_simd = { workspace = true }
-memchr = { workspace = true }
 
 # Optional dependencies
 facet = { workspace = true, optional = true }
@@ -76,8 +75,8 @@ tracing = ["dep:tracing"]
 libm = ["fearless_simd/libm"]
 
 # Enable support for a global allocator
-alloc = ["facet?/alloc", "memchr/alloc"]
+alloc = ["facet?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "facet?/std", "fearless_simd/std", "froglight-facet?/std", "memchr/std", "simdutf8/std", "tracing?/std"]
+std = ["alloc", "facet?/std", "fearless_simd/std", "froglight-facet?/std", "simdutf8/std", "tracing?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-facet?/nightly", "simdutf8/aarch64_neon_prefetch", "simd_cesu8/nightly"]

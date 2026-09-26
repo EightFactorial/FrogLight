@@ -5,19 +5,19 @@
 //! Ryzen 5800X with `nightly`:
 //!
 //! Encode UTF8:
-//!  - MString::from_utf8_simd : 504.854744ms
-//!  - simd_cesu8::mutf8::encode : 590.171713ms
-//!  - cesu8::to_java_cesu8 : 772.796508ms
+//!  - MString::from_utf8_simd : 508.133649ms
+//!  - simd_cesu8::mutf8::encode : 591.457994ms
+//!  - cesu8::to_java_cesu8 : 765.776418ms
 //!
 //! Encode ASCII:
-//!  - MString::from_utf8_simd : 11.509516ms
-//!  - simd_cesu8::mutf8::encode : 11.629326ms
-//!  - cesu8::to_java_cesu8 : 42.2539ms
+//!  - MString::from_utf8_simd : 10.781467ms
+//!  - simd_cesu8::mutf8::encode : 11.615085ms
+//!  - cesu8::to_java_cesu8 : 69.587603ms
 //!
 //! Decode UTF8:
-//!  - MString::to_utf8_simd : 724.598965ms
-//!  - simd_cesu8::mutf8::decode : 637.245628ms
-//!  - cesu8::from_java_cesu8 : 676.156892ms
+//!  - MString::to_utf8_simd : 698.068462ms
+//!  - simd_cesu8::mutf8::decode : 620.230279ms
+//!  - cesu8::from_java_cesu8 : 659.970129ms
 //!
 //! Decode ASCII:
 //!  - MString::to_utf8_simd : 9.820759ms
@@ -27,24 +27,24 @@
 //! Ryzen 5800X without `nightly`:
 //!
 //! Encode UTF8:
-//!  - MString::from_utf8_simd : 536.009327ms
-//!  - simd_cesu8::mutf8::encode : 603.965907ms
-//!  - cesu8::to_java_cesu8 : 796.84788ms
+//!  - MString::from_utf8_simd : 537.819819ms
+//!  - simd_cesu8::mutf8::encode : 592.939366ms
+//!  - cesu8::to_java_cesu8 : 775.57945ms
 //!
 //! Encode ASCII:
-//!  - MString::from_utf8_simd : 14.320873ms
-//!  - simd_cesu8::mutf8::encode : 16.93034ms
-//!  - cesu8::to_java_cesu8 : 43.862728ms
+//!  - MString::from_utf8_simd : 10.855477ms
+//!  - simd_cesu8::mutf8::encode : 16.61744ms
+//!  - cesu8::to_java_cesu8 : 42.104611ms
 //!
 //! Decode UTF8:
-//!  - MString::to_utf8_simd : 762.856229ms
-//!  - simd_cesu8::mutf8::decode : 669.136581ms
-//!  - cesu8::from_java_cesu8 : 648.300234ms
+//!  - MString::to_utf8_simd : 729.294534ms
+//!  - simd_cesu8::mutf8::decode : 633.969376ms
+//!  - cesu8::from_java_cesu8 : 655.613611ms
 //!
 //! Decode ASCII:
-//!  - MString::to_utf8_simd : 9.880668ms
-//!  - simd_cesu8::mutf8::decode : 11.752797ms
-//!  - cesu8::from_java_cesu8 : 11.292496ms
+//!  - MString::to_utf8_simd : 9.714378ms
+//!  - simd_cesu8::mutf8::decode : 11.628525ms
+//!  - cesu8::from_java_cesu8 : 11.165155ms
 
 use core::hint::black_box;
 use std::time::Instant;

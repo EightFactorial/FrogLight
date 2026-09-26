@@ -165,7 +165,7 @@ fn encode_surrogate_pair<S: Simd>(simd: S, abcd: [u8; 4]) -> [u8; 6] {
 fn portable_encode_surrogate_pair(abcd: [u8; 4]) -> [u8; 6] {
     use core::simd::prelude::*;
 
-    const CODEPOINT_AND: Simd<u8, 4> = Simd::from_array([0x07, 0x3F, 0x3F, 0x3F]);
+    const CODEPOINT_AND: Simd<u32, 4> = Simd::from_array([0x07, 0x3F, 0x3F, 0x3F]);
     const CODEPOINT_SHIFT: Simd<u32, 4> = Simd::from_array([18, 12, 6, 0]);
 
     const SURROGATE_AND: Simd<u32, 2> = Simd::from_array([0xFFFF_FFFF, 0x0000_03FF]);
@@ -177,8 +177,8 @@ fn portable_encode_surrogate_pair(abcd: [u8; 4]) -> [u8; 6] {
     const PAIR_SHIFT: Simd<u16, 6> = Simd::from_array([12, 6, 0, 12, 6, 0]);
     const PAIR_OR: Simd<u16, 6> = Simd::from_array([0xE0, 0x80, 0x80, 0xE0, 0x80, 0x80]);
 
-    let codepoint = Simd::from_array(abcd);
-    let codepoint = (codepoint & CODEPOINT_AND).cast::<u32>() << CODEPOINT_SHIFT;
+    let codepoint = Simd::from_array(abcd.map(u32::from));
+    let codepoint = (codepoint & CODEPOINT_AND) << CODEPOINT_SHIFT;
 
     let surrogate = Simd::splat(codepoint.reduce_or() - 0x0001_0000);
     let surrogate = ((surrogate & SURROGATE_AND) >> SURROGATE_SHIFT) | SURROGATE_OR;
@@ -226,7 +226,7 @@ fn decode_surrogate_pair<S: Simd>(simd: S, bcef: [u8; 4]) -> [u8; 4] {
 fn portable_decode_surrogate_pair(bcef: [u8; 4]) -> [u8; 4] {
     use core::simd::prelude::*;
 
-    const HIGHLOW_AND: Simd<u8, 4> = Simd::splat(0x003F);
+    const HIGHLOW_AND: Simd<u32, 4> = Simd::splat(0x003F);
     const HIGHLOW_SHIFT: Simd<u32, 4> = Simd::from_array([6, 0, 6, 0]);
     const HIGHLOW_OR: Simd<u32, 4> = Simd::splat(0xD000);
 
@@ -235,14 +235,14 @@ fn portable_decode_surrogate_pair(bcef: [u8; 4]) -> [u8; 4] {
     const CODEPOINT_SHIFT: Simd<u32, 4> = Simd::from_array([18, 12, 6, 0]);
     const CODEPOINT_OR: Simd<u32, 4> = Simd::from_array([0xF0, 0x80, 0x80, 0x80]);
 
-    let high_low = (Simd::from_array(bcef) & HIGHLOW_AND).cast::<u32>();
+    let high_low = Simd::from_array(bcef.map(u32::from)) & HIGHLOW_AND;
     let high_low = (high_low << HIGHLOW_SHIFT) | HIGHLOW_OR;
 
     let (high, low) = high_low.interleave(Simd::splat(0));
     let high_low = 0x0001_0000 + (((high.reduce_or() - 0xD800) << 10) | (low.reduce_or() - 0xDC00));
 
     let codepoint = Simd::splat(high_low) & CODEPOINT_AND;
-    let codepoint = ((codepoint) >> CODEPOINT_SHIFT) | CODEPOINT_OR;
+    let codepoint = (codepoint >> CODEPOINT_SHIFT) | CODEPOINT_OR;
 
     codepoint.cast::<u8>().to_array()
 }

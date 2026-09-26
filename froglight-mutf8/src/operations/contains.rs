@@ -25,42 +25,71 @@ pub fn contains_null_or_4_byte_header<S: Simd>(simd: S, mut bytes: &[u8]) -> boo
                 false
             }
         };
+        (@fearless @remainder $size:literal: $simd_ty:ty, $splat:path) => {{
+            let mask = $splat(simd, 0b1111_1000);
+            let header = $splat(simd, 0b1111_0000);
+
+            let mut array = [0u8; $size];
+            array[..bytes.len()].copy_from_slice(bytes);
+
+            let a = <$simd_ty>::load_array_ref(simd, &array);
+            let bitmask = (a & mask).simd_eq(header).to_bitmask();
+
+            (bitmask.trailing_zeros() as usize) < bytes.len()
+        }};
+
         (@portable $size:literal) => {
             if bytes.len() > $size {
                 use core::simd::prelude::*;
 
-                let zero = Simd::<u8, $size>::splat(0b0000_0000);
-                let mask = Simd::<u8, $size>::splat(0b1111_1000);
-                let header = Simd::<u8, $size>::splat(0b1111_0000);
+                const ZERO: Simd<u8, $size> = Simd::splat(0b0000_0000);
+                const MASK: Simd<u8, $size> = Simd::splat(0b1111_1000);
+                const HEADER: Simd<u8, $size> = Simd::splat(0b1111_0000);
 
                 let (chunks, remainder) = bytes.as_chunks::<$size>();
                 bytes = remainder;
 
                 chunks.iter().any(|slice| {
                     let a = Simd::<u8, $size>::from_array(*slice);
-                    a.simd_eq(zero).any() || (a & mask).simd_eq(header).any()
+                    a.simd_eq(ZERO).any() || (a & MASK).simd_eq(HEADER).any()
                 })
             } else {
                 false
             }
         };
+        (@portable @remainder $size:literal) => {{
+            use core::simd::prelude::*;
+
+            const MASK: Simd<u8, $size> = Simd::splat(0b1111_1000);
+            const HEADER: Simd<u8, $size> = Simd::splat(0b1111_0000);
+
+            let mut array = [0u8; $size];
+            array[..bytes.len()].copy_from_slice(bytes);
+
+            let a = Simd::<u8, $size>::from_array(array);
+            let bitmask = (a & MASK).simd_eq(HEADER).to_bitmask();
+
+            (bitmask.trailing_zeros() as usize) < bytes.len()
+        }};
     }
 
     cfg_select! {
         feature = "nightly" => {
-            if find_simd!(@portable 64)
-                || find_simd!(@portable 32)
-                || find_simd!(@portable 16)
-                || find_simd!(@portable 8)
-                || find_simd!(@portable 4)
+            if find_simd!(@portable 64) || find_simd!(@portable 32) || find_simd!(@portable 16) {
+                return true;
+            }
+        }
+        _ => {
+            if find_simd!(@fearless 64: fearless_simd::u8x64<S>, S::splat_u8x64)
+                || find_simd!(@fearless 32: fearless_simd::u8x32<S>, S::splat_u8x32)
+                || find_simd!(@fearless 16: fearless_simd::u8x16<S>, S::splat_u8x16)
             {
                 return true;
             }
-
-            bytes.iter().any(|b| *b == 0b0000_0000 || (*b & 0b1111_1000) == 0b1111_0000)
         }
-        _ => ::memchr::memchr(0b0000_0000, bytes).is_some() || contains_4_byte_header(simd, bytes),
     }
+
+    bytes.iter().any(|b| *b == 0b0000_0000 || (*b & 0b1111_1000) == 0b1111_0000)
 }
 
 /// Returns `true` if the given slice contains any 4-byte UTF-8 headers.
@@ -84,34 +113,56 @@ pub fn contains_4_byte_header<S: Simd>(simd: S, mut bytes: &[u8]) -> bool {
                 false
             }
         };
+        (@fearless @remainder $size:literal: $simd_ty:ty, $splat:path) => {{
+            let mask = $splat(simd, 0b1111_1000);
+            let header = $splat(simd, 0b1111_0000);
+
+            let mut array = [0u8; $size];
+            array[..bytes.len()].copy_from_slice(bytes);
+
+            let a = <$simd_ty>::load_array_ref(simd, &array);
+            let bitmask = (a & mask).simd_eq(header).to_bitmask();
+
+            (bitmask.trailing_zeros() as usize) < bytes.len()
+        }};
+
         (@portable $size:literal) => {
             if bytes.len() > $size {
                 use core::simd::prelude::*;
 
-                let mask = Simd::<u8, $size>::splat(0b1111_1000);
-                let header = Simd::<u8, $size>::splat(0b1111_0000);
+                const MASK: Simd<u8, $size> = Simd::splat(0b1111_1000);
+                const HEADER: Simd<u8, $size> = Simd::splat(0b1111_0000);
 
                 let (chunks, remainder) = bytes.as_chunks::<$size>();
                 bytes = remainder;
 
                 chunks.iter().any(|slice| {
                     let a = Simd::<u8, $size>::from_array(*slice);
-                    (a & mask).simd_eq(header).any()
+                    (a & MASK).simd_eq(HEADER).any()
                 })
             } else {
                 false
             }
         };
+        (@portable @remainder $size:literal) => {{
+            use core::simd::prelude::*;
+
+            const MASK: Simd<u8, $size> = Simd::splat(0b1111_1000);
+            const HEADER: Simd<u8, $size> = Simd::splat(0b1111_0000);
+
+            let mut array = [0u8; $size];
+            array[..bytes.len()].copy_from_slice(bytes);
+
+            let a = Simd::<u8, $size>::from_array(array);
+            let bitmask = (a & MASK).simd_eq(HEADER).to_bitmask();
+
+            (bitmask.trailing_zeros() as usize) < bytes.len()
+        }};
     }
 
     cfg_select! {
         feature = "nightly" => {
-            if find_simd!(@portable 64)
-                || find_simd!(@portable 32)
-                || find_simd!(@portable 16)
-                || find_simd!(@portable 8)
-                || find_simd!(@portable 4)
-            {
+            if find_simd!(@portable 64) || find_simd!(@portable 32) || find_simd!(@portable 16) {
                 return true;
             }
         }

@@ -159,7 +159,7 @@ fn decode_ascii(c: &mut Criterion) {
 
 bench! {
     valid_mutf8 = true:
-    @dispatch froglight_simd => froglight_mutf8::operations::contains::contains_null_or_4_byte_header,
+    @dispatch froglight_mutf8 => froglight_mutf8::operations::contains::contains_null_or_4_byte_header,
     froglight_const => froglight_mutf8::operations::contains::const_contains_null_or_4_byte_header,
     cesu8 => cesu8_is_valid,
     simd_cesu8 => simd_cesu8::implementation::active::contains_null_or_utf8_4_byte_char_header
