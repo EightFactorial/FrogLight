@@ -8,7 +8,7 @@ use smallvec::SmallVec;
 mod traits;
 pub use traits::*;
 
-use crate::{SECTION_HEIGHT, SECTION_WIDTH, component::SectionBlockPos};
+use crate::{SECTION_HEIGHT, SECTION_VOLUME, SECTION_WIDTH, component::SectionBlockPos};
 
 /// A piece of a chunk.
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -23,12 +23,22 @@ impl Section {
     /// An empty [`Section`].
     #[inline]
     #[must_use]
-    pub fn empty() -> Self {
-        Self {
-            solid_count: 0,
-            fluid_count: 0,
-            blocks: SectionData::empty(),
-            biomes: SectionData::empty(),
+    pub fn new_empty() -> Self { Self::new_uniform(0, 0, false, false) }
+
+    /// A uniform [`Section`].
+    ///
+    /// The `is_solid` and `is_fluid` arguments are used to determine the
+    /// initial solid and fluid counts.
+    #[must_use]
+    pub fn new_uniform(block: u32, biome: u32, is_solid: bool, is_fluid: bool) -> Self {
+        // SAFETY: This is the valid data for a uniform section.
+        unsafe {
+            Self::new_unchecked(
+                if is_solid { SECTION_VOLUME } else { 0 },
+                if is_fluid { SECTION_VOLUME } else { 0 },
+                SectionData::new_uniform(block),
+                SectionData::new_uniform(biome),
+            )
         }
     }
 
@@ -161,12 +171,43 @@ impl<T: SectionType> SectionData<T> {
     /// An empty [`SectionData`].
     #[inline]
     #[must_use]
-    pub fn empty() -> Self {
-        Self {
-            bits: 0,
-            palette: SectionPalette::Single(0),
-            data: BitVec::new_general(),
-            _phantom: PhantomData,
+    pub fn new_empty() -> Self { Self::new_uniform(0) }
+
+    /// Create a uniform [`SectionData`].
+    #[must_use]
+    pub fn new_uniform(value: u32) -> Self {
+        // SAFETY: The palette is valid and the data length is correct.
+        unsafe { Self::new_unchecked(0, SectionPalette::Single(value), BitVec::new_general()) }
+    }
+
+    /// Create a vector-paletted [`SectionData`].
+    ///
+    /// All entries will be set to the first value in the provided palette.
+    #[must_use]
+    pub fn new_vector(palette: &[u32]) -> Self {
+        // SAFETY: The palette is valid and the data length is correct.
+        let bits = palette.len().bit_width() as usize;
+        unsafe {
+            Self::new_unchecked(
+                bits,
+                SectionPalette::Vector(SmallVec::from_slice(palette)),
+                BitVec::from_elem_general(usize::from(T::VOLUME) * bits, false),
+            )
+        }
+    }
+
+    /// Create a global-paletted [`SectionData`].
+    ///
+    /// All entries will be set to the first value in the global palette.
+    #[must_use]
+    pub fn new_global(bits: usize) -> Self {
+        // SAFETY: The palette is valid and the data length is correct.
+        unsafe {
+            Self::new_unchecked(
+                bits,
+                SectionPalette::Global,
+                BitVec::from_elem_general(usize::from(T::VOLUME) * bits, false),
+            )
         }
     }
 
@@ -346,7 +387,8 @@ impl<T: SectionType> SectionData<T> {
             SectionPalette::Single(value) => *value == id,
             SectionPalette::Vector(items) => {
                 if items.contains(&id) {
-                    // Cannot return `true` directly as the palette may contain unused values.
+                    // Cannot return `true` directly as the palette may contain
+                    // unused values.
                     self.iter().any(|value| value == id)
                 } else {
                     false

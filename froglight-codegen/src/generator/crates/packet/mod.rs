@@ -239,7 +239,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             let mut current_data = VersionPackets { states: IndexMap::new() };
             for (state_name, state) in &data.states {
                 let Some(last_state) = last_data.states.get(state_name) else {
-                    // If the current state doesn't exist in the previous version copy everything.
+                    // If the current state doesn't exist in the previous
+                    // version copy everything.
                     current_data
                         .states
                         .insert(state_name.clone(), VersionState::from(state.clone()));
@@ -253,13 +254,15 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                     match last_state.clientbound.get(packet_name) {
                         Some(GeneratedPacket::Packet { info }) => {
                             if packet == info {
-                                // If the packet is the same, create a path to the previous packet.
+                                // If the packet is the same, create a path to
+                                // the previous packet.
                                 current_state.clientbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::path(info, &last.base, state_name),
                                 );
                             } else {
-                                // If the packet is different, create a new packet.
+                                // If the packet is different, create a new
+                                // packet.
                                 current_state.clientbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::packet(packet.clone()),
@@ -268,10 +271,12 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                         }
                         Some(path @ GeneratedPacket::Path { info, .. }) => {
                             if packet == info {
-                                // If the packet is the same, copy the previous path.
+                                // If the packet is the same, copy the previous
+                                // path.
                                 current_state.clientbound.insert(packet_name.clone(), path.clone());
                             } else {
-                                // If the packet is different, create a new packet.
+                                // If the packet is different, create a new
+                                // packet.
                                 current_state.clientbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::packet(packet.clone()),
@@ -291,13 +296,15 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                     match last_state.serverbound.get(packet_name) {
                         Some(GeneratedPacket::Packet { info }) => {
                             if packet == info {
-                                // If the packet is the same, create a path to the previous packet.
+                                // If the packet is the same, create a path to
+                                // the previous packet.
                                 current_state.serverbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::path(info, &last.base, state_name),
                                 );
                             } else {
-                                // If the packet is different, create a new packet.
+                                // If the packet is different, create a new
+                                // packet.
                                 current_state.serverbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::packet(packet.clone()),
@@ -306,10 +313,12 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                         }
                         Some(path @ GeneratedPacket::Path { info, .. }) => {
                             if packet == info {
-                                // If the packet is the same, copy the previous path.
+                                // If the packet is the same, copy the previous
+                                // path.
                                 current_state.serverbound.insert(packet_name.clone(), path.clone());
                             } else {
-                                // If the packet is different, create a new packet.
+                                // If the packet is different, create a new
+                                // packet.
                                 current_state.serverbound.insert(
                                     packet_name.clone(),
                                     GeneratedPacket::packet(packet.clone()),

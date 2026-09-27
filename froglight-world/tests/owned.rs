@@ -1,4 +1,7 @@
 //! TODO
+#![allow(clippy::std_instead_of_alloc, reason = "Ignored")]
+
+use std::alloc::Global;
 
 use froglight_world::{
     component::{ChunkBlockPos, SectionBlockPos},
@@ -9,7 +12,7 @@ use froglight_world::{
 #[test]
 fn chunk() {
     // An empty chunk with no blocks.
-    let mut chunk = NaiveChunk::new_empty_large();
+    let mut chunk = NaiveChunk::<Global>::empty_large();
     let offset = chunk.height_offset();
 
     for y in chunk.height_range() {
@@ -60,7 +63,7 @@ fn chunk() {
 #[test]
 fn section() {
     // An empty section with no blocks.
-    let mut section = Section::empty();
+    let mut section = Section::new_empty();
 
     assert_eq!(section.solid_count(), 0);
     assert_eq!(section.block_data().bits_per_entry(), 0);

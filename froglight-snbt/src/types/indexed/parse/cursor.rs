@@ -136,7 +136,8 @@ impl<'data> Cursor<'data> {
                 let index = if INCLUSIVE { index + char.len_utf8() } else { index };
 
                 // If `ESCAPABLE`, break if the target isn't escaped.
-                // (If `last_a` is a backslash, then `last_b` must not be a backslash)
+                // (If `last_a` is a backslash, then `last_b` must not be a
+                // backslash)
                 if ESCAPABLE && !((last_a == '\\') && (last_b != '\\')) {
                     take_length = index;
                     break;

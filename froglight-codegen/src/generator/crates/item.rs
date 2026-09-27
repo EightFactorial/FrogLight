@@ -124,7 +124,8 @@ impl ItemData {
                             )
                             .unwrap();
 
-                        // Find the string constant used to initialize the entity type
+                        // Find the string constant used to initialize the
+                        // entity type
                         let mut extracted = None;
                         for (_, op) in &code.bytecode.as_ref().unwrap().opcodes {
                             match op {
@@ -299,7 +300,8 @@ fn add_weathering_items(
             waxed = (format!("Waxed{key}"), original.ident.replace(':', ":waxed_"));
 
             // Note:
-            // v26_2 started removing the "_block" suffix from weathered copper block states
+            // v26_2 started removing the "_block" suffix from weathered copper
+            // block states
             let trimmed = original.ident.trim_end_matches("_block");
 
             unwaxed_exposed = (format!("Exposed{key}"), trimmed.replace(':', ":exposed_"));

@@ -34,7 +34,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
     #[inline]
     #[must_use]
     fn entries(&self) -> &[EntryIndex] {
-        // SAFETY: `IndexedCompound` guarantees that `index` is a valid range index.
+        // SAFETY: `IndexedCompound` guarantees that `index` is a valid range
+        // index.
         unsafe { self.core.entry_range(self.index) }
     }
 
@@ -45,7 +46,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
             let name = entry.name();
             let root = <C as IndexCore<A>>::root(&self.core);
 
-            // SAFETY: `IndexedCompound` guarantees that `name` is a valid index.
+            // SAFETY: `IndexedCompound` guarantees that `name` is a valid
+            // index.
             let entry_key = unsafe { IndexedReference::<_, Ref>::new(root, name) };
 
             key == entry_key.get()
@@ -67,7 +69,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
     pub fn get<K: PartialEq<MStr> + ?Sized>(self, key: &K) -> Option<IndexedValue<'index, A, C>> {
         if let Some(index) = self.entry_with_key(key).copied() {
             let value = index.value();
-            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid
+            // index.
             Some(unsafe { IndexedValue::<A, C>::new(self.core, value) })
         } else {
             None
@@ -80,7 +83,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
     #[must_use]
     pub fn get_index(self, index: usize) -> Option<IndexedEntry<'index, A, C>> {
         if let Some(entry) = self.entries().get(index).copied() {
-            // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
+            // SAFETY: `IndexedCompound` guarantees that `entry` has valid
+            // indexes.
             Some(unsafe { IndexedEntry::<A, C>::new(self.core, entry) })
         } else {
             None
@@ -99,7 +103,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
     {
         if let Some(index) = self.entry_with_key(key).copied() {
             let value = index.value();
-            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid
+            // index.
             Some(unsafe { IndexedValue::<Ref, C>::new(&self.core, value) })
         } else {
             None
@@ -115,7 +120,8 @@ impl<'index, A: NbtAccess, C: IndexCore<A> + 'index> IndexedCompound<'index, A, 
         C: IndexCore<Ref>,
     {
         if let Some(entry) = self.entries().get(index).copied() {
-            // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
+            // SAFETY: `IndexedCompound` guarantees that `entry` has valid
+            // indexes.
             Some(unsafe { IndexedEntry::<Ref, C>::new(&self.core, entry) })
         } else {
             None
@@ -161,7 +167,8 @@ impl<'index, C: IndexCore<Mut> + 'index> IndexedCompound<'index, Mut, C> {
     ) -> Option<IndexedValue<'a, Mut, C>> {
         if let Some(index) = self.entry_with_key(key).copied() {
             let value = index.value();
-            // SAFETY: `IndexedCompound` guarantees that `value` is a valid index.
+            // SAFETY: `IndexedCompound` guarantees that `value` is a valid
+            // index.
             Some(unsafe { IndexedValue::<Mut, C>::new(self.core, value) })
         } else {
             None
@@ -172,7 +179,8 @@ impl<'index, C: IndexCore<Mut> + 'index> IndexedCompound<'index, Mut, C> {
     #[must_use]
     pub fn get_index_mut(&mut self, index: usize) -> Option<IndexedEntry<'_, Mut, C>> {
         if let Some(entry) = self.entries().get(index).copied() {
-            // SAFETY: `IndexedCompound` guarantees that `entry` has valid indexes.
+            // SAFETY: `IndexedCompound` guarantees that `entry` has valid
+            // indexes.
             Some(unsafe { IndexedEntry::<Mut, C>::new(self.core, entry) })
         } else {
             None

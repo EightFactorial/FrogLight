@@ -164,7 +164,8 @@ pub fn deserialize_borrowed_core<'facet>(
                         ReaderError::from_str("Failed to deserialize value: expected String")
                     })?;
 
-                    // SAFETY: The lifetime is upgraded using the original SNBT string.
+                    // SAFETY: The lifetime is upgraded using the original SNBT
+                    // string.
                     let string = unsafe { value.upgrade(snbt.as_str()).get() };
 
                     if item.is_type::<&str>() {

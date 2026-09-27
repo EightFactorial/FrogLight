@@ -178,7 +178,8 @@ pub fn deserialize_borrowed_core<'facet>(
                         ReaderError::from_str("Failed to deserialize value: expected String")
                     })?;
 
-                    // SAFETY: The lifetime is upgraded using the original NBT slice.
+                    // SAFETY: The lifetime is upgraded using the original NBT
+                    // slice.
                     let mstr = unsafe { value.upgrade(nbt.as_slice()).get() };
 
                     if item.is_type::<&MStr>() {
@@ -191,7 +192,8 @@ pub fn deserialize_borrowed_core<'facet>(
                         ReaderError::from_str("Failed to deserialize value: expected String")
                     })?;
 
-                    // SAFETY: The lifetime is upgraded using the original NBT slice.
+                    // SAFETY: The lifetime is upgraded using the original NBT
+                    // slice.
                     let str = unsafe { value.upgrade(nbt.as_slice()).get().to_utf8() };
 
                     if item.is_type::<&str>() {

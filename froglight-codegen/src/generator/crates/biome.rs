@@ -207,7 +207,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             })
             .await?;
 
-            // Deduplicate and sort the biome types and attributes across all versions.
+            // Deduplicate and sort the biome types and attributes across all
+            // versions.
             let mut biomes = IndexSet::<String>::new();
             let mut attributes = IndexMap::<String, (String, Value)>::new();
             for versioned in global_biomes {

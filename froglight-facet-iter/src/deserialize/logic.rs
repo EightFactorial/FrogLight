@@ -462,7 +462,8 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
             }
 
             Type::User(UserType::Struct(ty)) => {
-                // Determine whether the struct should pass the variable flag to its fields.
+                // Determine whether the struct should pass the variable flag to
+                // its fields.
                 let variable_base = if self
                     .partial
                     .shape()
@@ -481,7 +482,8 @@ impl<'facet, const BORROW: bool> DeserializeIterator<'facet, BORROW> {
                 Ok(self)
             }
             Type::User(UserType::Enum(..)) => {
-                // Determine whether the struct should pass the variable flag to its fields.
+                // Determine whether the struct should pass the variable flag to
+                // its fields.
                 let variable_base = if self
                     .partial
                     .shape()

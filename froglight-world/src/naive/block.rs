@@ -101,7 +101,8 @@ impl NaiveChunk {
             SectionPalette::Single(id) => matches(*id),
             SectionPalette::Vector(vec) => vec.iter().any(|palette_id| {
                 if matches(*palette_id) {
-                    // Cannot return `true` directly as the palette may contain unused values.
+                    // Cannot return `true` directly as the palette may contain
+                    // unused values.
                     section.iter_raw_blocks().any(matches)
                 } else {
                     false

@@ -37,16 +37,16 @@ simdutf8 = { features = ["aarch64_neon"], workspace = true }
 
 [[bench]]
 name = "varint"
-required-features = ["simd", "std"]
+required-features = ["nightly", "std"]
 harness = false
 
 [[test]]
 name = "simd_arch"
-required-features = ["simd", "std"]
+required-features = ["nightly", "std"]
 
 [[test]]
 name = "simd_fallback"
-required-features = ["simd", "std"]
+required-features = ["nightly", "std"]
 
 # --- Features ---
 

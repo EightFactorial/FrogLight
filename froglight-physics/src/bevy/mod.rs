@@ -124,6 +124,7 @@ impl PhysicsPlugin {
         // Calculate all collisions in parallel.
         let collider_lens = collider.transmute_lens::<(Entity, Ref<Collider>)>();
         instances.par_iter().for_each(|instance| {
+            // TODO: Cache this `Vec` to avoid allocations every tick.
             let mut local = Vec::with_capacity(instance.entity_set().len());
             let collider_query = collider_lens.query_inner();
             local.extend(collider_query.iter_many_unique(instance.entity_set()).matched());

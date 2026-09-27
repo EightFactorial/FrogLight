@@ -171,7 +171,8 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
         let proxy_shape = proxy.shape;
         let proxy_layout = proxy_shape.layout.sized_layout().map_err(|_| SerializeError)?;
 
-        // SAFETY: `data` and `uninit` are guaranteed to be the `from` and `to` types.
+        // SAFETY: `data` and `uninit` are guaranteed to be the `from` and `to`
+        // types.
         let proxy_uninit = facet::alloc_for_layout(proxy_layout);
         let convert_result = unsafe { (proxy.convert_out)(item.peek().data(), proxy_uninit) };
 
@@ -393,7 +394,8 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                 // Push the fields in reverse order.
                 let iter = item.peek().into_struct()?.fields_for_binary_serialize();
 
-                // Determine whether the struct should pass the variable flag to its fields.
+                // Determine whether the struct should pass the variable flag to
+                // its fields.
                 let variable_base = if item
                     .shape()
                     .attributes
@@ -413,7 +415,8 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                         // Update `variable` using the field's attributes.
                         variable |= field.has_attr(self.namespace, "variable");
 
-                        // If the field has a custom serializer, treat it as a value.
+                        // If the field has a custom serializer, treat it as a
+                        // value.
                         if field.has_attr(self.namespace, "with") {
                             field_ty = ItemType::Value;
                         }
@@ -429,7 +432,8 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
             Type::User(UserType::Enum(..)) => {
                 let enum_ = item.peek().into_enum()?;
 
-                // Determine whether the enum should pass the variable flag to its fields.
+                // Determine whether the enum should pass the variable flag to
+                // its fields.
                 let variable_base = if item
                     .shape()
                     .attributes
@@ -461,7 +465,8 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>>
                         // Update `variable` using the field's attributes.
                         variable |= field.has_attr(self.namespace, "variable");
 
-                        // If the field has a custom serializer, treat it as a value.
+                        // If the field has a custom serializer, treat it as a
+                        // value.
                         if field.has_attr(self.namespace, "with") {
                             field_ty = ItemType::Value;
                         }

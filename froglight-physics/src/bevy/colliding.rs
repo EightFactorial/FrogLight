@@ -5,7 +5,8 @@ use core::{error, fmt};
 use bevy_ecs::{
     entity::{Entity, hash_set::Iter as HashSetIter},
     query::{
-        NestedQuery, QueryData, QueryEntityError, QueryFilter, QueryManyIter, ReadOnlyQueryData,
+        NestedQuery, QueryData, QueryEntityError, QueryFilter, QueryManyIter, QueryManyMatchedIter,
+        ReadOnlyQueryData,
     },
 };
 
@@ -171,31 +172,33 @@ impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> CollidingItem<'w, 's, D, F> {
 // -------------------------------------------------------------------------------------------------
 
 impl<'w, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator for CollidingItem<'w, 's, D, F> {
-    type IntoIter = QueryManyIter<'w, 's, D, F, HashSetIter<'w, Entity>>;
-    type Item = Result<D::Item<'w, 's>, QueryEntityError>;
+    type IntoIter = QueryManyMatchedIter<QueryManyIter<'w, 's, D, F, HashSetIter<'w, Entity>>>;
+    type Item = D::Item<'w, 's>;
 
     #[inline]
-    fn into_iter(self) -> Self::IntoIter { self.iter_inner() }
+    fn into_iter(self) -> Self::IntoIter { self.iter_inner().matched() }
 }
 
 impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
     for &'iter CollidingItem<'_, 's, D, F>
 {
-    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>;
-    type Item = Result<D::Item<'iter, 's>, QueryEntityError>;
+    type IntoIter =
+        QueryManyMatchedIter<QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>>;
+    type Item = D::Item<'iter, 's>;
 
     #[inline]
-    fn into_iter(self) -> Self::IntoIter { self.iter() }
+    fn into_iter(self) -> Self::IntoIter { self.iter().matched() }
 }
 #[allow(clippy::into_iter_without_iter, reason = "Read-Only")]
 impl<'iter, 's, D: ReadOnlyQueryData, F: QueryFilter> IntoIterator
     for &'iter mut CollidingItem<'_, 's, D, F>
 {
-    type IntoIter = QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>;
-    type Item = Result<D::Item<'iter, 's>, QueryEntityError>;
+    type IntoIter =
+        QueryManyMatchedIter<QueryManyIter<'iter, 's, D, F, HashSetIter<'iter, Entity>>>;
+    type Item = D::Item<'iter, 's>;
 
     #[inline]
-    fn into_iter(self) -> Self::IntoIter { self.iter() }
+    fn into_iter(self) -> Self::IntoIter { self.iter().matched() }
 }
 
 // -------------------------------------------------------------------------------------------------

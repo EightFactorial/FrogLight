@@ -1,12 +1,7 @@
 //! TODO
 
-use alloc::vec::Vec;
-use core::{fmt, ops::Range};
-
-#[cfg(feature = "bevy")]
-use bevy_ecs::{component::Component, reflect::ReflectComponent};
-#[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use alloc::{alloc::Global, vec::Vec};
+use core::{alloc::Allocator, fmt, ops::Range};
 
 use crate::{SECTION_HEIGHT, component::ChunkBlockPos, prelude::*, section::Section};
 
@@ -25,38 +20,40 @@ use storage::ChunkStorage;
 ///
 /// Contains no internal information about biomes or blocks,
 /// and requires the user to provide that information when needed.
-#[derive(Default, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
-#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
-pub struct NaiveChunk {
-    storage: ChunkStorage,
+#[derive(Default, Clone)]
+pub struct NaiveChunk<A: Allocator = Global> {
+    storage: ChunkStorage<A>,
 }
 
-impl NaiveChunk {
-    /// Create a new [`NaiveChunk`] from the given storage.
-    #[must_use]
-    pub const fn new(storage: ChunkStorage) -> Self { Self { storage } }
-
-    /// Create a new [`NaiveChunk`] from the given sections and offset.
-    #[must_use]
-    pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
-        Self { storage: ChunkStorage::new_from_vec(sections, offset) }
-    }
-
+impl<A: Allocator + Default> NaiveChunk<A> {
     /// Create a new empty large [`NaiveChunk`].
     ///
     /// This is equivalent to an overworld chunk,
     /// or 24 sections (384 blocks) tall with an offset of -64.
+    #[inline]
     #[must_use]
-    pub fn new_empty_large() -> Self { Self::new(ChunkStorage::empty_large()) }
+    pub fn empty_large() -> Self { Self::new(ChunkStorage::empty_large()) }
 
     /// Create a new empty normal [`NaiveChunk`].
     ///
     /// This is equivalent to a nether or end chunk,
     /// or 16 sections (256 blocks) tall with an offset of 0.
+    #[inline]
     #[must_use]
-    pub fn new_empty_normal() -> Self { Self::new(ChunkStorage::empty_normal()) }
+    pub fn empty_normal() -> Self { Self::new(ChunkStorage::empty_normal()) }
+}
+
+impl<A: Allocator> NaiveChunk<A> {
+    /// Create a new [`NaiveChunk`] from the given storage.
+    #[inline]
+    #[must_use]
+    pub const fn new(storage: ChunkStorage<A>) -> Self { Self { storage } }
+
+    /// Create a new [`NaiveChunk`] from the given sections and offset.
+    #[must_use]
+    pub fn new_from(sections: Vec<Section, A>, offset: i32) -> Self {
+        Self { storage: ChunkStorage::new(sections, offset) }
+    }
 
     /// Get the height of this [`NaiveChunk`].
     ///
@@ -272,3 +269,8 @@ impl fmt::Debug for NaiveChunk {
         f.debug_struct("NaiveChunk").finish_non_exhaustive()
     }
 }
+
+impl<A: Allocator> PartialEq for NaiveChunk<A> {
+    fn eq(&self, other: &Self) -> bool { self.storage == other.storage }
+}
+impl<A: Allocator> Eq for NaiveChunk<A> {}

@@ -90,7 +90,8 @@ impl NaiveChunk {
             SectionPalette::Single(id) => *id == biome_id,
             SectionPalette::Vector(vec) => vec.iter().any(|palette_id| {
                 if *palette_id == biome_id {
-                    // Cannot return `true` directly as the palette may contain unused values.
+                    // Cannot return `true` directly as the palette may contain
+                    // unused values.
                     section.iter_raw_biomes().any(|id| id == biome_id)
                 } else {
                     false

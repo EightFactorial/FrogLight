@@ -64,7 +64,8 @@ impl EntityCollisions {
             }
             true
         } else {
-            // Search through all collisions in case the entity is present somewhere.
+            // Search through all collisions in case the entity is present
+            // somewhere.
             let mut result = false;
             for collisions in self.0.values_mut() {
                 result |= collisions.remove(&entity);

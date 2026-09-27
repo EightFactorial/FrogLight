@@ -1,9 +1,11 @@
 //! Quick and dirty benchmarks for using `Chunk::contains_raw_block` vs
 //! iterating over all blocks.
 #![allow(clippy::large_stack_arrays, reason = "Ignored")]
+#![allow(clippy::std_instead_of_alloc, reason = "Ignored")]
 
 #[cfg(any(feature = "froglight-block", feature = "froglight-biome"))]
 use core::any::TypeId;
+use std::alloc::Global;
 
 use bit_vec::BitVec;
 use divan::prelude::*;
@@ -18,10 +20,7 @@ use froglight_block::{block::BlockMetadata, prelude::*, storage::BlockStorage};
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::prelude::*;
 use froglight_world::{
-    naive::{
-        NaiveChunk,
-        storage::{ArrayChunkStorage, ChunkStorage},
-    },
+    naive::{NaiveChunk, storage::ChunkStorage},
     section::{Section, SectionData, SectionPalette},
 };
 use smallvec::SmallVec;
@@ -30,34 +29,34 @@ fn main() { divan::main() }
 
 macro_rules! create {
     (@blocks $($tt:tt)*) => {{
-        black_box(NaiveChunk::new(ChunkStorage::Large(ArrayChunkStorage::new(
+        black_box(NaiveChunk::<Global>::new(ChunkStorage::new_large(
             core::array::from_fn(|_| unsafe {
                 Section::new_unchecked(
                     0,
                     0,
                     $($tt)*,
-                    SectionData::empty(),
+                    SectionData::new_empty(),
                 )
             }),
-        ))))
+        )))
     }};
     (@biomes $($tt:tt)*) => {{
-        black_box(NaiveChunk::new(ChunkStorage::Large(ArrayChunkStorage::new(
+        black_box(NaiveChunk::new(ChunkStorage::new_large(
             core::array::from_fn(|_| unsafe {
                 Section::new_unchecked(
                     0,
                     0,
-                    SectionData::empty(),
+                    SectionData::new_empty(),
                     $($tt)*,
                 )
             }),
-        ))))
+        )))
     }};
 }
 
 #[divan::bench]
 fn contains_single_best(b: Bencher) {
-    let single = NaiveChunk::new_empty_large();
+    let single = NaiveChunk::<Global>::empty_large();
     b.bench(|| {
         black_box(single.contains_raw_block(0));
     });
@@ -65,7 +64,7 @@ fn contains_single_best(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_worst(b: Bencher) {
-    let single = NaiveChunk::new_empty_large();
+    let single = NaiveChunk::<Global>::empty_large();
     b.bench(|| {
         black_box(single.contains_raw_block(1));
     });
@@ -73,7 +72,7 @@ fn contains_single_worst(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_best_iter(b: Bencher) {
-    let single = NaiveChunk::new_empty_large();
+    let single = NaiveChunk::<Global>::empty_large();
     b.bench(|| {
         black_box(single.iter_raw_blocks().any(|id| id == 0));
     });
@@ -81,7 +80,7 @@ fn contains_single_best_iter(b: Bencher) {
 
 #[divan::bench]
 fn contains_single_worst_iter(b: Bencher) {
-    let single = NaiveChunk::new_empty_large();
+    let single = NaiveChunk::<Global>::empty_large();
     b.bench(|| {
         black_box(single.iter_raw_blocks().any(|id| id == 1));
     });

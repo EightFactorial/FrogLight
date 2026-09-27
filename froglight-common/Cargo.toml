@@ -69,7 +69,7 @@ alloc = ["facet?/alloc", "once_cell?/alloc", "serde?/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bevy_reflect?/std", "critical-section?/std", "facet?/std", "foldhash?/std", "froglight-facet?/std", "glam?/std", "indexmap?/std", "once_cell?/std", "uuid?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash?/nightly", "hashbrown?/nightly", "froglight-facet?/nightly", "parking_lot?/nightly"]
+nightly = ["foldhash?/nightly", "froglight-facet?/nightly", "hashbrown?/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

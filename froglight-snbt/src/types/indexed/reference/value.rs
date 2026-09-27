@@ -76,24 +76,29 @@ impl<'index, C: IndexCore> ValueReference<'index, C> {
             }
 
             ValueIndex::List(index) => {
-                // SAFETY: `Index<IndexedListType>` has a valid `IndexedList` range.
+                // SAFETY: `Index<IndexedListType>` has a valid `IndexedList`
+                // range.
                 Self::List(unsafe { IndexedList::new(core, index.range()) })
             }
             ValueIndex::Compound(index) => {
-                // SAFETY: `Index<IndexedMapType>` has a valid `IndexedCompound` range.
+                // SAFETY: `Index<IndexedMapType>` has a valid `IndexedCompound`
+                // range.
                 Self::Compound(unsafe { IndexedCompound::new(core, index.range()) })
             }
 
             ValueIndex::ByteArray(index) => {
-                // SAFETY: `Index<IndexedSliceType<u8>>` has a valid `IndexedSlice<u8>` range.
+                // SAFETY: `Index<IndexedSliceType<u8>>` has a valid
+                // `IndexedSlice<u8>` range.
                 Self::ByteArray(unsafe { IndexedSlice::new(core, index.range()) })
             }
             ValueIndex::IntArray(index) => {
-                // SAFETY: `Index<IndexedSliceType<u32>>` has a valid `IndexedSlice<u32>` range.
+                // SAFETY: `Index<IndexedSliceType<u32>>` has a valid
+                // `IndexedSlice<u32>` range.
                 Self::IntArray(unsafe { IndexedSlice::new(core, index.range()) })
             }
             ValueIndex::LongArray(index) => {
-                // SAFETY: `Index<IndexedSliceType<u64>>` has a valid `IndexedSlice<u64>` range.
+                // SAFETY: `Index<IndexedSliceType<u64>>` has a valid
+                // `IndexedSlice<u64>` range.
                 Self::LongArray(unsafe { IndexedSlice::new(core, index.range()) })
             }
         }

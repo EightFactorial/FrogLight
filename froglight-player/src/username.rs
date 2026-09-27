@@ -29,7 +29,7 @@ use uuid::{Builder, Uuid};
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde", transparent))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Username(String);

@@ -1,100 +1,130 @@
 //! TODO
 
-#[cfg(feature = "nightly")]
-use alloc::alloc::Allocator;
-use alloc::{boxed::Box, vec::Vec};
-use core::ops::{Deref, DerefMut};
-
-#[cfg(feature = "bevy")]
-use bevy_reflect::Reflect;
+use alloc::{alloc::Global, boxed::Box, vec::Vec};
+use core::{
+    alloc::Allocator,
+    ops::{Deref, DerefMut},
+};
 
 use crate::section::Section;
 
 /// A storage container for multiple [`Section`]s.
-#[derive(Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque, Clone))]
-#[allow(clippy::large_enum_variant, reason = "This is by design")]
-pub enum ChunkStorage {
+#[derive(Clone)]
+pub enum ChunkStorage<A: Allocator = Global> {
     /// A large chunk.
     ///
     /// Typically used for overworld chunks.
-    Large(ArrayChunkStorage<24, -64>),
+    Large(ArrayStorage<24, -64, A>),
     /// A normal chunk.
     ///
     /// Typically used for nether and end chunks.
-    Normal(ArrayChunkStorage<16, 0>),
+    Normal(ArrayStorage<16, 0, A>),
     /// A chunk of some other variable size.
     ///
     /// May be used for custom worlds or in other special cases.
-    Variable(VecChunkStorage),
+    Variable(VecStorage<A>),
 }
 
-impl ChunkStorage {
+impl<A: Allocator + Default> ChunkStorage<A> {
     /// Create a new [`ChunkStorage::Large`].
     #[must_use]
-    pub fn new_large(sections: [Section; 24]) -> Self {
-        Self::Large(ArrayChunkStorage::new(sections))
-    }
+    pub fn new_large(sections: [Section; 24]) -> Self { Self::new_large_in(sections, A::default()) }
 
     /// Create a new [`ChunkStorage::Normal`].
     #[must_use]
     pub fn new_normal(sections: [Section; 16]) -> Self {
-        Self::Normal(ArrayChunkStorage::new(sections))
-    }
-
-    /// Create a new [`ChunkStorage::Variable`].
-    #[must_use]
-    pub fn new_variable(sections: Vec<Section>, offset: i32) -> Self {
-        Self::Variable(VecChunkStorage::new(sections, offset))
+        Self::new_normal_in(sections, A::default())
     }
 
     /// Create an empty [`ChunkStorage::Large`].
     #[must_use]
-    pub fn empty_large() -> Self {
-        Self::Large(ArrayChunkStorage::new(core::array::from_fn(|_| Section::empty())))
-    }
+    pub fn empty_large() -> Self { Self::Large(ArrayStorage::new_empty_in(A::default())) }
 
     /// Create an empty [`ChunkStorage::Normal`].
     #[must_use]
-    pub fn empty_normal() -> Self {
-        Self::Normal(ArrayChunkStorage::new(core::array::from_fn(|_| Section::empty())))
-    }
+    pub fn empty_normal() -> Self { Self::Normal(ArrayStorage::new_empty_in(A::default())) }
 
     /// Create an empty [`ChunkStorage::Variable`].
     #[must_use]
     pub fn empty_variable(offset: i32) -> Self {
-        Self::Variable(VecChunkStorage::new(Vec::new(), offset))
+        Self::Variable(VecStorage::new_empty_in(offset, A::default()))
+    }
+}
+
+impl<A: Allocator> ChunkStorage<A> {
+    /// Create a new [`ChunkStorage`] from a [`Vec<Section>`].
+    ///
+    /// Returns a specialized storage type if the length and offset match
+    /// known configurations.
+    #[must_use]
+    pub fn new(sections: Vec<Section, A>, offset: i32) -> Self {
+        match (sections.len(), offset) {
+            (24, -64) => {
+                // SAFETY: We have already checked that the length is 24.
+                #[cfg(feature = "nightly")]
+                let sections: Box<[Section; 24], A> =
+                    unsafe { sections.into_array().unwrap_unchecked() };
+
+                // SAFETY: We have already checked that the length is 24.
+                #[cfg(not(feature = "nightly"))]
+                let sections: Box<[Section; 24], A> =
+                    unsafe { sections.into_boxed_slice().try_into().unwrap_unchecked() };
+
+                Self::new_large_boxed(sections)
+            }
+            (16, 0) => {
+                // SAFETY: We have already checked that the length is 16.
+                #[cfg(feature = "nightly")]
+                let sections: Box<[Section; 16], A> =
+                    unsafe { sections.into_array().unwrap_unchecked() };
+
+                // SAFETY: We have already checked that the length is 16.
+                #[cfg(not(feature = "nightly"))]
+                let sections: Box<[Section; 16], A> =
+                    unsafe { sections.into_boxed_slice().try_into().unwrap_unchecked() };
+
+                Self::new_normal_boxed(sections)
+            }
+            _ => Self::new_variable(sections, offset),
+        }
     }
 
     /// Create a new [`ChunkStorage::Large`].
+    #[inline]
     #[must_use]
-    #[cfg(feature = "nightly")]
-    pub fn new_large_in<A: Allocator + Send + Sync>(
-        sections: [Section; 24],
-        allocator: &'static A,
-    ) -> Self {
-        Self::Large(ArrayChunkStorage::new_in(sections, allocator))
+    pub fn new_large_in(sections: [Section; 24], alloc: A) -> Self {
+        Self::Large(ArrayStorage::new_in(sections, alloc))
     }
 
     /// Create a new [`ChunkStorage::Normal`].
+    #[inline]
     #[must_use]
-    #[cfg(feature = "nightly")]
-    pub fn new_normal_in<A: Allocator + Send + Sync>(
-        sections: [Section; 16],
-        allocator: &'static A,
-    ) -> Self {
-        Self::Normal(ArrayChunkStorage::new_in(sections, allocator))
+    pub fn new_normal_in(sections: [Section; 16], alloc: A) -> Self {
+        Self::Normal(ArrayStorage::new_in(sections, alloc))
+    }
+
+    /// Create a new [`ChunkStorage::Large`].
+    #[inline]
+    #[must_use]
+    pub const fn new_large_boxed(sections: Box<[Section; 24], A>) -> Self {
+        ChunkStorage::Large(ArrayStorage::new(sections))
+    }
+
+    /// Create a new [`ChunkStorage::Normal`].
+    #[inline]
+    #[must_use]
+    pub const fn new_normal_boxed(sections: Box<[Section; 16], A>) -> Self {
+        ChunkStorage::Normal(ArrayStorage::new(sections))
     }
 
     /// Create a new [`ChunkStorage::Variable`].
+    ///
+    /// If you do not specifically need [`ChunkStorage::Variable`], use
+    /// [`ChunkStorage::new`] instead.
+    #[inline]
     #[must_use]
-    #[cfg(feature = "nightly")]
-    pub fn new_variable_in<A: Allocator + Send + Sync>(
-        sections: impl IntoIterator<Item = Section>,
-        offset: i32,
-        allocator: &'static A,
-    ) -> Self {
-        Self::Variable(VecChunkStorage::new_in(sections, offset, allocator))
+    pub const fn new_variable(sections: Vec<Section, A>, offset: i32) -> Self {
+        Self::Variable(VecStorage::new(sections, offset))
     }
 
     /// Get the vertical offset of the [`ChunkStorage`].
@@ -146,107 +176,27 @@ impl ChunkStorage {
             ChunkStorage::Variable(storage) => storage.0.as_mut_slice(),
         }
     }
-
-    /// Create a new [`ChunkStorage`] from a [`Vec<Section>`].
-    ///
-    /// Returns a specialized storage type if the length and offset match
-    /// known configurations.
-    #[must_use]
-    #[cfg(not(feature = "nightly"))]
-    pub fn new_from_vec(sections: Vec<Section>, offset: i32) -> ChunkStorage {
-        match (sections.len(), offset) {
-            (24, -64) => {
-                // SAFETY: We have already checked that the length is 24.
-                let array: [Section; 24] = unsafe { sections.try_into().unwrap_unchecked() };
-                ChunkStorage::Large(ArrayChunkStorage::new(array))
-            }
-            (16, 0) => {
-                // SAFETY: We have already checked that the length is 16.
-                let array: [Section; 16] = unsafe { sections.try_into().unwrap_unchecked() };
-                ChunkStorage::Normal(ArrayChunkStorage::new(array))
-            }
-            _ => ChunkStorage::Variable(VecChunkStorage::new(sections, offset)),
-        }
-    }
-
-    /// Create a new [`ChunkStorage`] from a [`Vec<Section>`].
-    ///
-    /// Returns a specialized storage type if the length and offset match
-    /// known configurations.
-    #[must_use]
-    #[cfg(feature = "nightly")]
-    pub fn new_from_vec(sections: Vec<Section>, offset: i32) -> ChunkStorage {
-        let sections = unsafe {
-            use alloc::alloc::Global;
-
-            let (ptr, len, cap, Global) = Vec::into_parts_with_allocator(sections);
-            Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(ptr, len, cap, &Global)
-        };
-
-        match (sections.len(), offset) {
-            (24, -64) => {
-                // SAFETY: We have already checked that the length is 24.
-                let array: Box<[Section; 24], _> =
-                    unsafe { sections.into_boxed_slice().into_array().unwrap_unchecked() };
-                ChunkStorage::Large(ArrayChunkStorage(array))
-            }
-            (16, 0) => {
-                // SAFETY: We have already checked that the length is 16.
-                let array: Box<[Section; 16], _> =
-                    unsafe { sections.into_boxed_slice().into_array().unwrap_unchecked() };
-                ChunkStorage::Normal(ArrayChunkStorage(array))
-            }
-            _ => ChunkStorage::Variable(VecChunkStorage(sections, offset)),
-        }
-    }
-
-    /// Create a new [`ChunkStorage`] from an iterator.
-    ///
-    /// Returns a specialized storage type if the length and offset match
-    /// known configurations.
-    #[must_use]
-    #[cfg(feature = "nightly")]
-    pub fn from_iter_in<A: Allocator + Send + Sync>(
-        sections: impl IntoIterator<Item = Section>,
-        offset: i32,
-        allocator: &'static A,
-    ) -> ChunkStorage {
-        let sections = sections.into_iter();
-
-        let (lower_bound, upper_bound) = sections.size_hint();
-        let mut vec = Vec::<_, &'static (dyn Allocator + Send + Sync)>::with_capacity_in(
-            upper_bound.unwrap_or(lower_bound),
-            allocator,
-        );
-        vec.extend(sections);
-
-        match (vec.len(), offset) {
-            (24, -64) => {
-                // SAFETY: We have already checked that the length is 24.
-                let array: Box<[Section; 24], _> =
-                    unsafe { vec.into_boxed_slice().into_array().unwrap_unchecked() };
-                ChunkStorage::Large(ArrayChunkStorage(array))
-            }
-            (16, 0) => {
-                // SAFETY: We have already checked that the length is 16.
-                let array: Box<[Section; 16], _> =
-                    unsafe { vec.into_boxed_slice().into_array().unwrap_unchecked() };
-                ChunkStorage::Normal(ArrayChunkStorage(array))
-            }
-            _ => ChunkStorage::Variable(VecChunkStorage(vec, offset)),
-        }
-    }
 }
 
-impl Deref for ChunkStorage {
+impl<A: Allocator> Deref for ChunkStorage<A> {
     type Target = [Section];
 
+    #[inline]
     fn deref(&self) -> &Self::Target { self.as_slice() }
 }
 
-impl Default for ChunkStorage {
+impl<A: Allocator + Default> Default for ChunkStorage<A> {
+    #[inline]
     fn default() -> Self { Self::empty_large() }
 }
+
+impl<A: Allocator> PartialEq for ChunkStorage<A> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.offset() == other.offset() && self.as_slice() == other.as_slice()
+    }
+}
+impl<A: Allocator> Eq for ChunkStorage<A> {}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -260,91 +210,84 @@ impl Default for ChunkStorage {
 ///
 /// 1. It guarantees that the number of sections is always correct.
 /// 2. It prevents unnecessary bounds checks when accessing the array.
-#[derive(Clone, PartialEq, Eq)]
-pub struct ArrayChunkStorage<const SECTIONS: usize, const OFFSET: i32>(ArrayStorage<SECTIONS>);
+#[derive(Clone)]
+pub struct ArrayStorage<const SECTIONS: usize, const OFFSET: i32, A: Allocator = Global>(
+    Box<[Section; SECTIONS], A>,
+);
 
-cfg_select! {
-    feature = "nightly" => {
-        type ArrayStorage<const SECTIONS: usize> =
-            Box<[Section; SECTIONS], &'static (dyn Allocator + Send + Sync)>;
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> ArrayStorage<SECTIONS, OFFSET, A> {
+    /// Create a new [`ArrayStorage`] from the given [`Section`]s.
+    #[inline]
+    #[must_use]
+    pub const fn new(sections: Box<[Section; SECTIONS], A>) -> Self { Self(sections) }
+
+    /// Create a new [`ArrayStorage`] from the given [`Section`]s and
+    /// allocator.
+    #[inline]
+    #[must_use]
+    pub fn new_in(sections: [Section; SECTIONS], alloc: A) -> Self {
+        Self(Box::new_in(sections, alloc))
     }
-    _ => {
-        type ArrayStorage<const SECTIONS: usize> = Box<[Section; SECTIONS]>;
-    }
-}
 
-impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunkStorage<SECTIONS, OFFSET> {
-    cfg_select! {
-        feature = "nightly" => {
-            /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
-            #[inline]
-            #[must_use]
-            pub fn new(sections: [Section; SECTIONS]) -> Self {
-                Self::new_in(sections, &alloc::alloc::Global)
-            }
-
-            /// Create a new [`ArrayChunkStorage`] from the given boxed
-            /// [`Section`]s.
-            #[inline]
-            #[must_use]
-            #[allow(clippy::boxed_local, reason = "Boxed constructor")]
-            pub fn new_from(sections: Box<[Section; SECTIONS]>) -> Self {
-                let sections = unsafe {
-                    use alloc::alloc::Global;
-
-                    let (ptr, Global) = Box::into_non_null_with_allocator(sections);
-                    Box::<[Section; SECTIONS], &'static (dyn Allocator + Send + Sync)>::from_non_null_in(ptr, &Global)
-                };
-
-                Self(sections)
-            }
-
-            /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
-            #[inline]
-            #[must_use]
-            pub fn new_in<A: Allocator + Send + Sync>(
-                sections: [Section; SECTIONS],
-                allocator: &'static A,
-            ) -> Self {
-                Self(Box::new_in(sections, allocator))
-            }
-        }
-        _ => {
-            /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
-            #[inline]
-            #[must_use]
-            pub fn new(sections: [Section; SECTIONS]) -> Self { Self::new_from(Box::new(sections)) }
-
-            /// Create a new [`ArrayChunkStorage`] from the given boxed
-            /// [`Section`]s.
-            #[inline]
-            #[must_use]
-            pub fn new_from(sections: Box<[Section; SECTIONS]>) -> Self { Self(sections) }
-        }
+    /// Create a new, empty [`ArrayStorage`] with the given allocator.
+    #[must_use]
+    pub fn new_empty_in(alloc: A) -> Self {
+        Self::new_in(core::array::from_fn(|_| Section::new_empty()), alloc)
     }
 
     /// Get the vertical offset of the storage.
+    #[inline]
     #[must_use]
     pub const fn offset(&self) -> i32 { OFFSET }
 
     /// Get the number of sections in the storage.
+    #[inline]
     #[must_use]
     pub const fn len(&self) -> usize { SECTIONS }
 
     /// Returns `true` if the storage contains no sections.
+    #[inline]
     #[must_use]
     pub const fn is_empty(&self) -> bool { SECTIONS == 0 }
 }
 
-impl<const SECTIONS: usize, const OFFSET: i32> Deref for ArrayChunkStorage<SECTIONS, OFFSET> {
-    type Target = ArrayStorage<SECTIONS>;
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator + Default> From<[Section; SECTIONS]>
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
+    #[inline]
+    fn from(sections: [Section; SECTIONS]) -> Self { Self::new_in(sections, A::default()) }
+}
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> From<Box<[Section; SECTIONS], A>>
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
+    #[inline]
+    fn from(sections: Box<[Section; SECTIONS], A>) -> Self { Self::new(sections) }
+}
+
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> Deref
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
+    type Target = Box<[Section; SECTIONS], A>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl<const SECTIONS: usize, const OFFSET: i32> DerefMut for ArrayChunkStorage<SECTIONS, OFFSET> {
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> DerefMut
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> PartialEq
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
+    #[inline]
+    fn eq(&self, other: &Self) -> bool { self.as_slice() == other.as_slice() }
+}
+impl<const SECTIONS: usize, const OFFSET: i32, A: Allocator> Eq
+    for ArrayStorage<SECTIONS, OFFSET, A>
+{
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -352,83 +295,51 @@ impl<const SECTIONS: usize, const OFFSET: i32> DerefMut for ArrayChunkStorage<SE
 /// A vertical slice of the world.
 ///
 /// Has a variable number of sections and a known offset.
-#[derive(Clone, PartialEq, Eq)]
-pub struct VecChunkStorage(VecStorage, i32);
+#[derive(Clone)]
+pub struct VecStorage<A: Allocator = Global>(Vec<Section, A>, i32);
 
-cfg_select! {
-    feature = "nightly" => {
-        type VecStorage = Vec<Section, &'static (dyn Allocator + Send + Sync)>;
-    }
-    _ => {
-        type VecStorage = Vec<Section>;
-    }
-}
+impl<A: Allocator> VecStorage<A> {
+    /// Create a new [`VecStorage`] from the given [`Section`]s and offset.
+    #[inline]
+    #[must_use]
+    pub const fn new(sections: Vec<Section, A>, offset: i32) -> Self { Self(sections, offset) }
 
-impl VecChunkStorage {
-    cfg_select! {
-        feature = "nightly" => {
-            /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
-            /// offset.
-            #[must_use]
-            pub const fn new(sections: Vec<Section>, offset: i32) -> Self {
-                let sections = unsafe {
-                    use alloc::alloc::Global;
-
-                    let (ptr, len, cap, Global) = Vec::into_parts_with_allocator(sections);
-                    Vec::<_, &'static (dyn Allocator + Send + Sync)>::from_parts_in(
-                        ptr, len, cap, &Global,
-                    )
-                };
-
-                Self(sections, offset)
-            }
-
-            /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
-            /// offset.
-            #[must_use]
-            pub fn new_in<A: Allocator + Send + Sync>(
-                sections: impl IntoIterator<Item = Section>,
-                offset: i32,
-                allocator: &'static A,
-            ) -> Self {
-                let sections = sections.into_iter();
-                let (lower_bound, upper_bound) = sections.size_hint();
-
-                let mut vec: Vec<Section, &'static (dyn Allocator + Send + Sync)> =
-                    Vec::with_capacity_in(upper_bound.unwrap_or(lower_bound), allocator);
-                vec.extend(sections);
-
-                Self(vec, offset)
-            }
-        }
-        _ => {
-            /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
-            /// offset.
-            #[must_use]
-            pub fn new(sections: Vec<Section>, offset: i32) -> Self { Self(sections, offset) }
-        }
-    }
+    /// Create a new, empty [`VecStorage`] from the given offset.
+    #[inline]
+    #[must_use]
+    pub fn new_empty_in(offset: i32, alloc: A) -> Self { Self::new(Vec::new_in(alloc), offset) }
 
     /// Get the vertical offset of the storage.
+    #[inline]
     #[must_use]
     pub const fn offset(&self) -> i32 { self.1 }
 
     /// Get the number of sections in the storage.
+    #[inline]
     #[must_use]
     pub const fn len(&self) -> usize { self.0.len() }
 
     /// Returns `true` if the storage contains no sections.
+    #[inline]
     #[must_use]
     pub const fn is_empty(&self) -> bool { self.0.is_empty() }
 }
 
-impl Deref for VecChunkStorage {
-    type Target = VecStorage;
+impl<A: Allocator> Deref for VecStorage<A> {
+    type Target = Vec<Section, A>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl DerefMut for VecChunkStorage {
+impl<A: Allocator> DerefMut for VecStorage<A> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
+
+impl<A: Allocator> PartialEq for VecStorage<A> {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.1 == other.1 && self.0.as_slice() == other.0.as_slice()
+    }
+}
+impl<A: Allocator> Eq for VecStorage<A> {}

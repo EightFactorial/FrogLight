@@ -79,7 +79,8 @@ pub trait NetworkVersion: PacketVersion {
             let state = Mutex::new(PacketStateEnum::Handshake);
 
             // Receive a packet from the client and send it to the server.
-            // Note: Exits if `state` is changed to cancel the `server_to_client` future.
+            // Note: Exits if `state` is changed to cancel the
+            // `server_to_client` future.
             let client_to_server =
                 async |writer: &mut EncryptorMut<R, R::Write>,
                        writer_buf_a: &mut Vec<u8>,
@@ -87,8 +88,9 @@ pub trait NetworkVersion: PacketVersion {
                     loop {
                         let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
 
-                        // Note: Holding this lock after receiving the packet to prevent
-                        // `server_to_client` from reading it while we potentially update it.
+                        // Note: Holding this lock after receiving the packet to
+                        // prevent `server_to_client`
+                        // from reading it while we potentially update it.
                         let mut state = state.lock().await;
 
                         #[cfg(feature = "tracing_ext")]
@@ -167,7 +169,8 @@ pub trait NetworkVersion: PacketVersion {
                 };
 
             // Receive a packet from the server and send it to the client.
-            // Note: Exits if a `ConnectionUpdate` is returned to update the connection.
+            // Note: Exits if a `ConnectionUpdate` is returned to update the
+            // connection.
             let server_to_client =
                 async |reader: &mut DecryptorMut<R, R::Read>, reader_buf: &mut Vec<u8>| {
                     loop {
@@ -265,8 +268,8 @@ pub trait NetworkVersion: PacketVersion {
 
             // Continuously handle packets from both directions.
             //
-            // If a `ConnectionUpdate` is received, update the connection's settings
-            // and continue.
+            // If a `ConnectionUpdate` is received, update the connection's
+            // settings and continue.
             loop {
                 let result =
                     or::<Result<Option<ConnectionUpdate>, Box<dyn Error + Send + Sync>>, _, _>(

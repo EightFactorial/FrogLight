@@ -26,7 +26,7 @@ use froglight_common::{crates::foldhash::fast::RandomState, types::IndexMap};
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(crate = "froglight_common::crates::serde", transparent))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct ProfilePropertySet(IndexMap<String, ProfileProperty>);

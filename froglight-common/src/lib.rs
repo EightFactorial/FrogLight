@@ -1,10 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![allow(clippy::disallowed_types, reason = "This crate selects and re-exports common types")]
+#![cfg_attr(feature = "nightly", allow(unused_features, reason = "Used if `no_std`"))]
 #![cfg_attr(feature = "nightly", feature(core_float_math))]
-#![cfg_attr(
-    feature = "nightly",
-    allow(unused_features, reason = "`core_float_math` used if `no_std`")
-)]
 #![no_std]
 
 #[cfg(feature = "alloc")]
@@ -44,6 +41,7 @@ pub mod crates {
 
 pub mod types {
     //! Re-exports of common types based on enabled features.
+    use ::foldhash::fast::RandomState;
 
     // Prefer `std` Lazy/Once over `once_cell`
     cfg_select! {
@@ -56,7 +54,8 @@ pub mod types {
             pub type OnceLock<T> = std::sync::OnceLock<T>;
         }
         all(feature = "once_cell", feature = "critical-section") => {
-            // pub use ::once_cell::sync::{Lazy as LazyLock, OnceCell as OnceLock};
+            // pub use ::once_cell::sync::{Lazy as LazyLock, OnceCell as
+            // OnceLock};
 
             /// A re-export of [`once_cell::sync::Lazy`].
             pub type LazyLock<T, F = fn() -> T> = ::once_cell::sync::Lazy<T, F>;
@@ -101,24 +100,22 @@ pub mod types {
             // pub use ::hashbrown::{HashMap, HashSet};
 
             /// A re-export of [`hashbrown::HashMap`].
-            pub type HashMap<K, V, S = ::foldhash::fast::RandomState> =
-                ::hashbrown::HashMap<K, V, S>;
+            pub type HashMap<K, V, S = RandomState> = ::hashbrown::HashMap<K, V, S>;
             /// A re-export of [`hashbrown::HashSet`].
-            pub type HashSet<T, S = ::foldhash::fast::RandomState> = ::hashbrown::HashSet<T, S>;
+            pub type HashSet<T, S = RandomState> = ::hashbrown::HashSet<T, S>;
         }
         feature = "std" => {
             /// A re-export of [`std::collections::HashMap`].
-            pub type HashMap<K, V, S = ::std::hash::RandomState> =
-                ::std::collections::HashMap<K, V, S>;
+            pub type HashMap<K, V, S = RandomState> = ::std::collections::HashMap<K, V, S>;
             /// A re-export of [`std::collections::HashSet`].
-            pub type HashSet<T, S = ::std::hash::RandomState> = ::std::collections::HashSet<T, S>;
+            pub type HashSet<T, S = RandomState> = ::std::collections::HashSet<T, S>;
         }
         _ => {}
     }
 
     /// A re-export of [`indexmap::IndexMap`].
     #[cfg(feature = "indexmap")]
-    pub type IndexMap<K, V, S = ::foldhash::fast::RandomState> = ::indexmap::IndexMap<K, V, S>;
+    pub type IndexMap<K, V, S = RandomState> = ::indexmap::IndexMap<K, V, S>;
 }
 
 pub mod prelude {

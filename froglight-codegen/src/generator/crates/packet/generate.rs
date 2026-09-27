@@ -50,7 +50,8 @@ as everything else is automatically @generated and will be overwritten.",
                             let mut settings =
                                 generate_state(&version, &state, packets, module, settings).await?;
 
-                            // Skip actually building the module if it is marked as @manual
+                            // Skip actually building the module if it is marked
+                            // as @manual
                             let path = path.join(&state).join("mod.rs");
                             if path.exists()
                                 && let Ok(content) = tokio::fs::read_to_string(&path).await
@@ -198,7 +199,8 @@ async fn generate_state(
 @generated packet for \"{name}\"",
                         ));
 
-                        // Skip actually building the module if it is marked as @manual
+                        // Skip actually building the module if it is marked as
+                        // @manual
                         let path = WORKSPACE_DIR
                             .join("froglight-packet/src/generated")
                             .join(&version_feature)
@@ -246,7 +248,8 @@ async fn generate_state(
 @generated packet for \"{name}\"",
                         ));
 
-                        // Skip actually building the module if it is marked as @manual
+                        // Skip actually building the module if it is marked as
+                        // @manual
                         let path = WORKSPACE_DIR
                             .join("froglight-packet/src/generated")
                             .join(&version_feature)

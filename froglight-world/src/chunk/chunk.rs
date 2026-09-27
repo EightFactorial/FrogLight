@@ -1,5 +1,6 @@
 //! TODO
 
+use alloc::alloc::Global;
 use core::{any::TypeId, fmt, ops::Range};
 
 #[cfg(feature = "bevy")]
@@ -26,7 +27,7 @@ use crate::{
 pub struct Chunk {
     biomes: &'static BiomeStorage,
     blocks: &'static BlockStorage,
-    naive: NaiveChunk,
+    naive: NaiveChunk<Global>,
 }
 
 impl Chunk {
@@ -284,7 +285,8 @@ impl Chunk {
         for section in self.sections_mut() {
             let biome = section.biome_data_mut();
 
-            // SAFETY: We guarantee that all biome ids via `convert_id` are valid.
+            // SAFETY: We guarantee that all biome ids via `convert_id` are
+            // valid.
             unsafe {
                 match biome.palette_mut() {
                     SectionPalette::Single(biome_id) => {
@@ -297,7 +299,8 @@ impl Chunk {
                     }
                     SectionPalette::Global => {
                         // Iterate over each biome index and convert it.
-                        // SAFETY: `index` is always within bounds `0..BiomeSection::VOLUME`.
+                        // SAFETY: `index` is always within bounds
+                        // `0..BiomeSection::VOLUME`.
                         for index in (0..BiomeSection::VOLUME).map(usize::from) {
                             let biome_id = biome.get_index(index).unwrap_unchecked();
                             biome.set_index(index, convert_id(biome_id));
@@ -345,7 +348,8 @@ impl Chunk {
         for section in self.sections_mut() {
             let biome = section.biome_data_mut();
 
-            // SAFETY: We guarantee that all blockstate ids via `convert_id` are valid.
+            // SAFETY: We guarantee that all blockstate ids via `convert_id` are
+            // valid.
             unsafe {
                 match biome.palette_mut() {
                     SectionPalette::Single(biome_id) => {
@@ -358,7 +362,8 @@ impl Chunk {
                     }
                     SectionPalette::Global => {
                         // Iterate over each biome index and convert it.
-                        // SAFETY: `index` is always within bounds `0..BiomeSection::VOLUME`.
+                        // SAFETY: `index` is always within bounds
+                        // `0..BiomeSection::VOLUME`.
                         for index in (0..BiomeSection::VOLUME).map(usize::from) {
                             let biome_id = biome.get_index(index).unwrap_unchecked();
                             biome.set_index(index, convert_new(biome_id));
@@ -380,7 +385,8 @@ impl Chunk {
         }
 
         if self.biomes().version_ty() == other.biomes().version_ty() {
-            // If the versions are the same we can just compare the data directly.
+            // If the versions are the same we can just compare the data
+            // directly.
             self.sections()
                 .iter()
                 .zip(other.sections().iter())
@@ -437,7 +443,8 @@ impl Chunk {
         }
 
         if self.blocks().version_ty() == other.blocks().version_ty() {
-            // If the versions are the same we can just compare the data directly.
+            // If the versions are the same we can just compare the data
+            // directly.
             self.sections()
                 .iter()
                 .zip(other.sections().iter())

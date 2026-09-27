@@ -207,7 +207,8 @@ impl BlockReport {
                     && values.contains(&String::from("true"))
                     && values.contains(&String::from("false"))
                 {
-                    // Append "Bool" to the property name if it has boolean values
+                    // Append "Bool" to the property name if it has boolean
+                    // values
                     property = format!("{}Bool", property.to_case(Case::Pascal));
                 } else if self
                     .0
@@ -779,7 +780,8 @@ fn add_weathering_blocks(
                 (format!("WAXED_{}", name_and_type.name), original.ident.replace(':', ":waxed_"));
 
             // Note:
-            // v26_2 started removing the "_block" suffix from weathered copper block states
+            // v26_2 started removing the "_block" suffix from weathered copper
+            // block states
             let trimmed = original.ident.trim_end_matches("_block");
 
             unwaxed_exposed =
@@ -1228,7 +1230,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
                     let val_length = attribute.values.len();
                     for (index, value) in attribute.values.into_iter().enumerate() {
-                        // Change numeric values to `_{value}` and convert to `PascalCase`
+                        // Change numeric values to `_{value}` and convert to
+                        // `PascalCase`
                         let ident = if value.parse::<i32>().is_ok() {
                             format!("_{value}")
                         } else {
