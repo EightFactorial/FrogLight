@@ -28,10 +28,16 @@ impl Plugin for TickPlugin {
         tick_schedule.set_executor(SingleThreadedExecutor::new());
         app.add_schedule(tick_schedule);
 
-        // Insert `RunTickLoop` after `RunFixedMainLoop`.
-        // (Usually after `PreUpdate` and before `Update`)
+        // Insert `RunTickLoop` after `RunFixedMainLoop` or `PreUpdate`,
+        // or before `Update` if neither of those exist.
         let mut schedules = app.world_mut().resource_mut::<MainScheduleOrder>();
-        schedules.insert_after(RunFixedMainLoop, RunTickLoop);
+        if schedules.labels.iter().any(|label| label.dyn_eq(&RunFixedMainLoop)) {
+            schedules.insert_after(RunFixedMainLoop, RunTickLoop);
+        } else if schedules.labels.iter().any(|label| label.dyn_eq(&PreUpdate)) {
+            schedules.insert_after(PreUpdate, RunTickLoop);
+        } else {
+            schedules.insert_before(Update, RunTickLoop);
+        }
 
         #[cfg(feature = "tracing")]
         tracing::trace!(target: "froglight_tick", "{:#?}", schedules.as_ref());
