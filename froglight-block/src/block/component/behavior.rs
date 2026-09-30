@@ -1,5 +1,4 @@
 #![expect(clippy::too_many_arguments, reason = "Only when manually constructing a BlockBehavior")]
-#![expect(missing_docs, reason = "The functions themselves have documentation")]
 
 use crate::{
     block::{BlockShape, BlockType},
@@ -7,40 +6,49 @@ use crate::{
     version::BlockVersion,
 };
 
-type StateFn<T> = fn(RelativeStateId) -> T;
-
 /// Functions that define a block's behavior.
 #[derive(Clone, Copy)]
 pub struct BlockBehavior {
-    pub is_air: StateFn<bool>,
-    pub is_solid: StateFn<bool>,
-    pub is_liquid: StateFn<bool>,
-    pub has_collision: StateFn<bool>,
-    pub is_transparent: StateFn<bool>,
-    pub has_occlusion: StateFn<bool>,
-    pub light_emission: StateFn<u8>,
-    pub shape_of: StateFn<&'static BlockShape<'static>>,
+    is_air: StateFn<bool>,
+    is_solid: StateFn<bool>,
+    is_liquid: StateFn<bool>,
+    has_collision: StateFn<bool>,
+    is_transparent: StateFn<bool>,
+    has_occlusion: StateFn<bool>,
+    light_emission: StateFn<u8>,
+    shape_of: StateFn<&'static BlockShape<'static>>,
 }
+
+type StateFn<T> = fn(RelativeStateId) -> T;
 
 impl BlockBehavior {
     /// Create a new [`BlockBehavior`] for the given [`BlockType`].
     #[must_use]
     pub const fn new<B: BlockType<V>, V: BlockVersion>() -> Self {
-        Self::new_manual(
-            B::is_air,
-            B::is_solid,
-            B::is_liquid,
-            B::has_collision,
-            B::is_transparent,
-            B::has_occlusion,
-            B::light_emission,
-            B::shape_of,
-        )
+        // SAFETY: The functions come from the `BlockType` trait.
+        unsafe {
+            Self::new_manual(
+                B::is_air,
+                B::is_solid,
+                B::is_liquid,
+                B::has_collision,
+                B::is_transparent,
+                B::has_occlusion,
+                B::light_emission,
+                B::shape_of,
+            )
+        }
     }
 
     /// Create a new [`BlockBehavior`] from manually provided functions.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the provided functions are valid for the
+    /// block type they are intended for.
+    #[inline]
     #[must_use]
-    pub const fn new_manual(
+    pub const unsafe fn new_manual(
         is_air: StateFn<bool>,
         is_solid: StateFn<bool>,
         is_liquid: StateFn<bool>,

@@ -2,11 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_common::{
-    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
-    prelude::*,
-    types::IndexMap,
-};
+use froglight_common::{crates::indexmap::map::Entry, prelude::*, types::IndexMap};
 
 use crate::{
     biome::{Biome, BiomeMetadata},
@@ -26,35 +22,51 @@ impl BiomeStorage {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that all provided biome metadata has the correct
-    /// global ids for this collection.
+    /// The caller must ensure that all provided [`BiomeMetadata`] is valid for
+    /// this [`Version`], and has a matching entry per-[`GlobalBiomeId`].
     ///
     /// # Panics
     ///
-    /// Panics if there are duplicate biome identifiers in the provided
-    /// metadata, or if any of the metadata belongs to a different
-    /// [`BiomeVersion`].
+    /// Panics in `debug` builds if the provided [`BiomeMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: BiomeVersion>(metadata: &[&'static BiomeMetadata]) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+        let mut identifiers = IndexMap::with_capacity_and_hasher(metadata.len(), <_>::default());
 
-        for meta in metadata {
-            if !meta.is_version::<V>() {
-                core::hint::cold_path();
-                panic!("BiomeMetadata version mismatch: expected {}", core::any::type_name::<V>());
-            }
+        for (_index, meta) in metadata.iter().enumerate() {
+            #[cfg(debug_assertions)]
+            #[expect(clippy::used_underscore_binding, reason = "Debug assertions")]
+            Self::assert_biome::<V>(_index, meta);
 
             match identifiers.entry(meta.identifier()) {
                 Entry::Vacant(entry) => _ = entry.insert(*meta),
                 Entry::Occupied(..) => {
                     core::hint::cold_path();
+
+                    #[cfg(debug_assertions)]
                     panic!("BiomeMetadata has duplicate identifier: {:?}", meta.identifier());
                 }
             }
         }
 
         Self { version: TypeId::of::<V>(), metadata: identifiers }
+    }
+
+    #[cfg(debug_assertions)]
+    fn assert_biome<V: BiomeVersion>(index: usize, meta: &BiomeMetadata) {
+        debug_assert_eq!(
+            index,
+            meta.global_id().into_usize(),
+            "GlobalBiomeId `{index}` does not match the expected value for {:?}: `{}`",
+            meta.identifier(),
+            meta.global_id().into_inner(),
+        );
+
+        debug_assert!(
+            meta.is_version::<V>(),
+            "BiomeMetadata Version mismatch for {:?}: expected {:?}",
+            meta.identifier(),
+            core::any::type_name::<V>()
+        );
     }
 
     /// Get the [`Biome`] for a given [`GlobalStateId`].

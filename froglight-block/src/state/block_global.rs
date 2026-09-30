@@ -38,6 +38,11 @@ impl GlobalBlockId {
     #[inline]
     #[must_use]
     pub const fn into_inner(self) -> u16 { self.0 }
+
+    /// Get the inner [`usize`] value.
+    #[inline]
+    #[must_use]
+    pub const fn into_usize(self) -> usize { self.0 as usize }
 }
 
 impl<T: Into<u16>> From<T> for GlobalBlockId {

@@ -25,35 +25,52 @@ impl EntityStorage {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that all provided entity metadata has the correct
-    /// global ids for this collection.
+    /// The caller must ensure that all provided [`EntityMetadata`] is valid for
+    /// this [`Version`], and has a matching entry per-[`GlobalEntityId`].
     ///
     /// # Panics
     ///
-    /// Panics if there are duplicate entity identifiers in the provided
-    /// metadata, or if any of the metadata belongs to a different
-    /// [`EntityVersion`].
+    /// Panics in `debug` builds if the provided [`EntityMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: EntityVersion>(metadata: &[&'static EntityMetadata]) -> Self {
         let mut identifiers =
             IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
 
-        for meta in metadata {
-            if !meta.is_version::<V>() {
-                core::hint::cold_path();
-                panic!("EntityMetadata version mismatch: expected {}", core::any::type_name::<V>());
-            }
+        for (_index, meta) in metadata.iter().enumerate() {
+            #[cfg(debug_assertions)]
+            #[expect(clippy::used_underscore_binding, reason = "Debug assertions")]
+            Self::assert_entity::<V>(_index, meta);
 
             match identifiers.entry(meta.identifier()) {
                 Entry::Vacant(entry) => _ = entry.insert(*meta),
                 Entry::Occupied(..) => {
                     core::hint::cold_path();
+
+                    #[cfg(debug_assertions)]
                     panic!("EntityMetadata has duplicate identifier: {:?}", meta.identifier());
                 }
             }
         }
 
         Self { version: TypeId::of::<V>(), metadata: identifiers }
+    }
+
+    #[cfg(debug_assertions)]
+    fn assert_entity<V: EntityVersion>(index: usize, meta: &EntityMetadata) {
+        debug_assert_eq!(
+            index,
+            meta.global_id().into_usize(),
+            "GlobalEntityId `{index}` does not match the expected value for {:?}: `{}`",
+            meta.identifier(),
+            meta.global_id().into_inner(),
+        );
+
+        debug_assert!(
+            meta.is_version::<V>(),
+            "EntityMetadata Version mismatch for {:?}: expected {:?}",
+            meta.identifier(),
+            core::any::type_name::<V>()
+        );
     }
 
     /// Get the default [`EntityBundle`] for a given [`GlobalEntityId`].

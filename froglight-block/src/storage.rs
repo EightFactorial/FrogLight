@@ -27,28 +27,47 @@ impl BlockStorage {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that all provided block metadata has the correct
-    /// global ids for this collection.
+    /// The caller must ensure that all provided [`BlockMetadata`] is valid for
+    /// this [`Version`], and has a matching entry per-[`GlobalStateId`].
     ///
     /// # Panics
     ///
-    /// Panics if any of the metadata belongs to a different [`BlockVersion`].
+    /// Panics in `debug` builds if the provided [`BlockMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: BlockVersion>(metadata: &'static [&'static BlockMetadata]) -> Self {
         let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
 
-        for meta in metadata {
-            if !meta.is_version::<V>() {
-                core::hint::cold_path();
-                panic!("BlockMetadata version mismatch: expected {}", core::any::type_name::<V>());
-            }
+        for (_index, meta) in metadata.iter().enumerate() {
+            #[cfg(debug_assertions)]
+            #[expect(clippy::used_underscore_binding, reason = "Debug assertions")]
+            Self::assert_block::<V>(_index, meta);
 
-            if let Entry::Vacant(entry) = identifiers.entry(meta.identifier()) {
-                entry.insert(meta.global_id_default());
+            match identifiers.entry(meta.identifier()) {
+                Entry::Vacant(entry) => _ = entry.insert(meta.global_id_default()),
+                Entry::Occupied(entry) => debug_assert_eq!(*entry.get(), meta.global_id_default()),
             }
         }
 
         Self { version: TypeId::of::<V>(), identifiers, metadata }
+    }
+
+    #[cfg(debug_assertions)]
+    fn assert_block<V: BlockVersion>(index: usize, meta: &BlockMetadata) {
+        let min = meta.global_id_base().into_usize();
+        let max = min + usize::from(meta.state_count());
+
+        debug_assert!(
+            (min..=max).contains(&index),
+            "GlobalStateId `{index}` is out of the expected bounds for {:?}: [{min}, {max}]",
+            meta.identifier()
+        );
+
+        debug_assert!(
+            meta.is_version::<V>(),
+            "BlockMetadata Version mismatch for {:?}: expected {:?}",
+            meta.identifier(),
+            core::any::type_name::<V>()
+        );
     }
 
     /// Get the default [`Block`] for a given [`GlobalBlockId`].
@@ -63,9 +82,7 @@ impl BlockStorage {
     /// This is typically used by the registry.
     #[must_use]
     pub fn get_block_by_id(&self, id: GlobalBlockId) -> Option<Block> {
-        self.identifiers
-            .get_index(id.into_inner() as usize)
-            .and_then(|(_, id)| self.get_block_by_state(*id))
+        self.identifiers.get_index(id.into_usize()).and_then(|(_, id)| self.get_block_by_state(*id))
     }
 
     /// Get the [`Block`] for a given [`GlobalStateId`].
@@ -77,11 +94,11 @@ impl BlockStorage {
     pub fn get_block_by_state(&self, id: GlobalStateId) -> Option<Block> {
         let metadata = self.metadata.get(id.into_inner() as usize)?;
         let state = id.into_inner().saturating_sub(metadata.global_id_base().into_inner());
-        let state = RelativeStateId::new(u16::try_from(state).ok()?);
+        let state = u16::try_from(state).ok()?;
 
-        if state.into_inner() < metadata.state_count() {
+        if state < metadata.state_count() {
             // SAFETY: We just checked if the state is valid for this metadata.
-            Some(unsafe { Block::new_unchecked(state, metadata) })
+            Some(unsafe { Block::new_unchecked(RelativeStateId::new(state), metadata) })
         } else {
             core::hint::cold_path();
             None

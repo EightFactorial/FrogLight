@@ -1,4 +1,4 @@
-use core::any::TypeId;
+use core::{any::TypeId, num::NonZeroU16};
 
 use crate::{
     attribute::BlockAttributeBundle,
@@ -11,9 +11,10 @@ pub struct BlockAttributes {
     /// The number of states for this block type.
     ///
     /// All blocks have at least one state, even if they have no attributes.
-    pub states: u16,
+    pub states: NonZeroU16,
     /// The `(attribute_name, attribute_type)` pairs for this block type.
     pub list: &'static [(&'static str, TypeId)],
+
     /// A function to get the string value of an attribute.
     pub get_attr_fn: fn(state: usize, attr: &str) -> Option<&'static str>,
     /// A function to set the string value of an attribute.
@@ -23,9 +24,10 @@ pub struct BlockAttributes {
 impl BlockAttributes {
     /// Create a new [`BlockAttribute`] for a given [`BlockType`].
     #[must_use]
+    #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub const fn new<B: BlockType<V>, V: BlockVersion>() -> Self {
         Self {
-            states: B::Attributes::TOTAL,
+            states: NonZeroU16::new(B::Attributes::TOTAL).unwrap(),
             list: B::ATTRDATA,
 
             get_attr_fn: |state, name| {

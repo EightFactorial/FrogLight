@@ -102,7 +102,7 @@ impl BlockMetadata {
     /// Blocks with no attributes have a state count of `1`.
     #[inline]
     #[must_use]
-    pub const fn state_count(&self) -> u16 { self.attributes.states }
+    pub const fn state_count(&self) -> u16 { self.attributes.states.get() }
 
     /// Get the value of an attribute for a given state.
     #[must_use]
@@ -117,6 +117,7 @@ impl BlockMetadata {
     }
 
     /// Get the value of an attribute as a string for a given state.
+    #[inline]
     #[must_use]
     pub fn get_attribute_str(&self, state: RelativeStateId, name: &str) -> Option<&'static str> {
         (self.attributes.get_attr_fn)(usize::from(state.into_inner()), name)
@@ -169,19 +170,20 @@ impl BlockMetadata {
     ) -> Option<(RelativeStateId, &'static str)> {
         let (state, value) =
             (self.attributes.set_attr_fn)(usize::from(state.into_inner()), name, value)?;
-        let state =
-            RelativeStateId::new(u16::try_from(state).expect("Invalid StateId, overflowed!"));
+        let state = u16::try_from(state).expect("Invalid StateId, overflowed!");
 
-        if state.into_inner() < self.attributes.states { Some((state, value)) } else { None }
+        if state < self.state_count() { Some((RelativeStateId::new(state), value)) } else { None }
     }
 
     /// Returns `true` if this block is of type `B`.
+    #[inline]
     #[must_use]
-    pub fn is_block<B: 'static>(&self) -> bool { self.block_ty == TypeId::of::<B>() }
+    pub fn is_block<B: 'static>(&self) -> bool { self.block_ty() == TypeId::of::<B>() }
 
     /// Returns `true` if this block is of version `V`.
+    #[inline]
     #[must_use]
-    pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
+    pub fn is_version<V: 'static>(&self) -> bool { self.version_ty() == TypeId::of::<V>() }
 
     /// Get the [`TypeId`] of the block type.
     #[inline]

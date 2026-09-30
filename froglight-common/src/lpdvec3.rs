@@ -93,7 +93,7 @@ impl LpDVec3 {
                 {
                     f64::round((val * 0.5 + 0.5) * 32766.) as u64
                 }
-                #[cfg(all(not(feature = "std"), feature = "nightly"))]
+                #[cfg(not(feature = "std"))]
                 {
                     core::f64::math::round((val * 0.5 + 0.5) * 32766.) as u64
                 }

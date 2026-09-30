@@ -35,6 +35,11 @@ impl GlobalBiomeId {
     #[inline]
     #[must_use]
     pub const fn into_inner(self) -> u32 { self.0 }
+
+    /// Get the inner [`usize`] value.
+    #[inline]
+    #[must_use]
+    pub const fn into_usize(self) -> usize { self.0 as usize }
 }
 
 impl<T: Into<u32>> From<T> for GlobalBiomeId {

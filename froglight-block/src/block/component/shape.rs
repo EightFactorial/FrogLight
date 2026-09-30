@@ -2,8 +2,6 @@ use alloc::{borrow::Cow, vec};
 use core::ops::Add;
 
 use froglight_common::crates::glam::DVec3;
-#[cfg(all(not(feature = "std"), feature = "libm"))]
-use froglight_common::crates::libm;
 
 /// Using larger epsilon to match original behavior.
 const EPSILON: f64 = 1e-7;
@@ -48,6 +46,7 @@ impl BlockShape<'_> {
 
     /// Creates a new [`BlockShape`] from the given minimum and maximum
     /// coordinates.
+    #[inline]
     #[must_use]
     pub const fn new_xyz(
         min_x: f64,
@@ -62,7 +61,6 @@ impl BlockShape<'_> {
 
     /// Creates a new [`BlockShape`] from the given two corner points.
     #[must_use]
-    #[cfg(feature = "std")]
     pub const fn new_from_corners(a: DVec3, b: DVec3) -> Self {
         if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
         {
@@ -71,21 +69,6 @@ impl BlockShape<'_> {
             BlockShape::Single(BlockAabb {
                 min: DVec3::new(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z)),
                 max: DVec3::new(a.x.max(b.x), a.y.max(b.y), a.z.max(b.z)),
-            })
-        }
-    }
-
-    /// Creates a new [`BlockShape`] from the given two corner points.
-    #[must_use]
-    #[cfg(all(not(feature = "std"), feature = "libm"))]
-    pub fn new_from_corners(a: DVec3, b: DVec3) -> Self {
-        if (a.x - b.x).abs() > EPSILON && (a.y - b.y).abs() > EPSILON && (a.z - b.z).abs() > EPSILON
-        {
-            BlockShape::None
-        } else {
-            BlockShape::Single(BlockAabb {
-                min: DVec3::new(libm::fmin(a.x, b.x), libm::fmin(a.y, b.y), libm::fmin(a.z, b.z)),
-                max: DVec3::new(libm::fmax(a.x, b.x), libm::fmax(a.y, b.y), libm::fmax(a.z, b.z)),
             })
         }
     }
