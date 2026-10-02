@@ -1,6 +1,6 @@
 use facet::{Attr, ConstTypeId, Facet, Field, Peek, ReflectError, Shape};
 
-/// A [`Serializer`] item.
+/// A [`Serializer`](super::Serializer) item.
 pub enum Item<'mem, 'facet> {
     /// A size to be serialized.
     Hint(u32, Peek<'mem, 'facet>),
@@ -29,23 +29,24 @@ pub enum ItemType {
 }
 
 impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
-    /// Create a new [`StackItem`].
+    /// Create a new [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn new(peek: Peek<'mem, 'facet>, ty: ItemType, var: bool) -> Self {
         Self { peek, ty, variable: var, field_attr: None }
     }
 
-    /// Create a new [`StackItem`] for a [`ItemType::Value`].
+    /// Create a new [`SerializeItem`] for a [`ItemType::Value`].
     ///
-    /// This is equivalent to calling [`Self::new`] with [`ItemType::Value`].
+    /// This is equivalent to calling [`SerializeItem::new`] with
+    /// [`ItemType::Value`].
     #[inline]
     #[must_use]
     pub fn new_peek<T: Facet<'facet>>(value: &'mem T) -> Self {
         Self::new(Peek::new(value), ItemType::Value, false)
     }
 
-    /// Get the value of this [`StackItem`].
+    /// Get the value of this [`SerializeItem`].
     ///
     /// # Errors
     ///
@@ -53,22 +54,22 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
     #[inline]
     pub fn get<T: Facet<'facet>>(&self) -> Result<&'mem T, ReflectError> { self.peek.get::<T>() }
 
-    /// Get the [`Peek`] for this [`StackItem`].
+    /// Get the [`Peek`] for this [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn peek(&self) -> &Peek<'mem, 'facet> { &self.peek }
 
-    /// Get the [`Shape`] for this [`StackItem`].
+    /// Get the [`Shape`] for this [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn shape(&self) -> &'static Shape { self.peek.shape() }
 
-    /// Get the [`ItemType`] for this [`StackItem`].
+    /// Get the [`ItemType`] for this [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn ty(&self) -> ItemType { self.ty }
 
-    /// Set the [`ItemType`] for this [`StackItem`].
+    /// Set the [`ItemType`] for this [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn with_ty(mut self, ty: ItemType) -> Self {
@@ -76,33 +77,34 @@ impl<'mem, 'facet> SerializeItem<'mem, 'facet> {
         self
     }
 
-    /// Returns `true` if this [`StackItem`] is of the given type.
+    /// Returns `true` if this [`SerializeItem`] is of the given type.
     #[inline]
     #[must_use]
     pub fn is_type<T: Facet<'facet> + ?Sized>(&self) -> bool {
         ConstTypeId::of::<T>() == self.shape().id
     }
 
-    /// Returns `true` if this [`StackItem`] is variable-length.
+    /// Returns `true` if this [`SerializeItem`] is
+    /// variable-length.
     #[inline]
     #[must_use]
     pub const fn is_variable(&self) -> bool { self.variable }
 
-    /// Set whether this [`StackItem`] is variable-length.
+    /// Set whether this [`SerializeItem`] is variable-length.
     #[inline]
     pub const fn set_variable(&mut self, variable: bool) { self.variable = variable; }
 
-    /// Get the [`Attr`]s of the field this [`StackItem`] came from, if any.
+    /// Get the [`Attr`]s of the field this [`SerializeItem`] came from, if any.
     #[inline]
     #[must_use]
     pub const fn field_attr(&self) -> Option<&'static [Attr]> { self.field_attr }
 
-    /// Get the [`Attr`]s of the [`StackItem`]'s type.
+    /// Get the [`Attr`]s of the [`SerializeItem`]'s type.
     #[inline]
     #[must_use]
     pub const fn shape_attr(&self) -> &'static [Attr] { self.peek.shape().attributes }
 
-    /// Set the [`Field`] [`Attr`]s of this [`StackItem`].
+    /// Set the [`Field`] [`Attr`]s of this [`SerializeItem`].
     #[inline]
     #[must_use]
     pub const fn with_field(mut self, field: Option<Field>) -> Self {

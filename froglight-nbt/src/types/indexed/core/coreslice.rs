@@ -57,7 +57,7 @@ impl IndexCore<Ref> for SliceCore<'_, Ref> {
         // SAFETY: The caller ensures that this is safe.
         unsafe {
             let range = self.ranges.get_unchecked(index);
-            self.entries.as_slice().get_unchecked(*range)
+            self.entries.get_unchecked(*range)
         }
     }
 
@@ -97,7 +97,7 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
     unsafe fn entry_range(&self, index: usize) -> &[EntryIndex] {
         unsafe {
             let range = self.ranges.get_unchecked(index);
-            self.entries.as_slice().get_unchecked(*range)
+            self.entries.get_unchecked(*range)
         }
     }
 
@@ -124,7 +124,7 @@ impl IndexCore<Mut> for SliceCore<'_, Mut> {
         // SAFETY: The caller ensures that this is safe.
         unsafe {
             let range = self.ranges.get_unchecked(index);
-            self.entries.as_mut_slice().get_unchecked_mut(*range)
+            self.entries.get_unchecked_mut(*range)
         }
     }
 }

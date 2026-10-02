@@ -4,8 +4,8 @@ use bevy_ecs::query::{
 
 use crate::{instance::SessionInstance, relationship::PartOfInstance};
 
-/// [`QueryData`] for [`Components`] on the [`SessionInstance`] of the current
-/// entity.
+/// [`QueryData`] for [`Components`](bevy_ecs::component::Component) on the
+/// [`SessionInstance`] of the current entity.
 ///
 /// Note that this requires the inner query to be a read-only to prevent mutable
 /// aliasing.

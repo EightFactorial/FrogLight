@@ -1,9 +1,10 @@
 //! TODO
 
-/// A `const` macro for creating [`MStr`] literals.
+/// A `const` macro for creating [`MStr`](crate::prelude::MStr) literals.
 ///
 /// This should only be used for `const` and `static` items,
-/// as the methods on [`MStr`] and [`MString`] are generally faster.
+/// as the methods on [`MStr`](crate::prelude::MStr) and
+/// [`MString`](crate::prelude::MString) are generally faster.
 ///
 /// # Panics
 ///

@@ -113,7 +113,7 @@ impl EntityBundle {
     #[must_use]
     pub const fn metadata(&self) -> &'static EntityMetadata { self.reference }
 
-    /// Get the [`GlobalId`] of this entity type.
+    /// Get the [`GlobalEntityId`] of this entity type.
     #[inline]
     #[must_use]
     pub fn global_id(&self) -> GlobalEntityId { self.reference.global_id() }

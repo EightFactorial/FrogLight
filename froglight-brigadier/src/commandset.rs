@@ -129,7 +129,7 @@ impl CommandExecuteError<'_> {
         }
     }
 
-    /// Create a new [`ParseOrExecuteError`] from an error.
+    /// Create a new [`CommandExecuteError`] from an error.
     #[inline]
     #[must_use]
     pub fn execute<E: Error + Send + Sync + 'static>(err: E) -> Self {

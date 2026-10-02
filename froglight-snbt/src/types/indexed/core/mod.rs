@@ -31,7 +31,7 @@ pub trait IndexCore {
     #[must_use]
     fn root_long(&self) -> Self::RootLong<'_>;
 
-    /// Get a slice of [`Entries`](Entry).
+    /// Get a slice of [`Entries`](EntryIndex).
     ///
     /// # Safety
     ///

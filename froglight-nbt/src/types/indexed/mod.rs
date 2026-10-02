@@ -102,7 +102,7 @@ impl<C: IndexCored> IndexedNbt<C> {
 
     /// Get the root NBT slice.
     ///
-    /// With certain [`IndexCore`](core::IndexCore)s (notably [`SliceCore`]),
+    /// With certain [`IndexCore`]s (notably [`SliceCore`]),
     /// this may allow for longer borrows.
     ///
     /// See [`IndexedReference::upgrade`](reference::IndexedReference::upgrade).
@@ -148,11 +148,11 @@ impl<C: IndexCored> IndexedNbt<C> {
         unsafe { IndexedCompound::new(&mut self.core, 0) }
     }
 
-    /// Get the root [`IndexedValueReference`] of this NBT structure.
+    /// Get the root [`ValueReference`] of this NBT structure.
     ///
     /// # Note
     ///
-    /// This is always a [`IndexedValueReference::Compound`].
+    /// This is always a [`ValueReference::Compound`].
     #[inline]
     #[must_use]
     pub fn as_value(&self) -> ValueReference<'_, Ref, C>
@@ -162,11 +162,11 @@ impl<C: IndexCored> IndexedNbt<C> {
         ValueReference::Compound(self.as_compound())
     }
 
-    /// Get the root [`IndexedValueReference`] of this NBT structure.
+    /// Get the root [`ValueReference`] of this NBT structure.
     ///
     /// # Note
     ///
-    /// This is always a [`IndexedValueReference::Compound`].
+    /// This is always a [`ValueReference::Compound`].
     #[inline]
     #[must_use]
     pub fn as_value_mut(&mut self) -> ValueReference<'_, Mut, C>

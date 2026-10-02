@@ -6,7 +6,11 @@ use froglight_common::prelude::*;
 use froglight_registry_template::implement_wrapper;
 
 mod component;
-pub use component::{attribute::BlockAttributes, behavior::BlockBehavior, shape::BlockShape};
+pub use component::{
+    attribute::BlockAttributes,
+    behavior::BlockBehavior,
+    shape::{BlockAabb, BlockShape},
+};
 
 mod metadata;
 pub use metadata::BlockMetadata;

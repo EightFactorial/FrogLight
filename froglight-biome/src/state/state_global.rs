@@ -5,11 +5,8 @@ use froglight_facet as mc;
 
 use crate::{biome::Biome, prelude::BiomeVersion};
 
-/// A unique identifier for a biome,
-/// relative to all other biomes in the same version.
-///
-/// This only guarantees uniqueness if both biomes are, for example,
-/// from [`V26_1`](froglight_common::prelude::V26_1).
+/// A unique identifier for a biome, relative to all other biomes in the same
+/// version.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]

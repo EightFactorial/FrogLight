@@ -16,7 +16,7 @@ static SCHEMAS: LazyMap<&'static Shape, Arc<TypePlanCore>> = LazyMap::new(RwLock
 ///
 /// # Errors
 ///
-/// Returns an error if a [`Schema`] cannot be built.
+/// Returns an error if a [`TypePlanCore`] cannot be built.
 #[inline]
 pub fn typeplan<'facet, T: Facet<'facet>>() -> Result<Arc<TypePlanCore>, AllocError> {
     // SAFETY: T::SHAPE comes from Facet metadata for a real type T.
@@ -29,7 +29,7 @@ pub fn typeplan<'facet, T: Facet<'facet>>() -> Result<Arc<TypePlanCore>, AllocEr
 ///
 /// # Errors
 ///
-/// Returns an error if a [`Schema`] cannot be built.
+/// Returns an error if a [`TypePlanCore`] cannot be built.
 ///
 /// # Safety
 ///

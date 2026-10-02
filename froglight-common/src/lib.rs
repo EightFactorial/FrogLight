@@ -14,6 +14,8 @@ pub mod impossible;
 pub mod lpdvec3;
 pub mod version;
 
+mod macros;
+
 pub mod crates {
     //! Re-exports of common crates and dependencies.
 
@@ -41,7 +43,10 @@ pub mod crates {
 
 pub mod types {
     //! Re-exports of common types based on enabled features.
+    #[cfg(feature = "hashbrown")]
     use ::foldhash::fast::RandomState;
+    #[cfg(all(feature = "std", not(feature = "hashbrown")))]
+    use ::std::hash::RandomState;
 
     // Prefer `std` Lazy/Once over `once_cell`
     cfg_select! {
@@ -123,5 +128,5 @@ pub mod prelude {
 
     #[cfg(feature = "alloc")]
     pub use crate::identifier::Identifier;
-    pub use crate::{identifier::Ident, version::*};
+    pub use crate::{ident, identifier::Ident, version::*};
 }

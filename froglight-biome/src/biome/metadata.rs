@@ -84,7 +84,7 @@ impl BiomeMetadata {
     #[must_use]
     pub const fn identifier(&self) -> &'static Ident { self.identifier }
 
-    /// Get the [`GlobalStateId`] of this biome.
+    /// Get the [`GlobalBiomeId`] of this biome.
     #[inline]
     #[must_use]
     pub const fn global_id(&self) -> GlobalBiomeId { self.global_id }

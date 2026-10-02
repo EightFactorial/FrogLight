@@ -10,7 +10,7 @@ use froglight_facet_iter::{
 
 pub mod functions;
 
-/// A trait for types that can be serialized as [`Snbt`].
+/// A trait for types that can be serialized as `Snbt`.
 pub trait SerializeSnbt<'facet> {}
 
 // -------------------------------------------------------------------------------------------------

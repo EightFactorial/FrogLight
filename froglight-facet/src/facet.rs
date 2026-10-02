@@ -65,14 +65,14 @@ pub struct WithFnAttr {
 }
 
 impl WithFnAttr {
-    /// Create a new [`WithFns`] using the provided template type.
+    /// Create a new [`WithFnAttr`] using the provided template type.
     #[inline]
     #[must_use]
     pub const fn template<T: FacetTemplate + ?Sized>() -> Self {
         Self::using(T::serialize, T::deserialize::<false>, T::deserialize::<true>)
     }
 
-    /// Create a new [`WithFns`] using the provided functions.
+    /// Create a new [`WithFnAttr`] using the provided functions.
     #[inline]
     #[must_use]
     pub const fn using(ser: SerFn, de_owned: DeFn<false>, de_owned_borrow: DeFn<true>) -> Self {

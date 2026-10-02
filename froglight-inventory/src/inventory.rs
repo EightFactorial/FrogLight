@@ -33,12 +33,12 @@ impl Default for Inventory {
 impl Inventory {
     /// Create a new, empty [`Inventory`].
     ///
-    /// Uses [`GlobalInventory`] as the default [`MenuGroupType`].
+    /// Uses [`GlobalInventory`] as the default [`MenuGroup`].
     #[inline]
     #[must_use]
     pub const fn new() -> Self { Self::new_using::<GlobalInventory>() }
 
-    /// Create a new, empty [`Inventory`] of the given [`MenuGroupType`].
+    /// Create a new, empty [`Inventory`] of the given [`MenuGroup`].
     #[inline]
     #[must_use]
     pub const fn new_using<G: MenuType>() -> Self {

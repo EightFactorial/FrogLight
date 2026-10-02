@@ -16,7 +16,7 @@ pub(super) enum StackItem {
     Other(DeserializeDesc),
 }
 
-/// A [`Deserializer`] item.
+/// A [`Deserializer`](super::Deserializer) item.
 pub enum Item<'facet, const BORROW: bool> {
     /// A size to be deserialized.
     Hint(u32, Partial<'facet, BORROW>),

@@ -8,14 +8,10 @@ use crate::{
     prelude::{BlockType, BlockVersion},
 };
 
-/// A unique identifier for a block state,
-/// relative to all other states of the same block in the same version.
+/// A unique identifier for a block state, relative to all other states of the
+/// same block in the same version.
 ///
-/// This only guarantees uniqueness if both blocks are, for example,
-/// [`Dirt`](crate::prelude::block::Dirt) from
-/// [`V26_1`](froglight_common::prelude::V26_1).
-///
-/// Two blocks of the same type and different states,
+/// Two blocks of the same type but different states,
 /// like stair orientation, *will not* equal each other.
 ///
 /// # Note
@@ -24,6 +20,8 @@ use crate::{
 /// smaller. For almost all operations the cost of making sure both blocks are
 /// of the same type is more expensive than using [`GlobalStateId`] in the first
 /// place.
+///
+/// [`GlobalStateId`]: crate::state::GlobalStateId
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]

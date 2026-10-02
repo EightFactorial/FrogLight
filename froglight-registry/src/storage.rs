@@ -57,7 +57,7 @@ impl RegistryStorage {
             .map(|(identifier, values)| TagRef::new(identifier.reborrow(), values))
     }
 
-    /// Get the [`TagReg`] for a given [`Identifier`].
+    /// Get the [`TagRef`] for a given [`Identifier`].
     ///
     /// # Note
     ///

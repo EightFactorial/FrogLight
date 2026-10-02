@@ -84,7 +84,7 @@ macro_rules! generate {
         #[cfg_attr(feature = "facet", derive(facet::Facet))]
         pub enum EntityDataType {
             $(
-                #[doc = concat!("The [`", stringify!($ty), "`] data type.")]
+                #[doc = concat!("The `", stringify!($ty), "` data type.")]
                 $ident($(#[ $($attr)* ])? $ty),
             )*
         }
@@ -102,7 +102,7 @@ macro_rules! generate {
 
             $(
                 #[must_use]
-                #[doc = concat!("Get the value of this data type as a [`",stringify!($ty),"`], if it is one.\n\nOtherwise, returns `None`.")]
+                #[doc = concat!("Get the value of this data type as a `",stringify!($ty),"`, if it is one.\n\nOtherwise, returns `None`.")]
                 pub fn $name(&self) -> Option<&$ty> {
                     if let EntityDataType::$ident(value) = self {
                         Some(value)

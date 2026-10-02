@@ -26,7 +26,7 @@ impl OnGround {
     /// A constant for [`OnGround::new(true)`](OnGround::new).
     pub const TRUE: Self = Self(true);
 
-    /// Create a new [`OnGround`] from a [`Vec3A`].
+    /// Create a new [`OnGround`] from a [`bool`].
     #[inline]
     #[must_use]
     pub const fn new(on_ground: bool) -> Self { Self(on_ground) }

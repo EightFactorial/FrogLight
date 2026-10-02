@@ -90,11 +90,11 @@ impl BlockMetadata {
         GlobalStateId::new(base_global + default_state)
     }
 
-    /// Get the default [`StateId`] for this block.
+    /// Get the default [`RelativeStateId`] for this block.
     #[must_use]
     pub const fn state_default(&self) -> RelativeStateId { self.default_state }
 
-    /// Get the number of [`StateId`]s for this block.
+    /// Get the number of [`RelativeStateId`]s for this block.
     ///
     /// # Note
     ///
@@ -135,7 +135,7 @@ impl BlockMetadata {
 
     /// Set the value of an attribute for a given state.
     ///
-    /// Returns the new [`StateId`] and the old value if successful.
+    /// Returns the new [`RelativeStateId`] and the old value if successful.
     #[must_use]
     pub fn set_attribute<A: BlockAttribute>(
         &self,
@@ -156,7 +156,7 @@ impl BlockMetadata {
 
     /// Set the value of an attribute as a string for a given state.
     ///
-    /// Returns the new [`StateId`] and the old value if successful.
+    /// Returns the new [`RelativeStateId`] and the old value if successful.
     #[must_use]
     #[expect(
         clippy::missing_panics_doc,

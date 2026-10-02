@@ -23,7 +23,7 @@ use crate::{
 
 pub mod functions;
 
-/// A trait for types that can be deserialized from [`Nbt`].
+/// A trait for types that can be deserialized from `Nbt`.
 pub trait DeserializeNbt<'facet>: Facet<'facet> + Sized {
     /// Deserialize a value from an [`IndexedNbtSlice`].
     ///

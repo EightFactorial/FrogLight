@@ -5,13 +5,10 @@ use froglight_facet as mc;
 
 use crate::{block::Block, prelude::BlockVersion};
 
-/// A unique identifier for a block state,
-/// relative to all other blocks and states in the same version.
+/// A unique identifier for a block state, relative to all other blocks and
+/// states in the same version.
 ///
-/// This only guarantees uniqueness if both blocks are, for example,
-/// from [`V26_1`](froglight_common::prelude::V26_1).
-///
-/// Two blocks of the same type and different states,
+/// Two blocks of the same type but different states,
 /// like stair orientation, *will not* equal each other.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]

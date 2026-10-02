@@ -7,7 +7,7 @@ pub type TagMap = IndexMap<Identifier<'static>, TagInnerMap>;
 /// A map of [`Identifier`]s to [`Vec<u32>`]s.
 pub type TagInnerMap = IndexMap<Identifier<'static>, Vec<u32>>;
 
-/// A reference to a [`Tag`] and it's associated values.
+/// A reference to a `Tag` and it's associated values.
 #[derive(Debug, Clone)]
 pub struct TagRef<'a> {
     identifier: Identifier<'a>,
@@ -73,12 +73,12 @@ impl<'a> TagValueRef<'a> {
         Self { identifier, values }
     }
 
-    /// Get the [`Identifier`] of this [`TagValue`].
+    /// Get the [`Identifier`] of this [`TagValueRef`].
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'a> { &self.identifier }
 
-    /// Get the [`u32`] values of this [`TagValue`].
+    /// Get the [`u32`] values of this [`TagValueRef`].
     #[inline]
     #[must_use]
     pub const fn values(&self) -> &'a [u32] { self.values }

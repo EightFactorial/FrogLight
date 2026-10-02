@@ -1,4 +1,4 @@
-//! A small wrapper around the [`yansi`](::yansi) crate,
+//! A small wrapper around the [`yansi`] crate,
 //! overriding the default colors to match Minecraft's color codes.
 
 pub use yansi::{Attribute, Condition};

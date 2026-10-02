@@ -1,4 +1,4 @@
-/// A macro that creates a [`Version`] subtrait.
+/// A macro that creates a `Version` subtrait.
 ///
 /// # Example
 ///
@@ -74,7 +74,7 @@ macro_rules! version_subtrait {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A macro that implements a [`Version`] subtrait.
+/// A macro that implements a `Version` subtrait.
 ///
 /// # Example
 ///

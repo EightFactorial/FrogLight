@@ -36,9 +36,9 @@ pub trait IndexableValue: Indexable {
     unsafe fn read_value(index: Index<Self>, root: &str) -> Self::Value<'_>;
 }
 
-/// A trait for types that refer to a slice of [`Entries`](Entry).
+/// A trait for types that refer to a slice of [`Entries`](EntryIndex).
 pub trait IndexableSlice: Indexable {
-    /// Get the slice of [`Entries`](Entry) that the [`Index`] points to.
+    /// Get the slice of [`Entries`](EntryIndex) that the [`Index`] points to.
     ///
     /// # Safety
     ///
@@ -101,7 +101,7 @@ impl<T: IndexableValue + ?Sized> Index<T> {
 }
 
 impl<T: IndexableSlice + ?Sized> Index<T> {
-    /// Get the slice of [`Entries`](Entry) that the [`Index`] points to.
+    /// Get the slice of [`Entries`](EntryIndex) that the [`Index`] points to.
     ///
     /// # Safety
     ///

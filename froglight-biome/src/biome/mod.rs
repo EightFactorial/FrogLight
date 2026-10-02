@@ -46,7 +46,7 @@ impl Biome {
     #[must_use]
     pub const fn metadata(&self) -> &'static BiomeMetadata { self.metadata }
 
-    /// Get the [`GlobalStateId`] of this biome.
+    /// Get the [`GlobalBiomeId`] of this biome.
     #[inline]
     #[must_use]
     pub fn global_id(&self) -> GlobalBiomeId { self.metadata.global_id() }

@@ -106,8 +106,8 @@ impl<'data> IndexedSnbt<core::CowCore<'data>> {
         Ok(IndexedSnbt::new(core::CowCore { root, entries }))
     }
 
-    /// Access this [`CowCore`]-based SNBT as [`SliceCore`]-based SNBT in the
-    /// provided closure.
+    /// Access this [`CowCore`](core::CowCore)-based SNBT as [`SliceCore`]-based
+    /// SNBT in the provided closure.
     pub fn as_scoped_slice<R>(
         mut self,
         f: impl FnOnce(&IndexedSnbt<SliceCore<'_>>) -> R,

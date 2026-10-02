@@ -20,7 +20,8 @@ use facet_json::{DeserializeError, JsonSerializeError};
 use froglight_common::crates::serde::{Deserialize, Serialize};
 use froglight_common::{crates::foldhash::fast::RandomState, types::IndexMap};
 
-/// A set of [`ProfileProperty`]s associated with a [`PlayerProfile`].
+/// A set of [`ProfileProperty`]s associated with a
+/// [`PlayerProfile`](super::PlayerProfile).
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
@@ -31,7 +32,7 @@ use froglight_common::{crates::foldhash::fast::RandomState, types::IndexMap};
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct ProfilePropertySet(IndexMap<String, ProfileProperty>);
 
-/// A property associated with a [`PlayerProfile`].
+/// A property associated with a [`PlayerProfile`](super::PlayerProfile).
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]

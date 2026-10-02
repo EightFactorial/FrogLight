@@ -143,7 +143,7 @@ pub struct EntityRelativeFlags {
 }
 
 impl EntityRelativeFlags {
-    /// An [`EntityRelativeMovements`] where all data is absolute.
+    /// An [`EntityRelativeFlags`] where all data is absolute.
     pub const ABSOLUTE: Self = Self {
         x: false,
         y: false,
@@ -155,7 +155,7 @@ impl EntityRelativeFlags {
         delta_z: false,
         rotate_delta: false,
     };
-    /// An [`EntityRelativeMovements`] where all data is relative.
+    /// An [`EntityRelativeFlags`] where all data is relative.
     pub const RELATIVE: Self = Self {
         x: true,
         y: true,
@@ -310,12 +310,12 @@ impl PositionDelta {
 pub struct RotationSteps(i8, i8);
 
 impl RotationSteps {
-    /// Create a new [`RotationValue`] from the given yaw and pitch in steps.
+    /// Create a new [`RotationSteps`] from the given yaw and pitch in steps.
     #[inline]
     #[must_use]
     pub const fn new_steps(yaw: i8, pitch: i8) -> Self { Self(yaw, pitch) }
 
-    /// Create a new [`RotationValue`] from the given yaw and pitch in degrees.
+    /// Create a new [`RotationSteps`] from the given yaw and pitch in degrees.
     #[must_use]
     #[expect(clippy::cast_possible_truncation, reason = "Expected")]
     pub const fn new_degrees(yaw: f32, pitch: f32) -> Self {
@@ -324,7 +324,7 @@ impl RotationSteps {
         Self(yaw, pitch)
     }
 
-    /// Create a new [`RotationValue`] from the given yaw and pitch in radians.
+    /// Create a new [`RotationSteps`] from the given yaw and pitch in radians.
     #[inline]
     #[must_use]
     pub const fn new_radians(yaw: f32, pitch: f32) -> Self {

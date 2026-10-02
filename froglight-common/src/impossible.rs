@@ -1,26 +1,22 @@
 //! [`Impossible`]
 
+use core::ops::{Deref, DerefMut};
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-#[cfg(all(feature = "bevy", feature = "serde"))]
-use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 
 /// A type that can never be constructed.
 ///
-/// Equivalent to [`Infallible`](core::convert::Infallible),
-/// but implements both [`Reflect`](bevy_reflect::Reflect) and
-/// [`Facet`](facet::Facet).
+/// Equivalent to [`Infallible`](core::convert::Infallible), but implements both
+/// `Reflect` and [`Facet`](facet::Facet).
 ///
-/// Will be removed if/when [`Reflect`](bevy_reflect::Reflect) is implemented
-/// for [`Infallible`](core::convert::Infallible).
+/// Will be removed if/when `Reflect` is implemented for
+/// [`Infallible`](core::convert::Infallible).
+#[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
-pub enum Impossible {}
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq, Hash))]
+pub struct Impossible(!);
 
 #[cfg(feature = "facet")]
 unsafe impl facet::Facet<'_> for Impossible {
@@ -40,4 +36,29 @@ unsafe impl facet::Facet<'_> for Impossible {
             .sync()
             .build()
     };
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl AsRef<!> for Impossible {
+    fn as_ref(&self) -> &! { &self.0 }
+}
+impl AsMut<!> for Impossible {
+    fn as_mut(&mut self) -> &mut ! { &mut self.0 }
+}
+
+impl Deref for Impossible {
+    type Target = !;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for Impossible {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl From<!> for Impossible {
+    fn from(_: !) -> Self { unreachable!() }
+}
+impl From<Impossible> for ! {
+    fn from(_: Impossible) -> Self { unreachable!() }
 }

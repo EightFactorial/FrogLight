@@ -33,14 +33,16 @@ impl Default for TickInstant {
 impl TickMeasurementPlugin {
     /// The [`DiagnosticPath`] for the "tick_runtime" diagnostic.
     ///
-    /// This is the amount of time it took to run the [`TickSchedule`]s in
-    /// milliseconds.
+    /// This is the amount of time it took to run the
+    /// [`TickSchedule`](crate::schedule::TickSchedule)s in milliseconds.
     pub const TICK_RUNTIME: DiagnosticPath =
         DiagnosticPath::const_new("froglight_tick/tick_runtime");
-    /// The suffix for the [`TICK_RUNTIME`] diagnostic.
+    /// The suffix for the [`TICK_RUNTIME`](TickMeasurementPlugin::TICK_RUNTIME)
+    /// diagnostic.
     pub const TICK_RUNTIME_SUFFIX: &'static str = "ms";
 
-    /// Creates the default [`TICK_RUNTIME`] [`Diagnostic`].
+    /// Creates the default
+    /// [`TICK_RUNTIME`](TickMeasurementPlugin::TICK_RUNTIME) [`Diagnostic`].
     #[must_use]
     pub fn create_diagnostic() -> Diagnostic {
         Diagnostic::new(Self::TICK_RUNTIME)
@@ -49,10 +51,12 @@ impl TickMeasurementPlugin {
             .with_smoothing_factor(0.0)
     }
 
-    /// A [`System`] for starting [`TICK_RUNTIME`] measurements.
+    /// A [`System`] for starting
+    /// [`TICK_RUNTIME`](TickMeasurementPlugin::TICK_RUNTIME) measurements.
     pub fn start_measurement(mut instant: ResMut<TickInstant>) { instant.0 = Instant::now(); }
 
-    /// A [`System`] for ending [`TICK_RUNTIME`] measurements.
+    /// A [`System`] for ending
+    /// [`TICK_RUNTIME`](TickMeasurementPlugin::TICK_RUNTIME) measurements.
     pub fn end_measurement(instant: Res<TickInstant>, mut diag: Diagnostics) {
         #[cfg(feature = "nightly")]
         diag.add_measurement(&Self::TICK_RUNTIME, || instant.0.elapsed().as_millis_f64());

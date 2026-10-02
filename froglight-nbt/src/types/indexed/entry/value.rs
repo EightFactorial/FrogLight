@@ -269,8 +269,8 @@ impl<'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'index> IndexedVal
         }
     }
 
-    /// Return a reference to the stored value if it is of type
-    /// [`IndexedValueList`], else `None`.
+    /// Return a reference to the stored value if it is of type [`ValueList`],
+    /// else `None`.
     #[must_use]
     pub fn as_list(&self) -> Option<ValueList<'_, Ref, C>> {
         if let ValueIndex::List(index) = self.index {
@@ -280,8 +280,7 @@ impl<'index, A: NbtAccess, C: IndexCore<Ref> + IndexCore<A> + 'index> IndexedVal
         }
     }
 
-    /// Return the stored value if it is of type [`IndexedValueList`], else
-    /// `None`.
+    /// Return the stored value if it is of type [`ValueList`], else `None`.
     #[must_use]
     pub fn into_list(self) -> Option<ValueList<'index, A, C>> {
         if let ValueIndex::List(index) = self.index {
@@ -304,7 +303,7 @@ impl<'index, C: IndexCore<Mut> + 'index> IndexedValue<'index, Mut, C> {
     }
 
     /// Return a mutable reference to the stored value if it is of type
-    /// [`IndexedValueList`], else else `None`.
+    /// [`ValueList`], else else `None`.
     pub fn as_list_mut(&mut self) -> Option<ValueList<'_, Mut, C>> {
         if let ValueIndex::List(index) = self.index {
             Some(create_list_mut(self.core, index))

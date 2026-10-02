@@ -20,7 +20,9 @@ pub enum BlockShape<'a> {
 /// A block's axis-aligned bounding box (AABB).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BlockAabb {
+    /// The minimum corner of the AABB.
     pub min: DVec3,
+    /// The maximum corner of the AABB.
     pub max: DVec3,
 }
 
@@ -114,7 +116,7 @@ impl BlockShape<'_> {
         }
     }
 
-    /// Returns the block's [`CommonDAabb`]s as a slice.
+    /// Returns the block's [`BlockAabb`]s as a slice.
     #[must_use]
     pub const fn as_slice(&self) -> &[BlockAabb] {
         match self {

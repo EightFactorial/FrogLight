@@ -1,4 +1,6 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "nightly", allow(stable_features, reason = "Targets Rust 1.100"))]
+#![cfg_attr(feature = "nightly", feature(exclusive_wrapper))]
 #![no_std]
 
 extern crate alloc;

@@ -12,8 +12,8 @@ pub struct Style(pub(super) YansiStyle);
 impl Style {
     const DEFAULT: Self = Self(YansiStyle::new());
 
-    /// Returns a new style with no foreground or background, no attributes
-    /// or quirks, and [`Condition::DEFAULT`].
+    /// Returns a new style with no foreground, background, attributes or
+    /// quirks.
     ///
     /// This is the default returned by [`Default::default()`].
     #[inline]

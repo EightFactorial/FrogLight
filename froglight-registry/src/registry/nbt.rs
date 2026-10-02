@@ -11,7 +11,7 @@ pub type NbtMap = IndexMap<Identifier<'static>, NbtInnerMap>;
 /// A map of [`Identifier`]s to [`IndexedNbtCow`]s.
 pub type NbtInnerMap = IndexMap<Identifier<'static>, IndexedNbtCow<'static>>;
 
-/// A reference to a [`Nbt`] and it's associated values.
+/// A reference to some `Nbt` and it's associated values.
 #[derive(Debug, Clone)]
 pub struct NbtRef<'a> {
     identifier: Identifier<'a>,
@@ -80,7 +80,7 @@ impl<'a> NbtValueRef<'a> {
         Self { identifier, values }
     }
 
-    /// Get the [`Identifier`] of this [`NbtValue`].
+    /// Get the [`Identifier`] of this [`NbtValueRef`].
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'a> { &self.identifier }

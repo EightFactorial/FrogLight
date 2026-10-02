@@ -53,7 +53,8 @@ impl Identifier<'_> {
     /// Try to create a new [`Identifier`] from a string slice.
     ///
     /// If the string does not contain a namespace,
-    /// the [`DEFAULT_NAMESPACE`] will be prepended.
+    /// the [`DEFAULT_NAMESPACE`](Identifier::DEFAULT_NAMESPACE) will be
+    /// prepended.
     ///
     /// # Errors
     ///
@@ -80,7 +81,8 @@ impl Identifier<'_> {
     /// Try to create an owned [`Identifier`] from a string slice.
     ///
     /// If the string does not contain a namespace,
-    /// the [`DEFAULT_NAMESPACE`] will be prepended.
+    /// the [`DEFAULT_NAMESPACE`](Identifier::DEFAULT_NAMESPACE) will be
+    /// prepended.
     ///
     /// # Errors
     ///
@@ -95,7 +97,8 @@ impl Identifier<'_> {
     /// Try to create a new owned [`Identifier`] from a string.
     ///
     /// If the string does not contain a namespace,
-    /// the [`DEFAULT_NAMESPACE`] will be prepended.
+    /// the [`DEFAULT_NAMESPACE`](Identifier::DEFAULT_NAMESPACE) will be
+    /// prepended.
     ///
     /// # Errors
     ///

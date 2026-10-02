@@ -8,10 +8,7 @@ use crate::{block::Block, prelude::BlockVersion};
 /// A unique identifier for a block type id,
 /// relative to all other blocks in the same version.
 ///
-/// This only guarantees uniqueness if both blocks are, for example,
-/// from [`V26_1`](froglight_common::prelude::V26_1).
-///
-/// Two blocks of the same type and different states,
+/// Two blocks of the same type but different states,
 /// like stair orientation, *will* equal each other.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]

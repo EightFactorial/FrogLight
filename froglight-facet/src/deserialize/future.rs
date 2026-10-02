@@ -1,9 +1,10 @@
 //! TODO
 
 use facet::{HeapValue, Partial};
+pub use froglight_facet_iter::deserialize::DeserializerFuture;
 use froglight_facet_iter::{
     Reader,
-    deserialize::{DeserializeError, Deserializer, DeserializerFuture},
+    deserialize::{DeserializeError, Deserializer},
 };
 
 use crate::deserialize::Deserialize;

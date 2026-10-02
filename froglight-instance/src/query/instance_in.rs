@@ -12,8 +12,9 @@ use bevy_ecs::{
 
 use crate::{instance::SessionInstance, relationship::PartOfInstance};
 
-/// [`QueryData`] for [`Entities`](Entity) with [`Components`] in the
-/// [`SessionInstance`] of the current entity.
+/// [`QueryData`] for [`Entities`](Entity) with
+/// [`Components`](bevy_ecs::component::Component) in the [`SessionInstance`] of
+/// the current entity.
 ///
 /// Note that this requires the inner query to be a read-only to prevent mutable
 /// aliasing.

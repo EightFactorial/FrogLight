@@ -82,7 +82,7 @@ const SCALE: f64 = 10_430.378_350_470_453;
 const WRAP: f64 = 16_384.0;
 const MASK: usize = 0xFFFF;
 
-/// Calculate the sine of an angle using the [`SIN`] table.
+/// Calculate the sine of an angle using the `SIN` table.
 #[must_use]
 pub fn sin(rad: f64) -> f32 {
     let x = rad * SCALE;
@@ -91,7 +91,7 @@ pub fn sin(rad: f64) -> f32 {
     SIN[index]
 }
 
-/// Calculate the cosine of an angle using the [`SIN`] table.
+/// Calculate the cosine of an angle using the `SIN` table.
 #[must_use]
 pub fn cos(rad: f64) -> f32 {
     let x = (rad * SCALE) + WRAP;
@@ -100,7 +100,7 @@ pub fn cos(rad: f64) -> f32 {
     SIN[index]
 }
 
-/// Calculate the sine and cosine of an angle using the [`SIN`] table.
+/// Calculate the sine and cosine of an angle using the `SIN` table.
 #[must_use]
 pub fn sin_cos(rad: f64) -> (f32, f32) {
     let x = rad * SCALE;

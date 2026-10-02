@@ -85,7 +85,7 @@ impl EntityStorage {
             .map(|(_, meta)| EntityBundle::new_from(meta))
     }
 
-    /// Get the [`Entity`] for a given [`Identifier`].
+    /// Get the [`EntityBundle`] for a given [`Identifier`].
     ///
     /// # Note
     ///

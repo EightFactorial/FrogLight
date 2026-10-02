@@ -1,3 +1,5 @@
+#[cfg(feature = "nightly")]
+use core::sync::SyncView;
 use core::{
     pin::Pin,
     task::{Context, Poll},
@@ -18,6 +20,9 @@ pub struct DeserializerFuture<
     const BORROW: bool,
     C: FnMut(Item<'facet, BORROW>) -> Result<Item<'facet, BORROW>, ReaderError>,
 > {
+    #[cfg(feature = "nightly")]
+    de: SyncView<Deserializer<'facet, 'core, BORROW, C>>,
+    #[cfg(not(feature = "nightly"))]
     de: Deserializer<'facet, 'core, BORROW, C>,
 }
 
@@ -31,12 +36,22 @@ impl<
     /// Create a new [`DeserializerFuture`] from a [`Deserializer`].
     #[inline]
     #[must_use]
-    pub const fn from_sync(de: Deserializer<'facet, 'core, BORROW, C>) -> Self { Self { de } }
+    pub const fn from_sync(de: Deserializer<'facet, 'core, BORROW, C>) -> Self {
+        cfg_select! {
+            feature = "nightly" => Self { de: SyncView::new(de) },
+            _ => Self { de },
+        }
+    }
 
     /// Convert this [`DeserializerFuture`] into a [`Deserializer`].
     #[inline]
     #[must_use]
-    pub fn into_sync(self) -> Deserializer<'facet, 'core, BORROW, C> { self.de }
+    pub fn into_sync(self) -> Deserializer<'facet, 'core, BORROW, C> {
+        cfg_select! {
+            feature = "nightly" => self.de.into_inner(),
+            _ => self.de,
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -50,7 +65,12 @@ impl<
     type Output = Result<Partial<'facet, BORROW>, DeserializeError>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        match Iterator::next(&mut self.de) {
+        let de = cfg_select! {
+            feature = "nightly" => self.de.as_mut(),
+            _ => &mut self.de,
+        };
+
+        match Iterator::next(de) {
             Some(Ok(())) => {
                 cx.waker().wake_by_ref();
                 Poll::Pending
@@ -58,8 +78,8 @@ impl<
             Some(Err(err)) => Poll::Ready(Err(err)),
 
             None => {
-                let starting_frame = self.de.starting_frame();
-                let mut partial = self.de.complete_mut()?;
+                let starting_frame = de.starting_frame();
+                let mut partial = de.complete_mut()?;
 
                 // Make sure the `Partial` is at the correct frame.
                 while partial.frame_count() > starting_frame {

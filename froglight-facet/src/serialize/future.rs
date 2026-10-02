@@ -3,9 +3,10 @@
 use alloc::vec::Vec;
 
 use facet::{Facet, Peek};
+pub use froglight_facet_iter::serialize::SerializerFuture;
 use froglight_facet_iter::{
     Writer,
-    serialize::{SerializeError, Serializer, SerializerFuture},
+    serialize::{SerializeError, Serializer},
 };
 
 use crate::serialize::Serialize;

@@ -18,7 +18,7 @@ use crate::{
 
 pub mod functions;
 
-/// A trait for types that can be deserialized from [`Snbt`].
+/// A trait for types that can be deserialized from `Snbt`.
 pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
     /// Deserialize a value from an SNBT string.
     ///
@@ -36,7 +36,7 @@ pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
             .map_or_else(|()| Err(DeserializeError), |snbt| Self::from_snbt(&snbt))
     }
 
-    /// Deserialize a value from an [`IndexedNbtSlice`].
+    /// Deserialize a value from an [`IndexedSnbtSlice`].
     ///
     /// # Errors
     ///
@@ -46,7 +46,7 @@ pub trait DeserializeSnbt<'facet>: Facet<'facet> + Sized {
         'facet: 'static,
         'static: 'facet;
 
-    /// Deserialize a value from an [`IndexedNbtSlice`].
+    /// Deserialize a value from an [`IndexedSnbtSlice`].
     ///
     /// Borrows from the input slice where possible.
     ///

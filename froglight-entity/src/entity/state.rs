@@ -1,10 +1,7 @@
 use crate::entity::EntityBundle;
 
-/// A unique identifier for an entity type,
-/// relative to all entity type in the same version.
-///
-/// This only guarantees uniqueness if both entity types are, for example,
-/// from [`V26_1`](froglight_common::prelude::V26_1).
+/// A unique identifier for an entity type, relative to all entity types in the
+/// same version.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 pub struct GlobalEntityId(u32);

@@ -143,13 +143,13 @@ impl Ident {
     #[must_use]
     pub const fn is_empty(&self) -> bool { false }
 
-    /// Get this string as an [`Identifier`].
+    /// Get this string as an [`Identifier`](crate::prelude::Identifier).
     #[inline]
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub const fn as_identifier(&self) -> crate::identifier::Identifier<'_> {
+    pub const fn as_identifier(&self) -> crate::prelude::Identifier<'_> {
         // SAFETY: `self` is guaranteed to be a valid identifier.
-        unsafe { crate::identifier::Identifier::new_unchecked(&self.0) }
+        unsafe { crate::prelude::Identifier::new_unchecked(&self.0) }
     }
 
     /// Get the inner string of the [`Ident`].
@@ -162,15 +162,15 @@ impl Ident {
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8] { self.0.as_bytes() }
 
-    /// Get the namespace of this [`Identifier`].
+    /// Get the namespace of this [`Ident`].
     #[must_use]
     pub fn namespace(&self) -> &str { self.namespace_and_path().0 }
 
-    /// Get the path of this [`Identifier`].
+    /// Get the path of this [`Ident`].
     #[must_use]
     pub fn path(&self) -> &str { self.namespace_and_path().1 }
 
-    /// Get the namespace and path of this [`Identifier`] as a tuple.
+    /// Get the namespace and path of this [`Ident`] as a tuple.
     #[must_use]
     #[expect(
         clippy::missing_panics_doc,

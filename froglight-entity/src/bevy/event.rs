@@ -3,7 +3,8 @@ use core::ops::{Deref, DerefMut};
 use bevy_ecs::prelude::*;
 use bevy_reflect::Reflect;
 
-/// An [`Event`] that is emitted when an [`EntityBundle`] is inserted onto an
+/// An [`Event`] that is emitted when an
+/// [`EntityBundle`](crate::entity::EntityBundle) is inserted onto an
 /// [`Entity`].
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EntityEvent, Reflect)]

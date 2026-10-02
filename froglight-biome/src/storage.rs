@@ -69,7 +69,7 @@ impl BiomeStorage {
         );
     }
 
-    /// Get the [`Biome`] for a given [`GlobalStateId`].
+    /// Get the [`Biome`] for a given [`GlobalBiomeId`].
     ///
     /// # Note
     ///

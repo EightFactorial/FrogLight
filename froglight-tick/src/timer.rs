@@ -6,10 +6,12 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::Reflect;
 use bevy_time::{Timer, TimerMode};
 
-/// The per-instance timer for the [`Tick`] schedule.
+/// The per-instance timer for the [`Tick`] schedules.
 ///
 /// If not ticking, disables the entity and all children
-/// recursively for the duration of the [`Tick`] schedule.
+/// recursively for the duration of the [`Tick`] schedules.
+///
+/// [`Tick`]: crate::schedule::TickSchedule
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Component, Reflect)]
 #[reflect(Debug, Clone, PartialEq, Component)]

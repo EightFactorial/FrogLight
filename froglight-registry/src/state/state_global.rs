@@ -1,10 +1,7 @@
 // use crate::registry::Registry;
 
-/// A unique identifier for a registry,
-/// relative to all other item in the same version.
-///
-/// This only guarantees uniqueness if both registries are, for example,
-/// from [`V26_1`](froglight_common::prelude::V26_1).
+/// A unique identifier for a registry, relative to all other items in the same
+/// version.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 pub struct GlobalRegistryId(u32);

@@ -7,10 +7,11 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-pub mod macros;
 #[doc(hidden)]
 pub mod operations;
 pub mod types;
+
+mod macros;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.

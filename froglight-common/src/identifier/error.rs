@@ -1,6 +1,7 @@
 use core::{error, fmt};
 
-/// An error that occurs when creating an [`Identifier`].
+/// An error that occurs when creating an
+/// [`Identifier`](crate::prelude::Identifier).
 #[derive(Debug, Clone, Copy)]
 pub enum IdentifierError {
     /// The string has no namespace separator (`:`).

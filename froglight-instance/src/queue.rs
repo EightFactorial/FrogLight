@@ -13,7 +13,7 @@ use froglight_world::prelude::*;
 
 use crate::prelude::*;
 
-/// A queue of [`BlockEdit`]s to be applied.
+/// A queue of block edits to be applied.
 #[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
 #[reflect(opaque, Debug, Default, Clone, PartialEq, Component)]
 pub struct BlockEditQueue {
@@ -34,7 +34,7 @@ impl Default for BlockEditQueue {
 }
 
 impl BlockEditQueue {
-    /// Create a new, empty [`BlockQueue`].
+    /// Create a new, empty [`BlockEditQueue`].
     #[inline]
     #[must_use]
     pub fn new() -> Self {

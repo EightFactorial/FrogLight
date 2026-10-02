@@ -86,7 +86,7 @@ impl SharedChunk {
     #[inline]
     pub fn store_arc(&mut self, chunk: Arc<Chunk>) { self.0 = chunk; }
 
-    /// Return the inner [`AtomicArc<Chunk>`].
+    /// Return the inner [`Arc<Chunk>`].
     #[inline]
     #[must_use]
     pub fn into_inner(self) -> Arc<Chunk> { self.0 }

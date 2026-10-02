@@ -23,17 +23,17 @@ impl<V: EntityVersion> DataSetSerializer<V> {
         Self { dataset, _phantom: PhantomData }
     }
 
-    /// Get a reference to the inner [`EntityBundle`].
+    /// Get a reference to the inner [`EntityDataSet`].
     #[inline]
     #[must_use]
     pub const fn dataset(&self) -> &EntityDataSet<'static> { &self.dataset }
 
-    /// Get a mutable reference to the inner [`EntityBundle`].
+    /// Get a mutable reference to the inner [`EntityDataSet`].
     #[inline]
     #[must_use]
     pub const fn dataset_mut(&mut self) -> &mut EntityDataSet<'static> { &mut self.dataset }
 
-    /// Return the inner [`EntityBundle`].
+    /// Return the inner [`EntityDataSet`].
     #[inline]
     #[must_use]
     pub fn into_inner(self) -> EntityDataSet<'static> { self.dataset }

@@ -22,7 +22,7 @@ pub struct BlockAttributes {
 }
 
 impl BlockAttributes {
-    /// Create a new [`BlockAttribute`] for a given [`BlockType`].
+    /// Create a new [`BlockAttributes`] for a given [`BlockType`].
     #[must_use]
     #[expect(clippy::missing_panics_doc, reason = "This should never panic")]
     pub const fn new<B: BlockType<V>, V: BlockVersion>() -> Self {

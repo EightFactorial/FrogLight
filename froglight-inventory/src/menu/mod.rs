@@ -13,7 +13,7 @@ pub use global::GlobalInventory;
 
 use crate::storage::InventoryStorage;
 
-/// Generic [`MenuGroupType`] data.
+/// Generic [`MenuGroup`] data.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, opaque))]

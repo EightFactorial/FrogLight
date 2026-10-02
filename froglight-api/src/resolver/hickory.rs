@@ -38,8 +38,8 @@ impl Default for Resolver {
 impl Resolver {
     /// Creates a new [`Resolver`] using the default configuration.
     ///
-    /// Uses Cloudflare's public DNS servers, see [`HickoryConfig::cloudflare`]
-    /// for more details.
+    /// Uses Cloudflare's public DNS servers, see [`CLOUDFLARE`] for more
+    /// details.
     ///
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
@@ -52,8 +52,7 @@ impl Resolver {
 
     /// Creates a new [`Resolver`].
     ///
-    /// Uses Google's public DNS servers, see [`HickoryConfig::google`]
-    /// for more details.
+    /// Uses Google's public DNS servers, see [`GOOGLE`] for more details.
     ///
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
@@ -66,8 +65,7 @@ impl Resolver {
 
     /// Creates a new [`Resolver`].
     ///
-    /// Uses Quad9's public DNS servers, see [`HickoryConfig::quad9`]
-    /// for more details.
+    /// Uses Quad9's public DNS servers, see [`QUAD9`] for more details.
     ///
     /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
@@ -132,7 +130,7 @@ impl DerefMut for Resolver {
 
 // -------------------------------------------------------------------------------------------------
 
-/// An [`Executor`], [`Spawn`], and [`RuntimeProvider`] for DNS operations.
+/// A [`DnsExecutor`], [`Spawn`], and [`RuntimeProvider`] for DNS operations.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DnsExecutor;
 
