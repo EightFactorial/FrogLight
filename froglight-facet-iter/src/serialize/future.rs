@@ -56,15 +56,10 @@ impl<'mem, 'facet, C: FnMut(Item<'mem, 'facet>) -> Result<(), WriterError>> Futu
     type Output = Result<(), SerializeError>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        cfg_select! {
-            feature = "nightly" => {
-                let mut pinned = self.as_mut();
-                let ser = pinned.ser.as_mut();
-            }
-            _ => {
-                let ser = &mut self.ser;
-            }
-        }
+        let ser = cfg_select! {
+            feature = "nightly" => self.ser.as_mut(),
+            _ => &mut self.ser,
+        };
 
         match Iterator::next(ser) {
             Some(Ok(())) => {

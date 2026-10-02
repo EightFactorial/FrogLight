@@ -159,7 +159,7 @@ impl BotPlugin {
         let login = LoginHelloContent::from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
-        let mut entity = world.spawn((api, profile, connection, TickTimer::default_20tps()));
+        let mut entity = world.spawn((api, profile, connection, TickTimer::default()));
         entity.observe(BotPlugin::exit_on_despawn);
 
         // Send the handshake and login events.

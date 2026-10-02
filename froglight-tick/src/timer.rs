@@ -11,6 +11,8 @@ use bevy_time::{Timer, TimerMode};
 /// If not ticking, disables the entity and all children
 /// recursively for the duration of the [`Tick`] schedules.
 ///
+/// By default, runs once every 50 milliseconds (20 TPS).
+///
 /// [`Tick`]: crate::schedule::TickSchedule
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Component, Reflect)]
@@ -19,13 +21,12 @@ pub struct TickTimer {
     timer: Timer,
 }
 
-impl TickTimer {
-    /// Create the default [`TickTimer`] with a duration of 50 milliseconds,
-    /// or 20 ticks per second (TPS).
+impl Default for TickTimer {
     #[inline]
-    #[must_use]
-    pub fn default_20tps() -> Self { Self::new_millis(50) }
+    fn default() -> Self { Self::new_millis(50) }
+}
 
+impl TickTimer {
     /// Create the default [`TickTimer`] with a duration in milliseconds.
     #[must_use]
     pub fn new_millis(millis: u64) -> Self {
