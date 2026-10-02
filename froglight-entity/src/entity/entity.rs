@@ -1,6 +1,6 @@
 #[cfg(feature = "bevy")]
 use alloc::{borrow::Cow, boxed::Box};
-use core::any::TypeId;
+use core::{any::TypeId, fmt};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{
@@ -24,7 +24,7 @@ use crate::{
 };
 
 /// A bundle of data and metadata for an entity.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_discard = Self::discard_hook))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq, Component))]
@@ -191,6 +191,30 @@ impl EntityBundle {
                 }
             });
         });
+    }
+}
+
+impl PartialEq for EntityBundle {
+    fn eq(&self, other: &Self) -> bool {
+        self.entity_ty() == other.entity_ty()
+            && self.version_ty() == other.version_ty()
+            && self.dataset == other.dataset
+    }
+}
+
+impl fmt::Display for EntityBundle {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self.identifier(), f)
+    }
+}
+
+impl fmt::Debug for EntityBundle {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("EntityBundle")
+            .field(&self.identifier())
+            .field(&self.global_id().into_inner())
+            .finish_non_exhaustive()
     }
 }
 

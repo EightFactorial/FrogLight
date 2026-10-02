@@ -15,6 +15,7 @@ use crate::{
 };
 
 /// A [`Plugin`] that ...
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InstancePlugin;
 
 impl Plugin for InstancePlugin {

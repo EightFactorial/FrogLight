@@ -9,7 +9,7 @@ pub type Nbt = ();
 
 /// Data about an [`Item`](crate::item::Item).
 #[repr(transparent)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ComponentData {
     raw: Nbt,
 }

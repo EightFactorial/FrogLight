@@ -139,7 +139,9 @@ impl BotPlugin {
             Ok(stream) => stream,
             Err(err) => {
                 error!("Failed to connect to server: {err}");
-                world.write_message(AppExit::error());
+                let code = err.raw_os_error().unwrap_or(1);
+                let code = u8::try_from(code).unwrap_or(1);
+                world.write_message(AppExit::from_code(code));
                 return;
             }
         };

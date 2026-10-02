@@ -1,8 +1,4 @@
-use core::{
-    any::TypeId,
-    cmp::Ordering,
-    fmt::{self, Debug, Display},
-};
+use core::{any::TypeId, fmt};
 
 use froglight_common::prelude::*;
 
@@ -107,31 +103,25 @@ impl Item {
     pub const fn version_ty(&self) -> TypeId { self.reference.version_ty() }
 }
 
-impl Eq for Item {}
 impl PartialEq for Item {
-    fn eq(&self, other: &Self) -> bool { self.reference.global_id() == other.reference.global_id() }
-}
-
-impl PartialOrd for Item {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.version_ty() == other.version_ty() {
-            Some(self.reference.global_id().cmp(&other.reference.global_id()))
-        } else {
-            None
-        }
+    fn eq(&self, other: &Self) -> bool {
+        self.item_ty() == other.item_ty()
+            && self.version_ty() == other.version_ty()
+            && self.data == other.data
     }
 }
 
-impl Display for Item {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(&self.identifier(), f) }
+impl fmt::Display for Item {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.identifier(), f)
+    }
 }
 
-impl Debug for Item {
+impl fmt::Debug for Item {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Item")
             .field(&self.identifier())
             .field(&self.global_id().into_inner())
-            .field(self)
             .finish_non_exhaustive()
     }
 }

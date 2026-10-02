@@ -1,6 +1,6 @@
 //! TODO
 
-use core::{any::TypeId, cmp::Ordering, fmt};
+use core::{any::TypeId, cmp::Ordering, fmt, hash};
 
 use froglight_common::prelude::*;
 use froglight_registry_template::implement_wrapper;
@@ -252,18 +252,26 @@ impl Eq for Block {}
 impl PartialEq for Block {
     fn eq(&self, other: &Self) -> bool {
         self.state == other.state
-            && self.metadata.block_ty() == other.metadata.block_ty()
-            && self.metadata.version_ty() == other.metadata.version_ty()
+            && self.block_ty() == other.block_ty()
+            && self.version_ty() == other.version_ty()
     }
 }
 
 impl PartialOrd for Block {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.metadata.version_ty() == other.metadata.version_ty() {
+        if self.version_ty() == other.version_ty() {
             self.global_id().partial_cmp(&other.global_id())
         } else {
             None
         }
+    }
+}
+
+impl hash::Hash for Block {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.state.hash(state);
+        self.block_ty().hash(state);
+        self.version_ty().hash(state);
     }
 }
 

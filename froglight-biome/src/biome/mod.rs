@@ -4,6 +4,7 @@ use core::{
     any::TypeId,
     cmp::Ordering,
     fmt::{self, Debug, Display},
+    hash,
 };
 
 use froglight_common::prelude::*;
@@ -156,16 +157,25 @@ froglight_registry_template::implement_wrapper! {
 
 impl Eq for Biome {}
 impl PartialEq for Biome {
-    fn eq(&self, other: &Self) -> bool { self.metadata.global_id() == other.metadata.global_id() }
+    fn eq(&self, other: &Self) -> bool {
+        self.biome_ty() == other.biome_ty() && self.version_ty() == other.version_ty()
+    }
 }
 
 impl PartialOrd for Biome {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self.version_ty() == other.version_ty() {
-            Some(self.metadata.global_id().cmp(&other.metadata.global_id()))
+            self.global_id().partial_cmp(&other.global_id())
         } else {
             None
         }
+    }
+}
+
+impl hash::Hash for Biome {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        self.biome_ty().hash(state);
+        self.version_ty().hash(state);
     }
 }
 

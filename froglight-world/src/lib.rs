@@ -8,6 +8,7 @@ extern crate std;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
 pub mod chunk;
 pub mod component;
 pub mod naive;
