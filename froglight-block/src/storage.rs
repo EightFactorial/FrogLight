@@ -2,11 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_common::{
-    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
-    prelude::*,
-    types::IndexMap,
-};
+use froglight_common::{crates::indexmap::map::Entry, prelude::*, types::IndexMap};
 
 use crate::{
     block::{Block, BlockMetadata},
@@ -35,7 +31,7 @@ impl BlockStorage {
     /// Panics in `debug` builds if the provided [`BlockMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: BlockVersion>(metadata: &'static [&'static BlockMetadata]) -> Self {
-        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, RandomState::default());
+        let mut identifiers = IndexMap::with_capacity_and_hasher(1024, <_>::default());
 
         for (_index, meta) in metadata.iter().enumerate() {
             #[cfg(debug_assertions)]
@@ -92,7 +88,7 @@ impl BlockStorage {
     /// This is typically used by the world.
     #[must_use]
     pub fn get_block_by_state(&self, id: GlobalStateId) -> Option<Block> {
-        let metadata = self.metadata.get(id.into_inner() as usize)?;
+        let metadata = self.metadata.get(id.into_usize())?;
         let state = id.into_inner().saturating_sub(metadata.global_id_base().into_inner());
         let state = u16::try_from(state).ok()?;
 

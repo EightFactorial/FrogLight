@@ -2,11 +2,7 @@
 
 use core::any::TypeId;
 
-use froglight_common::{
-    crates::{foldhash::fast::RandomState, indexmap::map::Entry},
-    prelude::*,
-    types::IndexMap,
-};
+use froglight_common::{crates::indexmap::map::Entry, prelude::*, types::IndexMap};
 
 use crate::{
     entity::{EntityBundle, EntityMetadata, GlobalEntityId},
@@ -33,8 +29,7 @@ impl EntityStorage {
     /// Panics in `debug` builds if the provided [`EntityMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: EntityVersion>(metadata: &[&'static EntityMetadata]) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+        let mut identifiers = IndexMap::with_capacity_and_hasher(metadata.len(), <_>::default());
 
         for (_index, meta) in metadata.iter().enumerate() {
             #[cfg(debug_assertions)]

@@ -53,4 +53,5 @@ once_cell = ["dep:once_cell"]
 # Enable support for the standard library
 std = ["facet/std", "facet-path/std", "facet-solver/std", "once_cell?/std", "replace_with/std", "tracing?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly", "hashbrown/nightly", "parking_lot/nightly", "replace_with/nightly", "smallvec/specialization"]
+nightly = ["foldhash/nightly", "hashbrown/nightly", "parking_lot/nightly", "smallvec/specialization"]
+### TODO: Restore "replace_with/nightly"

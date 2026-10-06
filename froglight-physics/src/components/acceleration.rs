@@ -26,6 +26,22 @@ use froglight_common::crates::serde::{Deserialize, Serialize};
 pub struct Acceleration(Vec3A);
 
 impl Acceleration {
+    /// All f32::MAX.
+    pub const MAX: Self = Self(Vec3A::MAX);
+    /// All f32::MIN.
+    pub const MIN: Self = Self(Vec3A::MIN);
+    /// A unit vector pointing along the negative X axis.
+    pub const NEG_X: Self = Self(Vec3A::NEG_X);
+    /// A unit vector pointing along the negative Y axis.
+    pub const NEG_Y: Self = Self(Vec3A::NEG_Y);
+    /// A unit vector pointing along the negative Z axis.
+    pub const NEG_Z: Self = Self(Vec3A::NEG_Z);
+    /// A unit vector pointing along the positive X axis.
+    pub const X: Self = Self(Vec3A::X);
+    /// A unit vector pointing along the positive Y axis.
+    pub const Y: Self = Self(Vec3A::Y);
+    /// A unit vector pointing along the positive Z axis.
+    pub const Z: Self = Self(Vec3A::Z);
     /// All zeros.
     pub const ZERO: Self = Self(Vec3A::ZERO);
 

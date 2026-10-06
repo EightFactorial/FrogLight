@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 use core::any::TypeId;
 
-use froglight_common::{crates::foldhash::fast::RandomState, prelude::*, types::IndexMap};
+use froglight_common::{prelude::*, types::IndexMap};
 use froglight_nbt::prelude::IndexedNbtCow;
 
 use crate::{
@@ -101,8 +101,8 @@ impl RegistryStorage {
         tags: Vec<(Identifier<'static>, Vec<(Identifier<'static>, Vec<u32>)>)>,
         nbt: Vec<(Identifier<'static>, Vec<(Identifier<'static>, IndexedNbtCow<'static>)>)>,
     ) -> Self {
-        let mut tag_data = IndexMap::with_capacity_and_hasher(tags.len(), RandomState::default());
-        let mut nbt_data = IndexMap::with_capacity_and_hasher(nbt.len(), RandomState::default());
+        let mut tag_data = IndexMap::with_capacity_and_hasher(tags.len(), <_>::default());
+        let mut nbt_data = IndexMap::with_capacity_and_hasher(nbt.len(), <_>::default());
 
         for (key, values) in tags {
             tag_data.entry(key).insert_entry(values.into_iter().collect());

@@ -25,8 +25,9 @@ rand = { workspace = true }
 simd_cesu8 = { features = ["default"], version = "1.1" }
 
 [dependencies]
-simdutf8 = { workspace = true }
 fearless_simd = { workspace = true }
+fearless_simd_macros = { workspace = true }
+simdutf8 = { workspace = true }
 
 # Optional dependencies
 facet = { workspace = true, optional = true }

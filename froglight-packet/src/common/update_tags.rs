@@ -3,11 +3,9 @@
 use alloc::vec::Vec;
 use core::ops::{Deref, DerefMut};
 
-use foldhash::fast::RandomState;
-use froglight_common::prelude::Identifier;
+use froglight_common::{prelude::Identifier, types::IndexMap};
 #[cfg(feature = "facet")]
 use froglight_facet as mc;
-use indexmap::IndexMap;
 
 /// A map of registry identifiers to their tags and values.
 #[repr(transparent)]
@@ -15,7 +13,7 @@ use indexmap::IndexMap;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct TagMap(pub IndexMap<Identifier<'static>, Vec<TagValue>, RandomState>);
+pub struct TagMap(pub IndexMap<Identifier<'static>, Vec<TagValue>>);
 
 /// A registry tag and it's values.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,17 +30,15 @@ pub struct TagValue {
 
 // -------------------------------------------------------------------------------------------------
 
-impl AsRef<IndexMap<Identifier<'static>, Vec<TagValue>, RandomState>> for TagMap {
-    fn as_ref(&self) -> &IndexMap<Identifier<'static>, Vec<TagValue>, RandomState> { &self.0 }
+impl AsRef<IndexMap<Identifier<'static>, Vec<TagValue>>> for TagMap {
+    fn as_ref(&self) -> &IndexMap<Identifier<'static>, Vec<TagValue>> { &self.0 }
 }
-impl AsMut<IndexMap<Identifier<'static>, Vec<TagValue>, RandomState>> for TagMap {
-    fn as_mut(&mut self) -> &mut IndexMap<Identifier<'static>, Vec<TagValue>, RandomState> {
-        &mut self.0
-    }
+impl AsMut<IndexMap<Identifier<'static>, Vec<TagValue>>> for TagMap {
+    fn as_mut(&mut self) -> &mut IndexMap<Identifier<'static>, Vec<TagValue>> { &mut self.0 }
 }
 
 impl Deref for TagMap {
-    type Target = IndexMap<Identifier<'static>, Vec<TagValue>, RandomState>;
+    type Target = IndexMap<Identifier<'static>, Vec<TagValue>>;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }

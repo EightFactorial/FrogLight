@@ -45,6 +45,50 @@
 //!  - MString::to_utf8_simd : 9.714378ms
 //!  - simd_cesu8::mutf8::decode : 11.628525ms
 //!  - cesu8::from_java_cesu8 : 11.165155ms
+//!
+//! Apple M4 Max with `nightly`:
+//!
+//! Encode UTF8:
+//!  - MString::from_utf8_simd : 307.983541ms
+//!  - simd_cesu8::mutf8::encode : 322.167375ms
+//!  - cesu8::to_java_cesu8 : 580.57225ms
+//!
+//! Encode ASCII:
+//!  - MString::from_utf8_simd : 9.203208ms
+//!  - simd_cesu8::mutf8::encode : 11.573166ms
+//!  - cesu8::to_java_cesu8 : 45.586208ms
+//!
+//! Decode UTF8:
+//!  - MString::to_utf8_simd : 483.25ms
+//!  - simd_cesu8::mutf8::decode : 371.476792ms
+//!  - cesu8::from_java_cesu8 : 373.597375ms
+//!
+//! Decode ASCII:
+//!  - MString::to_utf8_simd : 8.31425ms
+//!  - simd_cesu8::mutf8::decode : 9.282667ms
+//!  - cesu8::from_java_cesu8 : 9.121334ms
+//!
+//! Apple M4 Max without `nightly`:
+//!
+//! Encode UTF8:
+//!  - MString::from_utf8_simd : 322.964875ms
+//!  - simd_cesu8::mutf8::encode : 324.592ms
+//!  - cesu8::to_java_cesu8 : 577.494958ms
+//!
+//! Encode ASCII:
+//!  - MString::from_utf8_simd : 9.787125ms
+//!  - simd_cesu8::mutf8::encode : 12.688041ms
+//!  - cesu8::to_java_cesu8 : 44.02225ms
+//!
+//! Decode UTF8:
+//!  - MString::to_utf8_simd : 488.70725ms
+//!  - simd_cesu8::mutf8::decode : 372.784417ms
+//!  - cesu8::from_java_cesu8 : 388.719666ms
+//!
+//! Decode ASCII:
+//!  - MString::to_utf8_simd : 8.469ms
+//!  - simd_cesu8::mutf8::decode : 9.462917ms
+//!  - cesu8::from_java_cesu8 : 8.80875ms
 
 use core::hint::black_box;
 use std::time::Instant;

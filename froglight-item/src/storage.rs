@@ -2,9 +2,7 @@
 
 use core::any::TypeId;
 
-use foldhash::fast::RandomState;
-use froglight_common::prelude::*;
-use indexmap::{IndexMap, map::Entry};
+use froglight_common::{crates::indexmap::map::Entry, prelude::*, types::IndexMap};
 
 use crate::{
     item::{Item, ItemMetadata},
@@ -16,7 +14,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct ItemStorage {
     version: TypeId,
-    metadata: IndexMap<&'static Ident, &'static ItemMetadata, RandomState>,
+    metadata: IndexMap<&'static Ident, &'static ItemMetadata>,
 }
 
 impl ItemStorage {
@@ -32,8 +30,7 @@ impl ItemStorage {
     /// Panics in `debug` builds if the provided [`ItemMetadata`] is invalid.
     #[must_use]
     pub unsafe fn build<V: ItemVersion>(metadata: &[&'static ItemMetadata]) -> Self {
-        let mut identifiers =
-            IndexMap::with_capacity_and_hasher(metadata.len(), RandomState::default());
+        let mut identifiers = IndexMap::with_capacity_and_hasher(metadata.len(), <_>::default());
 
         for (_index, meta) in metadata.iter().enumerate() {
             #[cfg(debug_assertions)]
@@ -100,7 +97,7 @@ impl ItemStorage {
     /// Get the [`IndexMap`] metadata of this [`ItemStorage`].
     #[inline]
     #[must_use]
-    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static ItemMetadata, RandomState> {
+    pub const fn metadata(&self) -> &IndexMap<&'static Ident, &'static ItemMetadata> {
         &self.metadata
     }
 }

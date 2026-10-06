@@ -1,10 +1,7 @@
+#![doc = include_str!("../README.md")]
+#![allow(unused_features, reason = "`core_float_math` used if `no_std`")]
 #![cfg_attr(feature = "nightly", feature(core_float_math))]
 #![cfg_attr(feature = "nightly", feature(portable_simd))]
-#![cfg_attr(
-    feature = "nightly",
-    allow(unused_features, reason = "`core_float_math` used if `no_std`")
-)]
-#![doc = include_str!("../README.md")]
 #![no_std]
 
 #[cfg(feature = "alloc")]

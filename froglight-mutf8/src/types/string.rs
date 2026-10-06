@@ -137,10 +137,10 @@ impl MString {
     #[must_use]
     #[doc(hidden)]
     pub fn from_utf8_simd<S: Simd>(simd: S, str: &str) -> Cow<'_, MStr> {
-        match MStr::from_utf8_simd(simd, str) {
-            // SAFETY: `Ok` means the input was valid MUTF-8.
-            Ok(..) => Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) }),
-            Err(..) => Cow::Owned(operations::utf8_to_mutf8(simd, str)),
+        if operations::contains_null_or_4_byte_header::<S>(simd, str.as_bytes()) {
+            Cow::Owned(operations::utf8_to_mutf8(simd, str))
+        } else {
+            Cow::Borrowed(unsafe { MStr::from_mutf8_unchecked(str.as_bytes()) })
         }
     }
 
@@ -171,10 +171,11 @@ impl MString {
     #[must_use]
     #[doc(hidden)]
     pub fn from_utf8_owned_simd<S: Simd>(simd: S, s: String) -> Self {
-        match MStr::from_utf8_simd(simd, &s) {
-            // SAFETY: `Ok` means the input was valid MUTF-8.
-            Ok(..) => unsafe { Self::from_mutf8_unchecked(s.into_bytes()) },
-            Err(..) => operations::utf8_to_mutf8(simd, s.as_str()),
+        if operations::contains_null_or_4_byte_header::<S>(simd, s.as_bytes()) {
+            operations::utf8_to_mutf8(simd, s.as_str())
+        } else {
+            // SAFETY: `false` means the input was valid MUTF-8.
+            unsafe { Self::from_mutf8_unchecked(s.into_bytes()) }
         }
     }
 
@@ -189,9 +190,10 @@ impl MString {
     #[must_use]
     #[doc(hidden)]
     pub fn to_utf8_simd<S: Simd>(simd: S, str: &Self) -> Cow<'_, str> {
-        match str.as_mstr().as_utf8() {
-            Ok(str) => Cow::Borrowed(str),
-            Err(..) => Cow::Owned(operations::mutf8_to_utf8(simd, str.as_mstr())),
+        if let Ok(str) = simdutf8::basic::from_utf8(str.as_bytes()) {
+            Cow::Borrowed(str)
+        } else {
+            Cow::Owned(operations::mutf8_to_utf8(simd, str.as_mstr()))
         }
     }
 
@@ -218,10 +220,11 @@ impl MString {
     #[must_use]
     #[doc(hidden)]
     pub fn into_utf8_simd<S: Simd>(simd: S, str: Self) -> String {
-        match str.as_mstr().as_utf8() {
-            // SAFETY: `Ok` means the input was valid UTF-8.
-            Ok(..) => unsafe { String::from_utf8_unchecked(str.0) },
-            Err(..) => operations::mutf8_to_utf8(simd, str.as_mstr()),
+        if simdutf8::basic::from_utf8(str.as_bytes()).is_ok() {
+            // SAFETY: `true` means the input was valid UTF-8.
+            unsafe { String::from_utf8_unchecked(str.0) }
+        } else {
+            operations::mutf8_to_utf8(simd, str.as_mstr())
         }
     }
 

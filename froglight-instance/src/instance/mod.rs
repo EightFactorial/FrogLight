@@ -12,7 +12,7 @@ use bevy_ecs::{
 use bevy_reflect::Reflect;
 use froglight_biome::{storage::BiomeStorage, version::BiomeVersion};
 use froglight_block::{storage::BlockStorage, version::BlockVersion};
-use froglight_common::{crates::foldhash::fast::RandomState, prelude::Identifier, types::HashMap};
+use froglight_common::{prelude::Identifier, types::HashMap};
 use froglight_entity::{
     prelude::{EntityId, EntityUuid},
     storage::EntityStorage,
@@ -70,9 +70,9 @@ impl SessionInstance {
             v_items: V::items(),
 
             entity: EntityHashSet::new(),
-            entity_id: HashMap::with_hasher(RandomState::default()),
-            entity_uuid: HashMap::with_hasher(RandomState::default()),
-            chunk_pos: HashMap::with_hasher(RandomState::default()),
+            entity_id: HashMap::default(),
+            entity_uuid: HashMap::default(),
+            chunk_pos: HashMap::default(),
         }
     }
 

@@ -8,7 +8,7 @@ use bevy_ecs::{
 };
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use froglight_block::prelude::*;
-use froglight_common::{crates::foldhash::fast::RandomState, types::HashMap};
+use froglight_common::types::HashMap;
 use froglight_world::prelude::*;
 
 use crate::prelude::*;
@@ -37,9 +37,7 @@ impl BlockEditQueue {
     /// Create a new, empty [`BlockEditQueue`].
     #[inline]
     #[must_use]
-    pub fn new() -> Self {
-        Self { queue: HashMap::with_hasher(RandomState::default()), is_empty: true }
-    }
+    pub fn new() -> Self { Self { queue: HashMap::default(), is_empty: true } }
 
     /// Returns `true` if the queue is empty.
     #[inline]

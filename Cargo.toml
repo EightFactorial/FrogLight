@@ -30,18 +30,18 @@ froglight-tick = { default-features = false, path = "froglight-tick", version = 
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
-bevy = { default-features = false, version = "0.20.0-rc.1" }
-bevy_app = { default-features = false, version = "0.20.0-rc.1" }
-bevy_diagnostic = { default-features = false, version = "0.20.0-rc.1" }
-bevy_ecs = { default-features = false, version = "0.20.0-rc.1" }
-# bevy_math = { default-features = false, version = "0.20.0-rc.1" }
-bevy_reflect = { default-features = false, version = "0.20.0-rc.1" }
-bevy_sprite = { default-features = false, version = "0.20.0-rc.1" }
-bevy_tasks = { default-features = false, version = "0.20.0-rc.1" }
-bevy_time = { default-features = false, version = "0.20.0-rc.1" }
-bevy_transform = { default-features = false, version = "0.20.0-rc.1" }
-bevy_ui = { default-features = false, version = "0.20.0-rc.1" }
-# bevy_utils = { default-features = false, version = "0.20.0-rc.1" }
+bevy = { default-features = false, version = "0.20.0-rc.2" }
+bevy_app = { default-features = false, version = "0.20.0-rc.2" }
+bevy_diagnostic = { default-features = false, version = "0.20.0-rc.2" }
+bevy_ecs = { default-features = false, version = "0.20.0-rc.2" }
+# bevy_math = { default-features = false, version = "0.20.0-rc.2" }
+bevy_reflect = { default-features = false, version = "0.20.0-rc.2" }
+bevy_sprite = { default-features = false, version = "0.20.0-rc.2" }
+bevy_tasks = { default-features = false, version = "0.20.0-rc.2" }
+bevy_time = { default-features = false, version = "0.20.0-rc.2" }
+bevy_transform = { default-features = false, version = "0.20.0-rc.2" }
+bevy_ui = { default-features = false, version = "0.20.0-rc.2" }
+# bevy_utils = { default-features = false, version = "0.20.0-rc.2" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "=0.50.0-rc.7" }
@@ -54,7 +54,7 @@ facet-value = { default-features = false, version = "=0.50.0-rc.7" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.3" }
-base64 = { default-features = false, version = "0.23.0" }
+base64 = { default-features = false, version = "0.23.1" }
 cfb8 = { default-features = false, version = "0.9.1" }
 cipher = { default-features = false, version = "0.5.2" }
 # crc32c = { default-features = false, version = "0.6.8" }
@@ -80,6 +80,7 @@ blocking = { default-features = false, version = "1.6" }
 critical-section = { default-features = false, version = "1.2.0" }
 downcast-rs = { default-features = false, version = "2.0" }
 fearless_simd = { default-features = false, version = "1.0" }
+fearless_simd_macros = { default-features = false, version = "0.1" }
 futures-lite = { default-features = false, version = "^2.0" }
 glam = { default-features = false, version = "0.33" }
 hashbrown = { default-features = false, version = "0.17" }
@@ -102,7 +103,7 @@ socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "^1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.3" }
-uuid = { default-features = false, version = "1.26" }
+uuid = { default-features = false, version = "1.27" }
 variadics_please = { default-features = false, version = "2.0" }
 yansi = { default-features = false, version = "1.0" }
 

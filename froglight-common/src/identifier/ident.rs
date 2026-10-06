@@ -254,6 +254,15 @@ impl<'a> TryFrom<&'a [u8]> for &'a Ident {
 
 // -------------------------------------------------------------------------------------------------
 
+impl fmt::Display for Ident {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(self.as_str(), f) }
+}
+impl fmt::Debug for Ident {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(self.as_str(), f) }
+}
+
 impl AsRef<str> for Ident {
     #[inline]
     fn as_ref(&self) -> &str { self.as_str() }
@@ -302,15 +311,6 @@ impl PartialEq<alloc::string::String> for Ident {
 impl PartialEq<Ident> for alloc::string::String {
     #[inline]
     fn eq(&self, other: &Ident) -> bool { self == other.as_str() }
-}
-
-impl fmt::Display for Ident {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(self.as_str(), f) }
-}
-impl fmt::Debug for Ident {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Debug::fmt(self.as_str(), f) }
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ use facet_format::{DeserializeErrorKind, ParseError, SerializeError};
 use facet_json::{DeserializeError, JsonSerializeError};
 #[cfg(feature = "serde")]
 use froglight_common::crates::serde::{Deserialize, Serialize};
-use froglight_common::{crates::foldhash::fast::RandomState, types::IndexMap};
+use froglight_common::types::IndexMap;
 
 /// A set of [`ProfileProperty`]s associated with a
 /// [`PlayerProfile`](super::PlayerProfile).
@@ -52,7 +52,7 @@ impl ProfilePropertySet {
     ///
     /// Does not allocate.
     #[must_use]
-    pub fn new() -> Self { Self::new_from(IndexMap::with_hasher(RandomState::default())) }
+    pub fn new() -> Self { Self::new_from(IndexMap::default()) }
 
     /// Creates a new [`ProfilePropertySet`] from the given [`IndexMap`].
     #[inline]
@@ -62,7 +62,7 @@ impl ProfilePropertySet {
     /// Creates a new [`ProfilePropertySet`] with the given capacity.
     #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
-        Self::new_from(IndexMap::with_capacity_and_hasher(capacity, RandomState::default()))
+        Self::new_from(IndexMap::with_capacity_and_hasher(capacity, <_>::default()))
     }
 
     /// Returns `true` if the set contains no properties.
