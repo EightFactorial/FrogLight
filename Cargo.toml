@@ -82,7 +82,7 @@ downcast-rs = { default-features = false, version = "2.0" }
 fearless_simd = { default-features = false, version = "1.0" }
 fearless_simd_macros = { default-features = false, version = "0.1" }
 futures-lite = { default-features = false, version = "^2.0" }
-glam = { default-features = false, version = "0.33" }
+glam = { default-features = false, version = "0.34" }
 hashbrown = { default-features = false, version = "0.17" }
 hickory-resolver = { default-features = false, version = "0.26" }
 indexmap = { default-features = false, version = "2.14" }
