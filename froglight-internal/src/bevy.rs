@@ -36,8 +36,6 @@ bevy_app::plugin_group! {
         :InventoryPlugin,
         :PhysicsPlugin,
         :TickPlugin,
-        #[cfg(feature = "std")]
-        :TickMeasurementPlugin,
         :WorldPlugin
     }
     /// B
